@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- KPIカード -->
+<div class="dashboard-grid">
+    {% for key, kpi in kpis.items() %}
+    <div class="kpi-card">
+        <div class="kpi-value">{{ kpi.value }}{% if key == 'investor_satisfaction' or key == 'faq_accuracy' %}%{% endif %}</div>
+        <div class="kpi-label">{{ kpi.label }}</div>
+        <div class="kpi-trend {% if kpi.trend.startswith('+') %}trend-positive{% else %}trend-negative{% endif %}">
+            <span>{{ kpi.trend }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- メインコンテンツエリア -->
+<div class="flex gap-lg" style="flex-wrap: wrap;">
+    <!-- 最近のアクティビティ -->
+    <div class="activity-feed" style="flex: 2; min-width: 300px;">
+        <div class="activity-header">
+            <h2 class="activity-title">最近のアクティビティ</h2>
+            <button class="btn btn-sm btn-secondary">すべて表示</button>
+        </div>
+        
+        <div class="activity-list">
+            {% for activity in recent_activities %}
+            <div class="activity-item">
+                <div class="activity-icon">
+                    {{ activity.icon }}
+                </div>
+                <div class="activity-content">
+                    <div class="activity-type">{{ activity.type }}</div>
+                    <div class="activity-description">{{ activity.content }}</div>
+                    <div class="activity-time">{{ activity.time }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- クイックアクション -->
+    <div class="card" style="flex: 1; min-width: 250px;">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">クイックアクション</h3>
+        </div>
+        <div class="card-body">
+            <div class="flex flex-col gap-md">
+                <button class="btn btn-primary" onclick="showNewFAQModal()">
+                    <span>➕</span> 新規FAQ作成
+                </button>
+                <button class="btn btn-secondary" onclick="location.href='/upload'">
+                    <span>📤</span> ファイルアップロード
+                </button>
+                <button class="btn btn-secondary" onclick="location.href='/investors'">
+                    <span>👥</span> 投資家追加
+                </button>
+                <button class="btn btn-secondary" onclick="generateReport()">
+                    <span>📊</span> レポート生成
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- システムステータス -->
+<div class="card mt-lg">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">システムステータス</h3>
+    </div>
+    <div class="card-body">
+        <div class="flex gap-lg" style="flex-wrap: wrap;">
+            <div class="flex items-center gap-sm">
+                <span class="badge badge-success">●</span>
+                <span>AI処理エンジン: 稼働中</span>
+            </div>
+            <div class="flex items-center gap-sm">
+                <span class="badge badge-success">●</span>
+                <span>データベース: 正常</span>
+            </div>
+            <div class="flex items-center gap-sm">
+                <span class="badge badge-success">●</span>
+                <span>API接続: 良好</span>
+            </div>
+            <div class="flex items-center gap-sm">
+                <span class="badge badge-warning">●</span>
+                <span>バックアップ: 24時間前</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- モーダル（FAQ作成） -->
+<div class="modal" id="newFAQModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">新規FAQ作成</h2>
+            <button class="modal-close" onclick="closeModal('newFAQModal')">&times;</button>
+        </div>
+        <form onsubmit="event.preventDefault(); createFAQ();">
+            <div class="form-group">
+                <label class="form-label">質問</label>
+                <input type="text" class="form-control" placeholder="例：配当政策について教えてください" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">回答</label>
+                <textarea class="form-control" rows="4" placeholder="回答を入力..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">AI自動生成</label>
+                <button type="button" class="btn btn-secondary" onclick="generateAIAnswer()">
+                    🤖 AIで回答を生成
+                </button>
+            </div>
+            <div class="flex gap-md justify-end">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('newFAQModal')">キャンセル</button>
+                <button type="submit" class="btn btn-primary">作成</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// モーダル制御
+function showNewFAQModal() {
+    document.getElementById('newFAQModal').classList.add('active');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+// FAQ作成（モック）
+function createFAQ() {
+    alert('FAQを作成しました（デモ）');
+    closeModal('newFAQModal');
+}
+
+// AI回答生成（モック）
+function generateAIAnswer() {
+    const textarea = document.querySelector('textarea');
+    textarea.value = 'AIが生成した回答例：当社は安定的な配当を重視し、配当性向30%を目標としています。';
+}
+
+// レポート生成（モック）
+function generateReport() {
+    alert('レポートを生成中...（デモ）');
+}
+</script>
+{% endblock %}

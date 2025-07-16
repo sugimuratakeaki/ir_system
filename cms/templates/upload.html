@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- タブナビゲーション -->
+<div class="flex gap-md mb-lg" style="border-bottom: 2px solid var(--gray-200);">
+    <button class="btn btn-secondary" onclick="showSection('voice')" id="tab-voice" style="border-radius: 0; border-bottom: 2px solid transparent;">
+        🎙️ 音声・動画
+    </button>
+    <button class="btn btn-secondary" onclick="showSection('meeting')" id="tab-meeting" style="border-radius: 0; border-bottom: 2px solid transparent;">
+        💻 Web会議
+    </button>
+    <button class="btn btn-secondary" onclick="showSection('email')" id="tab-email" style="border-radius: 0; border-bottom: 2px solid transparent;">
+        📧 メール
+    </button>
+    <button class="btn btn-secondary" onclick="showSection('document')" id="tab-document" style="border-radius: 0; border-bottom: 2px solid transparent;">
+        📄 文書
+    </button>
+</div>
+
+<!-- 音声・動画セクション -->
+<div id="section-voice" class="upload-section">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">音声・動画ファイルアップロード</h3>
+        </div>
+        <div class="card-body">
+            <div class="upload-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" onclick="selectFile()">
+                <div class="upload-icon">🎙️</div>
+                <h3 class="text-xl mb-sm">音声・動画ファイルをドロップ</h3>
+                <p class="upload-text">または クリックして選択</p>
+                <p class="text-sm text-muted">対応形式: MP3, WAV, MP4, MOV (最大500MB)</p>
+                <input type="file" id="fileInput" style="display: none;" accept="audio/*,video/*" multiple onchange="handleFileSelect(event)">
+            </div>
+            
+            <!-- アップロード済みファイル -->
+            <div class="mt-lg">
+                <h4 class="text-lg font-semibold mb-md">処理中のファイル</h4>
+                <div class="flex flex-col gap-md">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="flex items-center gap-md mb-sm">
+                                        <span class="text-2xl">🎙️</span>
+                                        <div>
+                                            <div class="font-semibold">決算説明会_2024Q3.mp3</div>
+                                            <div class="text-sm text-muted">45.2MB • アップロード: 5分前</div>
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-sm">
+                                        <div class="progress-bar" style="width: 75%;"></div>
+                                    </div>
+                                    <div class="text-sm">文字起こし処理中... 75%</div>
+                                </div>
+                                <button class="btn btn-sm btn-danger">キャンセル</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-md">
+                                    <span class="text-2xl">✅</span>
+                                    <div>
+                                        <div class="font-semibold">投資家面談_20240115.wav</div>
+                                        <div class="text-sm text-muted">32.1MB • 処理完了</div>
+                                        <div class="flex gap-sm mt-sm">
+                                            <span class="badge badge-success">文字起こし完了</span>
+                                            <span class="badge badge-success">FAQ候補: 5件</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-sm">
+                                    <button class="btn btn-sm btn-secondary">結果確認</button>
+                                    <button class="btn btn-sm btn-secondary">ダウンロード</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Web会議セクション -->
+<div id="section-meeting" class="upload-section" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">Web会議連携</h3>
+        </div>
+        <div class="card-body">
+            <div class="dashboard-grid mb-lg">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="text-3xl mb-md">🔷</div>
+                        <h4 class="font-semibold mb-sm">Zoom</h4>
+                        <p class="text-sm text-muted mb-md">Zoomミーティングの録画を自動取込</p>
+                        <button class="btn btn-primary btn-sm">連携設定</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="text-3xl mb-md">📹</div>
+                        <h4 class="font-semibold mb-sm">Teams</h4>
+                        <p class="text-sm text-muted mb-md">Microsoft Teamsの会議録画を取込</p>
+                        <button class="btn btn-secondary btn-sm">連携設定</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="text-3xl mb-md">🟢</div>
+                        <h4 class="font-semibold mb-sm">Webex</h4>
+                        <p class="text-sm text-muted mb-md">Cisco Webexの録画を自動処理</p>
+                        <button class="btn btn-secondary btn-sm">連携設定</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <span>💡</span>
+                <span>Web会議システムと連携すると、録画ファイルが自動的に文字起こしされ、議事録が生成されます。</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メールセクション -->
+<div id="section-email" class="upload-section" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">メール取込</h3>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="form-label">メールアカウント設定</label>
+                <div class="flex gap-md">
+                    <input type="email" class="form-control" placeholder="ir@company.com">
+                    <button class="btn btn-primary">接続テスト</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">取込ルール</label>
+                <div class="flex flex-col gap-sm">
+                    <label class="flex items-center gap-sm">
+                        <input type="checkbox" checked>
+                        <span>投資家からの問い合わせメールを自動取込</span>
+                    </label>
+                    <label class="flex items-center gap-sm">
+                        <input type="checkbox" checked>
+                        <span>FAQ候補を自動生成</span>
+                    </label>
+                    <label class="flex items-center gap-sm">
+                        <input type="checkbox">
+                        <span>重要度の高いメールを優先処理</span>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary">設定を保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- 文書セクション -->
+<div id="section-document" class="upload-section" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">文書アップロード</h3>
+        </div>
+        <div class="card-body">
+            <div class="upload-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" onclick="selectDocumentFile()">
+                <div class="upload-icon">📄</div>
+                <h3 class="text-xl mb-sm">文書ファイルをドロップ</h3>
+                <p class="upload-text">または クリックして選択</p>
+                <p class="text-sm text-muted">対応形式: PDF, Word, Excel, PowerPoint (最大50MB)</p>
+                <input type="file" id="documentInput" style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" multiple>
+            </div>
+            
+            <div class="mt-lg">
+                <h4 class="font-semibold mb-md">文書カテゴリ</h4>
+                <div class="flex gap-md flex-wrap">
+                    <label class="flex items-center gap-sm">
+                        <input type="radio" name="doc-category" checked>
+                        <span>決算資料</span>
+                    </label>
+                    <label class="flex items-center gap-sm">
+                        <input type="radio" name="doc-category">
+                        <span>説明会資料</span>
+                    </label>
+                    <label class="flex items-center gap-sm">
+                        <input type="radio" name="doc-category">
+                        <span>適時開示</span>
+                    </label>
+                    <label class="flex items-center gap-sm">
+                        <input type="radio" name="doc-category">
+                        <span>その他</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// セクション切り替え
+function showSection(section) {
+    // すべてのセクションを非表示
+    document.querySelectorAll('.upload-section').forEach(s => {
+        s.style.display = 'none';
+    });
+    
+    // すべてのタブのスタイルをリセット
+    document.querySelectorAll('[id^="tab-"]').forEach(t => {
+        t.style.borderBottomColor = 'transparent';
+        t.style.color = 'var(--gray-700)';
+    });
+    
+    // 選択されたセクションを表示
+    document.getElementById(`section-${section}`).style.display = 'block';
+    
+    // 選択されたタブをアクティブに
+    const activeTab = document.getElementById(`tab-${section}`);
+    activeTab.style.borderBottomColor = 'var(--kagami-blue)';
+    activeTab.style.color = 'var(--kagami-blue)';
+}
+
+// ドラッグ&ドロップ処理
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('active');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('active');
+    
+    const files = e.dataTransfer.files;
+    handleFiles(files);
+}
+
+// ファイル選択
+function selectFile() {
+    document.getElementById('fileInput').click();
+}
+
+function selectDocumentFile() {
+    document.getElementById('documentInput').click();
+}
+
+function handleFileSelect(e) {
+    const files = e.target.files;
+    handleFiles(files);
+}
+
+// ファイル処理（モック）
+function handleFiles(files) {
+    alert(`${files.length}個のファイルをアップロードします（デモ）`);
+}
+
+// 初期表示
+showSection('voice');
+</script>
+{% endblock %}

@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- 投資家統計 -->
+<div class="dashboard-grid mb-lg">
+    <div class="kpi-card">
+        <div class="kpi-value">{{ total_investors }}</div>
+        <div class="kpi-label">総投資家数</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-value">68</div>
+        <div class="kpi-label">機関投資家</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-value">256</div>
+        <div class="kpi-label">個人投資家</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-value">12</div>
+        <div class="kpi-label">今月の新規登録</div>
+    </div>
+</div>
+
+<!-- アクションバー -->
+<div class="flex justify-between items-center mb-lg">
+    <div class="flex gap-md">
+        <button class="btn btn-primary" onclick="showNewInvestorModal()">
+            <span>➕</span> 投資家追加
+        </button>
+        <button class="btn btn-secondary" onclick="importInvestors()">
+            <span>📥</span> インポート
+        </button>
+        <button class="btn btn-secondary" onclick="exportInvestors()">
+            <span>📤</span> エクスポート
+        </button>
+    </div>
+    
+    <div class="flex gap-md">
+        <input type="text" class="form-control" placeholder="投資家を検索..." style="width: 300px;">
+        <select class="form-control" style="width: 150px;">
+            <option>すべて</option>
+            <option>機関投資家</option>
+            <option>個人投資家</option>
+            <option>海外投資家</option>
+        </select>
+    </div>
+</div>
+
+<!-- 投資家一覧 -->
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>氏名</th>
+                    <th>所属</th>
+                    <th>タイプ</th>
+                    <th>最終コンタクト</th>
+                    <th>関心度</th>
+                    <th>アクション</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for investor in investors %}
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-sm">
+                            <div style="width: 32px; height: 32px; background: var(--gray-200); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                {{ investor.name[0] }}
+                            </div>
+                            <span>{{ investor.name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ investor.company }}</td>
+                    <td>
+                        <span class="badge badge-primary">{{ investor.type }}</span>
+                    </td>
+                    <td>{{ investor.last_contact }}</td>
+                    <td>
+                        <div class="flex gap-xs">
+                            <span style="color: var(--warning-orange);">★★★★☆</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex gap-sm">
+                            <button class="btn btn-sm btn-secondary" onclick="viewInvestorDetail({{ investor.id }})">詳細</button>
+                            <button class="btn btn-sm btn-secondary" onclick="contactInvestor({{ investor.id }})">連絡</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 投資家詳細パネル（右サイド） -->
+<div class="modal" id="investorDetailModal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h2 class="modal-title">投資家詳細</h2>
+            <button class="modal-close" onclick="closeModal('investorDetailModal')">&times;</button>
+        </div>
+        
+        <div class="flex gap-lg">
+            <!-- 基本情報 -->
+            <div style="flex: 1;">
+                <h3 class="text-lg font-semibold mb-md">基本情報</h3>
+                <div class="form-group">
+                    <label class="form-label">氏名</label>
+                    <div id="investor-name" class="text-lg">山田 太郎</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">所属</label>
+                    <div id="investor-company">ABC投資顧問</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">メールアドレス</label>
+                    <div>yamada@abc-investment.jp</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">電話番号</label>
+                    <div>03-1234-5678</div>
+                </div>
+            </div>
+            
+            <!-- 活動履歴 -->
+            <div style="flex: 1;">
+                <h3 class="text-lg font-semibold mb-md">活動履歴</h3>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">💬</div>
+                        <div class="activity-content">
+                            <div class="activity-type">面談実施</div>
+                            <div class="activity-description">2024年度決算について</div>
+                            <div class="activity-time">3日前</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📧</div>
+                        <div class="activity-content">
+                            <div class="activity-type">メール送信</div>
+                            <div class="activity-description">説明会のご案内</div>
+                            <div class="activity-time">1週間前</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📄</div>
+                        <div class="activity-content">
+                            <div class="activity-type">資料ダウンロード</div>
+                            <div class="activity-description">中期経営計画</div>
+                            <div class="activity-time">2週間前</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 関心テーマ -->
+        <div class="mt-lg">
+            <h3 class="text-lg font-semibold mb-md">関心テーマ</h3>
+            <div class="flex gap-sm flex-wrap">
+                <span class="badge badge-primary">財務戦略</span>
+                <span class="badge badge-primary">ROE向上</span>
+                <span class="badge badge-primary">配当政策</span>
+                <span class="badge badge-primary">ESG</span>
+                <span class="badge badge-primary">DX推進</span>
+            </div>
+        </div>
+        
+        <div class="flex gap-md justify-end mt-lg">
+            <button class="btn btn-secondary" onclick="closeModal('investorDetailModal')">閉じる</button>
+            <button class="btn btn-primary" onclick="editInvestor()">編集</button>
+        </div>
+    </div>
+</div>
+
+<!-- 新規投資家追加モーダル -->
+<div class="modal" id="newInvestorModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">新規投資家追加</h2>
+            <button class="modal-close" onclick="closeModal('newInvestorModal')">&times;</button>
+        </div>
+        
+        <form onsubmit="event.preventDefault(); addInvestor();">
+            <div class="form-group">
+                <label class="form-label">氏名 *</label>
+                <input type="text" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">所属</label>
+                <input type="text" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">投資家タイプ *</label>
+                <select class="form-control" required>
+                    <option value="">選択してください</option>
+                    <option value="institutional">機関投資家</option>
+                    <option value="individual">個人投資家</option>
+                    <option value="foreign">海外投資家</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">メールアドレス</label>
+                <input type="email" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">電話番号</label>
+                <input type="tel" class="form-control">
+            </div>
+            
+            <div class="flex gap-md justify-end">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('newInvestorModal')">キャンセル</button>
+                <button type="submit" class="btn btn-primary">追加</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 新規投資家モーダル表示
+function showNewInvestorModal() {
+    document.getElementById('newInvestorModal').classList.add('active');
+}
+
+// 投資家詳細表示
+function viewInvestorDetail(id) {
+    document.getElementById('investorDetailModal').classList.add('active');
+}
+
+// モーダルを閉じる
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+// 投資家追加（モック）
+function addInvestor() {
+    alert('投資家を追加しました（デモ）');
+    closeModal('newInvestorModal');
+}
+
+// 投資家編集（モック）
+function editInvestor() {
+    alert('編集画面に移動します（デモ）');
+}
+
+// 投資家に連絡（モック）
+function contactInvestor(id) {
+    alert('連絡画面を開きます（デモ）');
+}
+
+// インポート（モック）
+function importInvestors() {
+    alert('CSVファイルをインポートします（デモ）');
+}
+
+// エクスポート（モック）
+function exportInvestors() {
+    alert('投資家リストをエクスポートしました（デモ）');
+}
+</script>
+{% endblock %}

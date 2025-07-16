@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- FAQ統計 -->
+<div class="faq-stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_faqs }}</div>
+        <div class="stat-label">総FAQ数</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ published_count }}</div>
+        <div class="stat-label">公開中</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_faqs - published_count }}</div>
+        <div class="stat-label">下書き</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">95%</div>
+        <div class="stat-label">平均信頼度</div>
+    </div>
+</div>
+
+<!-- アクションバー -->
+<div class="flex justify-between items-center mb-lg">
+    <div class="flex gap-md">
+        <button class="btn btn-primary" onclick="showNewFAQModal()">
+            <span>➕</span> 新規FAQ作成
+        </button>
+        <button class="btn btn-secondary" onclick="bulkGenerateFAQs()">
+            <span>🤖</span> AI一括生成
+        </button>
+    </div>
+    
+    <div class="flex gap-md">
+        <input type="text" class="form-control" placeholder="FAQを検索..." style="width: 300px;">
+        <select class="form-control" style="width: 150px;">
+            <option>すべて</option>
+            <option>公開中</option>
+            <option>下書き</option>
+        </select>
+    </div>
+</div>
+
+<!-- FAQ一覧 -->
+<div class="faq-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 40px;">
+                    <input type="checkbox" onchange="toggleAllCheckboxes(this)">
+                </th>
+                <th>質問</th>
+                <th>回答（要約）</th>
+                <th style="width: 100px;">ステータス</th>
+                <th style="width: 100px;">信頼度</th>
+                <th style="width: 120px;">アクション</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for faq in faqs %}
+            <tr>
+                <td>
+                    <input type="checkbox" name="faq-select" value="{{ faq.id }}">
+                </td>
+                <td>{{ faq.question }}</td>
+                <td>{{ faq.answer[:50] }}...</td>
+                <td>
+                    {% if faq.status == 'published' %}
+                        <span class="badge badge-success">公開中</span>
+                    {% else %}
+                        <span class="badge badge-warning">下書き</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="confidence-badge {% if faq.confidence >= 95 %}confidence-high{% elif faq.confidence >= 85 %}confidence-medium{% else %}confidence-low{% endif %}">
+                        {{ faq.confidence }}%
+                    </span>
+                </td>
+                <td>
+                    <div class="flex gap-sm">
+                        <button class="btn btn-sm btn-secondary" onclick="editFAQ({{ faq.id }})">編集</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteFAQ({{ faq.id }})">削除</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- ページネーション -->
+<div class="flex justify-center mt-lg">
+    <div class="flex gap-sm">
+        <button class="btn btn-sm btn-secondary">前へ</button>
+        <button class="btn btn-sm btn-primary">1</button>
+        <button class="btn btn-sm btn-secondary">2</button>
+        <button class="btn btn-sm btn-secondary">3</button>
+        <button class="btn btn-sm btn-secondary">次へ</button>
+    </div>
+</div>
+
+<!-- モーダル（FAQ作成/編集） -->
+<div class="modal" id="faqModal">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h2 class="modal-title">FAQ編集</h2>
+            <button class="modal-close" onclick="closeModal('faqModal')">&times;</button>
+        </div>
+        <form onsubmit="event.preventDefault(); saveFAQ();">
+            <div class="form-group">
+                <label class="form-label">質問</label>
+                <input type="text" class="form-control" id="faq-question" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">回答</label>
+                <textarea class="form-control" id="faq-answer" rows="6" required></textarea>
+            </div>
+            
+            <div class="flex gap-lg">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">カテゴリ</label>
+                    <select class="form-control">
+                        <option>財務・業績</option>
+                        <option>経営戦略</option>
+                        <option>ESG</option>
+                        <option>株主還元</option>
+                        <option>その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">ステータス</label>
+                    <select class="form-control">
+                        <option value="draft">下書き</option>
+                        <option value="published">公開</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">AI分析結果</label>
+                <div class="alert alert-info">
+                    <span>🤖</span>
+                    <div>
+                        <strong>信頼度: 95%</strong><br>
+                        類似FAQ: 3件検出 | キーワード: 財務、業績、見通し
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-md justify-end">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('faqModal')">キャンセル</button>
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// FAQ作成モーダル表示
+function showNewFAQModal() {
+    document.getElementById('faq-question').value = '';
+    document.getElementById('faq-answer').value = '';
+    document.getElementById('faqModal').classList.add('active');
+}
+
+// FAQ編集
+function editFAQ(id) {
+    // デモ用：固定データをセット
+    document.getElementById('faq-question').value = '2024年度の業績見通しは？';
+    document.getElementById('faq-answer').value = '売上高は前年比15%増の見込みです。';
+    document.getElementById('faqModal').classList.add('active');
+}
+
+// モーダルを閉じる
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+// FAQ保存（モック）
+function saveFAQ() {
+    alert('FAQを保存しました（デモ）');
+    closeModal('faqModal');
+}
+
+// FAQ削除（モック）
+function deleteFAQ(id) {
+    if (confirm('このFAQを削除しますか？')) {
+        alert('FAQを削除しました（デモ）');
+    }
+}
+
+// AI一括生成（モック）
+function bulkGenerateFAQs() {
+    if (confirm('過去の対話履歴からFAQを自動生成しますか？')) {
+        alert('AI分析を開始しました。完了後、新規FAQが追加されます。（デモ）');
+    }
+}
+
+// チェックボックス全選択
+function toggleAllCheckboxes(source) {
+    const checkboxes = document.getElementsByName('faq-select');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = source.checked;
+    });
+}
+</script>
+{% endblock %}

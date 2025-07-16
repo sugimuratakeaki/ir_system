@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - KAGAMI IR管理センター</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/cms.css') }}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMxYTM2NWQiLz4KPHBhdGggZD0iTTEwIDEySDE0VjIwSDEwVjEyWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE4IDhIMjJWMjBIMThWOFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg==">
+</head>
+<body>
+    <div class="cms-layout">
+        <!-- サイドバー -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    🔮 KAGAMI CMS
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item {% if request.url.path == '/' %}active{% endif %}">
+                    <span class="nav-icon">📊</span>
+                    <span>ダッシュボード</span>
+                </a>
+                <a href="/faq" class="nav-item {% if request.url.path == '/faq' %}active{% endif %}">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI-FAQ管理</span>
+                </a>
+                <a href="/investors" class="nav-item {% if request.url.path == '/investors' %}active{% endif %}">
+                    <span class="nav-icon">👥</span>
+                    <span>投資家管理</span>
+                </a>
+                <a href="/upload" class="nav-item {% if request.url.path == '/upload' %}active{% endif %}">
+                    <span class="nav-icon">📤</span>
+                    <span>データ取込</span>
+                </a>
+                <a href="/analytics" class="nav-item {% if request.url.path == '/analytics' %}active{% endif %}">
+                    <span class="nav-icon">📈</span>
+                    <span>分析・レポート</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer p-lg">
+                <div class="text-sm" style="opacity: 0.7;">
+                    © 2024 KAGAMI
+                </div>
+            </div>
+        </aside>
+        
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- ヘッダー -->
+            <header class="header">
+                <div class="flex items-center gap-md">
+                    <button class="btn btn-icon hide-desktop" onclick="toggleSidebar()">
+                        ☰
+                    </button>
+                    <h1 class="page-title">{{ title }}</h1>
+                </div>
+                
+                <div class="header-actions">
+                    <span class="text-sm text-muted">{{ current_time }}</span>
+                    <div class="user-info">
+                        <span>👤</span>
+                        <span class="text-sm">管理者</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- コンテンツエリア -->
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // サイドバートグル（モバイル対応）
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        
+        // クリック外で閉じる
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = event.target.closest('.btn-icon');
+            
+            if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !toggleBtn) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

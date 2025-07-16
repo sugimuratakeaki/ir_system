@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- 期間選択 -->
+<div class="card mb-lg">
+    <div class="card-body">
+        <div class="flex justify-between items-center">
+            <div class="flex gap-md items-center">
+                <label class="form-label mb-0">分析期間:</label>
+                <select class="form-control" style="width: 200px;">
+                    <option>過去30日間</option>
+                    <option>過去90日間</option>
+                    <option>今年度</option>
+                    <option>前年度</option>
+                    <option>カスタム期間</option>
+                </select>
+            </div>
+            <div class="flex gap-md">
+                <button class="btn btn-secondary">
+                    <span>🔄</span> 更新
+                </button>
+                <button class="btn btn-primary">
+                    <span>📊</span> レポート出力
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPIサマリー -->
+<div class="dashboard-grid mb-lg">
+    {% for key, kpi in kpis.items() %}
+    <div class="kpi-card">
+        <div class="kpi-value">{{ kpi.value }}{% if key == 'investor_satisfaction' or key == 'faq_accuracy' %}%{% endif %}</div>
+        <div class="kpi-label">{{ kpi.label }}</div>
+        <div class="kpi-trend {% if kpi.trend.startswith('+') %}trend-positive{% else %}trend-negative{% endif %}">
+            <span>{{ kpi.trend }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- グラフエリア -->
+<div class="flex gap-lg mb-lg" style="flex-wrap: wrap;">
+    <!-- 投資家エンゲージメント推移 -->
+    <div class="card" style="flex: 1; min-width: 400px;">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">投資家エンゲージメント推移</h3>
+        </div>
+        <div class="card-body">
+            <div style="height: 300px; background: var(--gray-100); display: flex; align-items: center; justify-content: center;">
+                <canvas id="engagementChart" style="width: 100%; height: 100%;"></canvas>
+                <div class="text-muted">
+                    📈 グラフエリア（実装時はChart.jsなどを使用）
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FAQ利用状況 -->
+    <div class="card" style="flex: 1; min-width: 400px;">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">FAQ利用状況</h3>
+        </div>
+        <div class="card-body">
+            <div style="height: 300px; background: var(--gray-100); display: flex; align-items: center; justify-content: center;">
+                <canvas id="faqChart" style="width: 100%; height: 100%;"></canvas>
+                <div class="text-muted">
+                    📊 円グラフエリア（カテゴリ別利用率）
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 詳細分析 -->
+<div class="card mb-lg">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">投資家行動分析</h3>
+    </div>
+    <div class="card-body">
+        <div class="flex gap-lg mb-lg" style="flex-wrap: wrap;">
+            <div style="flex: 1;">
+                <h4 class="font-semibold mb-md">最も関心の高いトピック</h4>
+                <div class="flex flex-col gap-sm">
+                    <div class="flex justify-between items-center">
+                        <span>財務・業績</span>
+                        <div class="flex items-center gap-sm">
+                            <div class="progress" style="width: 200px;">
+                                <div class="progress-bar" style="width: 85%;"></div>
+                            </div>
+                            <span class="text-sm">85%</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>経営戦略</span>
+                        <div class="flex items-center gap-sm">
+                            <div class="progress" style="width: 200px;">
+                                <div class="progress-bar" style="width: 72%;"></div>
+                            </div>
+                            <span class="text-sm">72%</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>ESG</span>
+                        <div class="flex items-center gap-sm">
+                            <div class="progress" style="width: 200px;">
+                                <div class="progress-bar" style="width: 68%;"></div>
+                            </div>
+                            <span class="text-sm">68%</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>株主還元</span>
+                        <div class="flex items-center gap-sm">
+                            <div class="progress" style="width: 200px;">
+                                <div class="progress-bar" style="width: 45%;"></div>
+                            </div>
+                            <span class="text-sm">45%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="flex: 1;">
+                <h4 class="font-semibold mb-md">投資家タイプ別活動</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>タイプ</th>
+                            <th>人数</th>
+                            <th>平均活動</th>
+                            <th>満足度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>機関投資家</td>
+                            <td>68</td>
+                            <td>月12.5回</td>
+                            <td><span class="text-success">96%</span></td>
+                        </tr>
+                        <tr>
+                            <td>個人投資家</td>
+                            <td>256</td>
+                            <td>月3.2回</td>
+                            <td><span class="text-success">94%</span></td>
+                        </tr>
+                        <tr>
+                            <td>海外投資家</td>
+                            <td>24</td>
+                            <td>月8.7回</td>
+                            <td><span class="text-warning">92%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AIインサイト -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">🤖 AIによるインサイト</h3>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info mb-md">
+            <span>💡</span>
+            <div>
+                <strong>重要な発見:</strong> 過去30日間で「中期経営計画」に関する問い合わせが45%増加しています。
+                特に海外投資家からの関心が高まっており、英語版資料の充実が推奨されます。
+            </div>
+        </div>
+        
+        <div class="flex flex-col gap-md">
+            <div class="flex gap-md">
+                <span class="badge badge-primary">推奨アクション</span>
+                <p class="mb-0">中期経営計画の進捗レポートを月次で公開することで、投資家の情報ニーズに応えられます。</p>
+            </div>
+            
+            <div class="flex gap-md">
+                <span class="badge badge-warning">注意事項</span>
+                <p class="mb-0">ESG関連の問い合わせが前四半期比で20%減少。情報開示の強化を検討してください。</p>
+            </div>
+            
+            <div class="flex gap-md">
+                <span class="badge badge-success">成功事例</span>
+                <p class="mb-0">AI-FAQ導入により、基本的な問い合わせが60%減少。IR担当者の業務効率が大幅に改善しました。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// レポート出力（モック）
+document.querySelector('.btn-primary').addEventListener('click', function() {
+    const format = confirm('PDF形式で出力しますか？\n（キャンセルでExcel形式）') ? 'PDF' : 'Excel';
+    alert(`${format}形式でレポートを生成しました（デモ）`);
+});
+
+// グラフ描画（実装時はChart.jsなどを使用）
+// ここではプレースホルダーとして配置
+
+// 期間変更時の処理
+document.querySelector('select').addEventListener('change', function() {
+    alert('データを更新しています...（デモ）');
+});
+</script>
+{% endblock %}
