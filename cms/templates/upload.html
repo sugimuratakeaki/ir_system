@@ -540,17 +540,134 @@ function handleDocumentSelect(e) {
 function handleFiles(files) {
     console.log(`${files.length}個の音声・動画ファイルをアップロード`);
     // 実際の実装では、ここでファイルアップロード処理を行う
-    alert('ファイルをアップロードしました。処理完了後、対話記録一覧で確認できます。');
+    
+    // アップロード進捗を表示
+    showUploadProgress(files[0]);
+    
+    // 2秒後に確認画面へ遷移（デモ用）
+    setTimeout(() => {
+        window.location.href = '/upload-confirm?file=' + encodeURIComponent(files[0].name);
+    }, 2000);
 }
 
 // ファイル処理（文書）
 function handleDocumentFiles(files) {
     console.log(`${files.length}個の文書ファイルをアップロード`);
     // 実際の実装では、ここでファイルアップロード処理を行う
-    alert('文書をアップロードしました。処理完了後、対話記録一覧で確認できます。');
+    
+    // アップロード進捗を表示
+    showUploadProgress(files[0]);
+    
+    // 2秒後に確認画面へ遷移（デモ用）
+    setTimeout(() => {
+        window.location.href = '/upload-confirm?file=' + encodeURIComponent(files[0].name) + '&type=document';
+    }, 2000);
+}
+
+// アップロード進捗表示
+function showUploadProgress(file) {
+    const progressModal = document.createElement('div');
+    progressModal.className = 'upload-progress-modal';
+    progressModal.innerHTML = `
+        <div class="upload-progress-content">
+            <h3>ファイルをアップロード中...</h3>
+            <div class="file-info">
+                <span class="file-icon">🎙️</span>
+                <span class="file-name">${file.name}</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar progress-animated" style="width: 0%;"></div>
+            </div>
+            <div class="progress-text">0%</div>
+        </div>
+    `;
+    document.body.appendChild(progressModal);
+    
+    // プログレスバーアニメーション
+    const progressBar = progressModal.querySelector('.progress-bar');
+    const progressText = progressModal.querySelector('.progress-text');
+    let progress = 0;
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 30;
+        if (progress > 100) progress = 100;
+        
+        progressBar.style.width = progress + '%';
+        progressText.textContent = Math.round(progress) + '%';
+        
+        if (progress >= 100) {
+            clearInterval(interval);
+            progressText.textContent = 'アップロード完了！';
+        }
+    }, 200);
 }
 
 // 初期表示
 showSection('voice');
+
+// アップロードモーダル用スタイル
+const uploadModalStyle = document.createElement('style');
+uploadModalStyle.textContent = `
+.upload-progress-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.upload-progress-content {
+    background: white;
+    padding: var(--space-xl);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-xl);
+    text-align: center;
+    min-width: 400px;
+}
+
+.upload-progress-content h3 {
+    margin-bottom: var(--space-md);
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.file-icon {
+    font-size: 2rem;
+}
+
+.file-name {
+    font-weight: var(--font-medium);
+}
+
+.progress {
+    height: 8px;
+    background-color: var(--gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+.progress-animated {
+    background-color: var(--kagami-blue);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+`;
+document.head.appendChild(uploadModalStyle);
 </script>
 {% endblock %}

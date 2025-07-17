@@ -145,12 +145,119 @@ async def file_upload(request: Request):
         "title": "データ取込設定"
     })
 
+@app.get("/upload-confirm", response_class=HTMLResponse)
+async def upload_confirm(request: Request):
+    """アップロード確認・メタ情報登録画面"""
+    # URLパラメータからファイル名を取得（モック用）
+    file_name = request.query_params.get("file", "野村AM_投資家面談_20250715.mp4")
+    file_type = request.query_params.get("type", "video")
+    
+    return templates.TemplateResponse("upload-confirm.html", {
+        "request": request,
+        "title": "アップロード確認・メタ情報登録",
+        "file_name": file_name,
+        "file_type": file_type,
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
+
 @app.get("/dialogue", response_class=HTMLResponse)
 async def dialogue_management(request: Request):
     """対話記録管理画面"""
     return templates.TemplateResponse("dialogue.html", {
         "request": request,
         "title": "対話記録管理"
+    })
+
+@app.get("/dialogue/analysis", response_class=HTMLResponse)
+async def dialogue_analysis(request: Request):
+    """AI詳細分析画面（モック）"""
+    # URLパラメータからIDを取得
+    record_id = request.query_params.get("id", "12345")
+    
+    return templates.TemplateResponse("dialogue-analysis.html", {
+        "request": request,
+        "title": "AI詳細分析",
+        "record_id": record_id,
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
+
+@app.get("/dialogue-analysis", response_class=HTMLResponse)
+async def dialogue_analysis_alt(request: Request):
+    """AI詳細分析画面（別ルート）"""
+    # URLパラメータからIDを取得
+    record_id = request.query_params.get("id", "12345")
+    
+    return templates.TemplateResponse("dialogue-analysis.html", {
+        "request": request,
+        "title": "AI詳細分析",
+        "record_id": record_id,
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
+
+@app.get("/dialogue/publish", response_class=HTMLResponse)
+async def dialogue_publish(request: Request):
+    """対話記録公開確認画面"""
+    # URLパラメータからIDを取得
+    record_id = request.query_params.get("id", "12345")
+    
+    return templates.TemplateResponse("dialogue-publish.html", {
+        "request": request,
+        "title": "確認・公開設定",
+        "record_id": record_id,
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
+
+@app.get("/dialogue/edit", response_class=HTMLResponse)
+async def dialogue_edit(request: Request):
+    """対話記録編集画面"""
+    # URLパラメータからIDを取得
+    record_id = request.query_params.get("id", "meeting_001")
+    
+    # モックデータ（実際はデータベースから取得）
+    mock_dialogue_data = {
+        "meeting_001": {
+            "title": "2024年第3四半期決算説明会",
+            "type": "決算説明会",
+            "date": "2024-01-15T14:00",
+            "participants": "156",
+            "investor_name": "機関投資家全般",
+            "investor_type": "国内機関投資家",
+            "holding_status": "複数",
+            "company_participants": ["CEO - 田中一郎", "CFO - 佐藤二郎"],
+            "importance": "最重要",
+            "confidentiality": "一般",
+            "tags": ["決算", "Q3", "AI事業", "成長戦略"],
+            "file_name": "決算説明会_Q3_20240115.mp4",
+            "file_size": "456.2MB",
+            "duration": "45分"
+        },
+        "voice_001": {
+            "title": "投資家B社との個別面談",
+            "type": "個別面談",
+            "date": "2024-01-13T10:00",
+            "participants": "4",
+            "investor_name": "投資家B社",
+            "investor_type": "国内機関投資家",
+            "holding_status": "主要株主（1-5%）",
+            "company_participants": ["CFO - 佐藤二郎", "IR部長 - 山本三郎"],
+            "importance": "高",
+            "confidentiality": "社内限定",
+            "tags": ["個別面談", "財務戦略", "配当政策"],
+            "file_name": "投資家B社_面談_20240113.mp3",
+            "file_size": "89.5MB",
+            "duration": "32分"
+        }
+    }
+    
+    # 指定されたIDのデータを取得（デフォルトはmeeting_001）
+    dialogue_data = mock_dialogue_data.get(record_id, mock_dialogue_data["meeting_001"])
+    
+    return templates.TemplateResponse("dialogue-edit.html", {
+        "request": request,
+        "title": "対話記録編集",
+        "record_id": record_id,
+        "dialogue_data": dialogue_data,
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
     })
 
 @app.get("/analytics", response_class=HTMLResponse)

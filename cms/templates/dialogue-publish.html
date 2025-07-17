@@ -1,0 +1,1088 @@
+{% extends "base.html" %}
+
+{% block title %}確認・公開設定{% endblock %}
+
+{% block content %}
+<!-- プログレスバー -->
+<div class="progress-header mb-lg">
+    <div class="progress-steps">
+        <div class="step completed">
+            <div class="step-number">1</div>
+            <div class="step-label">ファイル選択</div>
+        </div>
+        <div class="step completed">
+            <div class="step-number">2</div>
+            <div class="step-label">アップロード</div>
+        </div>
+        <div class="step completed">
+            <div class="step-number">3</div>
+            <div class="step-label">メタ情報登録</div>
+        </div>
+        <div class="step completed">
+            <div class="step-number">4</div>
+            <div class="step-label">AI分析</div>
+        </div>
+        <div class="step active">
+            <div class="step-number">5</div>
+            <div class="step-label">確認・公開</div>
+        </div>
+    </div>
+</div>
+
+<!-- ヘッダー -->
+<div class="flex justify-between items-center mb-lg">
+    <div>
+        <h2 class="text-2xl font-bold mb-sm">確認・公開設定</h2>
+        <p class="text-muted">野村アセットマネジメントとの個別面談（2025/07/15）</p>
+    </div>
+    <div class="flex gap-md">
+        <button class="btn btn-secondary" onclick="goBack()">
+            ← 前へ戻る
+        </button>
+        <button class="btn btn-success" onclick="publishDialogue()">
+            ✅ 公開する
+        </button>
+    </div>
+</div>
+
+<!-- 全体サマリー -->
+<div class="publish-summary mb-lg">
+    <h3 class="text-lg font-semibold mb-md">📊 処理結果サマリー</h3>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="item-icon">📄</div>
+            <div class="item-content">
+                <div class="item-label">ファイル処理</div>
+                <div class="item-value success">完了</div>
+                <div class="item-detail">90分15秒 / 8,432文字</div>
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="item-icon">🧠</div>
+            <div class="item-content">
+                <div class="item-label">AI分析</div>
+                <div class="item-value success">完了</div>
+                <div class="item-detail">12項目抽出</div>
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="item-icon">❓</div>
+            <div class="item-content">
+                <div class="item-label">FAQ候補</div>
+                <div class="item-value warning">5件</div>
+                <div class="item-detail">承認待ち: 2件</div>
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="item-icon">✅</div>
+            <div class="item-content">
+                <div class="item-label">アクション</div>
+                <div class="item-value info">8件</div>
+                <div class="item-detail">高優先度: 3件</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="publish-container">
+    <!-- 左カラム：確認事項 -->
+    <div class="publish-main">
+        <!-- 対話記録情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📋 対話記録情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">会議タイトル</span>
+                        <span class="info-value">野村アセットマネジメントとの個別面談</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">開催日時</span>
+                        <span class="info-value">2025年7月15日 14:00-15:30</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">投資家</span>
+                        <span class="info-value">野村アセットマネジメント（主要株主）</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">参加者</span>
+                        <span class="info-value">CEO田中一郎、CFO佐藤二郎 他</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">重要度</span>
+                        <span class="info-value"><span class="badge badge-danger">高</span></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">機密度</span>
+                        <span class="info-value"><span class="badge badge-warning">社内限定</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ承認 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">❓ FAQ承認</h3>
+                <div class="header-actions">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="select-all-faqs" onchange="toggleAllFAQs()">
+                        <span>すべて選択</span>
+                    </label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="faq-approval-list">
+                    <!-- FAQ 1 -->
+                    <div class="faq-approval-item approved">
+                        <div class="faq-checkbox-wrapper">
+                            <input type="checkbox" class="faq-select" checked>
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-header">
+                                <span class="faq-category">AI事業</span>
+                                <span class="confidence-badge high">信頼度: 95%</span>
+                                <span class="status-badge approved">自動承認</span>
+                            </div>
+                            <div class="faq-text">
+                                <div class="question">Q: AI事業の成長率35%を達成した要因は？</div>
+                                <div class="answer">A: エンタープライズSaaSの好調、新製品の市場投入、既存顧客のアップセルが主な要因です。</div>
+                            </div>
+                            <div class="faq-settings">
+                                <select class="form-control-sm">
+                                    <option>一般公開</option>
+                                    <option>会員限定</option>
+                                    <option selected>社内限定</option>
+                                </select>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="faq-approval-item pending">
+                        <div class="faq-checkbox-wrapper">
+                            <input type="checkbox" class="faq-select">
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-header">
+                                <span class="faq-category">人材戦略</span>
+                                <span class="confidence-badge medium">信頼度: 88%</span>
+                                <span class="status-badge pending">承認待ち</span>
+                            </div>
+                            <div class="faq-text">
+                                <div class="question">Q: エンジニア採用の具体的な目標と進捗は？</div>
+                                <div class="answer">A: 2025年度末までに200名体制を目指し、現在150名まで増強しました。</div>
+                            </div>
+                            <div class="faq-settings">
+                                <select class="form-control-sm">
+                                    <option>一般公開</option>
+                                    <option>会員限定</option>
+                                    <option selected>社内限定</option>
+                                </select>
+                                <button class="btn btn-sm btn-primary">承認</button>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-summary mt-md">
+                    <p class="text-sm text-muted">
+                        承認済み: 3件 / 承認待ち: 2件 / 合計: 5件
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- アクションアイテム確認 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">✅ アクションアイテム</h3>
+            </div>
+            <div class="card-body">
+                <div class="action-review-list">
+                    <div class="action-review-item high-priority">
+                        <div class="action-priority">🔴</div>
+                        <div class="action-content">
+                            <div class="action-title">競合分析レポートの準備</div>
+                            <div class="action-meta">
+                                <span>担当: IR部</span>
+                                <span>期限: 2025/07/22</span>
+                            </div>
+                        </div>
+                        <div class="action-assignee">
+                            <select class="form-control-sm">
+                                <option>IR部 - 山本三郎</option>
+                                <option>IR部 - 鈴木五郎</option>
+                                <option>経営企画部 - 伊藤六郎</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="action-review-item high-priority">
+                        <div class="action-priority">🔴</div>
+                        <div class="action-content">
+                            <div class="action-title">AI事業の詳細KPI共有</div>
+                            <div class="action-meta">
+                                <span>担当: 経営企画部</span>
+                                <span>期限: 2025/07/20</span>
+                            </div>
+                        </div>
+                        <div class="action-assignee">
+                            <select class="form-control-sm">
+                                <option>経営企画部 - 高橋四郎</option>
+                                <option>経営企画部 - 伊藤六郎</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右カラム：公開設定 -->
+    <div class="publish-sidebar">
+        <!-- 公開設定 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🌐 公開設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="publish-settings">
+                    <div class="setting-group">
+                        <label class="setting-label">対話記録の公開範囲</label>
+                        <select class="form-control">
+                            <option>非公開（内部のみ）</option>
+                            <option selected>社内限定</option>
+                            <option>役員限定</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">FAQの自動公開</label>
+                        <label class="switch-wrapper">
+                            <input type="checkbox" class="toggle-switch" checked>
+                            <span class="switch-label">承認済みFAQを自動公開</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">連携システム</label>
+                        <div class="integration-checklist">
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>投資家向けWebサイト</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>AIチャットボット</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>メール自動応答</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>社内ナレッジベース</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知設定 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📧 通知設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="notification-settings">
+                    <div class="setting-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked>
+                            <span>関係者に完了通知を送信</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">通知先</label>
+                        <div class="recipient-list">
+                            <div class="recipient-item">
+                                <span>CEO - 田中一郎</span>
+                                <span class="remove-btn">×</span>
+                            </div>
+                            <div class="recipient-item">
+                                <span>CFO - 佐藤二郎</span>
+                                <span class="remove-btn">×</span>
+                            </div>
+                            <div class="recipient-item">
+                                <span>IR部門責任者</span>
+                                <span class="remove-btn">×</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-secondary mt-sm">+ 通知先を追加</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- アーカイブ設定 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📁 アーカイブ設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="archive-settings">
+                    <div class="setting-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked>
+                            <span>対話記録をアーカイブ</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">保存期間</label>
+                        <select class="form-control">
+                            <option>1年間</option>
+                            <option>3年間</option>
+                            <option selected>5年間</option>
+                            <option>無期限</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">タグ</label>
+                        <div class="tag-input">
+                            <span class="tag">決算</span>
+                            <span class="tag">AI事業</span>
+                            <span class="tag">個別面談</span>
+                            <span class="tag">2025Q1</span>
+                            <input type="text" placeholder="タグを追加..." class="tag-input-field">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 公開前チェックリスト -->
+<div class="pre-publish-checklist mt-lg">
+    <h3 class="text-lg font-semibold mb-md">📝 公開前チェックリスト</h3>
+    <div class="checklist-grid">
+        <label class="checklist-item completed">
+            <input type="checkbox" checked disabled>
+            <span>ファイルの文字起こし完了</span>
+        </label>
+        <label class="checklist-item completed">
+            <input type="checkbox" checked disabled>
+            <span>AI分析完了</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="legal-check">
+            <span>法務チェック完了</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="approval-check">
+            <span>責任者承認取得</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="faq-review">
+            <span>FAQ内容確認完了</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="action-assign">
+            <span>アクション担当者割当完了</span>
+        </label>
+    </div>
+</div>
+
+<!-- アクションボタン -->
+<div class="action-bar">
+    <div class="flex justify-between items-center">
+        <div class="text-muted">
+            <span>💡 ヒント：公開前にすべてのチェック項目を確認してください</span>
+        </div>
+        <div class="flex gap-md">
+            <button class="btn btn-secondary" onclick="saveDraft()">
+                💾 下書き保存
+            </button>
+            <button class="btn btn-primary" onclick="validateAndPublish()">
+                ✅ 確認して公開
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* プログレスステップ（他ページと共通） */
+.progress-header {
+    background-color: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: var(--gray-300);
+    z-index: -1;
+}
+
+.step.completed:not(:last-child)::after,
+.step.active:not(:last-child)::after {
+    background-color: var(--kagami-blue);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--gray-300);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-sm);
+}
+
+.step.completed .step-number {
+    background-color: var(--success-green);
+}
+
+.step.active .step-number {
+    background-color: var(--kagami-blue);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.step-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: var(--kagami-blue);
+    font-weight: var(--font-medium);
+}
+
+/* 公開サマリー */
+.publish-summary {
+    background-color: white;
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+.item-icon {
+    font-size: 2rem;
+}
+
+.item-content {
+    flex: 1;
+}
+
+.item-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.item-value {
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+    margin: var(--space-xs) 0;
+}
+
+.item-value.success {
+    color: var(--success-green);
+}
+
+.item-value.warning {
+    color: var(--warning-yellow);
+}
+
+.item-value.info {
+    color: var(--kagami-blue);
+}
+
+.item-detail {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* 公開コンテナ */
+.publish-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+/* 情報グリッド */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.info-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.info-value {
+    font-weight: var(--font-medium);
+}
+
+/* FAQ承認リスト */
+.faq-approval-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.faq-approval-item {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.faq-approval-item.approved {
+    border-color: var(--success-green);
+}
+
+.faq-approval-item.pending {
+    border-color: var(--warning-yellow);
+}
+
+.faq-checkbox-wrapper {
+    display: flex;
+    align-items: flex-start;
+    padding-top: var(--space-xs);
+}
+
+.faq-content {
+    flex: 1;
+}
+
+.faq-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.faq-category {
+    font-weight: var(--font-medium);
+    color: var(--kagami-blue);
+}
+
+.confidence-badge {
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.confidence-badge.high {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success-green);
+}
+
+.confidence-badge.medium {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning-yellow);
+}
+
+.status-badge {
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.status-badge.approved {
+    background-color: var(--success-green);
+    color: white;
+}
+
+.status-badge.pending {
+    background-color: var(--warning-yellow);
+    color: white;
+}
+
+.faq-text {
+    margin-bottom: var(--space-sm);
+}
+
+.question {
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-xs);
+}
+
+.answer {
+    color: var(--gray-700);
+}
+
+.faq-settings {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.form-control-sm {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--text-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-sm);
+}
+
+/* アクションレビュー */
+.action-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.action-review-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+.action-review-item.high-priority {
+    border-left: 4px solid var(--error-red);
+}
+
+.action-priority {
+    font-size: 1.2rem;
+}
+
+.action-content {
+    flex: 1;
+}
+
+.action-title {
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-xs);
+}
+
+.action-meta {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.action-assignee {
+    min-width: 200px;
+}
+
+/* 設定グループ */
+.setting-group {
+    margin-bottom: var(--space-md);
+}
+
+.setting-group:last-child {
+    margin-bottom: 0;
+}
+
+.setting-label {
+    display: block;
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-sm);
+}
+
+/* スイッチ */
+.switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.toggle-switch {
+    width: 40px;
+    height: 20px;
+    appearance: none;
+    background-color: var(--gray-300);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-switch:checked {
+    background-color: var(--kagami-blue);
+}
+
+.toggle-switch::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+}
+
+.toggle-switch:checked::before {
+    transform: translateX(20px);
+}
+
+.switch-label {
+    font-size: var(--text-sm);
+}
+
+/* 統合チェックリスト */
+.integration-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+/* 受信者リスト */
+.recipient-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.recipient-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm);
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-sm);
+}
+
+.remove-btn {
+    cursor: pointer;
+    color: var(--gray-600);
+    font-weight: var(--font-bold);
+}
+
+.remove-btn:hover {
+    color: var(--error-red);
+}
+
+/* タグ入力 */
+.tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    background-color: white;
+    min-height: 44px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+}
+
+.tag-input-field {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    font-size: var(--text-sm);
+}
+
+/* チェックリスト */
+.pre-publish-checklist {
+    background-color: white;
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checklist-item:hover {
+    background-color: var(--gray-100);
+}
+
+.checklist-item.completed {
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* アクションバー */
+.action-bar {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    border-top: 1px solid var(--gray-200);
+    padding: var(--space-lg);
+    margin: var(--space-lg) calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ヘッダーアクション */
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+/* レスポンシブ */
+@media (max-width: 1024px) {
+    .publish-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-grid,
+    .info-grid,
+    .checklist-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .faq-settings {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .action-review-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+
+<script>
+// ページ初期化
+document.addEventListener('DOMContentLoaded', function() {
+    updatePublishReadiness();
+});
+
+// 前へ戻る
+function goBack() {
+    window.history.back();
+}
+
+// 公開処理
+function publishDialogue() {
+    if (!validatePublishChecklist()) {
+        alert('公開前チェックリストをすべて確認してください');
+        return;
+    }
+    
+    // 公開処理の実行
+    if (confirm('対話記録を公開しますか？')) {
+        showNotification('対話記録を公開しました', 'success');
+        // 実際の実装では、ここでAPIを呼び出して公開処理を実行
+        setTimeout(() => {
+            window.location.href = '/dialogue';
+        }, 2000);
+    }
+}
+
+// すべてのFAQを選択/解除
+function toggleAllFAQs() {
+    const selectAll = document.getElementById('select-all-faqs');
+    const checkboxes = document.querySelectorAll('.faq-select');
+    checkboxes.forEach(cb => {
+        cb.checked = selectAll.checked;
+    });
+}
+
+// 下書き保存
+function saveDraft() {
+    // 設定を収集して保存
+    const settings = collectPublishSettings();
+    console.log('下書き保存:', settings);
+    showNotification('設定を保存しました', 'success');
+}
+
+// 検証して公開
+function validateAndPublish() {
+    if (!validatePublishChecklist()) {
+        highlightMissingChecks();
+        showNotification('公開前チェックリストを確認してください', 'warning');
+        return;
+    }
+    
+    publishDialogue();
+}
+
+// 公開前チェックリストの検証
+function validatePublishChecklist() {
+    const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:not(:disabled)');
+    return Array.from(checkboxes).every(cb => cb.checked);
+}
+
+// 未チェック項目をハイライト
+function highlightMissingChecks() {
+    const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:not(:disabled)');
+    checkboxes.forEach(cb => {
+        if (!cb.checked) {
+            cb.closest('.checklist-item').style.border = '2px solid var(--error-red)';
+            setTimeout(() => {
+                cb.closest('.checklist-item').style.border = '';
+            }, 3000);
+        }
+    });
+}
+
+// 公開設定を収集
+function collectPublishSettings() {
+    return {
+        dialogueVisibility: document.querySelector('.publish-settings select').value,
+        autoPublishFAQ: document.querySelector('.toggle-switch').checked,
+        integrations: Array.from(document.querySelectorAll('.integration-checklist input:checked')).map(cb => cb.nextElementSibling.textContent),
+        faqs: Array.from(document.querySelectorAll('.faq-select:checked')).map(cb => {
+            const item = cb.closest('.faq-approval-item');
+            return {
+                selected: true,
+                visibility: item.querySelector('.form-control-sm').value
+            };
+        })
+    };
+}
+
+// 公開準備状況を更新
+function updatePublishReadiness() {
+    const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:not(:disabled)');
+    const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const totalCount = checkboxes.length;
+    
+    // プログレスを表示（実装例）
+    console.log(`公開準備: ${checkedCount}/${totalCount}`);
+}
+
+// 通知表示
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // スタイルを追加
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        border-left: 4px solid ${
+            type === 'success' ? 'var(--success-green)' : 
+            type === 'warning' ? 'var(--warning-yellow)' : 
+            type === 'error' ? 'var(--error-red)' : 
+            'var(--kagami-blue)'
+        };
+    `;
+    
+    // アニメーション
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // 3秒後に削除
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// チェックボックスの変更を監視
+document.querySelectorAll('.checklist-item input[type="checkbox"]:not(:disabled)').forEach(cb => {
+    cb.addEventListener('change', updatePublishReadiness);
+});
+</script>
+
+{% endblock %}

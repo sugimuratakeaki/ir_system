@@ -126,7 +126,7 @@
                         <td>
                             <div class="flex gap-sm">
                                 <button class="btn btn-sm btn-primary" onclick="showDetailModal('meeting_001')">詳細</button>
-                                <button class="btn btn-sm btn-secondary">編集</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('meeting_001')">編集</button>
                             </div>
                         </td>
                     </tr>
@@ -154,7 +154,7 @@
                         <td>
                             <div class="flex gap-sm">
                                 <button class="btn btn-sm btn-primary" disabled>詳細</button>
-                                <button class="btn btn-sm btn-secondary">編集</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('email_001')">編集</button>
                             </div>
                         </td>
                     </tr>
@@ -185,7 +185,7 @@
                         <td>
                             <div class="flex gap-sm">
                                 <button class="btn btn-sm btn-primary" onclick="showDetailModal('voice_001')">詳細</button>
-                                <button class="btn btn-sm btn-secondary">編集</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('voice_001')">編集</button>
                             </div>
                         </td>
                     </tr>
@@ -215,7 +215,7 @@
                         <td>
                             <div class="flex gap-sm">
                                 <button class="btn btn-sm btn-primary" onclick="showDetailModal('doc_001')">詳細</button>
-                                <button class="btn btn-sm btn-secondary">編集</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('doc_001')">編集</button>
                             </div>
                         </td>
                     </tr>
@@ -271,7 +271,7 @@
         
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeDetailModal()">閉じる</button>
-            <button class="btn btn-primary" onclick="saveDetails()">変更を保存</button>
+            <button class="btn btn-primary" onclick="editFromModal()">編集画面へ</button>
         </div>
     </div>
 </div>
@@ -375,6 +375,11 @@
 
 {% block extra_js %}
 <script>
+// 編集画面への遷移
+function editDialogue(recordId) {
+    window.location.href = `/dialogue/edit?id=${recordId}`;
+}
+
 // チェックボックス管理
 document.getElementById('selectAll').addEventListener('change', function() {
     const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
@@ -402,7 +407,10 @@ function updateBulkActionBar() {
 }
 
 // 詳細モーダルの表示
+let currentRecordId = null; // 現在表示中の記録ID
+
 function showDetailModal(recordId) {
+    currentRecordId = recordId; // IDを保存
     const modal = document.getElementById('detailModal');
     const modalBody = modal.querySelector('.modal-body');
     
@@ -462,6 +470,56 @@ function getMeetingDetailContent() {
                         <span class="tag">個人投資家（30名）</span>
                         <input type="text" class="form-control" placeholder="参加者を追加...">
                     </div>
+                    <div class="faq-candidate">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold">Q: エンジニア採用の具体的な目標は？</h4>
+                                <p class="text-sm text-muted mt-sm">A: 2025年度末までに200名体制を目指し、現在150名まで増強。新卒・中途採用をバランス良く進め、特にAI・機械学習分野のスペシャリスト確保に注力しています。</p>
+                            </div>
+                            <div class="flex gap-sm">
+                                <span class="confidence-badge confidence-high">信頼度: 95%</span>
+                                <label class="flex items-center gap-sm">
+                                    <input type="checkbox" checked>
+                                    <span>採用</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-md">
+                    <button class="btn btn-sm btn-secondary">すべてのFAQ候補を表示</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- フォローアップタスク -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📋 フォローアップタスク</h3>
+            </div>
+            <div class="card-body">
+                <div class="task-list">
+                    <div class="task-item">
+                        <input type="checkbox" id="task1">
+                        <label for="task1">
+                            <span class="task-title">競合分析レポートの更新</span>
+                            <span class="task-meta">期限: 2025/01/31 • 担当: 事業企画部</span>
+                        </label>
+                    </div>
+                    <div class="task-item">
+                        <input type="checkbox" id="task2">
+                        <label for="task2">
+                            <span class="task-title">人材確保戦略の詳細資料作成</span>
+                            <span class="task-meta">期限: 2025/01/25 • 担当: 人事部</span>
+                        </label>
+                    </div>
+                    <div class="task-item">
+                        <input type="checkbox" id="task3">
+                        <label for="task3">
+                            <span class="task-title">AI事業の成長戦略プレゼン資料更新</span>
+                            <span class="task-meta">期限: 2025/02/05 • 担当: AI事業部</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -473,8 +531,8 @@ function getMeetingDetailContent() {
             </div>
             <div class="card-body">
                 <div class="alert alert-info mb-md">
-                    <h4 class="font-semibold mb-sm">会議サマリー</h4>
-                    <p>第3四半期の好調な業績（売上高前年同期比15%増）を報告。特に海外事業の成長が顕著。投資家からは今後の成長戦略、DX投資計画、ESG目標について多数の質問。全体的にポジティブな反応。</p>
+                    <h4 class="font-semibold mb-sm">📝 対話サマリー</h4>
+                    <p>第3四半期の好調な業績（売上高前年同期比15%増、特にAI事業35%増）を報告。投資家からは今後の成長戦略、DX投資計画、ESG目標について多数の質問。全体的にポジティブな反応を得たが、競合他社の動向と人材確保については慎重な見方も示された。</p>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-md">
@@ -494,6 +552,14 @@ function getMeetingDetailContent() {
                             <div class="sentiment-bar neutral" style="width: 20%;">中立 20%</div>
                             <div class="sentiment-bar negative" style="width: 5%;">ネガティブ 5%</div>
                         </div>
+                        <div class="mt-md">
+                            <h5 class="font-medium mb-sm">⚠️ 検出された課題・懸念</h5>
+                            <ul class="concern-list-compact">
+                                <li class="concern-high">🔴 人材確保の持続可能性への懸念</li>
+                                <li class="concern-medium">🟡 競合他社の追い上げリスク</li>
+                                <li class="concern-low">🟢 海外展開のスピード感</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -510,8 +576,8 @@ function getMeetingDetailContent() {
                     <div class="faq-candidate">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
-                                <h4 class="font-semibold">Q: 海外事業の成長率30%達成の要因は？</h4>
-                                <p class="text-sm text-muted mt-sm">A: 現地パートナーとの戦略的提携、ローカライズ製品開発、デジタルマーケティング強化の3つの施策が奏功しました。</p>
+                                <h4 class="font-semibold">Q: AI事業の成長率35%の要因は？</h4>
+                                <p class="text-sm text-muted mt-sm">A: エンタープライズSaaSの好調、新製品の市場投入、既存顧客のアップセルが寄与しました。特に大手企業向けAIソリューションの採用が加速しています。</p>
                             </div>
                             <div class="flex gap-sm">
                                 <span class="confidence-badge confidence-high">信頼度: 98%</span>
@@ -733,10 +799,11 @@ function closeDetailModal() {
     document.body.style.overflow = 'auto';
 }
 
-// 詳細を保存
-function saveDetails() {
-    alert('変更を保存しました。');
-    closeDetailModal();
+// モーダルから編集画面へ
+function editFromModal() {
+    if (currentRecordId) {
+        window.location.href = `/dialogue/edit?id=${currentRecordId}`;
+    }
 }
 
 // タグ入力の処理
@@ -838,6 +905,77 @@ style.textContent = `
     background-color: var(--gray-50);
     border-radius: var(--border-radius-md);
     border: 1px solid var(--gray-200);
+}
+
+/* 懸念リスト（コンパクト） */
+.concern-list-compact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.concern-list-compact li {
+    padding: var(--space-xs) var(--space-sm);
+    margin-bottom: var(--space-xs);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+}
+
+.concern-list-compact .concern-high {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error-red);
+}
+
+.concern-list-compact .concern-medium {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning-yellow);
+}
+
+.concern-list-compact .concern-low {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success-green);
+}
+
+/* タスクリスト */
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+}
+
+.task-item input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.task-item label {
+    flex: 1;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-title {
+    font-weight: var(--font-medium);
+}
+
+.task-meta {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.task-item input[type="checkbox"]:checked + label .task-title {
+    text-decoration: line-through;
+    color: var(--gray-500);
 }
 
 .grid {

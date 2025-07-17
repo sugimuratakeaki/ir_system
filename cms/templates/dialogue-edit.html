@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% block title %}対話記録編集{% endblock %}
+
+{% block content %}
+<!-- ヘッダー -->
+<div class="flex justify-between items-center mb-lg">
+    <div>
+        <h2 class="text-2xl font-bold mb-sm">対話記録編集</h2>
+        <p class="text-muted">対話記録のメタ情報を編集します</p>
+    </div>
+    <div class="flex gap-md">
+        <button class="btn btn-secondary" onclick="cancelEdit()">
+            ❌ キャンセル
+        </button>
+    </div>
+</div>
+
+<!-- ファイル情報（読み取り専用） -->
+<div class="card mb-lg">
+    <div class="card-header bg-blue-50">
+        <h3 class="text-lg font-semibold flex items-center gap-sm">
+            📎 ファイル情報
+            <span class="badge badge-info">記録ID: {{ record_id }}</span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="flex items-start gap-md">
+            <div class="file-icon text-4xl">
+                {% if dialogue_data.file_name.endswith('.mp4') or dialogue_data.file_name.endswith('.mp3') %}
+                    🎙️
+                {% elif dialogue_data.file_name.endswith('.pdf') %}
+                    📄
+                {% else %}
+                    📊
+                {% endif %}
+            </div>
+            <div class="flex-1">
+                <h4 class="font-semibold text-lg mb-sm">{{ dialogue_data.file_name }}</h4>
+                <div class="file-meta flex gap-lg text-sm text-muted">
+                    <span>📊 {{ dialogue_data.file_size }}</span>
+                    <span>⏱️ {{ dialogue_data.duration }}</span>
+                    <span>📅 {{ dialogue_data.date[:10] }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メタ情報編集フォーム -->
+<form id="editForm">
+<div class="grid grid-cols-2 gap-lg">
+    <!-- 左カラム：基本情報 -->
+    <div>
+        <!-- 会議基本情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📋 会議基本情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label required">会議タイトル</label>
+                    <input type="text" class="form-control" name="title" value="{{ dialogue_data.title }}" placeholder="例：○○社との決算説明会">
+                    <small class="text-muted">投資家名や会議の種類を含めてください</small>
+                </div>
+
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label required">会議種別</label>
+                        <select class="form-control" name="type">
+                            <option {% if dialogue_data.type == "個別面談" %}selected{% endif %}>個別面談</option>
+                            <option {% if dialogue_data.type == "決算説明会" %}selected{% endif %}>決算説明会</option>
+                            <option {% if dialogue_data.type == "スモールミーティング" %}selected{% endif %}>スモールミーティング</option>
+                            <option {% if dialogue_data.type == "カンファレンス" %}selected{% endif %}>カンファレンス</option>
+                            <option {% if dialogue_data.type == "電話会議" %}selected{% endif %}>電話会議</option>
+                            <option {% if dialogue_data.type == "その他" %}selected{% endif %}>その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">開催日時</label>
+                        <input type="datetime-local" class="form-control" name="date" value="{{ dialogue_data.date }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">参加者数</label>
+                    <input type="number" class="form-control" name="participants" value="{{ dialogue_data.participants }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- 投資家情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🏢 投資家情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label required">投資家名</label>
+                    <input type="text" class="form-control" name="investor_name" value="{{ dialogue_data.investor_name }}" placeholder="投資家名を入力">
+                </div>
+
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">投資家タイプ</label>
+                        <select class="form-control" name="investor_type">
+                            <option {% if dialogue_data.investor_type == "国内機関投資家" %}selected{% endif %}>国内機関投資家</option>
+                            <option {% if dialogue_data.investor_type == "海外機関投資家" %}selected{% endif %}>海外機関投資家</option>
+                            <option {% if dialogue_data.investor_type == "個人投資家" %}selected{% endif %}>個人投資家</option>
+                            <option {% if dialogue_data.investor_type == "アナリスト" %}selected{% endif %}>アナリスト</option>
+                            <option {% if dialogue_data.investor_type == "その他" %}selected{% endif %}>その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">保有状況</label>
+                        <select class="form-control" name="holding_status">
+                            <option {% if dialogue_data.holding_status == "大株主（5%以上）" %}selected{% endif %}>大株主（5%以上）</option>
+                            <option {% if dialogue_data.holding_status == "主要株主（1-5%）" %}selected{% endif %}>主要株主（1-5%）</option>
+                            <option {% if dialogue_data.holding_status == "一般株主（1%未満）" %}selected{% endif %}>一般株主（1%未満）</option>
+                            <option {% if dialogue_data.holding_status == "非保有（関心あり）" %}selected{% endif %}>非保有（関心あり）</option>
+                            <option {% if dialogue_data.holding_status == "複数" %}selected{% endif %}>複数</option>
+                            <option {% if dialogue_data.holding_status == "不明" %}selected{% endif %}>不明</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右カラム：対話情報 -->
+    <div>
+        <!-- 自社参加者 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">👥 自社参加者</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">主要説明者</label>
+                    <div class="participant-list">
+                        {% for participant in dialogue_data.company_participants %}
+                        <div class="participant-tag">
+                            <span>{{ participant }}</span>
+                            <button type="button" class="btn-remove" onclick="removeParticipant(this)">×</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary mt-sm" onclick="addParticipant()">+ 参加者追加</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 重要度・機密度設定 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">⚡ 重要度・機密度設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">重要度</label>
+                        <select class="form-control" name="importance">
+                            <option {% if dialogue_data.importance == "低" %}selected{% endif %}>低</option>
+                            <option {% if dialogue_data.importance == "中" %}selected{% endif %}>中</option>
+                            <option {% if dialogue_data.importance == "高" %}selected{% endif %}>高</option>
+                            <option {% if dialogue_data.importance == "最重要" %}selected{% endif %}>最重要</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">機密度</label>
+                        <select class="form-control" name="confidentiality">
+                            <option {% if dialogue_data.confidentiality == "一般" %}selected{% endif %}>一般</option>
+                            <option {% if dialogue_data.confidentiality == "社内限定" %}selected{% endif %}>社内限定</option>
+                            <option {% if dialogue_data.confidentiality == "役員限定" %}selected{% endif %}>役員限定</option>
+                            <option {% if dialogue_data.confidentiality == "極秘" %}selected{% endif %}>極秘</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">タグ・キーワード</label>
+                    <div class="tag-input">
+                        {% for tag in dialogue_data.tags %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                        <input type="text" placeholder="タグを追加..." class="tag-input-field" onkeypress="handleTagInput(event)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 公開設定 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🔒 公開設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">公開ステータス</label>
+                    <select class="form-control" name="public_status">
+                        <option>非公開（IR部門のみ）</option>
+                        <option>社内公開</option>
+                        <option selected>投資家限定公開</option>
+                        <option>一般公開</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">公開予定日時</label>
+                    <input type="datetime-local" class="form-control" name="public_date">
+                    <small class="text-muted">空欄の場合は即時公開</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+
+<!-- アクションボタン -->
+<div class="action-bar">
+    <div class="flex justify-between items-center">
+        <div class="text-muted">
+            <span>💡 最終更新: {{ current_time }}</span>
+        </div>
+        <div class="flex gap-md">
+            <button class="btn btn-secondary" onclick="cancelEdit()">
+                キャンセル
+            </button>
+            <button class="btn btn-primary" onclick="saveChanges()">
+                変更を保存
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 既存のスタイルに追加 */
+.participant-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.participant-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+}
+
+.btn-remove {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0;
+    margin-left: var(--space-xs);
+}
+
+.btn-remove:hover {
+    opacity: 0.8;
+}
+
+/* タグ入力 */
+.tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    background-color: white;
+    min-height: 44px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+}
+
+.tag-input-field {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    font-size: var(--text-sm);
+}
+
+/* アクションバー */
+.action-bar {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    border-top: 1px solid var(--gray-200);
+    padding: var(--space-lg);
+    margin: var(--space-lg) calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 必須項目 */
+.form-label.required::after {
+    content: ' *';
+    color: var(--error-red);
+}
+
+/* ファイル情報 */
+.file-icon {
+    font-size: 3rem;
+}
+
+.file-meta {
+    display: flex;
+    gap: var(--space-lg);
+    color: var(--gray-600);
+}
+
+/* バッジ */
+.badge-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--kagami-blue);
+}
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// キャンセル
+function cancelEdit() {
+    if (confirm('変更を破棄して戻りますか？')) {
+        window.location.href = '/dialogue';
+    }
+}
+
+// 変更を保存
+function saveChanges() {
+    // フォームデータを収集
+    const formData = new FormData(document.getElementById('editForm'));
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+        data[key] = value;
+    }
+    
+    console.log('保存データ:', data);
+    
+    // 実際の実装では、ここでAPIを呼び出してデータを保存
+    showNotification('変更を保存しました', 'success');
+    
+    // 2秒後に一覧画面へ戻る
+    setTimeout(() => {
+        window.location.href = '/dialogue';
+    }, 2000);
+}
+
+// 参加者を削除
+function removeParticipant(button) {
+    button.parentElement.remove();
+}
+
+// 参加者を追加
+function addParticipant() {
+    const name = prompt('参加者名を入力してください（例：CEO - 山田太郎）');
+    if (name) {
+        const list = document.querySelector('.participant-list');
+        const tag = document.createElement('div');
+        tag.className = 'participant-tag';
+        tag.innerHTML = `
+            <span>${name}</span>
+            <button type="button" class="btn-remove" onclick="removeParticipant(this)">×</button>
+        `;
+        list.insertBefore(tag, list.lastElementChild);
+    }
+}
+
+// タグ入力処理
+function handleTagInput(event) {
+    if (event.key === 'Enter' && event.target.value.trim()) {
+        event.preventDefault();
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = event.target.value.trim();
+        event.target.parentElement.insertBefore(tag, event.target);
+        event.target.value = '';
+    }
+}
+
+// 通知表示
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // アニメーション
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // 3秒後に削除
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// 通知用のスタイル追加
+const notificationStyle = document.createElement('style');
+notificationStyle.textContent = `
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: var(--space-md) var(--space-lg);
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    border-left: 4px solid var(--success-green);
+}
+
+.notification-error {
+    border-left: 4px solid var(--error-red);
+}
+
+.notification-info {
+    border-left: 4px solid var(--kagami-blue);
+}
+`;
+document.head.appendChild(notificationStyle);
+</script>
+{% endblock %}

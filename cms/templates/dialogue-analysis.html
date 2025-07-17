@@ -1,0 +1,1759 @@
+{% extends "base.html" %}
+
+{% block title %}AI詳細分析 - 対話インサイト{% endblock %}
+
+{% block content %}
+<!-- プログレスバー -->
+<div class="progress-header mb-lg">
+    <div class="progress-steps">
+        <div class="step completed">
+            <div class="step-number">1</div>
+            <div class="step-label">ファイル選択</div>
+        </div>
+        <div class="step completed">
+            <div class="step-number">2</div>
+            <div class="step-label">アップロード</div>
+        </div>
+        <div class="step completed">
+            <div class="step-number">3</div>
+            <div class="step-label">メタ情報登録</div>
+        </div>
+        <div class="step active">
+            <div class="step-number">4</div>
+            <div class="step-label">AI分析</div>
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-label">確認・公開</div>
+        </div>
+    </div>
+</div>
+
+<!-- ヘッダー -->
+<div class="flex justify-between items-center mb-lg">
+    <div>
+        <h2 class="text-2xl font-bold mb-sm">AI詳細分析 - 対話インサイト</h2>
+        <p class="text-muted">野村アセットマネジメントとの個別面談（2025/07/15）</p>
+    </div>
+    <div class="flex gap-md">
+        <button class="btn btn-secondary" onclick="exportAnalysis()">
+            📥 分析結果をエクスポート
+        </button>
+        <button class="btn btn-primary" onclick="proceedToPublish()">
+            次へ：確認・公開 →
+        </button>
+    </div>
+</div>
+
+<!-- 分析サマリーカード -->
+<div class="analysis-summary-cards mb-lg">
+    <div class="summary-card">
+        <div class="card-icon">😊</div>
+        <div class="card-content">
+            <div class="card-value">85%</div>
+            <div class="card-label">ポジティブ</div>
+            <div class="card-detail">全体的に好意的</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="card-icon">🎯</div>
+        <div class="card-content">
+            <div class="card-value">12件</div>
+            <div class="card-label">重要ポイント</div>
+            <div class="card-detail">アクション必要</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="card-icon">❓</div>
+        <div class="card-content">
+            <div class="card-value">8件</div>
+            <div class="card-label">懸念事項</div>
+            <div class="card-detail">フォロー推奨</div>
+        </div>
+    </div>
+    <div class="summary-card">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+            <div class="card-value">95%</div>
+            <div class="card-label">関連性スコア</div>
+            <div class="card-detail">決算関連度</div>
+        </div>
+    </div>
+</div>
+
+<!-- メインコンテンツエリア -->
+<div class="analysis-container">
+    <!-- 左サイドバー：目次・ナビゲーション -->
+    <div class="analysis-sidebar">
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">分析セクション</h3>
+            <nav class="analysis-nav">
+                <a href="#executive-summary" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>エグゼクティブサマリー</span>
+                </a>
+                <a href="#sentiment-analysis" class="nav-item">
+                    <span class="nav-icon">😊</span>
+                    <span>感情分析</span>
+                </a>
+                <a href="#key-topics" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span>トピック分析</span>
+                </a>
+                <a href="#timeline-view" class="nav-item">
+                    <span class="nav-icon">⏰</span>
+                    <span>タイムライン</span>
+                </a>
+                <a href="#speaker-analysis" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>発言者分析</span>
+                </a>
+                <a href="#action-items" class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>アクションアイテム</span>
+                </a>
+                <a href="#risk-analysis" class="nav-item">
+                    <span class="nav-icon">⚠️</span>
+                    <span>リスク分析</span>
+                </a>
+            </nav>
+        </div>
+        
+        <!-- クイックアクション -->
+        <div class="sidebar-section">
+            <h4 class="sidebar-subtitle">クイックアクション</h4>
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="generateReport()">
+                    📄 レポート生成
+                </button>
+                <button class="quick-action-btn" onclick="shareInsights()">
+                    🔗 インサイト共有
+                </button>
+                <button class="quick-action-btn" onclick="scheduleFollowup()">
+                    📅 フォローアップ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="analysis-main">
+        <!-- エグゼクティブサマリー -->
+        <section id="executive-summary" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">📋 エグゼクティブサマリー</h3>
+                <button class="btn btn-sm btn-secondary" onclick="editSummary()">
+                    ✏️ 編集
+                </button>
+            </div>
+            
+            <div class="executive-summary-content">
+                <div class="summary-highlight">
+                    <h4>会議の概要</h4>
+                    <p>野村アセットマネジメントとの個別面談では、2025年第1四半期の業績について詳細な説明を行いました。特にAI事業の成長率35%という好調な結果に対して高い評価を受け、今後の成長戦略について建設的な議論が展開されました。</p>
+                </div>
+                
+                <div class="key-discussion-points">
+                    <h4>主要な議論ポイント</h4>
+                    <div class="discussion-grid">
+                        <div class="discussion-item positive">
+                            <div class="item-icon">✅</div>
+                            <div class="item-content">
+                                <h5>AI事業の成長性</h5>
+                                <p>エンタープライズ向けSaaSの好調な推移と新製品投入による相乗効果を高く評価</p>
+                                <span class="sentiment-tag">非常にポジティブ</span>
+                            </div>
+                        </div>
+                        <div class="discussion-item positive">
+                            <div class="item-icon">✅</div>
+                            <div class="item-content">
+                                <h5>財務健全性</h5>
+                                <p>営業利益率の改善とキャッシュフローの強化を評価</p>
+                                <span class="sentiment-tag">ポジティブ</span>
+                            </div>
+                        </div>
+                        <div class="discussion-item neutral">
+                            <div class="item-icon">🤔</div>
+                            <div class="item-content">
+                                <h5>人材戦略</h5>
+                                <p>エンジニア採用目標の達成可能性について慎重な見方も</p>
+                                <span class="sentiment-tag">中立的</span>
+                            </div>
+                        </div>
+                        <div class="discussion-item caution">
+                            <div class="item-icon">⚠️</div>
+                            <div class="item-content">
+                                <h5>競合環境</h5>
+                                <p>大手テック企業の参入による競争激化への対応策を質問</p>
+                                <span class="sentiment-tag">要注意</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="investor-stance">
+                    <h4>投資家のスタンス</h4>
+                    <div class="stance-meter">
+                        <div class="meter-labels">
+                            <span>ネガティブ</span>
+                            <span>中立</span>
+                            <span>ポジティブ</span>
+                        </div>
+                        <div class="meter-bar">
+                            <div class="meter-fill" style="width: 85%;"></div>
+                            <div class="meter-marker" style="left: 85%;">
+                                <span class="marker-value">85%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="stance-description">全体的に前向きな評価。特にAI事業の成長性と経営陣のビジョンを高く評価。追加投資を検討する可能性も示唆。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 感情分析 -->
+        <section id="sentiment-analysis" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">😊 感情分析</h3>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" onclick="toggleSentimentView('timeline')">
+                        タイムライン
+                    </button>
+                    <button class="toggle-btn" onclick="toggleSentimentView('speaker')">
+                        発言者別
+                    </button>
+                    <button class="toggle-btn" onclick="toggleSentimentView('topic')">
+                        トピック別
+                    </button>
+                </div>
+            </div>
+            
+            <div class="sentiment-content">
+                <!-- 感情推移チャート -->
+                <div class="sentiment-timeline-chart">
+                    <canvas id="sentimentChart" height="200"></canvas>
+                </div>
+                
+                <!-- 感情分布 -->
+                <div class="sentiment-distribution">
+                    <div class="distribution-item positive">
+                        <div class="distribution-bar" style="height: 65%;"></div>
+                        <div class="distribution-label">
+                            <span class="emoji">😊</span>
+                            <span class="percentage">65%</span>
+                            <span class="label">ポジティブ</span>
+                        </div>
+                    </div>
+                    <div class="distribution-item neutral">
+                        <div class="distribution-bar" style="height: 25%;"></div>
+                        <div class="distribution-label">
+                            <span class="emoji">😐</span>
+                            <span class="percentage">25%</span>
+                            <span class="label">中立</span>
+                        </div>
+                    </div>
+                    <div class="distribution-item negative">
+                        <div class="distribution-bar" style="height: 10%;"></div>
+                        <div class="distribution-label">
+                            <span class="emoji">😕</span>
+                            <span class="percentage">10%</span>
+                            <span class="label">ネガティブ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 感情的なハイライト -->
+                <div class="emotional-highlights">
+                    <h4>感情的なハイライト</h4>
+                    <div class="highlight-cards">
+                        <div class="highlight-card most-positive">
+                            <div class="highlight-header">
+                                <span class="highlight-icon">🎉</span>
+                                <span class="highlight-label">最もポジティブな瞬間</span>
+                            </div>
+                            <div class="highlight-content">
+                                <p class="quote">"AI事業の成長率35%は素晴らしい成果です。市場をリードする位置にいることは明確です。"</p>
+                                <p class="context">山田太郎氏 - 14:25</p>
+                            </div>
+                        </div>
+                        <div class="highlight-card concern">
+                            <div class="highlight-header">
+                                <span class="highlight-icon">🤔</span>
+                                <span class="highlight-label">懸念が示された瞬間</span>
+                            </div>
+                            <div class="highlight-content">
+                                <p class="quote">"競合他社の動向は気になります。特に大手テック企業の参入についてどうお考えですか？"</p>
+                                <p class="context">鈴木花子氏 - 35:40</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- トピック分析 -->
+        <section id="key-topics" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">🏷️ トピック分析</h3>
+                <button class="btn btn-sm btn-secondary" onclick="adjustTopics()">
+                    ⚙️ トピック調整
+                </button>
+            </div>
+            
+            <div class="topic-cloud">
+                <div class="topic-bubble large" data-weight="0.35">
+                    <span class="topic-name">AI事業</span>
+                    <span class="topic-percentage">35%</span>
+                </div>
+                <div class="topic-bubble medium" data-weight="0.20">
+                    <span class="topic-name">人材戦略</span>
+                    <span class="topic-percentage">20%</span>
+                </div>
+                <div class="topic-bubble medium" data-weight="0.15">
+                    <span class="topic-name">財務状況</span>
+                    <span class="topic-percentage">15%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.10">
+                    <span class="topic-name">競合分析</span>
+                    <span class="topic-percentage">10%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.08">
+                    <span class="topic-name">ESG</span>
+                    <span class="topic-percentage">8%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.07">
+                    <span class="topic-name">海外展開</span>
+                    <span class="topic-percentage">7%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.05">
+                    <span class="topic-name">技術革新</span>
+                    <span class="topic-percentage">5%</span>
+                </div>
+            </div>
+            
+            <!-- トピック詳細 -->
+            <div class="topic-details">
+                <h4>主要トピックの詳細分析</h4>
+                <div class="topic-detail-cards">
+                    <div class="topic-detail-card">
+                        <div class="topic-header">
+                            <h5>🤖 AI事業（35%）</h5>
+                            <span class="sentiment-indicator positive">+85%</span>
+                        </div>
+                        <div class="topic-keywords">
+                            <span class="keyword">成長率</span>
+                            <span class="keyword">SaaS</span>
+                            <span class="keyword">エンタープライズ</span>
+                            <span class="keyword">新製品</span>
+                        </div>
+                        <div class="topic-insights">
+                            <p>最も議論時間が長く、投資家の関心が最も高いトピック。特に持続的成長性と競争優位性に注目。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="topic-detail-card">
+                        <div class="topic-header">
+                            <h5>👥 人材戦略（20%）</h5>
+                            <span class="sentiment-indicator neutral">+45%</span>
+                        </div>
+                        <div class="topic-keywords">
+                            <span class="keyword">エンジニア採用</span>
+                            <span class="keyword">200名体制</span>
+                            <span class="keyword">人材確保</span>
+                            <span class="keyword">競争力</span>
+                        </div>
+                        <div class="topic-insights">
+                            <p>採用目標の実現可能性と人材の質に関する議論。市場での人材獲得競争への懸念も表明。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- タイムライン表示 -->
+        <section id="timeline-view" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">⏰ 対話タイムライン</h3>
+                <div class="timeline-controls">
+                    <button class="btn btn-sm btn-secondary" onclick="filterTimeline('all')">
+                        すべて
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="filterTimeline('key-moments')">
+                        重要な瞬間
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="filterTimeline('questions')">
+                        質問のみ
+                    </button>
+                </div>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-item key-moment">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-time">14:00</span>
+                            <span class="timeline-speaker">田中CEO</span>
+                            <span class="moment-badge">🌟 キーモーメント</span>
+                        </div>
+                        <div class="timeline-text">
+                            <p>本日はお時間をいただきありがとうございます。第1四半期の業績についてご説明させていただきます。</p>
+                        </div>
+                        <div class="timeline-analysis">
+                            <span class="analysis-tag">オープニング</span>
+                            <span class="sentiment-tag positive">ポジティブ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item question">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-time">14:23</span>
+                            <span class="timeline-speaker">山田氏（投資家）</span>
+                            <span class="question-badge">❓ 質問</span>
+                        </div>
+                        <div class="timeline-text">
+                            <p>AI事業の成長率35%を達成した要因について、もう少し詳しく教えていただけますか？</p>
+                        </div>
+                        <div class="timeline-analysis">
+                            <span class="analysis-tag">成長要因</span>
+                            <span class="interest-level high">高関心</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item answer key-moment">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-time">14:25</span>
+                            <span class="timeline-speaker">田中CEO</span>
+                            <span class="moment-badge">🌟 キーモーメント</span>
+                        </div>
+                        <div class="timeline-text">
+                            <p>主に3つの要因があります。第一にエンタープライズSaaSの好調、第二に新製品の市場投入、第三に既存顧客のアップセルです。特に大手企業向けAIソリューションの採用が加速しています。</p>
+                        </div>
+                        <div class="timeline-analysis">
+                            <span class="analysis-tag">成長戦略</span>
+                            <span class="sentiment-tag very-positive">非常にポジティブ</span>
+                            <span class="impact-tag">インパクト大</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- タイムラインナビゲーション -->
+                <div class="timeline-navigation">
+                    <button class="timeline-nav-btn" onclick="jumpToTime('start')">
+                        ⏮️ 開始
+                    </button>
+                    <button class="timeline-nav-btn" onclick="jumpToTime('previous')">
+                        ⏪ 前へ
+                    </button>
+                    <button class="timeline-nav-btn" onclick="jumpToTime('next')">
+                        ⏩ 次へ
+                    </button>
+                    <button class="timeline-nav-btn" onclick="jumpToTime('end')">
+                        ⏭️ 終了
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- アクションアイテム -->
+        <section id="action-items" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">✅ アクションアイテム</h3>
+                <button class="btn btn-sm btn-primary" onclick="addActionItem()">
+                    + アクション追加
+                </button>
+            </div>
+            
+            <div class="action-items-container">
+                <div class="action-priority-groups">
+                    <!-- 高優先度 -->
+                    <div class="priority-group high">
+                        <h4 class="priority-header">
+                            <span class="priority-icon">🔴</span>
+                            <span>高優先度</span>
+                            <span class="count">(3)</span>
+                        </h4>
+                        <div class="action-items-list">
+                            <div class="action-item">
+                                <input type="checkbox" id="action1" class="action-checkbox">
+                                <label for="action1" class="action-content">
+                                    <div class="action-title">競合分析レポートの準備</div>
+                                    <div class="action-details">
+                                        <span class="action-owner">担当: IR部</span>
+                                        <span class="action-due">期限: 2025/07/22</span>
+                                    </div>
+                                    <div class="action-context">
+                                        投資家から競合他社の動向について詳細な質問があったため、追加資料を準備
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="action-item">
+                                <input type="checkbox" id="action2" class="action-checkbox">
+                                <label for="action2" class="action-content">
+                                    <div class="action-title">AI事業の詳細KPI共有</div>
+                                    <div class="action-details">
+                                        <span class="action-owner">担当: 経営企画部</span>
+                                        <span class="action-due">期限: 2025/07/20</span>
+                                    </div>
+                                    <div class="action-context">
+                                        月次のARRやチャーンレートなど、より詳細なメトリクスの開示を検討
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 中優先度 -->
+                    <div class="priority-group medium">
+                        <h4 class="priority-header">
+                            <span class="priority-icon">🟡</span>
+                            <span>中優先度</span>
+                            <span class="count">(5)</span>
+                        </h4>
+                        <div class="action-items-list">
+                            <div class="action-item">
+                                <input type="checkbox" id="action3" class="action-checkbox">
+                                <label for="action3" class="action-content">
+                                    <div class="action-title">人材採用進捗の月次アップデート</div>
+                                    <div class="action-details">
+                                        <span class="action-owner">担当: 人事部</span>
+                                        <span class="action-due">期限: 月次</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- アクション統計 -->
+                <div class="action-statistics">
+                    <h4>アクション統計</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">総アクション数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">今週期限</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">75%</div>
+                            <div class="stat-label">完了率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 右サイドバー：AI推奨事項 -->
+    <div class="analysis-right-sidebar">
+        <div class="ai-recommendations">
+            <h3 class="sidebar-title">🤖 AI推奨事項</h3>
+            
+            <div class="recommendation-card">
+                <div class="rec-header">
+                    <span class="rec-icon">📊</span>
+                    <span class="rec-title">フォローアップ推奨</span>
+                </div>
+                <div class="rec-content">
+                    <p>競合分析に関する追加情報を2週間以内に提供することで、投資家の信頼を強化できます。</p>
+                    <button class="btn btn-sm btn-primary">タスク作成</button>
+                </div>
+            </div>
+            
+            <div class="recommendation-card">
+                <div class="rec-header">
+                    <span class="rec-icon">💡</span>
+                    <span class="rec-title">コミュニケーション改善</span>
+                </div>
+                <div class="rec-content">
+                    <p>技術的な説明をより具体的な事例で補強すると、理解度が向上します。</p>
+                    <button class="btn btn-sm btn-secondary">詳細を見る</button>
+                </div>
+            </div>
+            
+            <div class="recommendation-card">
+                <div class="rec-header">
+                    <span class="rec-icon">🎯</span>
+                    <span class="rec-title">次回の重点トピック</span>
+                </div>
+                <div class="rec-content">
+                    <ul class="rec-list">
+                        <li>人材確保の具体的施策</li>
+                        <li>競合対策の詳細</li>
+                        <li>海外展開のロードマップ</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 関連情報 -->
+        <div class="related-info">
+            <h4 class="sidebar-subtitle">関連する過去の対話</h4>
+            <div class="related-items">
+                <a href="#" class="related-item">
+                    <span class="date">2025/04/15</span>
+                    <span class="title">野村AM 四半期定例</span>
+                    <span class="similarity">類似度: 85%</span>
+                </a>
+                <a href="#" class="related-item">
+                    <span class="date">2025/01/20</span>
+                    <span class="title">野村AM 決算説明会</span>
+                    <span class="similarity">類似度: 72%</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* プログレスステップ（upload-confirmと共通） */
+.progress-header {
+    background-color: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: var(--gray-300);
+    z-index: -1;
+}
+
+.step.completed:not(:last-child)::after,
+.step.active:not(:last-child)::after {
+    background-color: var(--kagami-blue);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--gray-300);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-sm);
+}
+
+.step.completed .step-number {
+    background-color: var(--success-green);
+}
+
+.step.active .step-number {
+    background-color: var(--kagami-blue);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.step-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: var(--kagami-blue);
+    font-weight: var(--font-medium);
+}
+
+/* 分析サマリーカード */
+.analysis-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.summary-card {
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.card-icon {
+    font-size: 2.5rem;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-value {
+    font-size: 2rem;
+    font-weight: var(--font-bold);
+    color: var(--kagami-blue);
+}
+
+.card-label {
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+}
+
+.card-detail {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* 分析コンテナレイアウト */
+.analysis-container {
+    display: grid;
+    grid-template-columns: 240px 1fr 280px;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+/* 左サイドバー */
+.analysis-sidebar {
+    position: sticky;
+    top: var(--space-lg);
+    height: fit-content;
+}
+
+.sidebar-section {
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.sidebar-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-md);
+    color: var(--gray-900);
+}
+
+.sidebar-subtitle {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-sm);
+    color: var(--gray-700);
+}
+
+/* ナビゲーション */
+.analysis-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-md);
+    color: var(--gray-700);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: var(--text-sm);
+}
+
+.nav-item:hover {
+    background-color: var(--gray-50);
+    color: var(--kagami-blue);
+}
+
+.nav-item.active {
+    background-color: var(--kagami-blue);
+    color: white;
+}
+
+.nav-icon {
+    font-size: 1.2rem;
+}
+
+/* クイックアクション */
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.quick-action-btn {
+    width: 100%;
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    text-align: left;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    background-color: white;
+    border-color: var(--kagami-blue);
+    color: var(--kagami-blue);
+}
+
+/* メインコンテンツ */
+.analysis-main {
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.analysis-section {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.analysis-section:last-child {
+    border-bottom: none;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.section-title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+}
+
+/* エグゼクティブサマリー */
+.executive-summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.summary-highlight {
+    background-color: var(--gray-50);
+    padding: var(--space-md);
+    border-radius: var(--border-radius-md);
+    border-left: 4px solid var(--kagami-blue);
+}
+
+.summary-highlight h4 {
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-sm);
+}
+
+.discussion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+}
+
+.discussion-item {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.discussion-item.positive {
+    border-color: var(--success-green);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+.discussion-item.neutral {
+    border-color: var(--warning-yellow);
+    background-color: rgba(245, 158, 11, 0.05);
+}
+
+.discussion-item.caution {
+    border-color: var(--error-red);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.item-icon {
+    font-size: 1.5rem;
+}
+
+.item-content h5 {
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-xs);
+}
+
+.sentiment-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    background-color: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.sentiment-tag.positive {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-green);
+}
+
+.sentiment-tag.very-positive {
+    background-color: var(--success-green);
+    color: white;
+}
+
+/* 投資家スタンスメーター */
+.stance-meter {
+    margin: var(--space-md) 0;
+}
+
+.meter-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.meter-bar {
+    height: 24px;
+    background-color: var(--gray-200);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--error-red), var(--warning-yellow), var(--success-green));
+    border-radius: 12px;
+    transition: width 0.5s ease;
+}
+
+.meter-marker {
+    position: absolute;
+    top: -30px;
+    transform: translateX(-50%);
+}
+
+.marker-value {
+    display: inline-block;
+    padding: 2px 8px;
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+}
+
+/* 感情分析 */
+.view-toggle {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.toggle-btn {
+    padding: var(--space-xs) var(--space-md);
+    background-color: var(--gray-100);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+    background-color: var(--kagami-blue);
+    color: white;
+}
+
+.sentiment-timeline-chart {
+    margin-bottom: var(--space-lg);
+}
+
+.sentiment-distribution {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 200px;
+    margin-bottom: var(--space-lg);
+}
+
+.distribution-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.distribution-bar {
+    width: 60px;
+    background-color: var(--gray-300);
+    border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+    transition: height 0.5s ease;
+}
+
+.distribution-item.positive .distribution-bar {
+    background-color: var(--success-green);
+}
+
+.distribution-item.neutral .distribution-bar {
+    background-color: var(--warning-yellow);
+}
+
+.distribution-item.negative .distribution-bar {
+    background-color: var(--error-red);
+}
+
+.distribution-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--space-sm);
+}
+
+.distribution-label .emoji {
+    font-size: 1.5rem;
+}
+
+.distribution-label .percentage {
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+}
+
+.distribution-label .label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* 感情的ハイライト */
+.highlight-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+}
+
+.highlight-card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+}
+
+.highlight-card.most-positive {
+    border-color: var(--success-green);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+.highlight-card.concern {
+    border-color: var(--warning-yellow);
+    background-color: rgba(245, 158, 11, 0.05);
+}
+
+.highlight-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.highlight-icon {
+    font-size: 1.5rem;
+}
+
+.highlight-label {
+    font-weight: var(--font-medium);
+}
+
+.quote {
+    font-style: italic;
+    color: var(--gray-700);
+    margin-bottom: var(--space-sm);
+}
+
+.context {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* トピック分析 */
+.topic-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    justify-content: center;
+    padding: var(--space-lg);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.topic-bubble {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--kagami-blue);
+    color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.topic-bubble:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-lg);
+}
+
+.topic-bubble.large {
+    width: 120px;
+    height: 120px;
+}
+
+.topic-bubble.medium {
+    width: 90px;
+    height: 90px;
+}
+
+.topic-bubble.small {
+    width: 70px;
+    height: 70px;
+    font-size: var(--text-sm);
+}
+
+.topic-name {
+    font-weight: var(--font-medium);
+}
+
+.topic-percentage {
+    font-size: var(--text-sm);
+    opacity: 0.9;
+}
+
+/* トピック詳細カード */
+.topic-detail-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+}
+
+.topic-detail-card {
+    background-color: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+}
+
+.topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.sentiment-indicator {
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+}
+
+.sentiment-indicator.positive {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-green);
+}
+
+.sentiment-indicator.neutral {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: var(--warning-yellow);
+}
+
+.topic-keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+}
+
+.keyword {
+    padding: 2px 8px;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+}
+
+/* タイムライン */
+.timeline-controls {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.timeline-container {
+    position: relative;
+    padding-left: var(--space-lg);
+}
+
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--gray-200);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: var(--space-lg);
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -24px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    background-color: var(--gray-400);
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.timeline-item.key-moment .timeline-marker {
+    width: 16px;
+    height: 16px;
+    background-color: var(--kagami-blue);
+    left: -26px;
+}
+
+.timeline-content {
+    background-color: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+}
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-sm);
+}
+
+.timeline-time {
+    font-weight: var(--font-medium);
+    color: var(--gray-600);
+}
+
+.timeline-speaker {
+    font-weight: var(--font-medium);
+}
+
+.moment-badge,
+.question-badge {
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.moment-badge {
+    background-color: var(--kagami-blue);
+    color: white;
+}
+
+.question-badge {
+    background-color: var(--warning-yellow);
+    color: white;
+}
+
+.timeline-analysis {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+}
+
+.analysis-tag {
+    padding: 2px 8px;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+}
+
+.interest-level {
+    padding: 2px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.interest-level.high {
+    background-color: var(--error-red);
+    color: white;
+}
+
+.impact-tag {
+    padding: 2px 8px;
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.timeline-navigation {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.timeline-nav-btn {
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timeline-nav-btn:hover {
+    background-color: white;
+    border-color: var(--kagami-blue);
+}
+
+/* アクションアイテム */
+.action-items-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-lg);
+}
+
+.action-priority-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.priority-group {
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+}
+
+.priority-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    font-weight: var(--font-medium);
+}
+
+.priority-icon {
+    font-size: 1.2rem;
+}
+
+.count {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+}
+
+.action-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    background-color: white;
+    padding: var(--space-md);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.action-checkbox {
+    margin-top: 2px;
+}
+
+.action-content {
+    flex: 1;
+    cursor: pointer;
+}
+
+.action-title {
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-xs);
+}
+
+.action-details {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-xs);
+}
+
+.action-context {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* アクション統計 */
+.action-statistics {
+    background-color: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    height: fit-content;
+}
+
+.stats-grid {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.stat-item {
+    text-align: center;
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+}
+
+.stat-value {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--kagami-blue);
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* 右サイドバー */
+.analysis-right-sidebar {
+    position: sticky;
+    top: var(--space-lg);
+    height: fit-content;
+}
+
+.ai-recommendations {
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-md);
+}
+
+.recommendation-card {
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.rec-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.rec-icon {
+    font-size: 1.2rem;
+}
+
+.rec-title {
+    font-weight: var(--font-medium);
+}
+
+.rec-list {
+    list-style: none;
+    padding-left: var(--space-md);
+}
+
+.rec-list li {
+    position: relative;
+    padding-left: var(--space-md);
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-sm);
+}
+
+.rec-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--kagami-blue);
+}
+
+/* 関連情報 */
+.related-info {
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.related-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.related-item {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    color: var(--gray-700);
+    font-size: var(--text-sm);
+    transition: all 0.2s ease;
+}
+
+.related-item:hover {
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.related-item .date {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.related-item .title {
+    font-weight: var(--font-medium);
+}
+
+.related-item .similarity {
+    font-size: var(--text-xs);
+    color: var(--kagami-blue);
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 1200px) {
+    .analysis-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .analysis-sidebar,
+    .analysis-right-sidebar {
+        position: static;
+    }
+    
+    .analysis-sidebar {
+        order: -1;
+    }
+    
+    .analysis-right-sidebar {
+        order: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .analysis-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .discussion-grid,
+    .topic-detail-cards,
+    .highlight-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-items-container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// ページ初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // 感情分析チャートの初期化
+    initSentimentChart();
+    
+    // スクロールスパイの設定
+    setupScrollSpy();
+    
+    // アニメーション効果
+    animateElements();
+});
+
+// 感情分析チャートの初期化
+function initSentimentChart() {
+    const ctx = document.getElementById('sentimentChart');
+    if (ctx) {
+        // Chart.jsを使用した感情推移チャートの描画
+        // ここではデモ用の簡易実装
+        console.log('感情分析チャート初期化');
+    }
+}
+
+// スクロールスパイ
+function setupScrollSpy() {
+    const sections = document.querySelectorAll('.analysis-section');
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (scrollY >= (sectionTop - 200)) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('href') === `#${current}`) {
+                item.classList.add('active');
+            }
+        });
+    });
+}
+
+// アニメーション効果
+function animateElements() {
+    // 数値のカウントアップアニメーション
+    const animateValue = (element, start, end, duration) => {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.textContent = Math.floor(progress * (end - start) + start) + '%';
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    };
+    
+    // カード値のアニメーション
+    const cardValues = document.querySelectorAll('.card-value');
+    cardValues.forEach(element => {
+        const value = parseInt(element.textContent);
+        if (!isNaN(value)) {
+            animateValue(element, 0, value, 1000);
+        }
+    });
+}
+
+// エクスポート機能
+function exportAnalysis() {
+    alert('分析結果のエクスポート機能は開発中です');
+}
+
+// 次のステップへ
+function proceedToPublish() {
+    window.location.href = '/dialogue/publish?id=12345';
+}
+
+// サマリー編集
+function editSummary() {
+    alert('サマリー編集機能は開発中です');
+}
+
+// 感情分析ビュー切り替え
+function toggleSentimentView(view) {
+    // ビュー切り替えの実装
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    console.log(`感情分析ビューを${view}に切り替え`);
+}
+
+// トピック調整
+function adjustTopics() {
+    alert('トピック調整機能は開発中です');
+}
+
+// タイムラインフィルター
+function filterTimeline(filter) {
+    console.log(`タイムラインフィルター: ${filter}`);
+    // フィルタリングの実装
+}
+
+// タイムラインナビゲーション
+function jumpToTime(position) {
+    console.log(`タイムライン位置: ${position}`);
+    // ナビゲーションの実装
+}
+
+// アクションアイテム追加
+function addActionItem() {
+    alert('アクションアイテム追加機能は開発中です');
+}
+
+// レポート生成
+function generateReport() {
+    alert('レポート生成機能は開発中です');
+}
+
+// インサイト共有
+function shareInsights() {
+    alert('インサイト共有機能は開発中です');
+}
+
+// フォローアップスケジュール
+function scheduleFollowup() {
+    alert('フォローアップスケジュール機能は開発中です');
+}
+
+// スムーズスクロール
+document.querySelectorAll('.nav-item').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,2198 @@
+{% extends "base.html" %}
+
+{% block title %}アップロード確認・メタ情報登録{% endblock %}
+
+{% block content %}
+<!-- プログレスバー -->
+<div class="progress-header mb-lg">
+    <div class="progress-steps">
+        <div class="step completed">
+            <div class="step-number">1</div>
+            <div class="step-label">ファイル選択</div>
+        </div>
+        <div class="step completed">
+            <div class="step-number">2</div>
+            <div class="step-label">アップロード</div>
+        </div>
+        <div class="step active">
+            <div class="step-number">3</div>
+            <div class="step-label">メタ情報登録</div>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-label">AI分析</div>
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-label">確認・公開</div>
+        </div>
+    </div>
+</div>
+
+<!-- ヘッダー -->
+<div class="flex justify-between items-center mb-lg">
+    <div>
+        <h2 class="text-2xl font-bold mb-sm">アップロード確認・メタ情報登録</h2>
+        <p class="text-muted">対話の文脈を正確に記録し、価値ある情報を抽出します</p>
+    </div>
+    <div class="flex gap-md">
+        <button class="btn btn-secondary" onclick="saveDraft()">
+            💾 下書き保存
+        </button>
+        <button class="btn btn-danger" onclick="cancelUpload()">
+            ❌ キャンセル
+        </button>
+    </div>
+</div>
+
+<!-- アップロードファイル情報 -->
+<div class="card mb-lg">
+    <div class="card-header bg-blue-50">
+        <h3 class="text-lg font-semibold flex items-center gap-sm">
+            📎 アップロードファイル情報
+            <span class="badge badge-success">アップロード完了</span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="flex items-start gap-md">
+            <div class="file-icon text-4xl">🎙️</div>
+            <div class="flex-1">
+                <h4 class="font-semibold text-lg mb-sm">野村AM_投資家面談_20250715.mp4</h4>
+                <div class="file-meta flex gap-lg text-sm text-muted">
+                    <span>📊 234.6MB</span>
+                    <span>⏱️ 90分15秒</span>
+                    <span>📅 2025/07/15 14:00</span>
+                </div>
+                <div class="mt-sm">
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: 100%;"></div>
+                    </div>
+                    <div class="text-sm text-success mt-xs">✓ 文字起こし完了（8,432文字）</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メタ情報入力フォーム -->
+<div class="grid grid-cols-2 gap-lg">
+    <!-- 左カラム：基本情報 -->
+    <div>
+        <!-- 会議基本情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📋 会議基本情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label required">会議タイトル</label>
+                    <input type="text" class="form-control" value="野村アセットマネジメントとの個別面談" placeholder="例：○○社との決算説明会">
+                    <small class="text-muted">投資家名や会議の種類を含めてください</small>
+                </div>
+
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label required">会議種別</label>
+                        <select class="form-control">
+                            <option>-- 選択してください --</option>
+                            <option selected>個別面談</option>
+                            <option>決算説明会</option>
+                            <option>スモールミーティング</option>
+                            <option>カンファレンス</option>
+                            <option>電話会議</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">開催日時</label>
+                        <input type="datetime-local" class="form-control" value="2025-07-15T14:00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">会議の目的・アジェンダ</label>
+                    <textarea class="form-control" rows="3" placeholder="例：第1四半期決算の詳細説明、中期経営計画の進捗、ESG施策について">第1四半期決算の詳細説明
+AI事業の成長戦略について
+人材投資とDX推進状況</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 投資家情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🏢 投資家情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label required">投資家名</label>
+                    <div class="investor-select">
+                        <input type="text" class="form-control" value="野村アセットマネジメント" placeholder="投資家名を入力または選択">
+                        <div class="investor-suggestions" style="display: none;">
+                            <div class="suggestion-item">野村アセットマネジメント（既存）</div>
+                            <div class="suggestion-item">野村證券（既存）</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">投資家タイプ</label>
+                        <select class="form-control">
+                            <option selected>国内機関投資家</option>
+                            <option>海外機関投資家</option>
+                            <option>個人投資家</option>
+                            <option>アナリスト</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">保有状況</label>
+                        <select class="form-control">
+                            <option>大株主（5%以上）</option>
+                            <option selected>主要株主（1-5%）</option>
+                            <option>一般株主（1%未満）</option>
+                            <option>非保有（関心あり）</option>
+                            <option>不明</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">投資家側参加者</label>
+                    <div class="participant-tags">
+                        <span class="tag">山田太郎（ファンドマネージャー）</span>
+                        <span class="tag">鈴木花子（アナリスト）</span>
+                        <button class="btn btn-sm btn-secondary">+ 参加者追加</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右カラム：対話情報 -->
+    <div>
+        <!-- 自社参加者 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">👥 自社参加者</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label required">主要説明者</label>
+                    <div class="participant-list">
+                        <label class="participant-item">
+                            <input type="checkbox" checked>
+                            <span>CEO - 田中一郎</span>
+                        </label>
+                        <label class="participant-item">
+                            <input type="checkbox" checked>
+                            <span>CFO - 佐藤二郎</span>
+                        </label>
+                        <label class="participant-item">
+                            <input type="checkbox">
+                            <span>IR部長 - 山本三郎</span>
+                        </label>
+                        <label class="participant-item">
+                            <input type="checkbox" checked>
+                            <span>経営企画部長 - 高橋四郎</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">主担当者</label>
+                    <select class="form-control">
+                        <option>IR部 - 山本三郎</option>
+                        <option selected>IR部 - 鈴木五郎</option>
+                        <option>経営企画部 - 伊藤六郎</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 重要度・機密度設定 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">⚡ 重要度・機密度設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">重要度</label>
+                        <select class="form-control">
+                            <option>低</option>
+                            <option>中</option>
+                            <option selected>高</option>
+                            <option>最重要</option>
+                        </select>
+                        <small class="text-muted">大株主や影響力の高い投資家は「高」以上を推奨</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">機密度</label>
+                        <select class="form-control">
+                            <option>一般</option>
+                            <option selected>社内限定</option>
+                            <option>役員限定</option>
+                            <option>極秘</option>
+                        </select>
+                        <small class="text-muted">未公開情報を含む場合は適切に設定</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">タグ・キーワード</label>
+                    <div class="tag-input">
+                        <span class="tag">決算</span>
+                        <span class="tag">AI事業</span>
+                        <span class="tag">中期経営計画</span>
+                        <span class="tag">人材投資</span>
+                        <input type="text" placeholder="タグを追加..." class="tag-input-field">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 関連資料 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📎 関連資料</h3>
+            </div>
+            <div class="card-body">
+                <div class="related-docs">
+                    <div class="doc-item">
+                        <span class="doc-icon">📊</span>
+                        <div class="doc-info">
+                            <div class="doc-title">2025年第1四半期決算説明資料.pdf</div>
+                            <div class="doc-meta">2.3MB • 2025/07/10</div>
+                        </div>
+                        <button class="btn btn-sm btn-danger">削除</button>
+                    </div>
+                    <div class="doc-item">
+                        <span class="doc-icon">📈</span>
+                        <div class="doc-info">
+                            <div class="doc-title">中期経営計画進捗_202507.pptx</div>
+                            <div class="doc-meta">5.1MB • 2025/07/05</div>
+                        </div>
+                        <button class="btn btn-sm btn-danger">削除</button>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm mt-md">+ 関連資料を追加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI分析プレビュー -->
+<div class="card mt-lg">
+    <div class="card-header bg-gradient">
+        <h3 class="text-lg font-semibold text-white">🤖 AI分析プレビュー（リアルタイム分析中...）</h3>
+    </div>
+    <div class="card-body">
+        <div class="ai-analysis-preview">
+            <!-- 分析進捗 -->
+            <div class="analysis-progress mb-lg">
+                <div class="progress-item">
+                    <span class="progress-label">音声認識</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: 100%;"></div>
+                    </div>
+                    <span class="progress-status">✓ 完了</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">感情分析</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width: 85%;"></div>
+                    </div>
+                    <span class="progress-status">分析中...</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">重要ポイント抽出</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: 60%;"></div>
+                    </div>
+                    <span class="progress-status">処理中...</span>
+                </div>
+            </div>
+
+            <!-- 暫定サマリー -->
+            <div class="alert alert-info mb-lg">
+                <h4 class="font-semibold mb-sm">📝 暫定サマリー（AI生成）</h4>
+                <p>野村アセットマネジメントとの個別面談では、第1四半期の好調な業績（特にAI事業の成長率35%）について高い評価を受けました。主な議論は以下の3点に集中：</p>
+                <ul class="list-disc list-inside mt-sm">
+                    <li>AI事業の競争優位性と持続可能性</li>
+                    <li>人材投資とエンジニア採用の進捗</li>
+                    <li>中期経営計画の達成可能性</li>
+                </ul>
+                <p class="mt-sm">全体的にポジティブな反応でしたが、競合他社の動向と人材確保については慎重な見方も示されました。</p>
+            </div>
+
+            <!-- FAQ候補（拡張版） -->
+            <div class="faq-candidates-section">
+                <div class="section-header mb-md">
+                    <div>
+                        <h4 class="font-semibold">❓ FAQ候補（5件検出）</h4>
+                        <p class="text-sm text-muted mt-xs">対話内容から投資家の関心事項を自動抽出しました</p>
+                    </div>
+                    <div class="flex gap-sm">
+                        <button class="btn btn-sm btn-secondary" onclick="showFAQWorkflow()">
+                            ⚙️ ワークフロー設定
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="previewAllFAQs()">
+                            👁️ 全件プレビュー
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="acceptAllFAQs()">
+                            ✅ 全て採用
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- FAQ管理タブ -->
+                <div class="faq-management-tabs mb-md">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchFAQTab('candidates')">新規候補 (5)</button>
+                        <button class="tab-btn" onclick="switchFAQTab('similar')">類似FAQ (3)</button>
+                        <button class="tab-btn" onclick="switchFAQTab('workflow')">承認待ち (2)</button>
+                    </div>
+                </div>
+                
+                <div class="faq-preview-grid" id="faq-candidates">
+                    <!-- FAQ候補1 -->
+                    <div class="faq-candidate-card" data-faq-id="1">
+                        <div class="faq-header">
+                            <div class="flex items-center gap-sm">
+                                <input type="checkbox" class="faq-checkbox" id="faq1" checked>
+                                <label for="faq1" class="faq-category">AI事業</label>
+                                <span class="new-badge">NEW</span>
+                            </div>
+                            <div class="flex items-center gap-sm">
+                                <span class="confidence-badge confidence-high">信頼度: 95%</span>
+                                <button class="btn-icon" onclick="showFAQActions(1)">
+                                    <span>⋮</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-question">
+                                <span class="q-mark">Q</span>
+                                <span>AI事業の成長率35%を達成した要因は何ですか？</span>
+                            </div>
+                            <div class="faq-answer">
+                                <span class="a-mark">A</span>
+                                <span>エンタープライズSaaSの好調、新製品の市場投入、既存顧客のアップセルが主な要因です。特に大手企業向けAIソリューションの採用が加速しています。</span>
+                            </div>
+                            <div class="faq-meta">
+                                <div class="flex items-center gap-md text-xs text-muted">
+                                    <span>💬 発言箇所: 14:23-14:45</span>
+                                    <span>👤 質問者: 山田太郎</span>
+                                </div>
+                                <div class="faq-actions">
+                                    <button class="btn btn-xs btn-secondary" onclick="editFAQ(1)">
+                                        ✏️ 編集
+                                    </button>
+                                    <button class="btn btn-xs btn-secondary" onclick="setFAQVisibility(1)">
+                                        👁️ 公開設定
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- 公開設定パネル -->
+                            <div class="faq-visibility-panel" id="visibility-panel-1" style="display: none;">
+                                <div class="visibility-options">
+                                    <label class="visibility-option">
+                                        <input type="radio" name="visibility-1" value="public" checked>
+                                        <span>🌐 一般公開</span>
+                                        <small>投資家向けWebサイトで公開</small>
+                                    </label>
+                                    <label class="visibility-option">
+                                        <input type="radio" name="visibility-1" value="members">
+                                        <span>🔒 会員限定</span>
+                                        <small>ログインユーザーのみ閲覧可</small>
+                                    </label>
+                                    <label class="visibility-option">
+                                        <input type="radio" name="visibility-1" value="internal">
+                                        <span>🏢 社内限定</span>
+                                        <small>社内の想定問答集のみ</small>
+                                    </label>
+                                </div>
+                                <div class="visibility-tags mt-sm">
+                                    <input type="text" placeholder="タグを追加（決算、AI、成長戦略など）" class="tag-input-field">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ候補2 -->
+                    <div class="faq-candidate-card" data-faq-id="2">
+                        <div class="faq-header">
+                            <div class="flex items-center gap-sm">
+                                <input type="checkbox" class="faq-checkbox" id="faq2" checked>
+                                <label for="faq2" class="faq-category">人材戦略</label>
+                                <span class="update-badge">更新</span>
+                            </div>
+                            <div class="flex items-center gap-sm">
+                                <span class="confidence-badge confidence-high">信頼度: 92%</span>
+                                <button class="btn-icon" onclick="showFAQActions(2)">
+                                    <span>⋮</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="faq-content">
+                            <div class="similar-faq-notice">
+                                <span>⚠️ 類似FAQあり:</span>
+                                <a href="#" onclick="showSimilarFAQ(2)">「エンジニアの採用計画について」（2025/06/20）</a>
+                            </div>
+                            <div class="faq-question">
+                                <span class="q-mark">Q</span>
+                                <span>エンジニア採用の具体的な目標と進捗は？</span>
+                            </div>
+                            <div class="faq-answer">
+                                <span class="a-mark">A</span>
+                                <span>2025年度末までに200名体制を目指し、現在150名まで増強しました。新卒・中途をバランス良く採用し、特にAI・機械学習分野のスペシャリスト確保に注力しています。</span>
+                            </div>
+                            <div class="faq-meta">
+                                <div class="flex items-center gap-md text-xs text-muted">
+                                    <span>💬 発言箇所: 28:10-29:05</span>
+                                    <span>👤 質問者: 鈴木花子</span>
+                                </div>
+                                <div class="faq-actions">
+                                    <button class="btn btn-xs btn-secondary" onclick="editFAQ(2)">
+                                        ✏️ 編集
+                                    </button>
+                                    <button class="btn btn-xs btn-warning" onclick="mergeFAQ(2)">
+                                        🔄 統合
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ候補3 -->
+                    <div class="faq-candidate-card" data-faq-id="3">
+                        <div class="faq-header">
+                            <div class="flex items-center gap-sm">
+                                <input type="checkbox" class="faq-checkbox" id="faq3" checked>
+                                <label for="faq3" class="faq-category">競争戦略</label>
+                                <span class="new-badge">NEW</span>
+                            </div>
+                            <div class="flex items-center gap-sm">
+                                <span class="confidence-badge confidence-medium">信頼度: 88%</span>
+                                <button class="btn-icon" onclick="showFAQActions(3)">
+                                    <span>⋮</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-question">
+                                <span class="q-mark">Q</span>
+                                <span>競合他社との差別化戦略について教えてください</span>
+                            </div>
+                            <div class="faq-answer">
+                                <span class="a-mark">A</span>
+                                <span>当社の強みは、業界特化型AIソリューションの開発力と、顧客企業との共創による製品開発です。また、日本市場での実績を基にしたローカライズ力も差別化要因です。</span>
+                            </div>
+                            <div class="faq-meta">
+                                <div class="flex items-center gap-md text-xs text-muted">
+                                    <span>💬 発言箇所: 35:20-36:15</span>
+                                    <span>👤 質問者: 山田太郎</span>
+                                </div>
+                                <div class="faq-actions">
+                                    <button class="btn btn-xs btn-secondary" onclick="editFAQ(3)">
+                                        ✏️ 編集
+                                    </button>
+                                    <button class="btn btn-xs btn-secondary" onclick="setFAQVisibility(3)">
+                                        👁️ 公開設定
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ候補4 -->
+                    <div class="faq-candidate-card" data-faq-id="4">
+                        <div class="faq-header">
+                            <div class="flex items-center gap-sm">
+                                <input type="checkbox" class="faq-checkbox" id="faq4">
+                                <label for="faq4" class="faq-category">財務・業績</label>
+                                <span class="new-badge">NEW</span>
+                            </div>
+                            <div class="flex items-center gap-sm">
+                                <span class="confidence-badge confidence-medium">信頼度: 85%</span>
+                                <button class="btn-icon" onclick="showFAQActions(4)">
+                                    <span>⋮</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-question">
+                                <span class="q-mark">Q</span>
+                                <span>営業利益率の改善要因と今後の見通しは？</span>
+                            </div>
+                            <div class="faq-answer">
+                                <span class="a-mark">A</span>
+                                <span>AIソリューションの高付加価値化とサブスクリプション比率の向上により、営業利益率は前年同期比2.3ポイント改善しました。今後もSaaS事業の拡大により、さらなる改善を見込んでいます。</span>
+                            </div>
+                            <div class="faq-meta">
+                                <div class="flex items-center gap-md text-xs text-muted">
+                                    <span>💬 発言箇所: 42:15-43:30</span>
+                                    <span>👤 質問者: 鈴木花子</span>
+                                </div>
+                                <div class="faq-actions">
+                                    <button class="btn btn-xs btn-secondary" onclick="editFAQ(4)">
+                                        ✏️ 編集
+                                    </button>
+                                    <button class="btn btn-xs btn-secondary" onclick="setFAQVisibility(4)">
+                                        👁️ 公開設定
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ候補5 -->
+                    <div class="faq-candidate-card" data-faq-id="5">
+                        <div class="faq-header">
+                            <div class="flex items-center gap-sm">
+                                <input type="checkbox" class="faq-checkbox" id="faq5">
+                                <label for="faq5" class="faq-category">ESG・サステナビリティ</label>
+                                <span class="new-badge">NEW</span>
+                            </div>
+                            <div class="flex items-center gap-sm">
+                                <span class="confidence-badge confidence-low">信頼度: 78%</span>
+                                <button class="btn-icon" onclick="showFAQActions(5)">
+                                    <span>⋮</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-question">
+                                <span class="q-mark">Q</span>
+                                <span>カーボンニュートラルへの取り組み状況は？</span>
+                            </div>
+                            <div class="faq-answer">
+                                <span class="a-mark">A</span>
+                                <span>2030年までのカーボンニュートラル達成に向け、再生可能エネルギーの導入を進めています。現在、全電力使用量の35%を再エネ化し、データセンターの省エネ化も推進中です。</span>
+                            </div>
+                            <div class="faq-meta">
+                                <div class="flex items-center gap-md text-xs text-muted">
+                                    <span>💬 発言箇所: 56:40-57:25</span>
+                                    <span>👤 質問者: 山田太郎</span>
+                                </div>
+                                <div class="faq-actions">
+                                    <button class="btn btn-xs btn-secondary" onclick="editFAQ(5)">
+                                        ✏️ 編集
+                                    </button>
+                                    <button class="btn btn-xs btn-secondary" onclick="setFAQVisibility(5)">
+                                        👁️ 公開設定
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ活用シーン説明（拡張版） -->
+                <div class="faq-usage-info">
+                    <h5 class="font-medium mb-sm flex items-center gap-sm">
+                        <span>💡</span>
+                        <span>FAQ候補の活用フロー</span>
+                    </h5>
+                    
+                    <!-- ワークフロー図 -->
+                    <div class="workflow-diagram mb-md">
+                        <div class="workflow-step active">
+                            <div class="step-icon">🤖</div>
+                            <div class="step-label">AI抽出</div>
+                            <div class="step-desc">対話から自動検出</div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step current">
+                            <div class="step-icon">✏️</div>
+                            <div class="step-label">編集・分類</div>
+                            <div class="step-desc">内容確認・調整</div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">👥</div>
+                            <div class="step-label">承認</div>
+                            <div class="step-desc">IR責任者確認</div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        <div class="workflow-step">
+                            <div class="step-icon">🚀</div>
+                            <div class="step-label">公開・配信</div>
+                            <div class="step-desc">各チャネルへ展開</div>
+                        </div>
+                    </div>
+                    
+                    <div class="usage-grid">
+                        <div class="usage-item enhanced">
+                            <span class="usage-icon">🌐</span>
+                            <div>
+                                <div class="font-medium">投資家向けWebサイト</div>
+                                <div class="text-xs text-muted">FAQ自動更新システム</div>
+                                <div class="usage-stats">
+                                    <span class="stat-item">月間3,500PV</span>
+                                    <span class="stat-item">解決率85%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="usage-item enhanced">
+                            <span class="usage-icon">🤖</span>
+                            <div>
+                                <div class="font-medium">AIチャットボット</div>
+                                <div class="text-xs text-muted">24時間自動応答</div>
+                                <div class="usage-stats">
+                                    <span class="stat-item">応答時間0.5秒</span>
+                                    <span class="stat-item">満足度92%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="usage-item enhanced">
+                            <span class="usage-icon">📊</span>
+                            <div>
+                                <div class="font-medium">投資家分析</div>
+                                <div class="text-xs text-muted">関心事項のトレンド把握</div>
+                                <div class="usage-stats">
+                                    <span class="stat-item">月次レポート</span>
+                                    <span class="stat-item">予測精度向上</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="usage-item enhanced">
+                            <span class="usage-icon">📚</span>
+                            <div>
+                                <div class="font-medium">ナレッジベース</div>
+                                <div class="text-xs text-muted">社内情報共有システム</div>
+                                <div class="usage-stats">
+                                    <span class="stat-item">累計FAQ 2,840件</span>
+                                    <span class="stat-item">検索性向上</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ROI指標 -->
+                    <div class="roi-metrics">
+                        <h6 class="font-medium mb-sm">📈 FAQ活用による効果（予測）</h6>
+                        <div class="metric-grid">
+                            <div class="metric-item">
+                                <div class="metric-value">-65%</div>
+                                <div class="metric-label">問い合わせ対応時間削減</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">+40%</div>
+                                <div class="metric-label">投資家満足度向上</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">24/7</div>
+                                <div class="metric-label">対応可能時間拡大</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">¥2.5M/年</div>
+                                <div class="metric-label">コスト削減効果</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <div>
+                    <h4 class="font-semibold mb-sm">⚠️ 検出された課題・懸念</h4>
+                    <div class="concern-list">
+                        <div class="concern-item concern-high">
+                            <span class="concern-icon">🔴</span>
+                            <span>人材確保の持続可能性への懸念</span>
+                        </div>
+                        <div class="concern-item concern-medium">
+                            <span class="concern-icon">🟡</span>
+                            <span>競合他社の追い上げリスク</span>
+                        </div>
+                        <div class="concern-item concern-low">
+                            <span class="concern-icon">🟢</span>
+                            <span>海外展開のスピード感</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- アクションボタン -->
+<div class="action-bar">
+    <div class="flex justify-between items-center">
+        <div class="text-muted">
+            <span>💡 ヒント：メタ情報を正確に入力することで、AI分析の精度が向上します</span>
+        </div>
+        <div class="flex gap-md">
+            <button class="btn btn-secondary" onclick="saveDraft()">
+                💾 下書き保存
+            </button>
+            <button class="btn btn-primary" onclick="proceedToAnalysis()">
+                次へ：AI詳細分析 →
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- FAQワークフロー設定モーダル -->
+<div id="faq-workflow-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>⚙️ FAQワークフロー設定</h3>
+            <button class="close-btn" onclick="closeFAQWorkflowModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <!-- 承認フロー設定 -->
+            <div class="workflow-section">
+                <h4>🔄 承認フロー</h4>
+                <div class="workflow-settings">
+                    <div class="setting-item">
+                        <label class="setting-label">FAQ自動承認レベル</label>
+                        <select class="form-control">
+                            <option>信頼度90%以上は自動承認</option>
+                            <option>信頼度95%以上は自動承認</option>
+                            <option>すべて手動承認</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">承認者</label>
+                        <div class="approver-list">
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>IR部門責任者</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>法務部門</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>経営企画部</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 公開設定 -->
+            <div class="workflow-section">
+                <h4>🌐 公開設定</h4>
+                <div class="workflow-settings">
+                    <div class="setting-item">
+                        <label class="setting-label">デフォルト公開範囲</label>
+                        <select class="form-control">
+                            <option>社内限定（公開は個別設定）</option>
+                            <option>会員限定</option>
+                            <option>一般公開</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked>
+                            <span>公開前に法務チェックを必須とする</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 自動配信設定 -->
+            <div class="workflow-section">
+                <h4>🚀 自動配信・連携</h4>
+                <div class="workflow-settings">
+                    <div class="setting-item">
+                        <label class="setting-label">連携システム</label>
+                        <div class="integration-list">
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>投資家向けWebサイト（自動更新）</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>AIチャットボット（回答DB更新）</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>メール自動応答システム</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>IRナレッジベース</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">更新通知</label>
+                        <input type="email" class="form-control" placeholder="通知先メールアドレス" value="ir-team@example.com">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 品質管理 -->
+            <div class="workflow-section">
+                <h4>📊 品質管理</h4>
+                <div class="workflow-settings">
+                    <div class="setting-item">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked>
+                            <span>月次でFAQの利用状況をレポート</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked>
+                            <span>低評価のFAQを自動でフラグ付け</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-item">
+                            <input type="checkbox">
+                            <span>四半期毎に全FAQをレビュー</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeFAQWorkflowModal()">キャンセル</button>
+            <button class="btn btn-primary" onclick="saveFAQWorkflow()">設定を保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ統合モーダル -->
+<div id="faq-merge-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🔄 FAQの統合</h3>
+            <button class="close-btn" onclick="closeFAQMergeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="merge-comparison">
+                <div class="merge-item current">
+                    <h4>現在のFAQ候補</h4>
+                    <div class="faq-preview">
+                        <p class="question"><strong>Q:</strong> エンジニア採用の具体的な目標と進捗は？</p>
+                        <p class="answer"><strong>A:</strong> 2025年度末までに200名体制を目指し、現在150名まで増強しました。</p>
+                    </div>
+                </div>
+                <div class="merge-arrow">→</div>
+                <div class="merge-item existing">
+                    <h4>既存のFAQ</h4>
+                    <div class="faq-preview">
+                        <p class="question"><strong>Q:</strong> エンジニアの採用計画について</p>
+                        <p class="answer"><strong>A:</strong> 2025年度末までに200名体制を目指しています。</p>
+                        <p class="meta">最終更新: 2025/06/20</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="merge-options">
+                <h4>統合オプション</h4>
+                <div class="option-list">
+                    <label class="radio-item">
+                        <input type="radio" name="merge-option" value="replace" checked>
+                        <span>既存FAQを新しい内容で置き換え</span>
+                    </label>
+                    <label class="radio-item">
+                        <input type="radio" name="merge-option" value="append">
+                        <span>既存FAQに情報を追加</span>
+                    </label>
+                    <label class="radio-item">
+                        <input type="radio" name="merge-option" value="new">
+                        <span>別のFAQとして登録</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeFAQMergeModal()">キャンセル</button>
+            <button class="btn btn-primary" onclick="executeFAQMerge()">統合を実行</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* プログレスステップ */
+.progress-header {
+    background-color: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: var(--gray-300);
+    z-index: -1;
+}
+
+.step.completed:not(:last-child)::after,
+.step.active:not(:last-child)::after {
+    background-color: var(--kagami-blue);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--gray-300);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-sm);
+}
+
+.step.completed .step-number {
+    background-color: var(--success-green);
+}
+
+.step.active .step-number {
+    background-color: var(--kagami-blue);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.step-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: var(--kagami-blue);
+    font-weight: var(--font-medium);
+}
+
+/* ファイル情報 */
+.file-icon {
+    font-size: 3rem;
+}
+
+.file-meta {
+    display: flex;
+    gap: var(--space-lg);
+    color: var(--gray-600);
+}
+
+/* 投資家選択 */
+.investor-select {
+    position: relative;
+}
+
+.investor-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    margin-top: var(--space-xs);
+    z-index: 10;
+}
+
+.suggestion-item {
+    padding: var(--space-sm) var(--space-md);
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: var(--gray-50);
+}
+
+/* 参加者リスト */
+.participant-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.participant-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.participant-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+/* タグ入力 */
+.tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    background-color: white;
+    min-height: 44px;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+}
+
+.tag-input-field {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    font-size: var(--text-sm);
+}
+
+/* 関連資料 */
+.related-docs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.doc-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+.doc-icon {
+    font-size: 1.5rem;
+}
+
+.doc-info {
+    flex: 1;
+}
+
+.doc-title {
+    font-weight: var(--font-medium);
+}
+
+.doc-meta {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* AI分析プレビュー */
+.bg-gradient {
+    background: linear-gradient(135deg, var(--kagami-blue), var(--kagami-navy));
+}
+
+.ai-analysis-preview {
+    padding: var(--space-lg);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+.analysis-progress {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.progress-item {
+    display: grid;
+    grid-template-columns: 150px 1fr 100px;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.progress-label {
+    font-weight: var(--font-medium);
+}
+
+.progress-status {
+    text-align: right;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* FAQ候補セクション */
+.faq-candidates-section {
+    background-color: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    margin-top: var(--space-lg);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* FAQ管理タブ */
+.faq-management-tabs {
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: var(--space-lg);
+}
+
+.tab-buttons {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.tab-btn {
+    padding: var(--space-sm) var(--space-md);
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--gray-600);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: var(--kagami-blue);
+}
+
+.tab-btn.active {
+    color: var(--kagami-blue);
+    border-bottom-color: var(--kagami-blue);
+}
+
+.faq-preview-grid {
+    display: grid;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+/* FAQ候補カード */
+.faq-candidate-card {
+    background-color: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    transition: all 0.2s ease;
+}
+
+.faq-candidate-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--kagami-blue);
+}
+
+.faq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.faq-category {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--kagami-blue);
+    cursor: pointer;
+}
+
+/* バッジ */
+.new-badge,
+.update-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: var(--font-bold);
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.new-badge {
+    background-color: var(--success-green);
+    color: white;
+}
+
+.update-badge {
+    background-color: var(--warning-yellow);
+    color: white;
+}
+
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-icon:hover {
+    background-color: var(--gray-100);
+}
+
+/* 類似FAQ通知 */
+.similar-faq-notice {
+    background-color: rgba(245, 158, 11, 0.1);
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.similar-faq-notice a {
+    color: var(--kagami-blue);
+    text-decoration: underline;
+}
+
+.faq-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.faq-question,
+.faq-answer {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+}
+
+.q-mark,
+.a-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-weight: var(--font-bold);
+    font-size: var(--text-sm);
+    flex-shrink: 0;
+}
+
+.q-mark {
+    background-color: var(--kagami-blue);
+    color: white;
+}
+
+.a-mark {
+    background-color: var(--success-green);
+    color: white;
+}
+
+.faq-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--gray-100);
+}
+
+.faq-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* 公開設定パネル */
+.faq-visibility-panel {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.visibility-options {
+    display: grid;
+    gap: var(--space-sm);
+}
+
+.visibility-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.visibility-option:hover {
+    background-color: white;
+}
+
+.visibility-option small {
+    display: block;
+    margin-left: 24px;
+    color: var(--gray-600);
+    font-size: var(--text-xs);
+}
+
+.confidence-low {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: var(--gray-600);
+}
+
+.confidence-medium {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning-yellow);
+}
+
+/* ワークフロー図 */
+.workflow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    overflow-x: auto;
+}
+
+.workflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 100px;
+}
+
+.step-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-xs);
+}
+
+.step-label {
+    font-weight: var(--font-medium);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-xs);
+}
+
+.step-desc {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.workflow-step.active .step-icon {
+    filter: grayscale(0);
+}
+
+.workflow-step.current {
+    position: relative;
+}
+
+.workflow-step.current::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background-color: var(--kagami-blue);
+    border-radius: 50%;
+}
+
+.workflow-arrow {
+    font-size: 1.5rem;
+    color: var(--gray-400);
+    margin: 0 var(--space-md);
+}
+
+/* FAQ活用情報 */
+.faq-usage-info {
+    background-color: rgba(59, 130, 246, 0.05);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.usage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.usage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.usage-item.enhanced {
+    transition: all 0.2s ease;
+}
+
+.usage-item.enhanced:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.usage-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.usage-stats {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+}
+
+.stat-item {
+    font-size: var(--text-xs);
+    padding: 2px 6px;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-sm);
+    color: var(--gray-700);
+}
+
+/* ROI指標 */
+.roi-metrics {
+    background-color: white;
+    padding: var(--space-md);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-md);
+    text-align: center;
+}
+
+.metric-item {
+    padding: var(--space-md);
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: var(--font-bold);
+    color: var(--kagami-blue);
+    margin-bottom: var(--space-xs);
+}
+
+.metric-label {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.btn-xs {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--text-xs);
+}
+
+.btn-warning {
+    background-color: var(--warning-yellow);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #dc8b04;
+}
+
+/* 懸念事項リスト */
+.concern-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.concern-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background-color: white;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.concern-icon {
+    font-size: var(--text-sm);
+}
+
+.concern-high {
+    border-color: var(--error-red);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.concern-medium {
+    border-color: var(--warning-yellow);
+    background-color: rgba(245, 158, 11, 0.05);
+}
+
+.concern-low {
+    border-color: var(--success-green);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+/* アクションバー */
+.action-bar {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    border-top: 1px solid var(--gray-200);
+    padding: var(--space-lg);
+    margin: var(--space-lg) calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 必須項目 */
+.form-label.required::after {
+    content: ' *';
+    color: var(--error-red);
+}
+
+/* モーダル */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    width: 90%;
+    max-width: 800px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-600);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-md);
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background-color: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.modal-body {
+    padding: var(--space-lg);
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-top: 1px solid var(--gray-200);
+    background-color: var(--gray-50);
+}
+
+/* ワークフロー設定 */
+.workflow-section {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.workflow-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.workflow-section h4 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-md);
+    color: var(--gray-900);
+}
+
+.workflow-settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.setting-label {
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+}
+
+.checkbox-item,
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-item:hover,
+.radio-item:hover {
+    background-color: var(--gray-50);
+}
+
+.approver-list,
+.integration-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+/* FAQ統合モーダル */
+.merge-comparison {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-lg);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-lg);
+}
+
+.merge-item {
+    flex: 1;
+    background-color: white;
+    padding: var(--space-md);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.merge-item.current {
+    border-color: var(--kagami-blue);
+}
+
+.merge-item.existing {
+    border-color: var(--warning-yellow);
+}
+
+.merge-item h4 {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-sm);
+    color: var(--gray-700);
+}
+
+.merge-arrow {
+    font-size: 2rem;
+    color: var(--gray-400);
+}
+
+.faq-preview {
+    font-size: var(--text-sm);
+}
+
+.faq-preview .question,
+.faq-preview .answer {
+    margin-bottom: var(--space-sm);
+}
+
+.faq-preview .meta {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.merge-options {
+    background-color: white;
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.merge-options h4 {
+    font-size: var(--text-md);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-md);
+}
+
+.option-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-steps {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .step::after {
+        display: none;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 2% auto;
+    }
+    
+    .merge-comparison {
+        flex-direction: column;
+    }
+    
+    .merge-arrow {
+        transform: rotate(90deg);
+    }
+}
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // 投資家名のオートコンプリート
+    initInvestorAutocomplete();
+    
+    // タグ入力の初期化
+    initTagInput();
+    
+    // AI分析のシミュレーション
+    simulateAIAnalysis();
+});
+
+// 投資家名オートコンプリート
+function initInvestorAutocomplete() {
+    const input = document.querySelector('.investor-select input');
+    const suggestions = document.querySelector('.investor-suggestions');
+    
+    input.addEventListener('focus', function() {
+        if (this.value.length > 0) {
+            suggestions.style.display = 'block';
+        }
+    });
+    
+    input.addEventListener('input', function() {
+        if (this.value.length > 0) {
+            suggestions.style.display = 'block';
+            // 実際の実装では、ここでAPIを呼び出して候補を取得
+        } else {
+            suggestions.style.display = 'none';
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.investor-select')) {
+            suggestions.style.display = 'none';
+        }
+    });
+}
+
+// タグ入力
+function initTagInput() {
+    const tagInputs = document.querySelectorAll('.tag-input-field');
+    
+    tagInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                e.preventDefault();
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.textContent = this.value.trim();
+                this.parentElement.insertBefore(tag, this);
+                this.value = '';
+            }
+        });
+    });
+}
+
+// AI分析のシミュレーション
+function simulateAIAnalysis() {
+    const progressBars = [
+        { element: document.querySelectorAll('.progress-bar')[2], target: 100, speed: 30 },
+        { element: document.querySelectorAll('.progress-bar')[3], target: 100, speed: 20 }
+    ];
+    
+    progressBars.forEach(bar => {
+        if (bar.element) {
+            let current = parseInt(bar.element.style.width) || 0;
+            const interval = setInterval(() => {
+                current += 1;
+                bar.element.style.width = current + '%';
+                
+                if (current >= bar.target) {
+                    clearInterval(interval);
+                    // ステータスを更新
+                    const statusElement = bar.element.closest('.progress-item').querySelector('.progress-status');
+                    if (statusElement) {
+                        statusElement.textContent = '✓ 完了';
+                        statusElement.style.color = 'var(--success-green)';
+                    }
+                }
+            }, bar.speed);
+        }
+    });
+}
+
+// 下書き保存
+function saveDraft() {
+    // 実際の実装では、フォームデータを収集してAPIに送信
+    const formData = collectFormData();
+    console.log('下書き保存:', formData);
+    
+    // 成功メッセージを表示
+    showNotification('下書きを保存しました', 'success');
+}
+
+// キャンセル
+function cancelUpload() {
+    if (confirm('入力した内容は保存されません。本当にキャンセルしますか？')) {
+        window.location.href = '/upload';
+    }
+}
+
+// 次へ進む
+function proceedToAnalysis() {
+    // フォームバリデーション
+    if (!validateForm()) {
+        return;
+    }
+    
+    // 実際の実装では、データを保存してから次のステップへ
+    const formData = collectFormData();
+    console.log('AI詳細分析へ進む:', formData);
+    
+    // 次のページへ遷移（実際はデータをPOSTして遷移）
+    window.location.href = '/dialogue-analysis';
+}
+
+// フォームデータ収集
+function collectFormData() {
+    const form = document.querySelector('form') || document.body;
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const data = {};
+    
+    inputs.forEach(input => {
+        if (input.name) {
+            if (input.type === 'checkbox') {
+                data[input.name] = input.checked;
+            } else {
+                data[input.name] = input.value;
+            }
+        }
+    });
+    
+    return data;
+}
+
+// フォームバリデーション
+function validateForm() {
+    const requiredFields = document.querySelectorAll('.form-label.required');
+    let isValid = true;
+    
+    requiredFields.forEach(label => {
+        const input = label.nextElementSibling;
+        if (input && !input.value.trim()) {
+            input.classList.add('error');
+            isValid = false;
+        } else if (input) {
+            input.classList.remove('error');
+        }
+    });
+    
+    if (!isValid) {
+        showNotification('必須項目を入力してください', 'error');
+    }
+    
+    return isValid;
+}
+
+// 通知表示
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // アニメーション
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // 3秒後に削除
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// FAQ候補の操作
+function editFAQ(id) {
+    // FAQ編集モーダルを表示（簡易版）
+    const card = document.querySelector(`[data-faq-id="${id}"]`);
+    const question = card.querySelector('.faq-question span:last-child').textContent;
+    const answer = card.querySelector('.faq-answer span:last-child').textContent;
+    
+    const newQuestion = prompt('質問を編集:', question);
+    if (newQuestion !== null) {
+        const newAnswer = prompt('回答を編集:', answer);
+        if (newAnswer !== null) {
+            card.querySelector('.faq-question span:last-child').textContent = newQuestion;
+            card.querySelector('.faq-answer span:last-child').textContent = newAnswer;
+            showNotification('FAQを更新しました', 'success');
+        }
+    }
+}
+
+// FAQ公開設定の表示/非表示
+function setFAQVisibility(id) {
+    const panel = document.getElementById(`visibility-panel-${id}`);
+    if (panel.style.display === 'none') {
+        // 他のパネルを閉じる
+        document.querySelectorAll('.faq-visibility-panel').forEach(p => {
+            p.style.display = 'none';
+        });
+        panel.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+// FAQアクションメニュー
+function showFAQActions(id) {
+    // コンテキストメニューの表示
+    console.log(`FAQ ${id} のアクションメニュー`);
+}
+
+// FAQタブ切り替え
+function switchFAQTab(tab) {
+    // タブボタンのアクティブ状態を更新
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // コンテンツの表示切り替え（デモ用）
+    console.log(`${tab}タブに切り替え`);
+}
+
+// FAQワークフロー設定
+function showFAQWorkflow() {
+    document.getElementById('faq-workflow-modal').style.display = 'block';
+}
+
+function closeFAQWorkflowModal() {
+    document.getElementById('faq-workflow-modal').style.display = 'none';
+}
+
+function saveFAQWorkflow() {
+    // 設定を保存
+    const settings = {
+        autoApprovalLevel: document.querySelector('.workflow-section select').value,
+        approvers: [],
+        integrations: [],
+        notifications: document.querySelector('input[type="email"]').value
+    };
+    
+    // チェックされた承認者を取得
+    document.querySelectorAll('.approver-list input:checked').forEach(input => {
+        settings.approvers.push(input.nextElementSibling.textContent);
+    });
+    
+    // チェックされた連携システムを取得
+    document.querySelectorAll('.integration-list input:checked').forEach(input => {
+        settings.integrations.push(input.nextElementSibling.textContent);
+    });
+    
+    console.log('ワークフロー設定:', settings);
+    showNotification('ワークフロー設定を保存しました', 'success');
+    closeFAQWorkflowModal();
+}
+
+// 類似FAQ表示
+function showSimilarFAQ(id) {
+    alert(`FAQ ${id} の類似事例を表示`);
+}
+
+// FAQ統合
+function mergeFAQ(id) {
+    // 統合モーダルを表示
+    document.getElementById('faq-merge-modal').style.display = 'block';
+    // IDを保存（実際の実装ではデータを読み込む）
+    document.getElementById('faq-merge-modal').dataset.faqId = id;
+}
+
+function closeFAQMergeModal() {
+    document.getElementById('faq-merge-modal').style.display = 'none';
+}
+
+function executeFAQMerge() {
+    const selectedOption = document.querySelector('input[name="merge-option"]:checked').value;
+    const faqId = document.getElementById('faq-merge-modal').dataset.faqId;
+    
+    let message = '';
+    switch(selectedOption) {
+        case 'replace':
+            message = '既存FAQを更新しました';
+            break;
+        case 'append':
+            message = '既存FAQに情報を追加しました';
+            break;
+        case 'new':
+            message = '新しいFAQとして登録しました';
+            break;
+    }
+    
+    showNotification(message, 'success');
+    closeFAQMergeModal();
+    
+    // チェックボックスをチェック
+    document.querySelector(`[data-faq-id="${faqId}"] .faq-checkbox`).checked = true;
+}
+
+// 全FAQのプレビュー
+function previewAllFAQs() {
+    // 実際はモーダルで表示
+    alert('全FAQ候補のプレビュー機能は開発中です');
+}
+
+// 全FAQの採用
+function acceptAllFAQs() {
+    const checkboxes = document.querySelectorAll('.faq-checkbox');
+    checkboxes.forEach(cb => cb.checked = true);
+    showNotification('すべてのFAQ候補を採用しました', 'success');
+}
+
+// 通知用のスタイル追加
+const notificationStyle = document.createElement('style');
+notificationStyle.textContent = `
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: var(--space-md) var(--space-lg);
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    border-left: 4px solid var(--success-green);
+}
+
+.notification-error {
+    border-left: 4px solid var(--error-red);
+}
+
+.notification-info {
+    border-left: 4px solid var(--kagami-blue);
+}
+
+.form-control.error {
+    border-color: var(--error-red);
+}
+`;
+document.head.appendChild(notificationStyle);
+
+// モーダルの外側クリックで閉じる
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+};
+</script>
+{% endblock %}
