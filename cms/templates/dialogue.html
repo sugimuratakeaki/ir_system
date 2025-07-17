@@ -1,0 +1,865 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- ヘッダーセクション -->
+<div class="flex justify-between items-center mb-lg">
+    <div>
+        <h2 class="text-2xl font-bold mb-sm">対話記録管理</h2>
+        <p class="text-muted">すべての投資家対話記録を一元管理</p>
+    </div>
+    <div class="flex gap-md">
+        <button class="btn btn-secondary" onclick="showFilterModal()">
+            🔍 詳細フィルタ
+        </button>
+        <a href="/upload" class="btn btn-primary">
+            📤 新規取り込み
+        </a>
+    </div>
+</div>
+
+<!-- 統計サマリー -->
+<div class="dashboard-grid mb-lg">
+    <div class="kpi-card">
+        <div class="kpi-value">156</div>
+        <div class="kpi-label">今月の対話記録</div>
+        <div class="kpi-trend trend-positive">↑ 23% 前月比</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-value">42</div>
+        <div class="kpi-label">処理待ち</div>
+        <div class="kpi-trend trend-negative">↑ 5件 昨日より</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-value">98%</div>
+        <div class="kpi-label">AI分析完了率</div>
+        <div class="kpi-trend">→ 安定</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-value">234</div>
+        <div class="kpi-label">FAQ候補生成</div>
+        <div class="kpi-trend trend-positive">↑ 45% 効率改善</div>
+    </div>
+</div>
+
+<!-- フィルタバー -->
+<div class="card mb-lg">
+    <div class="card-body">
+        <div class="flex gap-md items-center flex-wrap">
+            <div class="form-group mb-0">
+                <select class="form-control">
+                    <option>すべてのソース</option>
+                    <option>🎙️ 音声・動画</option>
+                    <option>💻 Web会議</option>
+                    <option>📧 メール</option>
+                    <option>📄 文書</option>
+                </select>
+            </div>
+            <div class="form-group mb-0">
+                <select class="form-control">
+                    <option>すべてのステータス</option>
+                    <option>⏳ 処理待ち</option>
+                    <option>🔄 処理中</option>
+                    <option>✅ 完了</option>
+                    <option>❌ エラー</option>
+                </select>
+            </div>
+            <div class="form-group mb-0">
+                <input type="date" class="form-control" placeholder="開始日">
+            </div>
+            <span>〜</span>
+            <div class="form-group mb-0">
+                <input type="date" class="form-control" placeholder="終了日">
+            </div>
+            <div class="form-group mb-0 flex-1">
+                <input type="text" class="form-control" placeholder="キーワード検索...">
+            </div>
+            <button class="btn btn-primary">検索</button>
+        </div>
+    </div>
+</div>
+
+<!-- 対話記録一覧 -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="selectAll">
+                        </th>
+                        <th>ソース</th>
+                        <th>タイトル/内容</th>
+                        <th>日時</th>
+                        <th>関係者</th>
+                        <th>ステータス</th>
+                        <th>AI分析</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Web会議の例 -->
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td><span class="text-2xl">💻</span></td>
+                        <td>
+                            <div class="font-semibold">2024年第3四半期決算説明会</div>
+                            <div class="text-sm text-muted">Zoom • 45分 • 参加者: 156名</div>
+                        </td>
+                        <td>
+                            <div>2024/01/15</div>
+                            <div class="text-sm text-muted">14:00-14:45</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">CEO, CFO</div>
+                            <div class="text-sm text-muted">機関投資家多数</div>
+                        </td>
+                        <td><span class="badge badge-success">✅ 完了</span></td>
+                        <td>
+                            <div class="flex gap-xs">
+                                <span class="badge badge-info">FAQ: 12</span>
+                                <span class="badge badge-warning">課題: 3</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" onclick="showDetailModal('meeting_001')">詳細</button>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- メールの例 -->
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td><span class="text-2xl">📧</span></td>
+                        <td>
+                            <div class="font-semibold">配当政策に関する質問</div>
+                            <div class="text-sm text-muted">機関投資家A社 → IR部</div>
+                        </td>
+                        <td>
+                            <div>2024/01/14</div>
+                            <div class="text-sm text-muted">16:23</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">機関投資家A社</div>
+                            <div class="text-sm text-muted">担当: 田中</div>
+                        </td>
+                        <td><span class="badge badge-warning">🔄 処理中</span></td>
+                        <td>
+                            <div class="text-sm text-muted">分析中...</div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" disabled>詳細</button>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- 音声の例 -->
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td><span class="text-2xl">🎙️</span></td>
+                        <td>
+                            <div class="font-semibold">投資家B社との個別面談</div>
+                            <div class="text-sm text-muted">音声ファイル • 32分</div>
+                        </td>
+                        <td>
+                            <div>2024/01/13</div>
+                            <div class="text-sm text-muted">10:00-10:32</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">CFO, IR部長</div>
+                            <div class="text-sm text-muted">投資家B社 2名</div>
+                        </td>
+                        <td><span class="badge badge-success">✅ 完了</span></td>
+                        <td>
+                            <div class="flex gap-xs">
+                                <span class="badge badge-info">FAQ: 5</span>
+                                <span class="badge badge-success">好感</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" onclick="showDetailModal('voice_001')">詳細</button>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- 文書の例 -->
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td><span class="text-2xl">📄</span></td>
+                        <td>
+                            <div class="font-semibold">取締役会議事録</div>
+                            <div class="text-sm text-muted">PDF • 15ページ</div>
+                        </td>
+                        <td>
+                            <div>2024/01/10</div>
+                            <div class="text-sm text-muted">-</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">取締役会</div>
+                            <div class="text-sm text-muted">全取締役</div>
+                        </td>
+                        <td><span class="badge badge-success">✅ 完了</span></td>
+                        <td>
+                            <div class="flex gap-xs">
+                                <span class="badge badge-info">重要: 8</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" onclick="showDetailModal('doc_001')">詳細</button>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- ページネーション -->
+        <div class="flex justify-between items-center mt-lg">
+            <div class="text-sm text-muted">
+                全156件中 1-10件を表示
+            </div>
+            <div class="flex gap-sm">
+                <button class="btn btn-sm btn-secondary" disabled>前へ</button>
+                <button class="btn btn-sm btn-secondary active">1</button>
+                <button class="btn btn-sm btn-secondary">2</button>
+                <button class="btn btn-sm btn-secondary">3</button>
+                <span>...</span>
+                <button class="btn btn-sm btn-secondary">16</button>
+                <button class="btn btn-sm btn-secondary">次へ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 一括操作バー -->
+<div class="fixed-bottom-bar" id="bulkActionBar" style="display: none;">
+    <div class="container flex justify-between items-center">
+        <div>
+            <span id="selectedCount">0</span>件を選択中
+        </div>
+        <div class="flex gap-md">
+            <button class="btn btn-sm btn-secondary">タグ付け</button>
+            <button class="btn btn-sm btn-secondary">公開設定変更</button>
+            <button class="btn btn-sm btn-secondary">エクスポート</button>
+            <button class="btn btn-sm btn-danger">削除</button>
+        </div>
+    </div>
+</div>
+
+<!-- 詳細モーダル -->
+<div id="detailModal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeDetailModal()"></div>
+    <div class="modal-content" style="max-width: 90%; width: 1200px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <h2 class="text-xl font-bold">対話記録詳細</h2>
+            <button class="btn btn-icon" onclick="closeDetailModal()">✕</button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- 内容はshowDetailModal()で動的に生成 -->
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeDetailModal()">閉じる</button>
+            <button class="btn btn-primary" onclick="saveDetails()">変更を保存</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 固定底部バー */
+.fixed-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 250px; /* サイドバーの幅 */
+    right: 0;
+    background-color: white;
+    border-top: 1px solid var(--gray-200);
+    padding: var(--space-md);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+/* モーダル */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    position: relative;
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-xl);
+    z-index: 1001;
+}
+
+.modal-header {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body {
+    padding: var(--space-lg);
+}
+
+.modal-footer {
+    padding: var(--space-lg);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+}
+
+/* フレックスユーティリティ */
+.flex-1 {
+    flex: 1;
+}
+
+.gap-xs {
+    gap: var(--space-xs);
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+    .fixed-bottom-bar {
+        left: 0;
+    }
+    
+    .flex-wrap {
+        flex-wrap: wrap;
+    }
+}
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// チェックボックス管理
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+    updateBulkActionBar();
+});
+
+// 個別チェックボックス
+document.querySelectorAll('tbody input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', updateBulkActionBar);
+});
+
+// 一括操作バーの更新
+function updateBulkActionBar() {
+    const checkedBoxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+    const count = checkedBoxes.length;
+    const bulkActionBar = document.getElementById('bulkActionBar');
+    
+    if (count > 0) {
+        document.getElementById('selectedCount').textContent = count;
+        bulkActionBar.style.display = 'block';
+    } else {
+        bulkActionBar.style.display = 'none';
+    }
+}
+
+// 詳細モーダルの表示
+function showDetailModal(recordId) {
+    const modal = document.getElementById('detailModal');
+    const modalBody = modal.querySelector('.modal-body');
+    
+    // レコードタイプに応じて適切な内容を表示
+    if (recordId.startsWith('meeting_')) {
+        modalBody.innerHTML = getMeetingDetailContent();
+    } else if (recordId.startsWith('email_')) {
+        modalBody.innerHTML = getEmailDetailContent();
+    } else if (recordId.startsWith('voice_')) {
+        modalBody.innerHTML = getVoiceDetailContent();
+    } else if (recordId.startsWith('doc_')) {
+        modalBody.innerHTML = getDocumentDetailContent();
+    }
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+// Web会議の詳細コンテンツ
+function getMeetingDetailContent() {
+    return `
+        <!-- 基本情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📋 基本情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">タイトル</label>
+                        <input type="text" class="form-control" value="2024年第3四半期決算説明会">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">開催日時</label>
+                        <input type="datetime-local" class="form-control" value="2024-01-15T14:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">会議システム</label>
+                        <select class="form-control">
+                            <option selected>Zoom</option>
+                            <option>Teams</option>
+                            <option>Webex</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">参加者数</label>
+                        <input type="number" class="form-control" value="156">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">主な参加者</label>
+                    <div class="tag-input">
+                        <span class="tag">CEO 山田太郎</span>
+                        <span class="tag">CFO 鈴木花子</span>
+                        <span class="tag">機関投資家（120名）</span>
+                        <span class="tag">個人投資家（30名）</span>
+                        <input type="text" class="form-control" placeholder="参加者を追加...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI分析結果 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🤖 AI分析結果</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-md">
+                    <h4 class="font-semibold mb-sm">会議サマリー</h4>
+                    <p>第3四半期の好調な業績（売上高前年同期比15%増）を報告。特に海外事業の成長が顕著。投資家からは今後の成長戦略、DX投資計画、ESG目標について多数の質問。全体的にポジティブな反応。</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-md">
+                    <div>
+                        <h4 class="font-semibold mb-sm">📊 主要トピック</h4>
+                        <ul class="list-disc list-inside space-y-sm">
+                            <li>海外事業の成長戦略（35%の時間）</li>
+                            <li>DX投資計画（25%の時間）</li>
+                            <li>ESG目標と施策（20%の時間）</li>
+                            <li>財務状況・配当方針（20%の時間）</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-sm">😊 投資家センチメント</h4>
+                        <div class="sentiment-chart">
+                            <div class="sentiment-bar positive" style="width: 75%;">ポジティブ 75%</div>
+                            <div class="sentiment-bar neutral" style="width: 20%;">中立 20%</div>
+                            <div class="sentiment-bar negative" style="width: 5%;">ネガティブ 5%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ候補 -->
+        <div class="card mb-lg">
+            <div class="card-header flex justify-between items-center">
+                <h3 class="text-lg font-semibold">❓ FAQ候補（12件）</h3>
+                <button class="btn btn-sm btn-primary">すべて採用</button>
+            </div>
+            <div class="card-body">
+                <div class="space-y-md">
+                    <div class="faq-candidate">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold">Q: 海外事業の成長率30%達成の要因は？</h4>
+                                <p class="text-sm text-muted mt-sm">A: 現地パートナーとの戦略的提携、ローカライズ製品開発、デジタルマーケティング強化の3つの施策が奏功しました。</p>
+                            </div>
+                            <div class="flex gap-sm">
+                                <span class="confidence-badge confidence-high">信頼度: 98%</span>
+                                <label class="flex items-center gap-sm">
+                                    <input type="checkbox" checked>
+                                    <span>採用</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 公開設定 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🔒 公開設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">公開範囲</label>
+                        <select class="form-control">
+                            <option>非公開（IR部門のみ）</option>
+                            <option>社内公開</option>
+                            <option selected>投資家限定公開</option>
+                            <option>一般公開</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">公開日時</label>
+                        <input type="datetime-local" class="form-control" value="2024-01-15T18:00">
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// メールの詳細コンテンツ
+function getEmailDetailContent() {
+    return `
+        <!-- 基本情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📧 メール情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">送信者</label>
+                        <input type="text" class="form-control" value="機関投資家A社 田中様">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">受信日時</label>
+                        <input type="datetime-local" class="form-control" value="2024-01-14T16:23">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">件名</label>
+                        <input type="text" class="form-control" value="配当政策に関する質問">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">重要度</label>
+                        <select class="form-control">
+                            <option>低</option>
+                            <option selected>中</option>
+                            <option>高</option>
+                            <option>緊急</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">メール本文</label>
+                    <div class="email-content">
+                        <p>いつもお世話になっております。</p>
+                        <p>貴社の配当政策について、以下の点を確認させていただきたくご連絡いたしました。</p>
+                        <ol>
+                            <li>今期の配当性向目標について</li>
+                            <li>中期的な株主還元方針</li>
+                            <li>自社株買いの検討状況</li>
+                        </ol>
+                        <p>お忙しいところ恐縮ですが、ご回答いただければ幸いです。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI分析・回答案 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🤖 AI分析・回答案</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning mb-md">
+                    <span>⚠️</span>
+                    <span>配当政策に関する重要な質問です。経営陣の承認が必要な可能性があります。</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">回答案</label>
+                    <textarea class="form-control" rows="10">
+田中様
+
+お問い合わせいただきありがとうございます。
+配当政策について以下のとおり回答いたします。
+
+1. 今期の配当性向目標
+   当社は安定配当を基本方針とし、今期は配当性向30%を目標としております。
+
+2. 中期的な株主還元方針
+   今後3年間で配当性向を段階的に35%まで引き上げる予定です。
+   業績向上に応じて、株主の皆様への還元を強化してまいります。
+
+3. 自社株買いの検討状況
+   現時点では具体的な計画はございませんが、資本効率向上の観点から
+   継続的に検討してまいります。
+
+ご不明な点がございましたら、お気軽にお問い合わせください。
+
+IR部 鈴木
+                    </textarea>
+                </div>
+                
+                <div class="flex gap-md">
+                    <button class="btn btn-primary">この内容で返信</button>
+                    <button class="btn btn-secondary">下書き保存</button>
+                    <button class="btn btn-secondary">承認依頼</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 音声の詳細コンテンツ
+function getVoiceDetailContent() {
+    // 基本的にWeb会議と同様の構造だが、音声特有の要素を追加
+    return getMeetingDetailContent();
+}
+
+// 文書の詳細コンテンツ
+function getDocumentDetailContent() {
+    return `
+        <!-- 基本情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">📄 文書情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">文書名</label>
+                        <input type="text" class="form-control" value="取締役会議事録_20240110">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">文書タイプ</label>
+                        <select class="form-control">
+                            <option>決算資料</option>
+                            <option>説明会資料</option>
+                            <option selected>議事録</option>
+                            <option>適時開示</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">作成日</label>
+                        <input type="date" class="form-control" value="2024-01-10">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ページ数</label>
+                        <input type="number" class="form-control" value="15">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI抽出情報 -->
+        <div class="card mb-lg">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">🤖 AI抽出情報</h3>
+            </div>
+            <div class="card-body">
+                <h4 class="font-semibold mb-sm">📌 重要事項（8件）</h4>
+                <div class="space-y-sm mb-md">
+                    <div class="alert alert-warning">
+                        <strong>中期経営計画の修正承認</strong>
+                        <p class="text-sm mt-sm">DX投資を50億円から70億円に増額することを承認</p>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>配当方針の変更</strong>
+                        <p class="text-sm mt-sm">配当性向を30%から35%に引き上げることを決議</p>
+                    </div>
+                </div>
+                
+                <h4 class="font-semibold mb-sm">🔢 抽出された数値情報</h4>
+                <table class="table">
+                    <tr>
+                        <td>DX投資額</td>
+                        <td class="font-semibold">70億円</td>
+                    </tr>
+                    <tr>
+                        <td>配当性向</td>
+                        <td class="font-semibold">35%</td>
+                    </tr>
+                    <tr>
+                        <td>売上高目標（3年後）</td>
+                        <td class="font-semibold">1,500億円</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    `;
+}
+
+// 詳細モーダルを閉じる
+function closeDetailModal() {
+    document.getElementById('detailModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// 詳細を保存
+function saveDetails() {
+    alert('変更を保存しました。');
+    closeDetailModal();
+}
+
+// タグ入力の処理
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('tag-input') || e.target.parentElement?.classList.contains('tag-input')) {
+        const input = e.target.querySelector('input') || e.target;
+        if (input.tagName === 'INPUT') {
+            input.focus();
+        }
+    }
+});
+
+// スタイル追加
+const style = document.createElement('style');
+style.textContent = `
+.email-content {
+    background-color: var(--gray-50);
+    padding: var(--space-md);
+    border-radius: var(--border-radius-md);
+    font-family: monospace;
+}
+
+.sentiment-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.sentiment-bar {
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    text-align: center;
+}
+
+.sentiment-bar.positive {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--success-green);
+}
+
+.sentiment-bar.neutral {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: var(--gray-600);
+}
+
+.sentiment-bar.negative {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--error-red);
+}
+
+.tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+    padding: var(--space-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    background-color: white;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+}
+
+.tag-input input {
+    flex: 1;
+    min-width: 150px;
+    border: none;
+    outline: none;
+    padding: var(--space-xs);
+}
+
+.confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.confidence-high {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success-green);
+}
+
+.faq-candidate {
+    padding: var(--space-md);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.grid {
+    display: grid;
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.gap-md {
+    gap: var(--space-md);
+}
+
+.space-y-sm > * + * {
+    margin-top: var(--space-sm);
+}
+
+.space-y-md > * + * {
+    margin-top: var(--space-md);
+}
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

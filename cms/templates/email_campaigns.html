@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}メール配信管理{% endblock %}
+
+{% block content %}
+<!-- 配信統計 -->
+<div class="mb-lg">
+    <div class="faq-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_recipients }}</div>
+            <div class="stat-label">総配信先数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ sent_this_month }}</div>
+            <div class="stat-label">今月の配信数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ avg_open_rate }}%</div>
+            <div class="stat-label">平均開封率</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ scheduled_campaigns }}</div>
+            <div class="stat-label">予約配信</div>
+        </div>
+    </div>
+</div>
+
+<!-- アクションバー -->
+<div class="flex justify-between items-center mb-lg">
+    <div class="flex gap-md">
+        <button class="btn btn-primary" onclick="showNewCampaignModal()">
+            <span>✉️</span>
+            <span>新規配信作成</span>
+        </button>
+        <button class="btn btn-secondary">
+            <span>📋</span>
+            <span>テンプレート管理</span>
+        </button>
+        <button class="btn btn-secondary">
+            <span>👥</span>
+            <span>配信リスト管理</span>
+        </button>
+    </div>
+    <div class="flex gap-md">
+        <input type="text" class="form-control" placeholder="キャンペーンを検索..." style="width: 300px;">
+        <select class="form-control" style="width: 150px;">
+            <option>すべての状態</option>
+            <option>下書き</option>
+            <option>配信予約</option>
+            <option>配信済み</option>
+        </select>
+    </div>
+</div>
+
+<!-- キャンペーン一覧 -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">配信キャンペーン一覧</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>配信日時</th>
+                        <th>件名</th>
+                        <th>配信対象</th>
+                        <th>配信数</th>
+                        <th>開封率</th>
+                        <th>ステータス</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    <tr>
+                        <td>{{ campaign.scheduled_date }}</td>
+                        <td>
+                            <div class="font-medium">{{ campaign.subject }}</div>
+                            <div class="text-sm text-muted">{{ campaign.template }}</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-primary">{{ campaign.target_group }}</span>
+                        </td>
+                        <td>{{ campaign.recipient_count }}</td>
+                        <td>
+                            {% if campaign.status == "配信済み" %}
+                            <div class="flex items-center gap-sm">
+                                <div class="progress" style="width: 100px;">
+                                    <div class="progress-bar" style="width: {{ campaign.open_rate }}%"></div>
+                                </div>
+                                <span class="text-sm">{{ campaign.open_rate }}%</span>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if campaign.status == "下書き" %}
+                            <span class="badge badge-secondary">下書き</span>
+                            {% elif campaign.status == "配信予約" %}
+                            <span class="badge badge-warning">配信予約</span>
+                            {% elif campaign.status == "配信中" %}
+                            <span class="badge badge-primary">配信中</span>
+                            {% else %}
+                            <span class="badge badge-success">配信済み</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                {% if campaign.status == "下書き" %}
+                                <button class="btn btn-sm btn-primary">配信</button>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                                {% elif campaign.status == "配信予約" %}
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                                <button class="btn btn-sm btn-danger">キャンセル</button>
+                                {% else %}
+                                <button class="btn btn-sm btn-secondary">詳細</button>
+                                <button class="btn btn-sm btn-secondary">複製</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 配信グループ -->
+<div class="card mt-lg">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">配信グループ</h3>
+    </div>
+    <div class="card-body">
+        <div class="grid grid-cols-4 gap-md">
+            {% for group in mailing_groups %}
+            <div class="group-card">
+                <div class="group-icon">{{ group.icon }}</div>
+                <div class="group-name">{{ group.name }}</div>
+                <div class="group-count">{{ group.count }}件</div>
+                <div class="group-actions">
+                    <button class="btn btn-sm btn-secondary">編集</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 新規配信作成モーダル -->
+<div class="modal" id="newCampaignModal">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3 class="modal-title">新規メール配信作成</h3>
+            <button class="modal-close" onclick="closeNewCampaignModal()">&times;</button>
+        </div>
+        <form>
+            <div class="form-group">
+                <label class="form-label">配信タイプ</label>
+                <div class="flex gap-md">
+                    <label class="radio-label">
+                        <input type="radio" name="campaign_type" value="immediate" checked>
+                        <span>即時配信</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="campaign_type" value="scheduled">
+                        <span>予約配信</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group" id="scheduleGroup" style="display: none;">
+                <label class="form-label">配信日時</label>
+                <div class="flex gap-md">
+                    <input type="date" class="form-control">
+                    <input type="time" class="form-control">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">配信対象</label>
+                <select class="form-control">
+                    <option>すべての投資家</option>
+                    <option>機関投資家</option>
+                    <option>個人投資家</option>
+                    <option>海外投資家</option>
+                    <option>メール通知希望者</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">テンプレート</label>
+                <select class="form-control" onchange="loadTemplate()">
+                    <option value="">テンプレートを選択</option>
+                    <option value="earnings">決算発表通知</option>
+                    <option value="event">イベント案内</option>
+                    <option value="news">ニュースリリース</option>
+                    <option value="custom">カスタム</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">件名</label>
+                <input type="text" class="form-control" placeholder="例：【KAGAMI】2024年度第3四半期決算発表のお知らせ">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">本文</label>
+                <textarea class="form-control" rows="10" placeholder="メール本文を入力してください..."></textarea>
+                <div class="text-sm text-muted mt-sm">
+                    利用可能な変数: {{investor_name}}, {{company_name}}, {{date}}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">添付ファイル</label>
+                <div class="upload-area-small">
+                    <span>📎 ファイルを選択またはドラッグ&ドロップ</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-between">
+                <button type="button" class="btn btn-secondary" onclick="closeNewCampaignModal()">キャンセル</button>
+                <div class="flex gap-md">
+                    <button type="button" class="btn btn-secondary">下書き保存</button>
+                    <button type="submit" class="btn btn-primary">配信設定</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.grid {
+    display: grid;
+}
+
+.grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.group-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-lg);
+    text-align: center;
+    transition: all var(--transition-normal);
+}
+
+.group-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.group-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+}
+
+.group-name {
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-xs);
+}
+
+.group-count {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.upload-area-small {
+    border: 1px dashed var(--gray-300);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    text-align: center;
+    background-color: var(--gray-50);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.upload-area-small:hover {
+    border-color: var(--kagami-blue);
+    background-color: rgba(26, 54, 93, 0.05);
+}
+
+@media (max-width: 768px) {
+    .grid-cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
+<script>
+function showNewCampaignModal() {
+    document.getElementById('newCampaignModal').classList.add('active');
+}
+
+function closeNewCampaignModal() {
+    document.getElementById('newCampaignModal').classList.remove('active');
+}
+
+// 配信タイプ切り替え
+document.querySelectorAll('input[name="campaign_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const scheduleGroup = document.getElementById('scheduleGroup');
+        if (this.value === 'scheduled') {
+            scheduleGroup.style.display = 'block';
+        } else {
+            scheduleGroup.style.display = 'none';
+        }
+    });
+});
+
+function loadTemplate() {
+    // テンプレート読み込みの処理（モック）
+    console.log('テンプレートを読み込みました');
+}
+
+// モーダル外クリックで閉じる
+document.getElementById('newCampaignModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeNewCampaignModal();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- ヘッダー -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">システム設定</h1>
+        <p class="mt-2 text-gray-600">AI-IR管理センターの各種設定を管理します</p>
+    </div>
+
+    <!-- 設定タブ -->
+    <div class="mb-6">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8">
+                <button class="setting-tab active" data-tab="general">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    一般設定
+                </button>
+                <button class="setting-tab" data-tab="ai">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    AI設定
+                </button>
+                <button class="setting-tab" data-tab="notification">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    通知設定
+                </button>
+                <button class="setting-tab" data-tab="security">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    セキュリティ
+                </button>
+                <button class="setting-tab" data-tab="integration">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    外部連携
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 一般設定 -->
+    <div id="general-content" class="tab-content">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">一般設定</h2>
+            
+            <form class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">会社名</label>
+                    <input type="text" value="株式会社KAGAMI" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">システム名</label>
+                    <input type="text" value="KAGAMI IR管理センター" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">タイムゾーン</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="Asia/Tokyo" selected>Asia/Tokyo (JST)</option>
+                        <option value="UTC">UTC</option>
+                        <option value="America/New_York">America/New_York (EST)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">言語設定</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="ja" selected>日本語</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">お問い合わせメールアドレス</label>
+                    <input type="email" value="ir@kagami.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="pt-4">
+                    <button type="button" onclick="saveSettings('general')" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AI設定 -->
+    <div id="ai-content" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">AI設定</h2>
+            
+            <form class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">AI応答の信頼度しきい値</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" min="0" max="100" value="85" class="flex-1" id="confidenceThreshold">
+                        <span id="confidenceValue" class="text-gray-700 font-medium">85%</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">しきい値以下の場合は人間による確認が必要になります</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">自動学習</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">FAQの自動学習を有効にする</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">対話履歴から学習する</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">音声認識精度</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="high" selected>高精度（処理時間：長）</option>
+                        <option value="medium">標準（処理時間：中）</option>
+                        <option value="low">高速（処理時間：短）</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">感情分析</label>
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                        <span class="ml-2 text-gray-700">投資家の感情分析を有効にする</span>
+                    </label>
+                </div>
+
+                <div class="pt-4">
+                    <button type="button" onclick="saveSettings('ai')" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 通知設定 -->
+    <div id="notification-content" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">通知設定</h2>
+            
+            <form class="space-y-6">
+                <div>
+                    <h3 class="font-medium text-gray-800 mb-3">メール通知</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">新規お問い合わせ</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">重要な投資家からの連絡</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">AIの信頼度が低い回答</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">システムエラー</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-medium text-gray-800 mb-3">プッシュ通知</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">緊急のお問い合わせ</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">決算発表リマインダー</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">通知送信先メールアドレス</label>
+                    <textarea rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" 
+                              placeholder="複数のアドレスは改行で区切ってください">ir-team@kagami.com
+admin@kagami.com</textarea>
+                </div>
+
+                <div class="pt-4">
+                    <button type="button" onclick="saveSettings('notification')" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- セキュリティ設定 -->
+    <div id="security-content" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">セキュリティ設定</h2>
+            
+            <form class="space-y-6">
+                <div>
+                    <h3 class="font-medium text-gray-800 mb-3">パスワードポリシー</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">最小8文字以上</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">大文字・小文字・数字を含む</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">特殊文字を含む</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">パスワード有効期限</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="30">30日</option>
+                        <option value="60">60日</option>
+                        <option value="90" selected>90日</option>
+                        <option value="180">180日</option>
+                        <option value="0">無期限</option>
+                    </select>
+                </div>
+
+                <div>
+                    <h3 class="font-medium text-gray-800 mb-3">二要素認証</h3>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                        <span class="ml-2 text-gray-700">全ユーザーに二要素認証を必須にする</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">セッションタイムアウト</label>
+                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="15">15分</option>
+                        <option value="30" selected>30分</option>
+                        <option value="60">60分</option>
+                        <option value="120">120分</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">IPアドレス制限</label>
+                    <textarea rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" 
+                              placeholder="許可するIPアドレスを改行で区切って入力（空欄の場合は制限なし）"></textarea>
+                </div>
+
+                <div class="pt-4">
+                    <button type="button" onclick="saveSettings('security')" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 外部連携設定 -->
+    <div id="integration-content" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">外部連携設定</h2>
+            
+            <div class="space-y-6">
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <img src="https://www.gstatic.com/images/branding/product/1x/gmail_2020q4_48dp.png" alt="Gmail" class="w-8 h-8 mr-3">
+                            <div>
+                                <h3 class="font-medium text-gray-800">Gmail連携</h3>
+                                <p class="text-sm text-gray-600">メール自動送信・受信</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-green-600 text-sm mr-2">接続済み</span>
+                            <button class="text-gray-600 hover:text-gray-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <img src="https://cdn.worldvectorlogo.com/logos/slack-new-logo.svg" alt="Slack" class="w-8 h-8 mr-3">
+                            <div>
+                                <h3 class="font-medium text-gray-800">Slack連携</h3>
+                                <p class="text-sm text-gray-600">通知・アラート送信</p>
+                            </div>
+                        </div>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                            接続する
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold mr-3">Z</div>
+                            <div>
+                                <h3 class="font-medium text-gray-800">Zoom連携</h3>
+                                <p class="text-sm text-gray-600">オンライン面談・説明会</p>
+                            </div>
+                        </div>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                            接続する
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-gray-600 rounded flex items-center justify-center text-white font-bold mr-3">API</div>
+                            <div>
+                                <h3 class="font-medium text-gray-800">Webhook設定</h3>
+                                <p class="text-sm text-gray-600">外部システムへの自動通知</p>
+                            </div>
+                        </div>
+                        <button onclick="openWebhookModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 text-sm">
+                            設定
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .setting-tab {
+        @apply flex items-center text-gray-500 py-4 px-1 border-b-2 border-transparent font-medium text-sm cursor-pointer transition duration-200;
+    }
+    .setting-tab:hover {
+        @apply text-gray-700 border-gray-300;
+    }
+    .setting-tab.active {
+        @apply text-blue-600 border-blue-500;
+    }
+</style>
+
+<script>
+    // タブ切り替え
+    document.querySelectorAll('.setting-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            // タブのアクティブ状態を切り替え
+            document.querySelectorAll('.setting-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // コンテンツの表示切り替え
+            const tabName = tab.dataset.tab;
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tabName}-content`).classList.remove('hidden');
+        });
+    });
+
+    // 信頼度スライダー
+    const confidenceThreshold = document.getElementById('confidenceThreshold');
+    const confidenceValue = document.getElementById('confidenceValue');
+    
+    confidenceThreshold?.addEventListener('input', (e) => {
+        confidenceValue.textContent = `${e.target.value}%`;
+    });
+
+    // 設定保存（モック）
+    function saveSettings(section) {
+        alert(`${section}の設定を保存しました`);
+    }
+
+    // Webhook設定モーダル（モック）
+    function openWebhookModal() {
+        alert('Webhook設定画面を開きます');
+    }
+</script>
+{% endblock %}

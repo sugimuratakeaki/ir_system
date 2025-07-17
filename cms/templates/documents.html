@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- ヘッダー -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">IR資料管理</h1>
+                <p class="mt-2 text-gray-600">決算資料、有価証券報告書、説明会資料などの管理</p>
+            </div>
+            <button onclick="openUploadModal()"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                新規アップロード
+            </button>
+        </div>
+    </div>
+
+    <!-- カテゴリータブ -->
+    <div class="mb-6">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8">
+                <button class="tab-button active" data-category="all">
+                    全て
+                    <span class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">{{ total_documents }}</span>
+                </button>
+                <button class="tab-button" data-category="financial">
+                    決算短信
+                    <span class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">{{ financial_count }}</span>
+                </button>
+                <button class="tab-button" data-category="securities">
+                    有価証券報告書
+                    <span class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">{{ securities_count }}</span>
+                </button>
+                <button class="tab-button" data-category="presentation">
+                    説明会資料
+                    <span class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">{{ presentation_count }}</span>
+                </button>
+                <button class="tab-button" data-category="others">
+                    その他
+                    <span class="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">{{ others_count }}</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 検索とフィルター -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[300px]">
+                <div class="relative">
+                    <input type="text" 
+                           id="documentSearch"
+                           placeholder="資料名、年度、キーワードで検索..." 
+                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">年度</option>
+                <option value="2024">2024年度</option>
+                <option value="2023">2023年度</option>
+                <option value="2022">2022年度</option>
+            </select>
+            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">言語</option>
+                <option value="ja">日本語</option>
+                <option value="en">英語</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 資料グリッド -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for doc in documents %}
+        <div class="bg-white rounded-lg shadow hover:shadow-lg transition duration-200 document-card" data-category="{{ doc.category }}">
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center">
+                        {% if doc.type == 'pdf' %}
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-5L9 2H4z"/>
+                            </svg>
+                        </div>
+                        {% elif doc.type == 'excel' %}
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6z"/>
+                            </svg>
+                        </div>
+                        {% else %}
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-5L9 2H4z"/>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <div class="ml-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if doc.category == 'financial' %}bg-purple-100 text-purple-800
+                                {% elif doc.category == 'securities' %}bg-blue-100 text-blue-800
+                                {% elif doc.category == 'presentation' %}bg-green-100 text-green-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ doc.category_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% if doc.is_public %}
+                    <span class="text-green-500">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </span>
+                    {% else %}
+                    <span class="text-gray-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"/>
+                            <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/>
+                        </svg>
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ doc.title }}</h3>
+                <p class="text-sm text-gray-600 mb-4">{{ doc.description }}</p>
+
+                <div class="space-y-2 text-sm text-gray-500">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        {{ doc.date }}
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        {{ doc.file_size }}
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                        </svg>
+                        バージョン {{ doc.version }}
+                    </div>
+                </div>
+
+                <div class="mt-4 flex gap-2">
+                    <button onclick="previewDocument({{ doc.id }})" 
+                            class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition duration-200 text-sm">
+                        プレビュー
+                    </button>
+                    <button onclick="downloadDocument({{ doc.id }})" 
+                            class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition duration-200 text-sm">
+                        ダウンロード
+                    </button>
+                    <button onclick="editDocument({{ doc.id }})" 
+                            class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- アップロードモーダル -->
+<div id="uploadModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">IR資料アップロード</h3>
+            <form id="uploadForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">資料カテゴリー</label>
+                    <select required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">選択してください</option>
+                        <option value="financial">決算短信</option>
+                        <option value="securities">有価証券報告書</option>
+                        <option value="presentation">説明会資料</option>
+                        <option value="others">その他</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">タイトル</label>
+                    <input type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">説明</label>
+                    <textarea rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ファイル選択</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                                    <span>ファイルを選択</span>
+                                    <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".pdf,.xlsx,.xls,.ppt,.pptx">
+                                </label>
+                                <p class="pl-1">またはドラッグ＆ドロップ</p>
+                            </div>
+                            <p class="text-xs text-gray-500">PDF, Excel, PowerPoint形式（最大50MB）</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" id="is_public" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                    <label for="is_public" class="ml-2 text-sm text-gray-700">
+                        投資家向けサイトで公開する
+                    </label>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeUploadModal()" 
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                        キャンセル
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        アップロード
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tab-button {
+        @apply text-gray-500 py-4 px-1 border-b-2 border-transparent font-medium text-sm cursor-pointer transition duration-200;
+    }
+    .tab-button:hover {
+        @apply text-gray-700 border-gray-300;
+    }
+    .tab-button.active {
+        @apply text-blue-600 border-blue-500;
+    }
+</style>
+
+<script>
+    // タブ切り替え
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            // アクティブクラスの切り替え
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            
+            // カテゴリーフィルタリング
+            const category = button.dataset.category;
+            document.querySelectorAll('.document-card').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // モーダル操作
+    function openUploadModal() {
+        document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function closeUploadModal() {
+        document.getElementById('uploadModal').classList.add('hidden');
+    }
+
+    // 各種アクション（モック）
+    function previewDocument(id) {
+        alert(`資料ID ${id} のプレビューを表示します`);
+    }
+
+    function downloadDocument(id) {
+        alert(`資料ID ${id} のダウンロードを開始します`);
+    }
+
+    function editDocument(id) {
+        alert(`資料ID ${id} の編集画面を開きます`);
+    }
+
+    // 検索機能
+    document.getElementById('documentSearch')?.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.document-card').forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

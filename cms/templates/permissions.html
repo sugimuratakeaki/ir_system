@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}権限管理{% endblock %}
+
+{% block content %}
+<!-- 権限統計 -->
+<div class="mb-lg">
+    <div class="faq-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_roles }}</div>
+            <div class="stat-label">ロール数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_permissions }}</div>
+            <div class="stat-label">権限項目</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ active_sessions }}</div>
+            <div class="stat-label">アクティブセッション</div>
+        </div>
+    </div>
+</div>
+
+<!-- ロール管理 -->
+<div class="card mb-lg">
+    <div class="card-header flex justify-between items-center">
+        <h3 class="text-lg font-semibold">ロール管理</h3>
+        <button class="btn btn-primary btn-sm" onclick="showRoleModal()">
+            <span>➕</span>
+            <span>新規ロール</span>
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="roles-grid">
+            {% for role in roles %}
+            <div class="role-card {% if role.is_system %}system-role{% endif %}">
+                <div class="role-header">
+                    <h4 class="role-name">{{ role.name }}</h4>
+                    {% if role.is_system %}
+                    <span class="badge badge-secondary">システム</span>
+                    {% endif %}
+                </div>
+                <p class="role-description">{{ role.description }}</p>
+                <div class="role-stats">
+                    <span class="text-sm text-muted">{{ role.user_count }}人のユーザー</span>
+                </div>
+                <div class="role-actions mt-md">
+                    <button class="btn btn-sm btn-secondary" onclick="showPermissions({{ role.id }})">権限設定</button>
+                    {% if not role.is_system %}
+                    <button class="btn btn-sm btn-secondary">編集</button>
+                    <button class="btn btn-sm btn-danger">削除</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 権限マトリックス -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">権限マトリックス</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table permission-matrix">
+                <thead>
+                    <tr>
+                        <th>機能</th>
+                        {% for role in roles %}
+                        <th class="text-center">{{ role.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for permission in permissions %}
+                    <tr>
+                        <td>
+                            <div class="permission-info">
+                                <div class="permission-name">{{ permission.name }}</div>
+                                <div class="permission-desc text-sm text-muted">{{ permission.description }}</div>
+                            </div>
+                        </td>
+                        {% for role in roles %}
+                        <td class="text-center">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" 
+                                       {% if permission.id in role.permissions %}checked{% endif %}
+                                       {% if role.is_system %}disabled{% endif %}
+                                       onchange="updatePermission({{ role.id }}, {{ permission.id }})">
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- API キー管理 -->
+<div class="card mt-lg">
+    <div class="card-header flex justify-between items-center">
+        <h3 class="text-lg font-semibold">API キー管理</h3>
+        <button class="btn btn-primary btn-sm" onclick="generateApiKey()">
+            <span>🔑</span>
+            <span>新規キー生成</span>
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>名前</th>
+                        <th>キー</th>
+                        <th>権限</th>
+                        <th>最終使用</th>
+                        <th>状態</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for api_key in api_keys %}
+                    <tr>
+                        <td>{{ api_key.name }}</td>
+                        <td>
+                            <code class="api-key">{{ api_key.key_preview }}...</code>
+                            <button class="btn btn-sm btn-secondary ml-sm" onclick="copyApiKey('{{ api_key.key }}')">📋</button>
+                        </td>
+                        <td>
+                            <span class="badge badge-primary">{{ api_key.scope }}</span>
+                        </td>
+                        <td>{{ api_key.last_used }}</td>
+                        <td>
+                            {% if api_key.is_active %}
+                            <span class="badge badge-success">有効</span>
+                            {% else %}
+                            <span class="badge badge-danger">無効</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary">編集</button>
+                            <button class="btn btn-sm btn-danger">無効化</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ロール作成モーダル -->
+<div class="modal" id="roleModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">新規ロール作成</h3>
+            <button class="modal-close" onclick="closeRoleModal()">&times;</button>
+        </div>
+        <form>
+            <div class="form-group">
+                <label class="form-label">ロール名</label>
+                <input type="text" class="form-control" placeholder="例：コンテンツ編集者">
+            </div>
+            <div class="form-group">
+                <label class="form-label">説明</label>
+                <textarea class="form-control" rows="3" placeholder="このロールの説明を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">基本権限</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="basic_permissions" value="view">
+                        <span>閲覧権限</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="basic_permissions" value="create">
+                        <span>作成権限</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="basic_permissions" value="edit">
+                        <span>編集権限</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="basic_permissions" value="delete">
+                        <span>削除権限</span>
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-between">
+                <button type="button" class="btn btn-secondary" onclick="closeRoleModal()">キャンセル</button>
+                <button type="submit" class="btn btn-primary">作成</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+}
+
+.role-card {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-lg);
+    transition: all var(--transition-normal);
+}
+
+.role-card:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.role-card.system-role {
+    background-color: var(--bg-secondary);
+}
+
+.role-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.role-name {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin: 0;
+}
+
+.role-description {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+.role-stats {
+    color: var(--gray-500);
+    font-size: var(--text-sm);
+}
+
+.permission-matrix th {
+    min-width: 120px;
+}
+
+.permission-info {
+    min-width: 200px;
+}
+
+.permission-name {
+    font-weight: var(--font-medium);
+}
+
+.permission-desc {
+    margin-top: var(--space-xs);
+}
+
+.checkbox-wrapper {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.checkbox-wrapper input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.checkbox-wrapper input:checked ~ .checkmark {
+    background-color: var(--kagami-blue);
+    border-color: var(--kagami-blue);
+}
+
+.checkbox-wrapper input:checked ~ .checkmark:after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-wrapper input:disabled ~ .checkmark {
+    background-color: var(--gray-100);
+    cursor: not-allowed;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.api-key {
+    background-color: var(--gray-100);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+}
+
+.ml-sm {
+    margin-left: var(--space-sm);
+}
+</style>
+
+<script>
+function showRoleModal() {
+    document.getElementById('roleModal').classList.add('active');
+}
+
+function closeRoleModal() {
+    document.getElementById('roleModal').classList.remove('active');
+}
+
+function showPermissions(roleId) {
+    // 権限詳細表示の処理
+    console.log('Show permissions for role:', roleId);
+}
+
+function updatePermission(roleId, permissionId) {
+    // 権限更新の処理
+    console.log('Update permission:', roleId, permissionId);
+}
+
+function generateApiKey() {
+    // APIキー生成の処理
+    console.log('Generate new API key');
+}
+
+function copyApiKey(key) {
+    // クリップボードにコピー
+    navigator.clipboard.writeText(key).then(() => {
+        alert('APIキーをクリップボードにコピーしました');
+    });
+}
+
+// モーダル外クリックで閉じる
+document.getElementById('roleModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRoleModal();
+    }
+});
+</script>
+{% endblock %}

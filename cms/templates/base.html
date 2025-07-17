@@ -6,6 +6,59 @@
     <title>{% block title %}{% endblock %} - KAGAMI IR管理センター</title>
     
     <!-- CSS -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kagami-blue': '#1a365d',
+                        'kagami-blue-dark': '#0f2544',
+                        'accent-teal': '#14b8a6',
+                        'gray': {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            /* Tailwind CSSリセットを適用 */
+            *, ::before, ::after {
+                box-sizing: border-box;
+            }
+            html {
+                line-height: 1.5;
+                -webkit-text-size-adjust: 100%;
+            }
+            body {
+                margin: 0;
+                font-family: inherit;
+                line-height: inherit;
+            }
+        }
+    </style>
     <link rel="stylesheet" href="{{ url_for('static', path='/css/cms.css') }}">
     {% block extra_css %}{% endblock %}
     
@@ -27,22 +80,70 @@
                     <span class="nav-icon">📊</span>
                     <span>ダッシュボード</span>
                 </a>
-                <a href="/faq" class="nav-item {% if request.url.path == '/faq' %}active{% endif %}">
-                    <span class="nav-icon">🤖</span>
-                    <span>AI-FAQ管理</span>
-                </a>
-                <a href="/investors" class="nav-item {% if request.url.path == '/investors' %}active{% endif %}">
-                    <span class="nav-icon">👥</span>
-                    <span>投資家管理</span>
-                </a>
-                <a href="/upload" class="nav-item {% if request.url.path == '/upload' %}active{% endif %}">
-                    <span class="nav-icon">📤</span>
-                    <span>データ取込</span>
-                </a>
-                <a href="/analytics" class="nav-item {% if request.url.path == '/analytics' %}active{% endif %}">
-                    <span class="nav-icon">📈</span>
-                    <span>分析・レポート</span>
-                </a>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">コンテンツ管理</div>
+                    <a href="/faq" class="nav-item {% if request.url.path == '/faq' %}active{% endif %}">
+                        <span class="nav-icon">🤖</span>
+                        <span>AI-FAQ管理</span>
+                    </a>
+                    <a href="/documents" class="nav-item {% if request.url.path == '/documents' %}active{% endif %}">
+                        <span class="nav-icon">📄</span>
+                        <span>ドキュメント</span>
+                    </a>
+                    <a href="/news" class="nav-item {% if request.url.path == '/news' %}active{% endif %}">
+                        <span class="nav-icon">📰</span>
+                        <span>ニュース・お知らせ</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">業務管理</div>
+                    <a href="/investors" class="nav-item {% if request.url.path == '/investors' %}active{% endif %}">
+                        <span class="nav-icon">👥</span>
+                        <span>投資家管理</span>
+                    </a>
+                    <a href="/schedule" class="nav-item {% if request.url.path == '/schedule' %}active{% endif %}">
+                        <span class="nav-icon">📅</span>
+                        <span>スケジュール</span>
+                    </a>
+                    <a href="/email-campaigns" class="nav-item {% if request.url.path == '/email-campaigns' %}active{% endif %}">
+                        <span class="nav-icon">✉️</span>
+                        <span>メール配信</span>
+                    </a>
+                    <a href="/dialogue" class="nav-item {% if request.url.path == '/dialogue' %}active{% endif %}">
+                        <span class="nav-icon">💬</span>
+                        <span>対話記録管理</span>
+                    </a>
+                    <a href="/upload" class="nav-item {% if request.url.path == '/upload' %}active{% endif %}">
+                        <span class="nav-icon">📤</span>
+                        <span>データ取込設定</span>
+                    </a>
+                    <a href="/analytics" class="nav-item {% if request.url.path == '/analytics' %}active{% endif %}">
+                        <span class="nav-icon">📈</span>
+                        <span>分析・レポート</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">システム管理</div>
+                    <a href="/users" class="nav-item {% if request.url.path == '/users' %}active{% endif %}">
+                        <span class="nav-icon">👤</span>
+                        <span>ユーザー管理</span>
+                    </a>
+                    <a href="/permissions" class="nav-item {% if request.url.path == '/permissions' %}active{% endif %}">
+                        <span class="nav-icon">🔐</span>
+                        <span>権限管理</span>
+                    </a>
+                    <a href="/audit-logs" class="nav-item {% if request.url.path == '/audit-logs' %}active{% endif %}">
+                        <span class="nav-icon">🔍</span>
+                        <span>監査ログ</span>
+                    </a>
+                    <a href="/settings" class="nav-item {% if request.url.path == '/settings' %}active{% endif %}">
+                        <span class="nav-icon">⚙️</span>
+                        <span>設定</span>
+                    </a>
+                </div>
             </nav>
             
             <div class="sidebar-footer p-lg">

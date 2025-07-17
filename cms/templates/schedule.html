@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}スケジュール管理{% endblock %}
+
+{% block content %}
+<!-- スケジュール統計 -->
+<div class="mb-lg">
+    <div class="faq-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ upcoming_events }}</div>
+            <div class="stat-label">今後のイベント</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ this_month_events }}</div>
+            <div class="stat-label">今月のイベント</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ pending_tasks }}</div>
+            <div class="stat-label">未完了タスク</div>
+        </div>
+    </div>
+</div>
+
+<!-- アクションバー -->
+<div class="flex justify-between items-center mb-lg">
+    <div class="flex gap-md">
+        <button class="btn btn-primary" onclick="showEventModal()">
+            <span>➕</span>
+            <span>イベント追加</span>
+        </button>
+        <button class="btn btn-secondary">
+            <span>📅</span>
+            <span>カレンダー表示</span>
+        </button>
+    </div>
+    <div class="flex gap-md">
+        <input type="text" class="form-control" placeholder="イベントを検索..." style="width: 300px;">
+        <select class="form-control" style="width: 150px;">
+            <option>すべての種類</option>
+            <option>決算発表</option>
+            <option>説明会</option>
+            <option>株主総会</option>
+            <option>その他</option>
+        </select>
+    </div>
+</div>
+
+<!-- スケジュールカレンダー -->
+<div class="card mb-lg">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">2024年1月のスケジュール</h3>
+    </div>
+    <div class="card-body">
+        <div class="calendar-grid">
+            <!-- カレンダーのヘッダー -->
+            <div class="calendar-header">
+                <div class="calendar-day-header">日</div>
+                <div class="calendar-day-header">月</div>
+                <div class="calendar-day-header">火</div>
+                <div class="calendar-day-header">水</div>
+                <div class="calendar-day-header">木</div>
+                <div class="calendar-day-header">金</div>
+                <div class="calendar-day-header">土</div>
+            </div>
+            <!-- カレンダーの日付（簡略版） -->
+            <div class="calendar-body">
+                {% for day in range(1, 32) %}
+                <div class="calendar-day {% if day == 15 %}has-event{% endif %}">
+                    <div class="calendar-day-number">{{ day }}</div>
+                    {% if day == 15 %}
+                    <div class="calendar-event">
+                        <span class="event-dot"></span>
+                        <span class="event-title">決算発表</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- イベントリスト -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="text-lg font-semibold">今後のイベント</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>日時</th>
+                        <th>イベント名</th>
+                        <th>種類</th>
+                        <th>場所</th>
+                        <th>ステータス</th>
+                        <th>担当者</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.date }} {{ event.time }}</td>
+                        <td>
+                            <div class="font-medium">{{ event.title }}</div>
+                            {% if event.description %}
+                            <div class="text-sm text-muted">{{ event.description }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-primary">{{ event.type }}</span>
+                        </td>
+                        <td>{{ event.location }}</td>
+                        <td>
+                            {% if event.status == "予定" %}
+                            <span class="badge badge-warning">予定</span>
+                            {% elif event.status == "準備中" %}
+                            <span class="badge badge-primary">準備中</span>
+                            {% else %}
+                            <span class="badge badge-success">完了</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ event.assignee }}</td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                                <button class="btn btn-sm btn-danger">削除</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- イベント追加モーダル -->
+<div class="modal" id="eventModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">新規イベント登録</h3>
+            <button class="modal-close" onclick="closeEventModal()">&times;</button>
+        </div>
+        <form>
+            <div class="form-group">
+                <label class="form-label">イベント名</label>
+                <input type="text" class="form-control" placeholder="例：2024年度第3四半期決算発表">
+            </div>
+            <div class="form-group">
+                <label class="form-label">種類</label>
+                <select class="form-control">
+                    <option>決算発表</option>
+                    <option>決算説明会</option>
+                    <option>株主総会</option>
+                    <option>IR説明会</option>
+                    <option>その他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">日時</label>
+                <div class="flex gap-md">
+                    <input type="date" class="form-control">
+                    <input type="time" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">場所</label>
+                <input type="text" class="form-control" placeholder="例：本社会議室、オンライン">
+            </div>
+            <div class="form-group">
+                <label class="form-label">詳細</label>
+                <textarea class="form-control" rows="3" placeholder="イベントの詳細情報を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">担当者</label>
+                <select class="form-control">
+                    <option>IR部門責任者</option>
+                    <option>広報担当者A</option>
+                    <option>経理部門</option>
+                </select>
+            </div>
+            <div class="flex justify-between">
+                <button type="button" class="btn btn-secondary" onclick="closeEventModal()">キャンセル</button>
+                <button type="submit" class="btn btn-primary">登録</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* カレンダースタイル */
+.calendar-grid {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-day-header {
+    padding: var(--space-sm);
+    text-align: center;
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+    min-height: 80px;
+    padding: var(--space-sm);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.calendar-day:nth-child(7n) {
+    border-right: none;
+}
+
+.calendar-day-number {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-xs);
+}
+
+.calendar-day.has-event {
+    background-color: var(--bg-secondary);
+}
+
+.calendar-event {
+    font-size: var(--text-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--kagami-blue);
+}
+
+.event-title {
+    color: var(--kagami-blue);
+    font-weight: var(--font-medium);
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+</style>
+
+<script>
+function showEventModal() {
+    document.getElementById('eventModal').classList.add('active');
+}
+
+function closeEventModal() {
+    document.getElementById('eventModal').classList.remove('active');
+}
+
+// モーダル外クリックで閉じる
+document.getElementById('eventModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEventModal();
+    }
+});
+</script>
+{% endblock %}

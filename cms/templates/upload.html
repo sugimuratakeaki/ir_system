@@ -34,9 +34,12 @@
                 <input type="file" id="fileInput" style="display: none;" accept="audio/*,video/*" multiple onchange="handleFileSelect(event)">
             </div>
             
-            <!-- アップロード済みファイル -->
+            <!-- 処理状況 -->
             <div class="mt-lg">
-                <h4 class="text-lg font-semibold mb-md">処理中のファイル</h4>
+                <div class="flex justify-between items-center mb-md">
+                    <h4 class="text-lg font-semibold">処理状況</h4>
+                    <a href="/dialogue" class="btn btn-sm btn-secondary">対話記録一覧へ →</a>
+                </div>
                 <div class="flex flex-col gap-md">
                     <div class="card">
                         <div class="card-body">
@@ -58,28 +61,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-md">
-                                    <span class="text-2xl">✅</span>
-                                    <div>
-                                        <div class="font-semibold">投資家面談_20240115.wav</div>
-                                        <div class="text-sm text-muted">32.1MB • 処理完了</div>
-                                        <div class="flex gap-sm mt-sm">
-                                            <span class="badge badge-success">文字起こし完了</span>
-                                            <span class="badge badge-success">FAQ候補: 5件</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex gap-sm">
-                                    <button class="btn btn-sm btn-secondary">結果確認</button>
-                                    <button class="btn btn-sm btn-secondary">ダウンロード</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -90,41 +71,117 @@
 <div id="section-meeting" class="upload-section" style="display: none;">
     <div class="card">
         <div class="card-header">
-            <h3 class="text-lg font-semibold">Web会議連携</h3>
+            <h3 class="text-lg font-semibold">Web会議連携設定</h3>
         </div>
         <div class="card-body">
-            <div class="dashboard-grid mb-lg">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <div class="text-3xl mb-md">🔷</div>
-                        <h4 class="font-semibold mb-sm">Zoom</h4>
-                        <p class="text-sm text-muted mb-md">Zoomミーティングの録画を自動取込</p>
-                        <button class="btn btn-primary btn-sm">連携設定</button>
+            <!-- Zoom設定 -->
+            <div class="card mb-lg">
+                <div class="card-header bg-blue-50">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-semibold flex items-center gap-sm">
+                            <span class="text-2xl">🔷</span>
+                            Zoom連携設定
+                        </h4>
+                        <span class="badge badge-success">連携中</span>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-body text-center">
-                        <div class="text-3xl mb-md">📹</div>
-                        <h4 class="font-semibold mb-sm">Teams</h4>
-                        <p class="text-sm text-muted mb-md">Microsoft Teamsの会議録画を取込</p>
-                        <button class="btn btn-secondary btn-sm">連携設定</button>
+                <div class="card-body">
+                    <div class="grid grid-cols-2 gap-md mb-md">
+                        <div class="form-group">
+                            <label class="form-label">API Key</label>
+                            <input type="password" class="form-control" value="••••••••••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">API Secret</label>
+                            <input type="password" class="form-control" value="••••••••••••••••">
+                        </div>
                     </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-body text-center">
-                        <div class="text-3xl mb-md">🟢</div>
-                        <h4 class="font-semibold mb-sm">Webex</h4>
-                        <p class="text-sm text-muted mb-md">Cisco Webexの録画を自動処理</p>
-                        <button class="btn btn-secondary btn-sm">連携設定</button>
+                    
+                    <div class="form-group mb-md">
+                        <label class="form-label">自動取り込み設定</label>
+                        <div class="space-y-sm">
+                            <label class="flex items-center gap-sm">
+                                <input type="checkbox" checked>
+                                <span>録画完了後、自動的に文字起こしを開始</span>
+                            </label>
+                            <label class="flex items-center gap-sm">
+                                <input type="checkbox" checked>
+                                <span>議事録を自動生成</span>
+                            </label>
+                            <label class="flex items-center gap-sm">
+                                <input type="checkbox">
+                                <span>参加者に議事録を自動送信</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">取り込み対象</label>
+                        <select class="form-control">
+                            <option>すべての録画</option>
+                            <option selected>特定のタグが付いた録画のみ</option>
+                            <option>特定の参加者を含む録画のみ</option>
+                        </select>
+                        <input type="text" class="form-control mt-sm" placeholder="タグ: IR, 投資家, 決算" value="IR, 投資家">
+                    </div>
+                    
+                    <div class="flex gap-md mt-md">
+                        <button class="btn btn-primary">設定を保存</button>
+                        <button class="btn btn-secondary">接続テスト</button>
+                        <button class="btn btn-danger">連携解除</button>
                     </div>
                 </div>
             </div>
             
-            <div class="alert alert-info">
-                <span>💡</span>
-                <span>Web会議システムと連携すると、録画ファイルが自動的に文字起こしされ、議事録が生成されます。</span>
+            <!-- Teams設定 -->
+            <div class="card mb-lg">
+                <div class="card-header bg-gray-50">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-semibold flex items-center gap-sm">
+                            <span class="text-2xl">📹</span>
+                            Microsoft Teams連携設定
+                        </h4>
+                        <span class="badge badge-secondary">未連携</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-md">Microsoft 365アカウントと連携して、Teams会議の録画を自動取り込みします。</p>
+                    <button class="btn btn-primary">Microsoft 365でサインイン</button>
+                </div>
+            </div>
+            
+            <!-- 取り込み履歴 -->
+            <div class="mt-lg">
+                <div class="flex justify-between items-center mb-md">
+                    <h4 class="font-semibold">最近の取り込み</h4>
+                    <a href="/dialogue?source=meeting" class="text-sm text-primary">すべて表示 →</a>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>会議名</th>
+                                <th>日時</th>
+                                <th>参加者数</th>
+                                <th>ステータス</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>週次IR定例会</td>
+                                <td>2024/01/15 10:00</td>
+                                <td>5名</td>
+                                <td><span class="badge badge-success">処理完了</span></td>
+                            </tr>
+                            <tr>
+                                <td>投資家A社との面談</td>
+                                <td>2024/01/14 14:00</td>
+                                <td>3名</td>
+                                <td><span class="badge badge-warning">処理中</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -134,36 +191,122 @@
 <div id="section-email" class="upload-section" style="display: none;">
     <div class="card">
         <div class="card-header">
-            <h3 class="text-lg font-semibold">メール取込</h3>
+            <h3 class="text-lg font-semibold">メール連携設定</h3>
         </div>
         <div class="card-body">
-            <div class="form-group">
-                <label class="form-label">メールアカウント設定</label>
-                <div class="flex gap-md">
-                    <input type="email" class="form-control" placeholder="ir@company.com">
-                    <button class="btn btn-primary">接続テスト</button>
+            <!-- メールサーバー設定 -->
+            <div class="card mb-lg">
+                <div class="card-header">
+                    <h4 class="font-semibold">📧 メールサーバー設定</h4>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-2 gap-md mb-md">
+                        <div class="form-group">
+                            <label class="form-label">メールアドレス</label>
+                            <input type="email" class="form-control" value="ir@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">メールサーバー</label>
+                            <select class="form-control">
+                                <option>Gmail (Google Workspace)</option>
+                                <option selected>Exchange (Office 365)</option>
+                                <option>IMAP/SMTP</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mb-md">
+                        <span>💡</span>
+                        <span>Exchange連携の場合、管理者の承認が必要です。</span>
+                    </div>
+                    
+                    <button class="btn btn-primary">Exchangeアカウントで認証</button>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">取込ルール</label>
-                <div class="flex flex-col gap-sm">
-                    <label class="flex items-center gap-sm">
-                        <input type="checkbox" checked>
-                        <span>投資家からの問い合わせメールを自動取込</span>
-                    </label>
-                    <label class="flex items-center gap-sm">
-                        <input type="checkbox" checked>
-                        <span>FAQ候補を自動生成</span>
-                    </label>
-                    <label class="flex items-center gap-sm">
-                        <input type="checkbox">
-                        <span>重要度の高いメールを優先処理</span>
-                    </label>
+            <!-- 取り込みルール -->
+            <div class="card mb-lg">
+                <div class="card-header">
+                    <h4 class="font-semibold">🔧 取り込みルール設定</h4>
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-md">
+                        <label class="form-label">取り込み対象フォルダ</label>
+                        <div class="flex gap-md">
+                            <select class="form-control flex-1">
+                                <option>受信トレイ</option>
+                                <option selected>IR問い合わせフォルダ</option>
+                                <option>特定のラベル/タグ</option>
+                            </select>
+                            <button class="btn btn-secondary">フォルダ選択</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-md">
+                        <label class="form-label">フィルタリング条件</label>
+                        <div class="space-y-sm">
+                            <div class="flex items-center gap-md">
+                                <select class="form-control" style="width: 150px;">
+                                    <option>送信者</option>
+                                    <option>件名</option>
+                                    <option>本文</option>
+                                </select>
+                                <select class="form-control" style="width: 100px;">
+                                    <option>を含む</option>
+                                    <option>を含まない</option>
+                                    <option>と一致</option>
+                                </select>
+                                <input type="text" class="form-control flex-1" placeholder="条件を入力">
+                                <button class="btn btn-sm btn-danger">削除</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-secondary mt-sm">+ 条件を追加</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">処理設定</label>
+                        <div class="space-y-sm">
+                            <label class="flex items-center gap-sm">
+                                <input type="checkbox" checked>
+                                <span>投資家からの質問を自動抽出</span>
+                            </label>
+                            <label class="flex items-center gap-sm">
+                                <input type="checkbox" checked>
+                                <span>FAQ候補として自動登録</span>
+                            </label>
+                            <label class="flex items-center gap-sm">
+                                <input type="checkbox">
+                                <span>重要度を自動判定（AI分析）</span>
+                            </label>
+                            <label class="flex items-center gap-sm">
+                                <input type="checkbox">
+                                <span>返信期限をカレンダーに自動登録</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-md mt-md">
+                        <button class="btn btn-primary">ルールを保存</button>
+                        <button class="btn btn-secondary">テスト実行</button>
+                    </div>
                 </div>
             </div>
             
-            <button class="btn btn-primary">設定を保存</button>
+            <!-- 取り込み統計 -->
+            <div class="grid grid-cols-3 gap-md">
+                <div class="stat-card">
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">今月の取り込み数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">FAQ候補生成数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3.2時間</div>
+                    <div class="stat-label">平均返信時間</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -175,38 +318,156 @@
             <h3 class="text-lg font-semibold">文書アップロード</h3>
         </div>
         <div class="card-body">
-            <div class="upload-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" onclick="selectDocumentFile()">
+            <div class="upload-area" ondrop="handleDropDocument(event)" ondragover="handleDragOver(event)" onclick="selectDocumentFile()">
                 <div class="upload-icon">📄</div>
                 <h3 class="text-xl mb-sm">文書ファイルをドロップ</h3>
                 <p class="upload-text">または クリックして選択</p>
                 <p class="text-sm text-muted">対応形式: PDF, Word, Excel, PowerPoint (最大50MB)</p>
-                <input type="file" id="documentInput" style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" multiple>
+                <input type="file" id="documentInput" style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" multiple onchange="handleDocumentSelect(event)">
             </div>
             
             <div class="mt-lg">
-                <h4 class="font-semibold mb-md">文書カテゴリ</h4>
-                <div class="flex gap-md flex-wrap">
-                    <label class="flex items-center gap-sm">
-                        <input type="radio" name="doc-category" checked>
-                        <span>決算資料</span>
-                    </label>
-                    <label class="flex items-center gap-sm">
-                        <input type="radio" name="doc-category">
-                        <span>説明会資料</span>
-                    </label>
-                    <label class="flex items-center gap-sm">
-                        <input type="radio" name="doc-category">
-                        <span>適時開示</span>
-                    </label>
-                    <label class="flex items-center gap-sm">
-                        <input type="radio" name="doc-category">
-                        <span>その他</span>
-                    </label>
+                <h4 class="font-semibold mb-md">アップロード時の初期設定</h4>
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">デフォルトカテゴリ</label>
+                        <select class="form-control">
+                            <option>決算資料</option>
+                            <option>説明会資料</option>
+                            <option>適時開示</option>
+                            <option>議事録</option>
+                            <option selected>その他（都度選択）</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">デフォルト公開範囲</label>
+                        <select class="form-control">
+                            <option>非公開（IR部門のみ）</option>
+                            <option selected>社内公開</option>
+                            <option>投資家限定</option>
+                            <option>一般公開</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">処理オプション</label>
+                    <div class="space-y-sm">
+                        <label class="flex items-center gap-sm">
+                            <input type="checkbox" checked>
+                            <span>OCRで文字を抽出（画像PDF対応）</span>
+                        </label>
+                        <label class="flex items-center gap-sm">
+                            <input type="checkbox" checked>
+                            <span>重要情報を自動抽出（数値、日付、人名など）</span>
+                        </label>
+                        <label class="flex items-center gap-sm">
+                            <input type="checkbox">
+                            <span>類似文書を自動検索して関連付け</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 最近のアップロード -->
+            <div class="mt-lg">
+                <div class="flex justify-between items-center mb-md">
+                    <h4 class="font-semibold">最近のアップロード</h4>
+                    <a href="/dialogue?source=document" class="text-sm text-primary">すべて表示 →</a>
+                </div>
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="flex items-start gap-md">
+                                <span class="text-2xl">📊</span>
+                                <div class="flex-1">
+                                    <div class="font-semibold">2024年第3四半期決算短信</div>
+                                    <div class="text-sm text-muted">PDF • 2.3MB • 10分前</div>
+                                    <div class="flex gap-sm mt-sm">
+                                        <span class="badge badge-success">処理完了</span>
+                                        <span class="badge badge-info">重要数値: 15件</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="flex items-start gap-md">
+                                <span class="text-2xl">📑</span>
+                                <div class="flex-1">
+                                    <div class="font-semibold">取締役会議事録_20240110</div>
+                                    <div class="text-sm text-muted">Word • 856KB • 1時間前</div>
+                                    <div class="flex gap-sm mt-sm">
+                                        <span class="badge badge-warning">OCR処理中</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* グリッドレイアウト */
+.grid {
+    display: grid;
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.gap-md {
+    gap: var(--space-md);
+}
+
+.space-y-sm > * + * {
+    margin-top: var(--space-sm);
+}
+
+/* 背景色 */
+.bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.bg-gray-50 {
+    background-color: var(--gray-50);
+}
+
+/* テーブルコンテナ */
+.table-container {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.table th {
+    font-weight: var(--font-semibold);
+    background-color: var(--gray-50);
+}
+
+.table tr:hover {
+    background-color: var(--gray-50);
+}
+</style>
 
 {% endblock %}
 
@@ -248,6 +509,14 @@ function handleDrop(e) {
     handleFiles(files);
 }
 
+function handleDropDocument(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('active');
+    
+    const files = e.dataTransfer.files;
+    handleDocumentFiles(files);
+}
+
 // ファイル選択
 function selectFile() {
     document.getElementById('fileInput').click();
@@ -262,9 +531,23 @@ function handleFileSelect(e) {
     handleFiles(files);
 }
 
-// ファイル処理（モック）
+function handleDocumentSelect(e) {
+    const files = e.target.files;
+    handleDocumentFiles(files);
+}
+
+// ファイル処理（音声・動画）
 function handleFiles(files) {
-    alert(`${files.length}個のファイルをアップロードします（デモ）`);
+    console.log(`${files.length}個の音声・動画ファイルをアップロード`);
+    // 実際の実装では、ここでファイルアップロード処理を行う
+    alert('ファイルをアップロードしました。処理完了後、対話記録一覧で確認できます。');
+}
+
+// ファイル処理（文書）
+function handleDocumentFiles(files) {
+    console.log(`${files.length}個の文書ファイルをアップロード`);
+    // 実際の実装では、ここでファイルアップロード処理を行う
+    alert('文書をアップロードしました。処理完了後、対話記録一覧で確認できます。');
 }
 
 // 初期表示
