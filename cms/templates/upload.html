@@ -57,7 +57,10 @@
                                     </div>
                                     <div class="text-sm">文字起こし処理中... 75%</div>
                                 </div>
-                                <button class="btn btn-sm btn-danger">キャンセル</button>
+                                <div class="flex gap-sm">
+                                    <button class="btn btn-sm btn-primary" onclick="proceedToConfirm('決算説明会_2024Q3.mp3')">確認へ →</button>
+                                    <button class="btn btn-sm btn-danger">キャンセル</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -598,12 +601,21 @@ function showUploadProgress(file) {
         if (progress >= 100) {
             clearInterval(interval);
             progressText.textContent = 'アップロード完了！';
+            // アップロード完了後、確認画面へ遷移
+            setTimeout(() => {
+                window.location.href = '/upload-confirm?file=' + encodeURIComponent(file.name);
+            }, 1000);
         }
     }, 200);
 }
 
 // 初期表示
 showSection('voice');
+
+// 確認画面へ遷移
+function proceedToConfirm(fileName) {
+    window.location.href = '/upload-confirm?file=' + encodeURIComponent(fileName);
+}
 
 // アップロードモーダル用スタイル
 const uploadModalStyle = document.createElement('style');

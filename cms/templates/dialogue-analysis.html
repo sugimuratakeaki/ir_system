@@ -6,15 +6,15 @@
 <!-- プログレスバー -->
 <div class="progress-header mb-lg">
     <div class="progress-steps">
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(1)">
             <div class="step-number">1</div>
             <div class="step-label">ファイル選択</div>
         </div>
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(2)">
             <div class="step-number">2</div>
             <div class="step-label">アップロード</div>
         </div>
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(3)">
             <div class="step-number">3</div>
             <div class="step-label">メタ情報登録</div>
         </div>
@@ -36,6 +36,9 @@
         <p class="text-muted">野村アセットマネジメントとの個別面談（2025/07/15）</p>
     </div>
     <div class="flex gap-md">
+        <button class="btn btn-secondary" onclick="goBack()">
+            ← 前へ戻る
+        </button>
         <button class="btn btn-secondary" onclick="exportAnalysis()">
             📥 分析結果をエクスポート
         </button>
@@ -686,6 +689,15 @@
 .step.active .step-label {
     color: var(--kagami-blue);
     font-weight: var(--font-medium);
+}
+
+.step.clickable {
+    cursor: pointer;
+}
+
+.step.clickable:hover .step-number {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
 }
 
 /* 分析サマリーカード */
@@ -1677,6 +1689,30 @@ function animateElements() {
             animateValue(element, 0, value, 1000);
         }
     });
+}
+
+// 前へ戻る
+function goBack() {
+    window.location.href = '/upload-confirm';
+}
+
+// ステップナビゲーション
+function navigateToStep(step) {
+    switch(step) {
+        case 1:
+        case 2:
+            window.location.href = '/upload';
+            break;
+        case 3:
+            window.location.href = '/upload-confirm';
+            break;
+        case 4:
+            // 現在のページ
+            break;
+        case 5:
+            proceedToPublish();
+            break;
+    }
 }
 
 // エクスポート機能

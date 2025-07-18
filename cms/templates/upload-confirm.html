@@ -6,11 +6,11 @@
 <!-- プログレスバー -->
 <div class="progress-header mb-lg">
     <div class="progress-steps">
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(1)">
             <div class="step-number">1</div>
             <div class="step-label">ファイル選択</div>
         </div>
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(2)">
             <div class="step-number">2</div>
             <div class="step-label">アップロード</div>
         </div>
@@ -725,6 +725,9 @@ AI事業の成長戦略について
             <span>💡 ヒント：メタ情報を正確に入力することで、AI分析の精度が向上します</span>
         </div>
         <div class="flex gap-md">
+            <button class="btn btn-secondary" onclick="goBack()">
+                ← 前へ戻る
+            </button>
             <button class="btn btn-secondary" onclick="saveDraft()">
                 💾 下書き保存
             </button>
@@ -983,6 +986,15 @@ AI事業の成長戦略について
 .step.active .step-label {
     color: var(--kagami-blue);
     font-weight: var(--font-medium);
+}
+
+.step.clickable {
+    cursor: pointer;
+}
+
+.step.clickable:hover .step-number {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
 }
 
 /* ファイル情報 */
@@ -1935,6 +1947,13 @@ function cancelUpload() {
     }
 }
 
+// 前へ戻る
+function goBack() {
+    if (confirm('入力した内容は保存されません。前のページに戻りますか？')) {
+        window.location.href = '/upload';
+    }
+}
+
 // 次へ進む
 function proceedToAnalysis() {
     // フォームバリデーション
@@ -1989,6 +2008,27 @@ function validateForm() {
     }
     
     return isValid;
+}
+
+// ステップナビゲーション
+function navigateToStep(step) {
+    switch(step) {
+        case 1:
+        case 2:
+            if (confirm('入力した内容は保存されません。移動しますか？')) {
+                window.location.href = '/upload';
+            }
+            break;
+        case 3:
+            // 現在のページ
+            break;
+        case 4:
+            proceedToAnalysis();
+            break;
+        case 5:
+            alert('先にAI分析を完了してください');
+            break;
+    }
 }
 
 // 通知表示

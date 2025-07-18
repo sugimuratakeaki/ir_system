@@ -33,9 +33,98 @@ MOCK_DATA = {
         {"time": "2時間前", "type": "システム", "content": "定期バックアップ完了", "icon": "⚙️"}
     ],
     "faqs": [
-        {"id": 1, "question": "2024年度の業績見通しは？", "answer": "売上高は前年比15%増の見込みです。", "status": "published", "confidence": 98},
-        {"id": 2, "question": "配当政策について教えてください", "answer": "配当性向30%を目標としています。", "status": "published", "confidence": 95},
-        {"id": 3, "question": "ESGへの取り組みは？", "answer": "2030年までにカーボンニュートラルを目指します。", "status": "draft", "confidence": 92}
+        {
+            "id": 1, 
+            "question": "2024年度の業績見通しは？", 
+            "answer": "売上高は前年比15%増の見込みです。", 
+            "status": "published", 
+            "confidence": 98,
+            "data_sources": [
+                {"id": 1, "name": "2024年度第3四半期決算短信", "type": "決算資料", "date": "2024-01-20", "relevance": 95},
+                {"id": 2, "name": "2024年度第3四半期決算説明会", "type": "説明会", "date": "2024-01-21", "relevance": 90}
+            ],
+            "valid_from": "2024-01-20",
+            "valid_until": "2024-04-30",
+            "category": "財務・業績",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-20 15:30:00",
+            "created_by": "IR担当者A",
+            "tags": ["決算", "業績見通し", "売上高"],
+            "similar_faqs": [2, 5],
+            "view_count": 156,
+            "is_current": True
+        },
+        {
+            "id": 2, 
+            "question": "配当政策について教えてください", 
+            "answer": "配当性向30%を目標としています。", 
+            "status": "published", 
+            "confidence": 95,
+            "data_sources": [
+                {"id": 1, "name": "2024年度第3四半期決算短信", "type": "決算資料", "date": "2024-01-20", "relevance": 85},
+                {"id": 3, "name": "中期経営計画", "type": "経営計画", "date": "2024-01-10", "relevance": 80}
+            ],
+            "valid_from": "2024-01-20",
+            "valid_until": "2024-12-31",
+            "category": "株主還元",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-20 14:25:00",
+            "created_by": "IR担当者B",
+            "tags": ["配当", "株主還元", "配当性向"],
+            "similar_faqs": [],
+            "view_count": 89,
+            "is_current": True
+        },
+        {
+            "id": 3, 
+            "question": "ESGへの取り組みは？", 
+            "answer": "2030年までにカーボンニュートラルを目指します。", 
+            "status": "draft", 
+            "confidence": 92,
+            "data_sources": [
+                {"id": 4, "name": "統合報告書2023", "type": "IR資料", "date": "2023-12-15", "relevance": 90}
+            ],
+            "valid_from": "2023-12-15",
+            "valid_until": "2024-12-31",
+            "category": "ESG",
+            "version": "2023",
+            "last_updated": "2024-01-15 10:20:00",
+            "created_by": "IR担当者A",
+            "tags": ["ESG", "カーボンニュートラル", "環境"],
+            "similar_faqs": [],
+            "view_count": 45,
+            "is_current": True
+        }
+    ],
+    "data_sources": [
+        {"id": 1, "name": "2024年度第3四半期決算短信", "type": "決算資料", "date": "2024-01-20", "status": "公開", "url": "/documents/1"},
+        {"id": 2, "name": "2024年度第3四半期決算説明会", "type": "説明会", "date": "2024-01-21", "status": "公開", "url": "/events/1"},
+        {"id": 3, "name": "中期経営計画", "type": "経営計画", "date": "2024-01-10", "status": "公開", "url": "/documents/2"},
+        {"id": 4, "name": "統合報告書2023", "type": "IR資料", "date": "2023-12-15", "status": "公開", "url": "/documents/3"},
+        {"id": 5, "name": "2024年度第2四半期決算短信", "type": "決算資料", "date": "2023-10-20", "status": "公開", "url": "/documents/4"},
+        {"id": 6, "name": "2024年度第1四半期決算短信", "type": "決算資料", "date": "2023-07-20", "status": "公開", "url": "/documents/5"}
+    ],
+    "faq_versions": [
+        {
+            "faq_id": 1,
+            "version": "2024-Q2",
+            "question": "2024年度の業績見通しは？",
+            "answer": "売上高は前年比12%増の見込みです。",
+            "valid_from": "2023-10-20",
+            "valid_until": "2024-01-19",
+            "data_sources": [{"id": 5, "name": "2024年度第2四半期決算短信", "type": "決算資料", "date": "2023-10-20"}],
+            "created_at": "2023-10-20 16:00:00"
+        },
+        {
+            "faq_id": 1,
+            "version": "2024-Q1",
+            "question": "2024年度の業績見通しは？",
+            "answer": "売上高は前年比10%増の見込みです。",
+            "valid_from": "2023-07-20",
+            "valid_until": "2023-10-19",
+            "data_sources": [{"id": 6, "name": "2024年度第1四半期決算短信", "type": "決算資料", "date": "2023-07-20"}],
+            "created_at": "2023-07-20 15:30:00"
+        }
     ],
     "investors": [
         {"id": 1, "name": "山田太郎", "company": "ABC投資顧問", "type": "機関投資家", "last_contact": "2024-01-15"},
@@ -119,12 +208,22 @@ async def dashboard(request: Request):
 @app.get("/faq", response_class=HTMLResponse)
 async def faq_management(request: Request):
     """FAQ管理画面"""
+    # 日付計算
+    from datetime import datetime, timedelta
+    today = datetime.now().date()
+    soon_date = today + timedelta(days=30)
+    
     return templates.TemplateResponse("faq.html", {
         "request": request,
         "title": "AI-FAQ管理",
         "faqs": MOCK_DATA["faqs"],
+        "data_sources": MOCK_DATA["data_sources"],
         "total_faqs": len(MOCK_DATA["faqs"]),
-        "published_count": len([f for f in MOCK_DATA["faqs"] if f["status"] == "published"])
+        "published_count": len([f for f in MOCK_DATA["faqs"] if f["status"] == "published"]),
+        "current_version_count": len([f for f in MOCK_DATA["faqs"] if f["is_current"]]),
+        "expiring_soon_count": len([f for f in MOCK_DATA["faqs"] if f["valid_until"] < str(soon_date)]),
+        "today": str(today),
+        "soon_date": str(soon_date)
     })
 
 @app.get("/investors", response_class=HTMLResponse)
@@ -393,15 +492,52 @@ async def create_faq(request: Request):
     """FAQ作成API（モック）"""
     return {"status": "success", "message": "FAQを作成しました"}
 
-@app.get("/api/investors")
-async def get_investors():
-    """投資家一覧取得API"""
-    return {"investors": MOCK_DATA["investors"], "total": len(MOCK_DATA["investors"])}
+@app.get("/api/faqs/{faq_id}/versions")
+async def get_faq_versions(faq_id: int):
+    """FAQバージョン履歴取得API"""
+    versions = [v for v in MOCK_DATA["faq_versions"] if v["faq_id"] == faq_id]
+    return {"versions": versions}
 
-@app.post("/api/upload")
-async def upload_file(request: Request):
-    """ファイルアップロードAPI（モック）"""
-    return {"status": "success", "message": "ファイルをアップロードしました"}
+@app.get("/api/faqs/{faq_id}/data-sources")
+async def get_faq_data_sources(faq_id: int):
+    """FAQデータソース取得API"""
+    faq = next((f for f in MOCK_DATA["faqs"] if f["id"] == faq_id), None)
+    if faq:
+        return {"data_sources": faq.get("data_sources", [])}
+    return {"data_sources": []}
+
+@app.get("/api/data-sources")
+async def get_data_sources():
+    """データソース一覧取得API"""
+    return {"data_sources": MOCK_DATA["data_sources"]}
+
+@app.post("/api/faqs/{faq_id}/update-version")
+async def update_faq_version(faq_id: int, request: Request):
+    """FAQバージョン更新API"""
+    return {"status": "success", "message": "FAQバージョンを更新しました"}
+
+@app.get("/api/faqs/expiring-soon")
+async def get_expiring_faqs():
+    """期限切れ間近のFAQ取得API"""
+    from datetime import datetime, timedelta
+    soon_date = datetime.now().date() + timedelta(days=30)
+    expiring_faqs = [f for f in MOCK_DATA["faqs"] if f["valid_until"] < str(soon_date)]
+    return {"faqs": expiring_faqs}
+
+@app.post("/api/faqs/bulk-generate")
+async def bulk_generate_faqs(request: Request):
+    """AI一括生成API"""
+    return {"status": "success", "message": "AI一括生成を開始しました"}
+
+@app.get("/api/faqs/export")
+async def export_faqs():
+    """FAQエクスポートAPI"""
+    return {"status": "success", "data": MOCK_DATA["faqs"]}
+
+@app.post("/api/faqs/import")
+async def import_faqs(request: Request):
+    """FAQインポートAPI"""
+    return {"status": "success", "message": "FAQをインポートしました"}
 
 # ===== アプリケーション起動 =====
 if __name__ == "__main__":

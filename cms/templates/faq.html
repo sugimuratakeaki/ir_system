@@ -2,24 +2,284 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+/* FAQ管理画面専用スタイル */
+.faq-outdated {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+}
+
+.faq-outdated:hover {
+    opacity: 1;
+    background-color: #e9ecef;
+}
+
+.faq-question-cell, .faq-answer-cell {
+    max-width: 300px;
+}
+
+.version-info, .expiry-info {
+    text-align: center;
+}
+
+/* 統計カードボタンスタイル */
+.stat-button {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background: white;
+}
+
+.stat-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+
+.stat-button.active {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.stat-button.active .stat-value,
+.stat-button.active .stat-label {
+    color: white;
+}
+
+.filter-bar {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.data-sources-container {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    background: #f8f9fa;
+}
+
+.data-sources-list {
+    margin-bottom: 1rem;
+}
+
+.data-source-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    background: white;
+}
+
+.data-source-item .source-info {
+    flex: 1;
+}
+
+.data-source-item .source-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.data-sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.data-source-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    background: white;
+}
+
+.data-source-card .source-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.data-source-card .source-type {
+    background: #007bff;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.data-source-card .source-date {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.data-source-card .source-name {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.data-source-card .source-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.version-timeline {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.version-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: white;
+}
+
+.version-item .version-info {
+    flex: 1;
+}
+
+.version-item .version-date {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.version-item .version-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.form-help {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.badge-xs {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.25rem;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.text-warning {
+    color: #ffc107;
+}
+
+.text-success {
+    color: #28a745;
+}
+
+.mt-xs {
+    margin-top: 0.25rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.filter-count {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- FAQ統計 -->
 <div class="faq-stats">
-    <div class="stat-card">
+    <button class="stat-card stat-button" onclick="filterByStatus('all')" id="stat-all">
         <div class="stat-value">{{ total_faqs }}</div>
         <div class="stat-label">総FAQ数</div>
-    </div>
-    <div class="stat-card">
+    </button>
+    <button class="stat-card stat-button" onclick="filterByStatus('published')" id="stat-published">
         <div class="stat-value">{{ published_count }}</div>
         <div class="stat-label">公開中</div>
-    </div>
-    <div class="stat-card">
+    </button>
+    <button class="stat-card stat-button" onclick="filterByStatus('draft')" id="stat-draft">
         <div class="stat-value">{{ total_faqs - published_count }}</div>
         <div class="stat-label">下書き</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-value">95%</div>
-        <div class="stat-label">平均信頼度</div>
+    </button>
+    <button class="stat-card stat-button" onclick="filterByStatus('current')" id="stat-current">
+        <div class="stat-value">{{ current_version_count }}</div>
+        <div class="stat-label">最新版</div>
+    </button>
+    <button class="stat-card stat-button" onclick="filterByStatus('expiring')" id="stat-expiring">
+        <div class="stat-value">{{ expiring_soon_count }}</div>
+        <div class="stat-label">期限切れ間近</div>
+    </button>
+</div>
+
+<!-- フィルター・検索バー -->
+<div class="filter-bar mb-lg">
+    <div class="flex gap-md items-center">
+        <!-- 時点フィルター -->
+        <div class="form-group">
+            <label class="form-label">時点</label>
+            <select class="form-control" id="version-filter">
+                <option value="current">最新版のみ</option>
+                <option value="all">全バージョン</option>
+                <option value="2024-Q3">2024年第3四半期</option>
+                <option value="2024-Q2">2024年第2四半期</option>
+                <option value="2024-Q1">2024年第1四半期</option>
+            </select>
+        </div>
+        
+        <!-- カテゴリフィルター -->
+        <div class="form-group">
+            <label class="form-label">カテゴリ</label>
+            <select class="form-control" id="category-filter">
+                <option value="">すべて</option>
+                <option value="財務・業績">財務・業績</option>
+                <option value="経営戦略">経営戦略</option>
+                <option value="ESG">ESG</option>
+                <option value="株主還元">株主還元</option>
+                <option value="その他">その他</option>
+            </select>
+        </div>
+        
+        <!-- 有効期限フィルター -->
+        <div class="form-group">
+            <label class="form-label">有効期限</label>
+            <select class="form-control" id="expiry-filter">
+                <option value="">すべて</option>
+                <option value="current">有効</option>
+                <option value="expiring">期限切れ間近</option>
+                <option value="expired">期限切れ</option>
+            </select>
+        </div>
+        
+        <!-- 検索 -->
+        <div class="form-group">
+            <label class="form-label">検索</label>
+            <input type="text" class="form-control" id="search-input" placeholder="FAQを検索..." style="width: 300px;">
+        </div>
     </div>
 </div>
 
@@ -32,20 +292,29 @@
         <button class="btn btn-secondary" onclick="bulkGenerateFAQs()">
             <span>🤖</span> AI一括生成
         </button>
+        <button class="btn btn-warning" onclick="showVersionHistoryModal()">
+            <span>📋</span> バージョン履歴
+        </button>
+        <button class="btn btn-info" onclick="showDataSourcesModal()">
+            <span>📚</span> データソース管理
+        </button>
     </div>
     
     <div class="flex gap-md">
-        <input type="text" class="form-control" placeholder="FAQを検索..." style="width: 300px;">
-        <select class="form-control" style="width: 150px;">
-            <option>すべて</option>
-            <option>公開中</option>
-            <option>下書き</option>
-        </select>
+        <button class="btn btn-sm btn-secondary" onclick="exportFAQs()">
+            <span>📤</span> エクスポート
+        </button>
+        <button class="btn btn-sm btn-secondary" onclick="importFAQs()">
+            <span>📥</span> インポート
+        </button>
     </div>
 </div>
 
-<!-- FAQ一覧 -->
+<!-- FAQ一覧（改善版） -->
 <div class="faq-table">
+    <div class="table-header">
+        <div class="filter-count">{{ total_faqs }}件表示中</div>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -54,19 +323,64 @@
                 </th>
                 <th>質問</th>
                 <th>回答（要約）</th>
-                <th style="width: 100px;">ステータス</th>
+                <th style="width: 120px;">時点・バージョン</th>
+                <th style="width: 100px;">有効期限</th>
+                <th style="width: 80px;">ステータス</th>
                 <th style="width: 100px;">信頼度</th>
-                <th style="width: 120px;">アクション</th>
+                <th style="width: 150px;">アクション</th>
             </tr>
         </thead>
         <tbody>
             {% for faq in faqs %}
-            <tr>
+            <tr class="{% if not faq.is_current %}faq-outdated{% endif %}">
                 <td>
                     <input type="checkbox" name="faq-select" value="{{ faq.id }}">
                 </td>
-                <td>{{ faq.question }}</td>
-                <td>{{ faq.answer[:50] }}...</td>
+                <td>
+                    <div class="faq-question-cell">
+                        <div class="font-semibold">{{ faq.question }}</div>
+                        <div class="text-sm text-muted">
+                            <span class="badge badge-xs badge-secondary">{{ faq.category }}</span>
+                            {% for tag in faq.tags[:3] %}
+                            <span class="badge badge-xs badge-light">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="faq-answer-cell">
+                        <div>{{ faq.answer[:80] }}{% if faq.answer|length > 80 %}...{% endif %}</div>
+                        <div class="text-sm text-muted mt-xs">
+                            <span>👁️ {{ faq.view_count }}回閲覧</span>
+                            <span>📅 {{ faq.last_updated[:10] }}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="version-info">
+                        <div class="font-semibold">{{ faq.version }}</div>
+                        <div class="text-sm text-muted">
+                            {% if faq.data_sources %}
+                            <span>📚 {{ faq.data_sources|length }}件の資料</span>
+                            {% endif %}
+                        </div>
+                        {% if not faq.is_current %}
+                        <span class="badge badge-warning badge-xs">旧版</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="expiry-info">
+                        <div class="{% if faq.valid_until < today %}text-danger{% elif faq.valid_until < soon_date %}text-warning{% else %}text-success{% endif %}">
+                            {{ faq.valid_until }}
+                        </div>
+                        {% if faq.valid_until < today %}
+                        <span class="badge badge-danger badge-xs">期限切れ</span>
+                        {% elif faq.valid_until < soon_date %}
+                        <span class="badge badge-warning badge-xs">間近</span>
+                        {% endif %}
+                    </div>
+                </td>
                 <td>
                     {% if faq.status == 'published' %}
                         <span class="badge badge-success">公開中</span>
@@ -82,6 +396,8 @@
                 <td>
                     <div class="flex gap-sm">
                         <button class="btn btn-sm btn-secondary" onclick="editFAQ({{ faq.id }})">編集</button>
+                        <button class="btn btn-sm btn-info" onclick="showDataSources({{ faq.id }})">資料</button>
+                        <button class="btn btn-sm btn-warning" onclick="showVersionHistory({{ faq.id }})">履歴</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteFAQ({{ faq.id }})">削除</button>
                     </div>
                 </td>
@@ -104,59 +420,156 @@
 
 <!-- モーダル（FAQ作成/編集） -->
 <div class="modal" id="faqModal">
-    <div class="modal-content" style="max-width: 700px;">
+    <div class="modal-content" style="max-width: 900px;">
         <div class="modal-header">
             <h2 class="modal-title">FAQ編集</h2>
             <button class="modal-close" onclick="closeModal('faqModal')">&times;</button>
         </div>
         <form onsubmit="event.preventDefault(); saveFAQ();">
-            <div class="form-group">
-                <label class="form-label">質問</label>
-                <input type="text" class="form-control" id="faq-question" required>
+            <div class="form-row">
+                <div class="form-group" style="flex: 2;">
+                    <label class="form-label">質問</label>
+                    <input type="text" class="form-control" id="faq-question" required>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">カテゴリ</label>
+                    <select class="form-control" id="faq-category">
+                        <option value="財務・業績">財務・業績</option>
+                        <option value="経営戦略">経営戦略</option>
+                        <option value="ESG">ESG</option>
+                        <option value="株主還元">株主還元</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">バージョン</label>
+                    <select class="form-control" id="faq-version">
+                        <option value="2024-Q3">2024年第3四半期</option>
+                        <option value="2024-Q2">2024年第2四半期</option>
+                        <option value="2024-Q1">2024年第1四半期</option>
+                        <option value="2023">2023年度</option>
+                    </select>
+                </div>
             </div>
             
             <div class="form-group">
                 <label class="form-label">回答</label>
                 <textarea class="form-control" id="faq-answer" rows="6" required></textarea>
+                <div class="form-help">
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="generateAIAnswer()">
+                        🤖 AIで回答を生成
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="suggestAnswer()">
+                        💡 回答候補を表示
+                    </button>
+                </div>
             </div>
             
-            <div class="flex gap-lg">
+            <div class="form-row">
                 <div class="form-group" style="flex: 1;">
-                    <label class="form-label">カテゴリ</label>
-                    <select class="form-control">
-                        <option>財務・業績</option>
-                        <option>経営戦略</option>
-                        <option>ESG</option>
-                        <option>株主還元</option>
-                        <option>その他</option>
-                    </select>
+                    <label class="form-label">有効期間開始</label>
+                    <input type="date" class="form-control" id="faq-valid-from" required>
+                </div>
+                
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">有効期間終了</label>
+                    <input type="date" class="form-control" id="faq-valid-until" required>
                 </div>
                 
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">ステータス</label>
-                    <select class="form-control">
+                    <select class="form-control" id="faq-status">
                         <option value="draft">下書き</option>
                         <option value="published">公開</option>
                     </select>
                 </div>
             </div>
             
+            <!-- データソース選択 -->
+            <div class="form-group">
+                <label class="form-label">データソース（回答の根拠となる資料）</label>
+                <div class="data-sources-container">
+                    <div class="data-sources-list" id="data-sources-list">
+                        <!-- データソースが動的に追加される -->
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="addDataSource()">
+                        ➕ 資料を追加
+                    </button>
+                </div>
+            </div>
+            
+            <!-- タグ -->
+            <div class="form-group">
+                <label class="form-label">タグ</label>
+                <input type="text" class="form-control" id="faq-tags" placeholder="カンマ区切りで入力（例：決算,業績見通し,売上高）">
+            </div>
+            
+            <!-- AI分析結果 -->
             <div class="form-group">
                 <label class="form-label">AI分析結果</label>
-                <div class="alert alert-info">
+                <div class="alert alert-info" id="ai-analysis">
                     <span>🤖</span>
                     <div>
                         <strong>信頼度: 95%</strong><br>
-                        類似FAQ: 3件検出 | キーワード: 財務、業績、見通し
+                        類似FAQ: 3件検出 | キーワード: 財務、業績、見通し<br>
+                        推奨資料: 2024年度第3四半期決算短信（関連度: 95%）
                     </div>
                 </div>
             </div>
             
             <div class="flex gap-md justify-end">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('faqModal')">キャンセル</button>
+                <button type="button" class="btn btn-warning" onclick="saveAsDraft()">下書き保存</button>
                 <button type="submit" class="btn btn-primary">保存</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- データソース管理モーダル -->
+<div class="modal" id="dataSourcesModal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h2 class="modal-title">データソース管理</h2>
+            <button class="modal-close" onclick="closeModal('dataSourcesModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="data-sources-grid">
+                {% for source in data_sources %}
+                <div class="data-source-card">
+                    <div class="source-header">
+                        <span class="source-type">{{ source.type }}</span>
+                        <span class="source-date">{{ source.date }}</span>
+                    </div>
+                    <div class="source-name">{{ source.name }}</div>
+                    <div class="source-status">
+                        <span class="badge badge-success">{{ source.status }}</span>
+                    </div>
+                    <div class="source-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="viewSource({{ source.id }})">閲覧</button>
+                        <button class="btn btn-sm btn-primary" onclick="selectSource({{ source.id }})">選択</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- バージョン履歴モーダル -->
+<div class="modal" id="versionHistoryModal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h2 class="modal-title">バージョン履歴</h2>
+            <button class="modal-close" onclick="closeModal('versionHistoryModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="version-timeline" id="version-timeline">
+                <!-- バージョン履歴が動的に表示される -->
+            </div>
+        </div>
     </div>
 </div>
 
@@ -164,10 +577,136 @@
 
 {% block extra_js %}
 <script>
+// フィルター機能
+document.getElementById('version-filter').addEventListener('change', filterFAQs);
+document.getElementById('category-filter').addEventListener('change', filterFAQs);
+document.getElementById('expiry-filter').addEventListener('change', filterFAQs);
+document.getElementById('search-input').addEventListener('input', filterFAQs);
+
+// 現在のフィルター状態
+let currentFilter = {
+    status: 'all',
+    version: 'all',
+    category: '',
+    expiry: '',
+    search: ''
+};
+
+function filterFAQs() {
+    // フィルター状態を更新
+    currentFilter.version = document.getElementById('version-filter').value;
+    currentFilter.category = document.getElementById('category-filter').value;
+    currentFilter.expiry = document.getElementById('expiry-filter').value;
+    currentFilter.search = document.getElementById('search-input').value;
+    
+    // テーブル行をフィルター
+    const rows = document.querySelectorAll('.faq-table tbody tr');
+    rows.forEach(row => {
+        let show = true;
+        
+        // ステータスフィルター
+        if (currentFilter.status !== 'all') {
+            const status = row.querySelector('.badge-success, .badge-warning');
+            if (currentFilter.status === 'published' && !status.classList.contains('badge-success')) {
+                show = false;
+            } else if (currentFilter.status === 'draft' && !status.classList.contains('badge-warning')) {
+                show = false;
+            } else if (currentFilter.status === 'current' && row.classList.contains('faq-outdated')) {
+                show = false;
+            } else if (currentFilter.status === 'expiring') {
+                const expiryElement = row.querySelector('.expiry-info');
+                if (!expiryElement || !expiryElement.querySelector('.badge-warning')) {
+                    show = false;
+                }
+            }
+        }
+        
+        // バージョンフィルター
+        if (currentFilter.version !== 'all' && show) {
+            const versionElement = row.querySelector('.version-info .font-semibold');
+            if (versionElement && versionElement.textContent !== currentFilter.version) {
+                show = false;
+            }
+        }
+        
+        // カテゴリフィルター
+        if (currentFilter.category && show) {
+            const categoryElement = row.querySelector('.badge-secondary');
+            if (categoryElement && categoryElement.textContent !== currentFilter.category) {
+                show = false;
+            }
+        }
+        
+        // 有効期限フィルター
+        if (currentFilter.expiry && show) {
+            const expiryElement = row.querySelector('.expiry-info');
+            if (currentFilter.expiry === 'current' && expiryElement.querySelector('.text-danger')) {
+                show = false;
+            } else if (currentFilter.expiry === 'expired' && !expiryElement.querySelector('.text-danger')) {
+                show = false;
+            } else if (currentFilter.expiry === 'expiring' && !expiryElement.querySelector('.badge-warning')) {
+                show = false;
+            }
+        }
+        
+        // 検索フィルター
+        if (currentFilter.search && show) {
+            const question = row.querySelector('.faq-question-cell .font-semibold').textContent.toLowerCase();
+            const answer = row.querySelector('.faq-answer-cell div').textContent.toLowerCase();
+            const searchTerm = currentFilter.search.toLowerCase();
+            if (!question.includes(searchTerm) && !answer.includes(searchTerm)) {
+                show = false;
+            }
+        }
+        
+        // 表示/非表示を切り替え
+        row.style.display = show ? '' : 'none';
+    });
+    
+    // フィルター結果の件数を表示
+    updateFilterCount();
+}
+
+// FAQ統計カードクリック時のフィルター
+function filterByStatus(status) {
+    // 他のフィルターをリセット
+    document.getElementById('version-filter').value = 'all';
+    document.getElementById('category-filter').value = '';
+    document.getElementById('expiry-filter').value = '';
+    document.getElementById('search-input').value = '';
+    
+    // 統計カードのボタンにactiveクラスを追加
+    document.querySelectorAll('.faq-stats .stat-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    document.getElementById(`stat-${status}`).classList.add('active');
+    
+    // フィルター状態を更新
+    currentFilter.status = status;
+    currentFilter.version = 'all';
+    currentFilter.category = '';
+    currentFilter.expiry = '';
+    currentFilter.search = '';
+    
+    // フィルターを適用
+    filterFAQs();
+}
+
+// フィルター結果の件数を更新
+function updateFilterCount() {
+    const visibleRows = document.querySelectorAll('.faq-table tbody tr:not([style*="display: none"])');
+    const countElement = document.querySelector('.filter-count');
+    if (countElement) {
+        countElement.textContent = `${visibleRows.length}件表示中`;
+    }
+}
+
 // FAQ作成モーダル表示
 function showNewFAQModal() {
     document.getElementById('faq-question').value = '';
     document.getElementById('faq-answer').value = '';
+    document.getElementById('faq-valid-from').value = new Date().toISOString().split('T')[0];
+    document.getElementById('faq-valid-until').value = '';
     document.getElementById('faqModal').classList.add('active');
 }
 
@@ -176,6 +715,12 @@ function editFAQ(id) {
     // デモ用：固定データをセット
     document.getElementById('faq-question').value = '2024年度の業績見通しは？';
     document.getElementById('faq-answer').value = '売上高は前年比15%増の見込みです。';
+    document.getElementById('faq-category').value = '財務・業績';
+    document.getElementById('faq-version').value = '2024-Q3';
+    document.getElementById('faq-valid-from').value = '2024-01-20';
+    document.getElementById('faq-valid-until').value = '2024-04-30';
+    document.getElementById('faq-status').value = 'published';
+    document.getElementById('faq-tags').value = '決算,業績見通し,売上高';
     document.getElementById('faqModal').classList.add('active');
 }
 
@@ -190,6 +735,12 @@ function saveFAQ() {
     closeModal('faqModal');
 }
 
+// 下書き保存
+function saveAsDraft() {
+    document.getElementById('faq-status').value = 'draft';
+    saveFAQ();
+}
+
 // FAQ削除（モック）
 function deleteFAQ(id) {
     if (confirm('このFAQを削除しますか？')) {
@@ -202,6 +753,51 @@ function bulkGenerateFAQs() {
     if (confirm('過去の対話履歴からFAQを自動生成しますか？')) {
         alert('AI分析を開始しました。完了後、新規FAQが追加されます。（デモ）');
     }
+}
+
+// データソース表示
+function showDataSources(id) {
+    alert('データソース詳細を表示します（デモ）');
+}
+
+// バージョン履歴表示
+function showVersionHistory(id) {
+    document.getElementById('versionHistoryModal').classList.add('active');
+}
+
+// データソース管理モーダル表示
+function showDataSourcesModal() {
+    document.getElementById('dataSourcesModal').classList.add('active');
+}
+
+// バージョン履歴モーダル表示
+function showVersionHistoryModal() {
+    document.getElementById('versionHistoryModal').classList.add('active');
+}
+
+// AI回答生成
+function generateAIAnswer() {
+    alert('AIによる回答生成を開始します（デモ）');
+}
+
+// 回答候補表示
+function suggestAnswer() {
+    alert('回答候補を表示します（デモ）');
+}
+
+// データソース追加
+function addDataSource() {
+    alert('データソース選択画面を表示します（デモ）');
+}
+
+// エクスポート
+function exportFAQs() {
+    alert('FAQデータをエクスポートします（デモ）');
+}
+
+// インポート
+function importFAQs() {
+    alert('FAQデータをインポートします（デモ）');
 }
 
 // チェックボックス全選択

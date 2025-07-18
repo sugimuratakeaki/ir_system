@@ -6,19 +6,19 @@
 <!-- プログレスバー -->
 <div class="progress-header mb-lg">
     <div class="progress-steps">
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(1)">
             <div class="step-number">1</div>
             <div class="step-label">ファイル選択</div>
         </div>
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(2)">
             <div class="step-number">2</div>
             <div class="step-label">アップロード</div>
         </div>
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(3)">
             <div class="step-number">3</div>
             <div class="step-label">メタ情報登録</div>
         </div>
-        <div class="step completed">
+        <div class="step completed clickable" onclick="navigateToStep(4)">
             <div class="step-number">4</div>
             <div class="step-label">AI分析</div>
         </div>
@@ -944,7 +944,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 前へ戻る
 function goBack() {
-    window.history.back();
+    window.location.href = '/dialogue-analysis';
 }
 
 // 公開処理
