@@ -10,6 +10,17 @@
         <p class="text-muted">すべての投資家対話記録を一元管理</p>
     </div>
     <div class="flex gap-md">
+        <!-- ビュー切り替えボタン -->
+        <div class="view-toggle">
+            <button class="view-btn active" onclick="setViewMode('simple')" data-view="simple">
+                <span class="icon">📋</span>
+                <span>シンプル</span>
+            </button>
+            <button class="view-btn" onclick="setViewMode('detailed')" data-view="detailed">
+                <span class="icon">📊</span>
+                <span>詳細</span>
+            </button>
+        </div>
         <button class="btn btn-secondary" onclick="showFilterModal()">
             🔍 詳細フィルタ
         </button>
@@ -84,43 +95,149 @@
 <div class="card">
     <div class="card-body">
         <div class="table-container">
-            <table class="table">
+            <table class="table" id="dialogueTable">
                 <thead>
-                    <tr>
+                    <tr class="simple-view">
                         <th style="width: 40px;">
                             <input type="checkbox" id="selectAll">
                         </th>
-                        <th>ソース</th>
+                        <th style="width: 120px;">日時</th>
+                        <th style="width: 100px;">データ</th>
                         <th>タイトル/内容</th>
-                        <th>日時</th>
-                        <th>関係者</th>
-                        <th>ステータス</th>
-                        <th>AI分析</th>
-                        <th>アクション</th>
+                        <th style="width: 120px;">取引先</th>
+                        <th style="width: 150px;">社内関係者</th>
+                        <th style="width: 100px;">ステータス</th>
+                        <th style="width: 120px;">アクション</th>
+                    </tr>
+                    <tr class="detailed-view">
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="selectAllDetailed">
+                        </th>
+                        <th style="width: 120px;">日時</th>
+                        <th style="width: 100px;">データ</th>
+                        <th>タイトル/内容</th>
+                        <th style="width: 300px;">AIサマリー</th>
+                        <th style="width: 120px;">取引先</th>
+                        <th style="width: 150px;">社内関係者</th>
+                        <th style="width: 100px;">AI分析</th>
+                        <th style="width: 100px;">ステータス</th>
+                        <th style="width: 120px;">アクション</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Web会議の例 -->
-                    <tr>
+                    <tr class="simple-view">
                         <td><input type="checkbox"></td>
-                        <td><span class="text-2xl">💻</span></td>
-                        <td>
-                            <div class="font-semibold">2024年第3四半期決算説明会</div>
-                            <div class="text-sm text-muted">Zoom • 45分 • 参加者: 156名</div>
-                        </td>
                         <td>
                             <div>2024/01/15</div>
                             <div class="text-sm text-muted">14:00-14:45</div>
                         </td>
                         <td>
-                            <div class="text-sm">CEO, CFO</div>
-                            <div class="text-sm text-muted">機関投資家多数</div>
+                            <div class="data-icons">
+                                <span class="data-icon active" title="Web会議">💻</span>
+                                <span class="data-icon active" title="音声あり">🎤</span>
+                                <span class="data-icon active" title="動画あり">🎥</span>
+                                <span class="data-icon inactive" title="文書なし">📄</span>
+                                <span class="data-icon inactive" title="メールなし">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">45分・156名</div>
                         </td>
-                        <td><span class="badge badge-success">✅ 完了</span></td>
                         <td>
-                            <div class="flex gap-xs">
-                                <span class="badge badge-info">FAQ: 12</span>
-                                <span class="badge badge-warning">課題: 3</span>
+                            <div class="font-semibold">2024年第3四半期決算説明会</div>
+                            <div class="text-sm text-muted">Zoom会議 • 投資家向け説明会</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">機関投資家多数</div>
+                            <div class="text-sm text-muted">投資家向け説明会</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">CEO, CFO</div>
+                            <div class="text-sm text-muted">IR部</div>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="badge badge-success">✅ 完了</span>
+                                <div class="ai-status mt-xs">
+                                    <span class="ai-badge ai-complete" title="AI分析完了">🤖</span>
+                                    <span class="text-xs">AI処理済</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" onclick="showDetailModal('meeting_001')">詳細</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('meeting_001')">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="detailed-view">
+                        <td><input type="checkbox"></td>
+                        <td>
+                            <div>2024/01/15</div>
+                            <div class="text-sm text-muted">14:00-14:45</div>
+                        </td>
+                        <td>
+                            <div class="data-icons">
+                                <span class="data-icon active" title="Web会議">💻</span>
+                                <span class="data-icon active" title="音声あり">🎤</span>
+                                <span class="data-icon active" title="動画あり">🎥</span>
+                                <span class="data-icon inactive" title="文書なし">📄</span>
+                                <span class="data-icon inactive" title="メールなし">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">45分・156名</div>
+                        </td>
+                        <td>
+                            <div class="font-semibold">2024年第3四半期決算説明会</div>
+                            <div class="text-sm text-muted">Zoom会議 • 投資家向け説明会</div>
+                        </td>
+                        <td>
+                            <div class="ai-summary">
+                                <div class="summary-header">
+                                    <span class="icon">📝</span>
+                                    <span class="text-sm font-semibold">AIサマリー</span>
+                                </div>
+                                <p class="text-sm mt-sm">好調な業績（売上15%増、AI事業35%増）を報告。投資家から成長戦略、DX投資、ESG目標について質問多数。全体的にポジティブな反応。</p>
+                                <div class="summary-tags mt-sm">
+                                    <span class="tag-small">📈 成長性</span>
+                                    <span class="tag-small">👥 人材確保</span>
+                                    <span class="tag-small">🌏 ESG</span>
+                                </div>
+                                <div class="summary-metrics mt-sm">
+                                    <div class="metric-item">
+                                        <span class="metric-label">主要トピック:</span>
+                                        <span class="metric-value">海外事業(35%), DX投資(25%), ESG(20%)</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">投資家反応:</span>
+                                        <span class="metric-value positive">ポジティブ 75%</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">重要度:</span>
+                                        <span class="metric-value high">高</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm">機関投資家多数</div>
+                            <div class="text-sm text-muted">投資家向け説明会</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">CEO, CFO</div>
+                            <div class="text-sm text-muted">IR部</div>
+                        </td>
+                        <td>
+                            <div class="ai-analysis-summary">
+                                <div class="flex gap-xs flex-wrap">
+                                    <span class="badge badge-info">FAQ: 12</span>
+                                    <span class="badge badge-warning">課題: 3</span>
+                                    <span class="badge badge-success">好感75%</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="badge badge-success">✅ 完了</span>
                             </div>
                         </td>
                         <td>
@@ -131,25 +248,117 @@
                         </td>
                     </tr>
                     
-                    <!-- メールの例 -->
-                    <tr>
+                    <!-- メールの例 (シンプルビュー) -->
+                    <tr class="simple-view">
                         <td><input type="checkbox"></td>
-                        <td><span class="text-2xl">📧</span></td>
-                        <td>
-                            <div class="font-semibold">配当政策に関する質問</div>
-                            <div class="text-sm text-muted">機関投資家A社 → IR部</div>
-                        </td>
                         <td>
                             <div>2024/01/14</div>
                             <div class="text-sm text-muted">16:23</div>
                         </td>
                         <td>
+                            <div class="data-icons">
+                                <span class="data-icon inactive" title="Web会議なし">💻</span>
+                                <span class="data-icon inactive" title="音声なし">🎤</span>
+                                <span class="data-icon inactive" title="動画なし">🎥</span>
+                                <span class="data-icon inactive" title="文書なし">📄</span>
+                                <span class="data-icon active" title="メールあり">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">メール対応</div>
+                        </td>
+                        <td>
+                            <div class="font-semibold">配当政策に関する質問</div>
+                            <div class="text-sm text-muted">機関投資家A社 → IR部</div>
+                        </td>
+                        <td>
                             <div class="text-sm">機関投資家A社</div>
                             <div class="text-sm text-muted">担当: 田中</div>
                         </td>
-                        <td><span class="badge badge-warning">🔄 処理中</span></td>
                         <td>
-                            <div class="text-sm text-muted">分析中...</div>
+                            <div class="text-sm">IR部</div>
+                            <div class="text-sm text-muted">担当: 鈴木</div>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="badge badge-warning">🔄 処理中</span>
+                                <div class="ai-status mt-xs">
+                                    <span class="ai-badge ai-processing" title="AI分析中">🤖</span>
+                                    <span class="text-xs">分析中</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" disabled>詳細</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('email_001')">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- メールの例 (詳細ビュー) -->
+                    <tr class="detailed-view">
+                        <td><input type="checkbox"></td>
+                        <td>
+                            <div>2024/01/14</div>
+                            <div class="text-sm text-muted">16:23</div>
+                        </td>
+                        <td>
+                            <div class="data-icons">
+                                <span class="data-icon inactive" title="Web会議なし">💻</span>
+                                <span class="data-icon inactive" title="音声なし">🎤</span>
+                                <span class="data-icon inactive" title="動画なし">🎥</span>
+                                <span class="data-icon inactive" title="文書なし">📄</span>
+                                <span class="data-icon active" title="メールあり">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">メール対応</div>
+                        </td>
+                        <td>
+                            <div class="font-semibold">配当政策に関する質問</div>
+                            <div class="text-sm text-muted">機関投資家A社 → IR部</div>
+                        </td>
+                        <td>
+                            <div class="ai-summary">
+                                <div class="summary-header">
+                                    <span class="icon">📝</span>
+                                    <span class="text-sm font-semibold">AIサマリー</span>
+                                </div>
+                                <p class="text-sm mt-sm">配当性向目標、中期的な株主還元方針、自社株買いの検討状況についての問い合わせ。経営方針に関わる重要事項。</p>
+                                <div class="summary-tags mt-sm">
+                                    <span class="tag-small">💵 配当</span>
+                                    <span class="tag-small">📈 株主還元</span>
+                                    <span class="tag-small">⚠️ 重要</span>
+                                </div>
+                                <div class="summary-metrics mt-sm">
+                                    <div class="metric-item">
+                                        <span class="metric-label">質問内容:</span>
+                                        <span class="metric-value">配当性向、株主還元、自社株買い</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">緊急度:</span>
+                                        <span class="metric-value medium">中</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">回答要否:</span>
+                                        <span class="metric-value required">要回答</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm">機関投資家A社</div>
+                            <div class="text-sm text-muted">担当: 田中</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">IR部</div>
+                            <div class="text-sm text-muted">担当: 鈴木</div>
+                        </td>
+                        <td>
+                            <div class="ai-analysis-summary">
+                                <div class="text-sm text-muted">分析中...</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="badge badge-warning">🔄 処理中</span>
+                            </div>
                         </td>
                         <td>
                             <div class="flex gap-sm">
@@ -159,27 +368,120 @@
                         </td>
                     </tr>
                     
-                    <!-- 音声の例 -->
-                    <tr>
+                    <!-- 音声の例 (シンプルビュー) -->
+                    <tr class="simple-view">
                         <td><input type="checkbox"></td>
-                        <td><span class="text-2xl">🎙️</span></td>
-                        <td>
-                            <div class="font-semibold">投資家B社との個別面談</div>
-                            <div class="text-sm text-muted">音声ファイル • 32分</div>
-                        </td>
                         <td>
                             <div>2024/01/13</div>
                             <div class="text-sm text-muted">10:00-10:32</div>
                         </td>
                         <td>
-                            <div class="text-sm">CFO, IR部長</div>
-                            <div class="text-sm text-muted">投資家B社 2名</div>
+                            <div class="data-icons">
+                                <span class="data-icon inactive" title="Web会議なし">💻</span>
+                                <span class="data-icon active" title="音声あり">🎤</span>
+                                <span class="data-icon inactive" title="動画なし">🎥</span>
+                                <span class="data-icon inactive" title="文書なし">📄</span>
+                                <span class="data-icon inactive" title="メールなし">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">32分・4名</div>
                         </td>
-                        <td><span class="badge badge-success">✅ 完了</span></td>
                         <td>
-                            <div class="flex gap-xs">
-                                <span class="badge badge-info">FAQ: 5</span>
-                                <span class="badge badge-success">好感</span>
+                            <div class="font-semibold">投資家B社との個別面談</div>
+                            <div class="text-sm text-muted">音声ファイル • 個別面談</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">投資家B社</div>
+                            <div class="text-sm text-muted">2名参加</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">CFO, IR部長</div>
+                            <div class="text-sm text-muted">IR部</div>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="badge badge-success">✅ 完了</span>
+                                <div class="ai-status mt-xs">
+                                    <span class="ai-badge ai-complete" title="AI分析完了">🤖</span>
+                                    <span class="text-xs">AI処理済</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" onclick="showDetailModal('voice_001')">詳細</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('voice_001')">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- 音声の例 (詳細ビュー) -->
+                    <tr class="detailed-view">
+                        <td><input type="checkbox"></td>
+                        <td>
+                            <div>2024/01/13</div>
+                            <div class="text-sm text-muted">10:00-10:32</div>
+                        </td>
+                        <td>
+                            <div class="data-icons">
+                                <span class="data-icon inactive" title="Web会議なし">💻</span>
+                                <span class="data-icon active" title="音声あり">🎤</span>
+                                <span class="data-icon inactive" title="動画なし">🎥</span>
+                                <span class="data-icon inactive" title="文書なし">📄</span>
+                                <span class="data-icon inactive" title="メールなし">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">32分・4名</div>
+                        </td>
+                        <td>
+                            <div class="font-semibold">投資家B社との個別面談</div>
+                            <div class="text-sm text-muted">音声ファイル • 個別面談</div>
+                        </td>
+                        <td>
+                            <div class="ai-summary">
+                                <div class="summary-header">
+                                    <span class="icon">📝</span>
+                                    <span class="text-sm font-semibold">AIサマリー</span>
+                                </div>
+                                <p class="text-sm mt-sm">投資家B社との個別面談。事業戦略、財務状況、ESG取り組みについて詳細な説明。投資家からは成長戦略とリスク管理について質問多数。全体的に建設的な対話。</p>
+                                <div class="summary-tags mt-sm">
+                                    <span class="tag-small">📈 成長戦略</span>
+                                    <span class="tag-small">💰 財務</span>
+                                    <span class="tag-small">🌏 ESG</span>
+                                </div>
+                                <div class="summary-metrics mt-sm">
+                                    <div class="metric-item">
+                                        <span class="metric-label">主要トピック:</span>
+                                        <span class="metric-value">事業戦略(40%), 財務(30%), ESG(30%)</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">投資家反応:</span>
+                                        <span class="metric-value positive">ポジティブ 80%</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">重要度:</span>
+                                        <span class="metric-value high">高</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm">投資家B社</div>
+                            <div class="text-sm text-muted">2名参加</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">CFO, IR部長</div>
+                            <div class="text-sm text-muted">IR部</div>
+                        </td>
+                        <td>
+                            <div class="ai-analysis-summary">
+                                <div class="flex gap-xs flex-wrap">
+                                    <span class="badge badge-info">FAQ: 5</span>
+                                    <span class="badge badge-warning">課題: 2</span>
+                                    <span class="badge badge-success">好感80%</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="badge badge-success">✅ 完了</span>
                             </div>
                         </td>
                         <td>
@@ -190,26 +492,120 @@
                         </td>
                     </tr>
                     
-                    <!-- 文書の例 -->
-                    <tr>
+                    <!-- 文書の例 (シンプルビュー) -->
+                    <tr class="simple-view">
                         <td><input type="checkbox"></td>
-                        <td><span class="text-2xl">📄</span></td>
-                        <td>
-                            <div class="font-semibold">取締役会議事録</div>
-                            <div class="text-sm text-muted">PDF • 15ページ</div>
-                        </td>
                         <td>
                             <div>2024/01/10</div>
                             <div class="text-sm text-muted">-</div>
                         </td>
                         <td>
+                            <div class="data-icons">
+                                <span class="data-icon inactive" title="Web会議なし">💻</span>
+                                <span class="data-icon inactive" title="音声なし">🎤</span>
+                                <span class="data-icon inactive" title="動画なし">🎥</span>
+                                <span class="data-icon active" title="文書あり">📄</span>
+                                <span class="data-icon inactive" title="メールなし">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">PDF・15ページ</div>
+                        </td>
+                        <td>
+                            <div class="font-semibold">取締役会議事録</div>
+                            <div class="text-sm text-muted">PDF • 議事録</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">-</div>
+                            <div class="text-sm text-muted">内部文書</div>
+                        </td>
+                        <td>
                             <div class="text-sm">取締役会</div>
                             <div class="text-sm text-muted">全取締役</div>
                         </td>
-                        <td><span class="badge badge-success">✅ 完了</span></td>
                         <td>
-                            <div class="flex gap-xs">
-                                <span class="badge badge-info">重要: 8</span>
+                            <div class="status-indicator">
+                                <span class="badge badge-success">✅ 完了</span>
+                                <div class="ai-status mt-xs">
+                                    <span class="ai-badge ai-complete" title="AI分析完了">🤖</span>
+                                    <span class="text-xs">AI処理済</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-primary" onclick="showDetailModal('doc_001')">詳細</button>
+                                <button class="btn btn-sm btn-secondary" onclick="editDialogue('doc_001')">編集</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- 文書の例 (詳細ビュー) -->
+                    <tr class="detailed-view">
+                        <td><input type="checkbox"></td>
+                        <td>
+                            <div>2024/01/10</div>
+                            <div class="text-sm text-muted">-</div>
+                        </td>
+                        <td>
+                            <div class="data-icons">
+                                <span class="data-icon inactive" title="Web会議なし">💻</span>
+                                <span class="data-icon inactive" title="音声なし">🎤</span>
+                                <span class="data-icon inactive" title="動画なし">🎥</span>
+                                <span class="data-icon active" title="文書あり">📄</span>
+                                <span class="data-icon inactive" title="メールなし">✉️</span>
+                            </div>
+                            <div class="text-xs text-muted mt-xs">PDF・15ページ</div>
+                        </td>
+                        <td>
+                            <div class="font-semibold">取締役会議事録</div>
+                            <div class="text-sm text-muted">PDF • 議事録</div>
+                        </td>
+                        <td>
+                            <div class="ai-summary">
+                                <div class="summary-header">
+                                    <span class="icon">📝</span>
+                                    <span class="text-sm font-semibold">AIサマリー</span>
+                                </div>
+                                <p class="text-sm mt-sm">2024年1月10日開催の取締役会議事録。中期経営計画の修正、配当方針の変更、DX投資増額など重要な決議事項多数。全取締役出席。</p>
+                                <div class="summary-tags mt-sm">
+                                    <span class="tag-small">📋 議事録</span>
+                                    <span class="tag-small">💰 配当</span>
+                                    <span class="tag-small">⚠️ 重要</span>
+                                </div>
+                                <div class="summary-metrics mt-sm">
+                                    <div class="metric-item">
+                                        <span class="metric-label">決議事項:</span>
+                                        <span class="metric-value">中期計画修正、配当方針変更、DX投資増額</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">重要度:</span>
+                                        <span class="metric-value critical">最高</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">開示要否:</span>
+                                        <span class="metric-value required">要開示</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm">-</div>
+                            <div class="text-sm text-muted">内部文書</div>
+                        </td>
+                        <td>
+                            <div class="text-sm">取締役会</div>
+                            <div class="text-sm text-muted">全取締役</div>
+                        </td>
+                        <td>
+                            <div class="ai-analysis-summary">
+                                <div class="flex gap-xs flex-wrap">
+                                    <span class="badge badge-info">重要: 8</span>
+                                    <span class="badge badge-warning">決議: 5</span>
+                                    <span class="badge badge-success">完了</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="badge badge-success">✅ 完了</span>
                             </div>
                         </td>
                         <td>
@@ -277,6 +673,192 @@
 </div>
 
 <style>
+/* ビュー切り替えボタン */
+.view-toggle {
+    display: flex;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-md);
+    padding: 2px;
+}
+
+.view-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.view-btn:hover {
+    color: var(--gray-800);
+}
+
+.view-btn.active {
+    background-color: white;
+    color: var(--kagami-blue);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn .icon {
+    font-size: 1.2em;
+}
+
+/* データアイコン */
+.data-icons {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.data-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.data-icon.active {
+    background-color: rgba(21, 123, 255, 0.1);
+    filter: grayscale(0);
+}
+
+.data-icon.inactive {
+    background-color: var(--gray-50);
+    filter: grayscale(1);
+    opacity: 0.4;
+}
+
+/* AIステータス */
+.ai-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.ai-badge {
+    font-size: 16px;
+}
+
+.ai-badge.ai-complete {
+    filter: hue-rotate(120deg);
+}
+
+.ai-badge.ai-processing {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* AIサマリー */
+.ai-summary {
+    background-color: var(--gray-50);
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-md);
+    border-left: 3px solid var(--kagami-blue);
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.summary-tags {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.tag-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 8px;
+    background-color: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+    color: var(--gray-700);
+}
+
+/* ステータスインジケーター */
+.status-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+}
+
+/* AI分析サマリー */
+.ai-analysis-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.mt-xs {
+    margin-top: var(--space-xs);
+}
+
+/* テーブルのビュー切り替え */
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+/* デフォルト状態: シンプルビューを表示 */
+.table tbody tr.simple-view {
+    display: table-row !important;
+}
+
+.table tbody tr.detailed-view {
+    display: none !important;
+}
+
+/* 詳細モード時: 詳細ビューを表示 */
+body.detailed-mode .table tbody tr.simple-view {
+    display: none !important;
+}
+
+body.detailed-mode .table tbody tr.detailed-view {
+    display: table-row !important;
+}
+
+/* ヘッダーの切り替え */
+.table thead tr.simple-view {
+    display: table-row !important;
+}
+
+.table thead tr.detailed-view {
+    display: none !important;
+}
+
+body.detailed-mode .table thead tr.simple-view {
+    display: none !important;
+}
+
+body.detailed-mode .table thead tr.detailed-view {
+    display: table-row !important;
+}
+
 /* 固定底部バー */
 .fixed-bottom-bar {
     position: fixed;
@@ -359,6 +941,58 @@
     margin-bottom: 0;
 }
 
+/* サマリーメトリクス */
+.summary-metrics {
+    border-top: 1px solid var(--gray-200);
+    padding-top: var(--space-sm);
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-xs);
+}
+
+.metric-item:last-child {
+    margin-bottom: 0;
+}
+
+.metric-label {
+    color: var(--gray-600);
+    font-weight: var(--font-medium);
+}
+
+.metric-value {
+    font-weight: var(--font-semibold);
+}
+
+.metric-value.positive {
+    color: var(--success-green);
+}
+
+.metric-value.negative {
+    color: var(--error-red);
+}
+
+.metric-value.high {
+    color: var(--warning-yellow);
+}
+
+.metric-value.critical {
+    color: var(--error-red);
+}
+
+.metric-value.medium {
+    color: var(--warning-yellow);
+}
+
+.metric-value.required {
+    color: var(--error-red);
+    font-weight: var(--font-bold);
+}
+
 /* レスポンシブ */
 @media (max-width: 768px) {
     .fixed-bottom-bar {
@@ -375,26 +1009,99 @@
 
 {% block extra_js %}
 <script>
+// ビューモードの切り替え
+function setViewMode(mode) {
+    console.log('setViewMode called with:', mode);
+    
+    // ボタンのアクティブ状態を更新
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-view="${mode}"]`).classList.add('active');
+    
+    // bodyにクラスを追加/削除
+    if (mode === 'detailed') {
+        document.body.classList.add('detailed-mode');
+        console.log('Added detailed-mode class to body');
+    } else {
+        document.body.classList.remove('detailed-mode');
+        console.log('Removed detailed-mode class from body');
+    }
+    
+    // チェックボックスの同期
+    syncCheckboxes();
+    
+    // LocalStorageに保存
+    localStorage.setItem('dialogueViewMode', mode);
+    
+    // デバッグ: 現在の表示状態を確認
+    const simpleRows = document.querySelectorAll('tbody tr.simple-view');
+    const detailedRows = document.querySelectorAll('tbody tr.detailed-view');
+    console.log('Simple rows:', simpleRows.length);
+    console.log('Detailed rows:', detailedRows.length);
+    console.log('Body has detailed-mode class:', document.body.classList.contains('detailed-mode'));
+}
+
+// チェックボックスの同期
+function syncCheckboxes() {
+    const isDetailedMode = document.body.classList.contains('detailed-mode');
+    const selectAll = isDetailedMode ? document.getElementById('selectAllDetailed') : document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll(`tbody tr.${isDetailedMode ? 'detailed' : 'simple'}-view input[type="checkbox"]`);
+    
+    // 全選択チェックボックスの状態を更新
+    if (selectAll) {
+        selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+    }
+}
+
+// ページ読み込み時に保存されたビューモードを適用
+window.addEventListener('DOMContentLoaded', function() {
+    const savedMode = localStorage.getItem('dialogueViewMode') || 'simple';
+    if (savedMode === 'detailed') {
+        setViewMode('detailed');
+    }
+});
+
 // 編集画面への遷移
 function editDialogue(recordId) {
     window.location.href = `/dialogue/edit?id=${recordId}`;
 }
 
 // チェックボックス管理
-document.getElementById('selectAll').addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
-    checkboxes.forEach(cb => cb.checked = this.checked);
-    updateBulkActionBar();
-});
+function setupCheckboxListeners() {
+    // 全選択チェックボックス
+    ['selectAll', 'selectAllDetailed'].forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+            checkbox.addEventListener('change', function() {
+                const isDetailedMode = document.body.classList.contains('detailed-mode');
+                const viewClass = isDetailedMode ? 'detailed-view' : 'simple-view';
+                const checkboxes = document.querySelectorAll(`tbody tr.${viewClass} input[type="checkbox"]`);
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateBulkActionBar();
+            });
+        }
+    });
+    
+    // 個別チェックボックス
+    document.querySelectorAll('tbody input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+            updateBulkActionBar();
+            syncCheckboxes();
+        });
+    });
+}
 
-// 個別チェックボックス
-document.querySelectorAll('tbody input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', updateBulkActionBar);
+// ページ読み込み時にリスナーを設定
+window.addEventListener('DOMContentLoaded', function() {
+    setupCheckboxListeners();
 });
 
 // 一括操作バーの更新
 function updateBulkActionBar() {
-    const checkedBoxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+    const isDetailedMode = document.body.classList.contains('detailed-mode');
+    const viewClass = isDetailedMode ? 'detailed-view' : 'simple-view';
+    const checkedBoxes = document.querySelectorAll(`tbody tr.${viewClass} input[type="checkbox"]:checked`);
     const count = checkedBoxes.length;
     const bulkActionBar = document.getElementById('bulkActionBar');
     
