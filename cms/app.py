@@ -777,28 +777,173 @@ MOCK_DATA = {
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     """ダッシュボード画面"""
-    from datetime import datetime, date
+    from datetime import datetime
     
-    # 本日の日付を取得
-    today = date.today()
+    # 新しいミーティング処理データの追加
+    active_meetings = [
+        {
+            "id": "meeting_001",
+            "title": "野村AMとの面談記録",
+            "investor_name": "野村アセットマネジメント",
+            "investor_type": "大口機関投資家",
+            "date": "2024-01-22 10:00",
+            "duration": "1時間30分",
+            "priority": "high",
+            "days_elapsed": 2,
+            "is_urgent": False,
+            "stages": {
+                "upload": {
+                    "status": "completed",
+                    "files": ["🎥", "🎤", "📄"]
+                },
+                "transcription": {
+                    "status": "completed",
+                    "duration": "15分",
+                    "progress": 100
+                },
+                "ai_summary": {
+                    "status": "completed"
+                },
+                "faq": {
+                    "status": "in_progress",
+                    "draft_count": 3,
+                    "count": 0
+                },
+                "review": {
+                    "status": "waiting"
+                },
+                "publish": {
+                    "status": "waiting"
+                }
+            }
+        },
+        {
+            "id": "meeting_002",
+            "title": "BlackRock定例ミーティング",
+            "investor_name": "BlackRock Inc.",
+            "investor_type": "海外機関投資家",
+            "date": "2024-01-21 17:00",
+            "duration": "45分",
+            "priority": "high",
+            "days_elapsed": 3,
+            "is_urgent": False,
+            "stages": {
+                "upload": {
+                    "status": "completed",
+                    "files": ["💻", "🎤"]
+                },
+                "transcription": {
+                    "status": "processing",
+                    "progress": 65
+                },
+                "ai_summary": {
+                    "status": "waiting"
+                },
+                "faq": {
+                    "status": "waiting"
+                },
+                "review": {
+                    "status": "waiting"
+                },
+                "publish": {
+                    "status": "waiting"
+                }
+            }
+        },
+        {
+            "id": "meeting_003",
+            "title": "個人投資家説明会",
+            "investor_name": "個人投資家（30名）",
+            "investor_type": "個人投資家",
+            "date": "2024-01-20 14:00",
+            "duration": "2時間",
+            "priority": "medium",
+            "days_elapsed": 4,
+            "is_urgent": True,
+            "stages": {
+                "upload": {
+                    "status": "pending"
+                },
+                "transcription": {
+                    "status": "waiting"
+                },
+                "ai_summary": {
+                    "status": "waiting"
+                },
+                "faq": {
+                    "status": "waiting"
+                },
+                "review": {
+                    "status": "waiting"
+                },
+                "publish": {
+                    "status": "waiting"
+                }
+            }
+        },
+        {
+            "id": "meeting_004",
+            "title": "アナリスト向けスモールミーティング",
+            "investor_name": "証券アナリスト5名",
+            "investor_type": "アナリスト",
+            "date": "2024-01-19 16:00",
+            "duration": "1時間",
+            "priority": "high",
+            "days_elapsed": 5,
+            "is_urgent": True,
+            "stages": {
+                "upload": {
+                    "status": "completed",
+                    "files": ["💻", "📄"]
+                },
+                "transcription": {
+                    "status": "completed",
+                    "duration": "10分"
+                },
+                "ai_summary": {
+                    "status": "completed"
+                },
+                "faq": {
+                    "status": "completed",
+                    "count": 5
+                },
+                "review": {
+                    "status": "approved",
+                    "approver": "IR部長"
+                },
+                "publish": {
+                    "status": "ready"
+                }
+            }
+        }
+    ]
     
-    # 処理待ちタスクを優先度でソート
-    pending_tasks = sorted(MOCK_DATA["pending_tasks"], 
-                          key=lambda x: (0 if x["priority"] == "high" else 1, x["created_at"]))
+    urgent_meetings = [m for m in active_meetings if m["is_urgent"]]
     
-    # 本日のスケジュールを時間でソート
-    todays_schedule = sorted(MOCK_DATA["todays_schedule"], key=lambda x: x["time"])
+    # 本日のミーティング数（モック）
+    todays_meetings = 3
+    
+    # KPIデータ（モック）
+    processing_efficiency = 87
+    avg_processing_time = "2.5時間"
+    ai_usage_rate = 92
+    ai_automated_tasks = 156
+    ai_improvement = 15
+    investor_satisfaction = 95
     
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
-        "title": "ダッシュボード",
-        "kpis": MOCK_DATA["kpis"],
-        "recent_activities": MOCK_DATA["recent_activities"],
-        "pending_tasks": pending_tasks,
-        "todays_schedule": todays_schedule,
-        "urgent_items": MOCK_DATA["urgent_items"],
-        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M"),
-        "today": today.strftime("%Y年%m月%d日")
+        "title": "ミーティング処理ダッシュボード",
+        "active_meetings": active_meetings,
+        "urgent_meetings": urgent_meetings,
+        "todays_meetings": todays_meetings,
+        "processing_efficiency": processing_efficiency,
+        "avg_processing_time": avg_processing_time,
+        "ai_usage_rate": ai_usage_rate,
+        "ai_automated_tasks": ai_automated_tasks,
+        "ai_improvement": ai_improvement,
+        "investor_satisfaction": investor_satisfaction,
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
     })
 
 @app.get("/faq", response_class=HTMLResponse)
@@ -904,54 +1049,260 @@ async def dialogue_publish(request: Request):
 
 @app.get("/dialogue/edit", response_class=HTMLResponse)
 async def dialogue_edit(request: Request):
-    """対話記録編集画面"""
+    """ミーティング処理詳細画面"""
     # URLパラメータからIDを取得
-    record_id = request.query_params.get("id", "meeting_001")
+    meeting_id = request.query_params.get("id", "meeting_001")
     
     # モックデータ（実際はデータベースから取得）
-    mock_dialogue_data = {
+    mock_meeting_data = {
         "meeting_001": {
-            "title": "2024年第3四半期決算説明会",
-            "type": "決算説明会",
-            "date": "2024-01-15T14:00",
-            "participants": "156",
-            "investor_name": "機関投資家全般",
-            "investor_type": "国内機関投資家",
-            "holding_status": "複数",
-            "company_participants": ["CEO - 田中一郎", "CFO - 佐藤二郎"],
-            "importance": "最重要",
-            "confidentiality": "一般",
-            "tags": ["決算", "Q3", "AI事業", "成長戦略"],
-            "file_name": "決算説明会_Q3_20240115.mp4",
-            "file_size": "456.2MB",
-            "duration": "45分"
-        },
-        "voice_001": {
-            "title": "投資家B社との個別面談",
+            "title": "野村AMとの面談記録",
+            "investor_name": "野村アセットマネジメント",
+            "investor_type": "大口機関投資家",
             "type": "個別面談",
-            "date": "2024-01-13T10:00",
-            "participants": "4",
-            "investor_name": "投資家B社",
-            "investor_type": "国内機関投資家",
-            "holding_status": "主要株主（1-5%）",
+            "date": "2024-01-22 10:00",
+            "formatted_date": "2024年1月22日 10:00",
+            "participants": 4,
+            "company_participants": ["CEO - 田中一郎", "CFO - 佐藤二郎"],
+            "tags": ["決算", "Q3", "AI事業", "成長戦略"],
+            "priority": "high",
+            "days_elapsed": 2,
+            "current_stage": "faq",
+            "stages": {
+                "upload": {
+                    "status": "completed",
+                    "files": ["🎥", "🎤", "📄"]
+                },
+                "transcription": {
+                    "status": "completed",
+                    "duration": "15分",
+                    "progress": 100
+                },
+                "ai_summary": {
+                    "status": "completed"
+                },
+                "faq": {
+                    "status": "in_progress",
+                    "draft_count": 3,
+                    "count": 0
+                },
+                "review": {
+                    "status": "waiting"
+                },
+                "publish": {
+                    "status": "waiting"
+                }
+            },
+            "files": [
+                {
+                    "id": "file_001",
+                    "name": "野村AM_面談_20240122.mp4",
+                    "type": "video",
+                    "size": "456.2MB",
+                    "duration": "1時間30分"
+                },
+                {
+                    "id": "file_002",
+                    "name": "野村AM_面談_音声.mp3",
+                    "type": "audio",
+                    "size": "89.5MB",
+                    "duration": "1時間30分"
+                },
+                {
+                    "id": "file_003",
+                    "name": "説明資料.pdf",
+                    "type": "document",
+                    "size": "12.3MB",
+                    "duration": "-"
+                }
+            ],
+            "transcript_preview": "【田中（CEO）】本日はお忙しい中、お時間をいただきありがとうございます。第3四半期の決算についてご説明させていただきます。\n\n【投資家】ありがとうございます。特にAI事業の進捗について詳しくお聞きしたいです。\n\n【田中（CEO）】AI事業については、予想を上回るペースで成長しております。特に金融機関向けのAIソリューションが好調で...",
+            "transcript_stats": {
+                "total_chars": 15680,
+                "reading_time": 12
+            },
+            "ai_summary": {
+                "executive_summary": "第3四半期の業績は全体的に好調で、特にAI事業が予想を上回る成長を示しました。投資家からは今後の成長性と競争優位性について高い関心が寄せられました。",
+                "key_points": [
+                    "AI事業の売上が前年同期比150%成長",
+                    "金融機関向けAIソリューションの契約数が倍増",
+                    "2024年度の業績予想を上方修正の可能性",
+                    "ESG目標達成に向けた具体的なロードマップを策定中"
+                ],
+                "investor_concerns": [
+                    {
+                        "topic": "AI事業の競争優位性",
+                        "detail": "競合他社との差別化要因、技術的優位性の持続可能性"
+                    },
+                    {
+                        "topic": "投資効率",
+                        "detail": "AI開発への投資額とROIの具体的な数値"
+                    },
+                    {
+                        "topic": "ESG目標",
+                        "detail": "2030年カーボンニュートラルの実現可能性とコスト"
+                    }
+                ],
+                "recommended_actions": [
+                    "AI事業の詳細な事業計画とKPIを次回決算説明会で公表",
+                    "ESGロードマップを2月末までに公開",
+                    "競合分析レポートを作成し、投資家向けに共有"
+                ]
+            },
+            "faq_drafts": [
+                {
+                    "id": "faq_001",
+                    "question": "AI事業の今後の成長性について教えてください",
+                    "answer": "AI事業は当社の成長戦略の中核であり、特に金融機関向けソリューションで強い競争力を持っています。今期は前年同期比150%の成長を達成し、来期も100%以上の成長を見込んでいます。",
+                    "ai_generated": True,
+                    "confidence": 95
+                },
+                {
+                    "id": "faq_002",
+                    "question": "ESG目標の進捗状況は？",
+                    "answer": "2030年カーボンニュートラル目標に向けて、現在詳細なロードマップを策定中です。2月末までに具体的な施策とマイルストーンを公表予定です。",
+                    "ai_generated": True,
+                    "confidence": 88
+                },
+                {
+                    "id": "faq_003",
+                    "question": "配当政策に変更はありますか？",
+                    "answer": "現時点で配当政策に変更はありません。配当性合30%を維持し、安定的な株主還元を継続します。",
+                    "ai_generated": False,
+                    "confidence": 100
+                }
+            ],
+            "timeline": [
+                {
+                    "type": "success",
+                    "title": "ファイルアップロード完了",
+                    "timestamp": "2024-01-22 11:35",
+                    "user": "IR担当者A"
+                },
+                {
+                    "type": "success",
+                    "title": "文字起こし完了",
+                    "timestamp": "2024-01-22 11:50",
+                    "user": "AI自動処理"
+                },
+                {
+                    "type": "success",
+                    "title": "AI要約完了",
+                    "timestamp": "2024-01-22 12:05",
+                    "user": "AI自動処理"
+                },
+                {
+                    "type": "processing",
+                    "title": "FAQ作成中",
+                    "timestamp": "2024-01-22 14:30",
+                    "user": "IR担当者A"
+                }
+            ],
+            "current_stage_info": {
+                "action_required": True,
+                "message": "FAQの作成・確認が必要です。AIが生成した3件のFAQ案を確認し、必要に応じて編集・追加してください。",
+                "action_label": "FAQを編集",
+                "action_function": "manageFAQs()"
+            },
+            "can_edit_basic_info": True,
+            "can_generate_more_faqs": True,
+            "can_upload_more": True,
+            "can_save": True,
+            "show_action_bar": True,
+            "primary_action": {
+                "label": "レビューに進む",
+                "function": "submitForReview()"
+            },
+            "total_processing_time": "2時間30分",
+            "progress_percentage": 65,
+            "last_updated": "2024-01-22 14:30"
+        },
+        "meeting_002": {
+            "title": "BlackRock定例ミーティング",
+            "investor_name": "BlackRock Inc.",
+            "investor_type": "海外機関投資家",
+            "type": "Web会議",
+            "date": "2024-01-21 17:00",
+            "formatted_date": "2024年1月21日 17:00",
+            "participants": 6,
             "company_participants": ["CFO - 佐藤二郎", "IR部長 - 山本三郎"],
-            "importance": "高",
-            "confidentiality": "社内限定",
-            "tags": ["個別面談", "財務戦略", "配当政策"],
-            "file_name": "投資家B社_面談_20240113.mp3",
-            "file_size": "89.5MB",
-            "duration": "32分"
+            "tags": ["ESG", "グローバル投資", "ガバナンス"],
+            "priority": "high",
+            "days_elapsed": 3,
+            "current_stage": "transcription",
+            "stages": {
+                "upload": {
+                    "status": "completed",
+                    "files": ["💻", "🎤"]
+                },
+                "transcription": {
+                    "status": "processing",
+                    "progress": 65
+                },
+                "ai_summary": {
+                    "status": "waiting"
+                },
+                "faq": {
+                    "status": "waiting"
+                },
+                "review": {
+                    "status": "waiting"
+                },
+                "publish": {
+                    "status": "waiting"
+                }
+            },
+            "files": [
+                {
+                    "id": "file_004",
+                    "name": "BlackRock_meeting_20240121.mp4",
+                    "type": "video",
+                    "size": "234.5MB",
+                    "duration": "45分"
+                },
+                {
+                    "id": "file_005",
+                    "name": "BlackRock_meeting_audio.mp3",
+                    "type": "audio",
+                    "size": "45.2MB",
+                    "duration": "45分"
+                }
+            ],
+            "timeline": [
+                {
+                    "type": "success",
+                    "title": "ファイルアップロード完了",
+                    "timestamp": "2024-01-21 18:00",
+                    "user": "IR担当者B"
+                },
+                {
+                    "type": "processing",
+                    "title": "文字起こし開始",
+                    "timestamp": "2024-01-21 18:15",
+                    "user": "AI自動処理"
+                }
+            ],
+            "current_stage_info": {
+                "action_required": False,
+                "message": "文字起こしを処理中です。完了まで約 15分かかります。"
+            },
+            "can_edit_basic_info": True,
+            "can_upload_more": False,
+            "show_action_bar": False,
+            "total_processing_time": "1時間",
+            "progress_percentage": 30,
+            "last_updated": "2024-01-21 18:15"
         }
     }
     
     # 指定されたIDのデータを取得（デフォルトはmeeting_001）
-    dialogue_data = mock_dialogue_data.get(record_id, mock_dialogue_data["meeting_001"])
+    meeting_data = mock_meeting_data.get(meeting_id, mock_meeting_data["meeting_001"])
     
     return templates.TemplateResponse("dialogue-edit.html", {
         "request": request,
-        "title": "対話記録編集",
-        "record_id": record_id,
-        "dialogue_data": dialogue_data,
+        "title": "ミーティング処理詳細",
+        "meeting_id": meeting_id,
+        "meeting_data": meeting_data,
         "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
     })
 
