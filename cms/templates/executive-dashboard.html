@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}経営陣ダッシュボード{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- ヘッダー -->
+    <div class="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-8 rounded-xl mb-8">
+        <h2 class="text-3xl font-bold mb-4">経営陣向けIRインテリジェンス</h2>
+        <p class="text-blue-100">投資家の声を経営判断に直結する戦略インサイト</p>
+    </div>
+
+    <!-- メトリクスカード -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-600 text-sm">投資家センチメント</span>
+                <span class="text-2xl">😊</span>
+            </div>
+            <div class="text-3xl font-bold text-green-600">78%</div>
+            <div class="text-sm text-gray-500 mt-2">前月比 +5%</div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-600 text-sm">緊急対応事項</span>
+                <span class="text-2xl">⚠️</span>
+            </div>
+            <div class="text-3xl font-bold text-orange-600">{{ urgent_items }}</div>
+            <div class="text-sm text-gray-500 mt-2">要確認</div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-600 text-sm">今週の面談</span>
+                <span class="text-2xl">📅</span>
+            </div>
+            <div class="text-3xl font-bold text-blue-600">{{ meetings_this_week }}</div>
+            <div class="text-sm text-gray-500 mt-2">予定</div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-600 text-sm">投資家満足度</span>
+                <span class="text-2xl">⭐</span>
+            </div>
+            <div class="text-3xl font-bold text-purple-600">4.2/5</div>
+            <div class="text-sm text-gray-500 mt-2">安定</div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- 左側: 重要懸念事項 -->
+        <div class="lg:col-span-2">
+            <!-- 投資家の重要懸念事項 TOP5 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        <span class="text-2xl mr-2">🎯</span>
+                        投資家の重要懸念事項 TOP5
+                    </h3>
+                    <span class="text-sm text-gray-500">{{ current_time }}</span>
+                </div>
+                
+                <div class="space-y-4">
+                    {% for concern in top_concerns %}
+                    <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <div class="flex items-start">
+                            <div class="bg-{{ concern.color }}-100 text-{{ concern.color }}-600 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                                {{ loop.index }}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800 mb-2">{{ concern.title }}</h4>
+                                <p class="text-gray-600 text-sm mb-3">{{ concern.description }}</p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4 text-sm">
+                                        <span class="text-gray-500">言及回数: <span class="font-semibold text-gray-700">{{ concern.mention_count }}回</span></span>
+                                        <span class="text-gray-500">重要度: <span class="font-semibold text-{{ concern.color }}-600">{{ concern.importance }}</span></span>
+                                    </div>
+                                    <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">詳細分析 →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 推奨アクション -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <span class="text-2xl mr-2">💡</span>
+                    AI推奨アクション
+                </h3>
+                
+                <div class="space-y-4">
+                    {% for action in recommended_actions %}
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-start">
+                            <div class="bg-{{ action.priority_color }}-100 rounded-lg p-2 mr-4">
+                                <span class="text-2xl">{{ action.icon }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800 mb-2">{{ action.title }}</h4>
+                                <p class="text-gray-600 text-sm mb-3">{{ action.description }}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-{{ action.priority_color }}-100 text-{{ action.priority_color }}-800">
+                                        {{ action.priority }}
+                                    </span>
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">実行する →</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側: スケジュールとスキル向上 -->
+        <div class="space-y-8">
+            <!-- 重要な面談スケジュール -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <span class="text-2xl mr-2">📅</span>
+                    重要な面談予定
+                </h3>
+                
+                <div class="space-y-4">
+                    {% for meeting in important_meetings %}
+                    <div class="border-l-4 border-{{ meeting.priority_color }} pl-4 py-2">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h4 class="font-semibold text-gray-800">{{ meeting.investor }}</h4>
+                                <p class="text-sm text-gray-600">{{ meeting.date }} {{ meeting.time }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ meeting.agenda }}</p>
+                            </div>
+                            <span class="text-xs font-medium px-2 py-1 bg-{{ meeting.priority_color }}-100 text-{{ meeting.priority_color }}-800 rounded">
+                                {{ meeting.type }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <a href="/schedule" class="block text-center text-blue-600 hover:text-blue-800 text-sm font-medium mt-4">
+                    全てのスケジュールを見る →
+                </a>
+            </div>
+
+            <!-- IR対話スキル向上 -->
+            <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <span class="text-2xl mr-2">🎯</span>
+                    IR対話スキル向上
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">今週のポイント</h4>
+                        <p class="text-sm text-gray-600">{{ skill_tip.weekly_point }}</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">推奨トレーニング</h4>
+                        <ul class="space-y-2 text-sm">
+                            {% for training in skill_tip.trainings %}
+                            <li class="flex items-center">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-gray-600">{{ training }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        対話シミュレーションを開始
+                    </button>
+                </div>
+            </div>
+
+            <!-- 投資家フィードバックサマリー -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <span class="text-2xl mr-2">💬</span>
+                    最新フィードバック
+                </h3>
+                
+                <div class="space-y-3">
+                    {% for feedback in recent_feedback %}
+                    <div class="border-b border-gray-100 pb-3 last:border-0">
+                        <div class="flex items-start">
+                            <div class="bg-{{ feedback.sentiment_color }}-100 rounded-full p-1 mr-3">
+                                <span class="text-sm">{{ feedback.sentiment_icon }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-700">"{{ feedback.comment }}"</p>
+                                <p class="text-xs text-gray-500 mt-1">- {{ feedback.investor }} ({{ feedback.date }})</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-container {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* ホバーエフェクト */
+    .hover\:bg-gray-100:hover {
+        transition: background-color 0.2s ease;
+    }
+    
+    /* カードのシャドウエフェクト */
+    .shadow-lg:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transition: box-shadow 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ページ読み込み時のアニメーション
+    document.addEventListener('DOMContentLoaded', function() {
+        // メトリクスカードのアニメーション
+        const cards = document.querySelectorAll('.grid > div');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+    
+    // リアルタイム更新のシミュレーション（本番環境ではWebSocketを使用）
+    setInterval(() => {
+        // センチメントの更新をシミュレート
+        const sentimentElement = document.querySelector('.text-green-600');
+        if (sentimentElement) {
+            const currentValue = parseInt(sentimentElement.textContent);
+            const newValue = currentValue + (Math.random() > 0.5 ? 1 : -1);
+            sentimentElement.textContent = Math.max(0, Math.min(100, newValue)) + '%';
+        }
+    }, 30000); // 30秒ごとに更新
+</script>
+{% endblock %}

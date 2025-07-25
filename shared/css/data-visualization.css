@@ -1,0 +1,180 @@
+/* 共通データアイコンスタイル */
+.data-icons {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.data-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: help; /* ツールチップがあることを示す */
+}
+
+.data-icon.active {
+    background-color: rgba(21, 123, 255, 0.1);
+    filter: grayscale(0);
+}
+
+.data-icon.inactive {
+    background-color: var(--gray-50);
+    filter: grayscale(1);
+    opacity: 0.4;
+}
+
+/* AIステータス共通スタイル */
+.ai-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.ai-badge {
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-badge.ai-complete {
+    filter: hue-rotate(120deg);
+}
+
+.ai-badge.ai-processing {
+    animation: pulse 2s infinite;
+}
+
+.ai-badge.ai-error {
+    filter: hue-rotate(-45deg);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* AIサマリー共通スタイル */
+.ai-summary {
+    background-color: var(--gray-50);
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-md);
+    border-left: 3px solid var(--kagami-blue);
+    position: relative;
+}
+
+.ai-summary::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--kagami-blue), var(--kagami-blue-light));
+    border-radius: 3px 0 0 3px;
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.summary-tags {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.tag-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 8px;
+    background-color: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+    color: var(--gray-700);
+    transition: all 0.2s ease;
+}
+
+.tag-small:hover {
+    border-color: var(--kagami-blue);
+    color: var(--kagami-blue);
+    transform: translateY(-1px);
+}
+
+/* ビュー切り替えボタン共通スタイル */
+.view-toggle {
+    display: flex;
+    background-color: var(--gray-100);
+    border-radius: var(--border-radius-md);
+    padding: 2px;
+}
+
+.view-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    font-weight: var(--font-medium);
+}
+
+.view-btn:hover {
+    color: var(--gray-800);
+}
+
+.view-btn.active {
+    background-color: white;
+    color: var(--kagami-blue);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn .icon {
+    font-size: 1.2em;
+}
+
+/* ステータスインジケーター共通スタイル */
+.status-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .data-icons {
+        gap: 1px;
+    }
+    
+    .data-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+    
+    .ai-summary {
+        padding: var(--space-xs);
+    }
+    
+    .tag-small {
+        font-size: 10px;
+        padding: 1px 6px;
+    }
+}

@@ -81,6 +81,16 @@
                     <span>ダッシュボード</span>
                 </a>
                 
+                <a href="/executive-dashboard" class="nav-item {% if request.url.path == '/executive-dashboard' %}active{% endif %}">
+                    <span class="nav-icon">👔</span>
+                    <span>経営陣ダッシュボード</span>
+                </a>
+                
+                <a href="/director-dashboard" class="nav-item {% if request.url.path == '/director-dashboard' %}active{% endif %}">
+                    <span class="nav-icon">🎭</span>
+                    <span>社外取締役ダッシュボード</span>
+                </a>
+                
                 <div class="nav-section">
                     <div class="nav-section-title">コンテンツ管理</div>
                     <a href="/faq" class="nav-item {% if request.url.path == '/faq' %}active{% endif %}">
