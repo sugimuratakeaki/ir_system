@@ -1811,6 +1811,14 @@ async def ir_strategy(request: Request):
         "title": "中長期戦略開示管理"
     })
 
+@app.get("/strategy-disclosure-assistant", response_class=HTMLResponse)
+async def strategy_disclosure_assistant(request: Request):
+    """中長期計画開示支援ツール画面"""
+    return templates.TemplateResponse("strategy-disclosure-assistant.html", {
+        "request": request,
+        "title": "中長期計画開示支援ツール"
+    })
+
 @app.get("/dialogue/faq/{meeting_id}", response_class=HTMLResponse)
 async def dialogue_faq_edit(request: Request, meeting_id: str):
     """ミーティングFAQ編集画面"""
