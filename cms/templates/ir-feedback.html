@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+
+{% block title %}投資家フィードバック管理{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- フィードバック登録セクション -->
+<div class="activity-feed mb-6">
+    <div class="activity-header">
+        <h2 class="activity-title">📝 新規フィードバック登録</h2>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">フィードバック元</label>
+            <select id="feedbackSource" class="w-full p-2 border border-gray-300 rounded-md">
+                <option value="">選択してください</option>
+                <option value="meeting">個別面談</option>
+                <option value="conference">決算説明会</option>
+                <option value="small">スモールミーティング</option>
+                <option value="written">書面での質問</option>
+                <option value="other">その他</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">投資家情報</label>
+            <input type="text" id="investorName" class="w-full p-2 border border-gray-300 rounded-md" placeholder="投資家名・機関名">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">対応日時</label>
+            <input type="datetime-local" id="feedbackDate" class="w-full p-2 border border-gray-300 rounded-md">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">重要度</label>
+            <select id="priority" class="w-full p-2 border border-gray-300 rounded-md">
+                <option value="critical">🔴 要経営判断</option>
+                <option value="high">🟡 重要</option>
+                <option value="medium">🔵 中程度</option>
+                <option value="low">⚪ 参考</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">フィードバック概要</label>
+        <input type="text" id="feedbackTitle" class="w-full p-2 border border-gray-300 rounded-md" placeholder="簡潔なタイトル（例：ROE改善施策の具体化要望）">
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">詳細内容</label>
+        <textarea id="feedbackDetail" class="w-full p-2 border border-gray-300 rounded-md" rows="4" placeholder="投資家からの具体的な指摘内容、質問、要望等"></textarea>
+    </div>
+    
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">カテゴリー（複数選択可）</label>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" value="finance" class="rounded">
+                <span class="text-sm">財務戦略</span>
+            </label>
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" value="governance" class="rounded">
+                <span class="text-sm">ガバナンス</span>
+            </label>
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" value="esg" class="rounded">
+                <span class="text-sm">ESG</span>
+            </label>
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" value="strategy" class="rounded">
+                <span class="text-sm">経営戦略</span>
+            </label>
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" value="operations" class="rounded">
+                <span class="text-sm">事業運営</span>
+            </label>
+            <label class="flex items-center space-x-2">
+                <input type="checkbox" value="capital" class="rounded">
+                <span class="text-sm">資本政策</span>
+            </label>
+        </div>
+    </div>
+    
+    <div class="flex gap-3">
+        <button class="btn-primary" onclick="saveFeedback()">💾 フィードバック登録</button>
+        <button class="btn-secondary" onclick="saveAsDraft()">📝 下書き保存</button>
+    </div>
+</div>
+
+<!-- フィードバック管理ダッシュボード -->
+<div class="activity-feed mb-6">
+    <div class="activity-header">
+        <h2 class="activity-title">📊 フィードバック管理ダッシュボード</h2>
+        <div class="flex gap-3">
+            <button class="btn-primary" onclick="generateExecutiveReport()">📑 経営報告書生成</button>
+            <button class="btn-secondary" onclick="exportFeedbackData()">📥 データエクスポート</button>
+        </div>
+    </div>
+
+    <!-- ステータスサマリー -->
+    <div class="dashboard-grid mb-6">
+        <div class="kpi-card border-l-4 border-red-500">
+            <div class="kpi-value text-red-600">5</div>
+            <div class="kpi-label">🔴 要経営判断</div>
+            <div class="text-xs text-gray-500 mt-2">
+                <p>未対応: 3件</p>
+                <p>対応中: 2件</p>
+            </div>
+        </div>
+        
+        <div class="kpi-card border-l-4 border-yellow-500">
+            <div class="kpi-value text-yellow-600">12</div>
+            <div class="kpi-label">🟡 重要課題</div>
+            <div class="text-xs text-gray-500 mt-2">
+                <p>今週期限: 4件</p>
+                <p>遅延: 1件</p>
+            </div>
+        </div>
+        
+        <div class="kpi-card border-l-4 border-green-500">
+            <div class="kpi-value text-green-600">68%</div>
+            <div class="kpi-label">📈 対応進捗</div>
+            <div class="text-xs text-gray-500 mt-2">
+                <p>完了: 45件</p>
+                <p>進行中: 21件</p>
+            </div>
+        </div>
+        
+        <div class="kpi-card border-l-4 border-blue-500">
+            <div class="kpi-value text-blue-600">3</div>
+            <div class="kpi-label">💡 トレンド</div>
+            <div class="text-xs text-gray-500 mt-2">
+                <p>共通課題検出</p>
+                <p>要注意テーマ</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- フィードバック一覧 -->
+    <div class="bg-white rounded-lg shadow-sm">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">📋 フィードバック一覧</h3>
+                <div class="flex gap-3">
+                    <input type="search" placeholder="🔍 検索..." class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                    <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        <option value="">すべてのステータス</option>
+                        <option value="new">新規</option>
+                        <option value="inprogress">対応中</option>
+                        <option value="resolved">解決済み</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-4 py-3">優先度</th>
+                        <th class="px-4 py-3">フィードバック概要</th>
+                        <th class="px-4 py-3">投資家</th>
+                        <th class="px-4 py-3">受領日</th>
+                        <th class="px-4 py-3">進捗</th>
+                        <th class="px-4 py-3">アクション</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <span class="text-red-500 text-lg">🔴</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <h4 class="font-medium text-gray-900">資本効率改善への具体的なロードマップ不足</h4>
+                            <div class="flex gap-2 mt-1">
+                                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">財務戦略</span>
+                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">資本政策</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900">大手機関投資家A社</td>
+                        <td class="px-4 py-3 text-sm text-gray-500">2024/12/20</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 30%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">30%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded" onclick="viewDetails('fb-001')">詳細</button>
+                                <button class="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 rounded" onclick="updateProgress('fb-001')">更新</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <span class="text-yellow-500 text-lg">🟡</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <h4 class="font-medium text-gray-900">ESG目標の定量化と進捗開示の強化要望</h4>
+                            <div class="flex gap-2 mt-1">
+                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">ESG</span>
+                                <span class="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">ガバナンス</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900">ESG投資ファンドB</td>
+                        <td class="px-4 py-3 text-sm text-gray-500">2024/12/18</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 65%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">65%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded" onclick="viewDetails('fb-002')">詳細</button>
+                                <button class="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 rounded" onclick="updateProgress('fb-002')">更新</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 経営陣向け要約レポート -->
+<div class="activity-feed">
+    <div class="activity-header">
+        <h2 class="activity-title">📊 経営陣向け要約レポート</h2>
+    </div>
+
+    <div class="bg-gray-50 rounded-lg p-6">
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">2024年12月 投資家フィードバック要約</h3>
+            <p class="text-sm text-gray-500">作成日: 2024年12月25日</p>
+        </div>
+
+        <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-4">🎯 主要テーマ（頻出度順）</h4>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-6">
+                        <div class="bg-kagami-blue h-6 rounded-full flex items-center justify-end pr-3" style="width: 85%">
+                            <span class="text-white text-xs font-medium">85%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between min-w-0 flex-1">
+                        <span class="text-sm font-medium text-gray-900">資本効率・ROE改善</span>
+                        <span class="text-sm text-gray-500">12件</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-6">
+                        <div class="bg-kagami-blue h-6 rounded-full flex items-center justify-end pr-3" style="width: 70%">
+                            <span class="text-white text-xs font-medium">70%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between min-w-0 flex-1">
+                        <span class="text-sm font-medium text-gray-900">ESG情報開示</span>
+                        <span class="text-sm text-gray-500">9件</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-6">
+                        <div class="bg-kagami-blue h-6 rounded-full flex items-center justify-end pr-3" style="width: 60%">
+                            <span class="text-white text-xs font-medium">60%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between min-w-0 flex-1">
+                        <span class="text-sm font-medium text-gray-900">中期経営計画の具体性</span>
+                        <span class="text-sm text-gray-500">7件</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="font-medium text-gray-900 mb-4">⚡ 要アクション項目</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white border border-red-200 rounded-lg p-4">
+                    <h5 class="font-medium text-red-800 mb-2">🔴 緊急対応</h5>
+                    <ul class="text-sm text-red-700 space-y-1">
+                        <li>• ROE改善計画の具体化と開示（3月期決算まで）</li>
+                        <li>• 資本配分方針の明確化</li>
+                    </ul>
+                </div>
+                <div class="bg-white border border-yellow-200 rounded-lg p-4">
+                    <h5 class="font-medium text-yellow-800 mb-2">🟡 中期対応</h5>
+                    <ul class="text-sm text-yellow-700 space-y-1">
+                        <li>• ESG目標の定量化とKPI設定</li>
+                        <li>• 四半期進捗レポートの拡充</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// IR管理機能のJavaScript
+function saveFeedback() {
+    alert('フィードバックを登録しました（モック）');
+}
+
+function saveAsDraft() {
+    alert('下書きとして保存しました（モック）');
+}
+
+function generateExecutiveReport() {
+    alert('経営報告書を生成中...（モック）');
+}
+
+function exportFeedbackData() {
+    alert('データをエクスポートしています...（モック）');
+}
+
+function viewDetails(id) {
+    alert(`フィードバック ${id} の詳細を表示（モック）`);
+}
+
+function updateProgress(id) {
+    const progress = prompt('進捗率を入力してください（0-100）:');
+    if (progress !== null) {
+        alert(`進捗を ${progress}% に更新しました（モック）`);
+    }
+}
+
+// スタイル用のクラス定義
+document.head.insertAdjacentHTML('beforeend', `
+<style>
+.btn-primary {
+    @apply bg-kagami-blue hover:bg-kagami-blue-dark text-white px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+.btn-secondary {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+</style>
+`);
+</script>
+{% endblock %}

@@ -1,156 +1,215 @@
-# KAGAMI IR System - CMS
+# KAGAMI IR System - モック・サンプルサイト
 
-## 概要
-KAGAMI IR Systemは、AI技術を活用したIR（投資家向け広報）業務支援システムです。
-投資家との効率的なコミュニケーションと情報開示を実現します。
+AI技術を活用した投資家向け情報管理システムのモック実装です。
 
-## システム構成
+## 🚀 プロジェクト概要
 
-### フロントエンド（投資家向け）
-- `/frontend` - 投資家が利用するウェブサイト
+KAGAMIは、投資家対応業務を効率化するAI-IRシステムです。
+- **CMS（管理画面）**: IR担当者が投資家対応を管理
+- **フロントエンド**: 投資家が情報を閲覧
 
-### CMS（管理者向け）
-- `/cms` - IR担当者が利用する管理システム
-
-### 共通リソース
-- `/shared` - 両システムで共有するCSS、画像などのリソース
-
-## CMS機能一覧
-
-### コンテンツ管理
-- **AI-FAQ管理** - AIを活用したFAQの自動生成と管理
-- **ドキュメント管理** - IR資料の一元管理
-- **ニュース・お知らせ管理** - タイムリーな情報発信
-
-### 業務管理
-- **投資家管理** - 投資家情報の管理とセグメンテーション
-- **スケジュール管理** - IR活動スケジュールの管理
-- **メール配信管理** - ターゲティングメール配信
-- **データ取込** - 音声・テキストファイルの自動処理
-- **分析・レポート** - IR活動の効果測定
-
-### システム管理
-- **ユーザー管理** - CMSユーザーの管理
-- **権限管理** - ロールベースのアクセス制御
-- **監査ログ** - 操作履歴の記録と監視
-- **設定** - システム設定の管理
-
-## 技術スタック
-
-### バックエンド
-- Python 3.x
-- FastAPI - 高速なWebフレームワーク
-- Jinja2 - テンプレートエンジン
-
-### フロントエンド
-- HTML5 / CSS3
-- JavaScript (Vanilla)
-- Tailwind CSS ベースのカスタムデザインシステム
-
-### デザインシステム
-- モダンでミニマルなデザイン
-- レスポンシブ対応
-- アクセシビリティ配慮
-
-## インストール方法
-
-### 1. リポジトリのクローン
-```bash
-git clone https://github.com/your-repo/kagami-ir-system.git
-cd kagami-ir-system
-```
-
-### 2. CMS環境のセットアップ
-```bash
-cd cms
-
-# 仮想環境の作成
-python -m venv venv
-
-# 仮想環境の有効化（Windows）
-.\venv\Scripts\activate
-
-# 仮想環境の有効化（Mac/Linux）
-source venv/bin/activate
-
-# 依存関係のインストール
-pip install -r requirements.txt
-```
-
-### 3. CMSの起動
-```bash
-# Windows
-start.bat
-
-# Mac/Linux
-./start.sh
-
-# または直接実行
-python app.py
-```
-
-CMSは http://localhost:8000 でアクセスできます。
-
-## プロジェクト構造
+## 📂 ディレクトリ構造
 
 ```
 ir_system/
-├── cms/                    # CMS（管理システム）
+├── cms/                    # CMS管理画面
 │   ├── app.py             # FastAPIアプリケーション
-│   ├── requirements.txt   # Python依存関係
-│   ├── static/           # CMS専用の静的ファイル
-│   │   └── css/
-│   │       └── cms.css   # CMS専用スタイル
-│   └── templates/        # Jinja2テンプレート
-│       ├── base.html     # ベーステンプレート
-│       ├── dashboard.html # ダッシュボード
-│       ├── faq.html      # FAQ管理
-│       └── ...           # その他の画面
+│   ├── templates/         # HTMLテンプレート
+│   │   ├── base.html      # 共通レイアウト
+│   │   ├── dashboard.html # ダッシュボード
+│   │   └── ...
+│   └── static/            # 静的ファイル
+│       └── css/
+│           └── cms.css    # CMS専用スタイル
 │
-├── frontend/             # フロントエンド（投資家向け）
-│   └── ...
+├── frontend/              # 投資家向けサイト
+│   ├── app.py            # FastAPIアプリケーション
+│   ├── templates/        # HTMLテンプレート
+│   │   ├── base.html     # 共通レイアウト
+│   │   ├── home.html     # ホームページ
+│   │   └── investor_qa.html # 投資家Q&A
+│   └── static/           # 静的ファイル
 │
-└── shared/              # 共通リソース
-    └── css/
-        ├── variables.css   # CSS変数定義
-        └── components.css  # 共通コンポーネント
+├── shared/               # 共通リソース
+│   └── css/
+│       ├── components.css # 共通コンポーネント
+│       └── variables.css  # CSS変数定義
+│
+└── docs/                 # ドキュメント
 ```
 
-## デザイン原則
+## 🛠 技術スタック
+
+- **バックエンド**: Python 3.8+, FastAPI
+- **フロントエンド**: HTML5, Tailwind CSS, Chart.js
+- **スタイリング**: レスポンシブデザイン対応
+
+## 📊 主な機能
+
+### CMS管理画面
+1. **ミーティング処理ダッシュボード**
+   - 52週分の処理件数推移（棒グラフ）
+   - 今日の投資家予定と過去のヒアリング内容
+   - 質問カテゴリの内訳（円グラフ）
+
+2. **AI-FAQ管理**
+   - 自動生成されたFAQの編集・承認
+   - バージョン管理と有効期限管理
+
+3. **投資家管理**
+   - 投資家情報の一元管理
+   - 対話履歴の追跡
+
+### フロントエンド（投資家向け）
+1. **投資家Q&A**
+   - AIが回答する質問応答システム
+   - カテゴリ別の検索機能
+
+2. **財務情報**
+   - 最新の決算情報
+   - 財務ハイライト
+
+3. **IRライブラリ**
+   - 決算資料のダウンロード
+   - IR関連文書の閲覧
+
+## 🚀 セットアップ
+
+### 1. 必要な環境
+- Python 3.8以上
+- pip（Pythonパッケージマネージャー）
+
+### 2. 依存関係のインストール
+
+```bash
+# CMSのセットアップ
+cd cms
+pip install fastapi uvicorn jinja2 python-multipart
+
+# フロントエンドのセットアップ
+cd ../frontend
+pip install fastapi uvicorn jinja2
+```
+
+### 3. アプリケーションの起動
+
+#### 一括起動スクリプトを使用する場合
+```bash
+# 実行権限を付与
+chmod +x start_all.sh
+
+# 起動
+./start_all.sh
+```
+
+#### CMS管理画面（ポート8000）
+```bash
+cd cms
+python app.py
+# または
+uvicorn app:app --reload --port 8000
+```
+アクセス: http://localhost:8000
+
+#### フロントエンド（ポート8001）
+```bash
+cd frontend
+python app.py
+# または
+uvicorn app:app --reload --port 8001
+```
+アクセス: http://localhost:8001
+
+## 📱 レスポンシブデザイン
+
+すべてのページはモバイル・タブレット・デスクトップに対応しています。
+- モバイル: 320px〜
+- タブレット: 768px〜
+- デスクトップ: 1024px〜
+
+## 🎨 デザインシステム
 
 ### カラーパレット
-- **プライマリ**: KAGAMI Blue (#1a365d)
-- **セカンダリ**: Accent Purple (#6b46c1), Accent Teal (#0891b2)
-- **フィードバック**: Success (#10b981), Warning (#f59e0b), Error (#ef4444)
+- **Primary**: Kagami Blue (#1a365d)
+- **Secondary**: Accent Teal (#14b8a6)
+- **Grays**: 50-900のグラデーション
 
-### タイポグラフィ
-- システムフォント優先（-apple-system, BlinkMacSystemFont, etc.）
-- 明確な階層構造
-- 読みやすさを重視
+### コンポーネント
+共通コンポーネントは `/shared/css/components.css` で定義：
+- ボタン（.btn）
+- カード（.card）
+- フォーム要素（.form-control）
+- バッジ（.badge）
+- アラート（.alert）
 
-### レイアウト
-- 8pxグリッドシステム
-- レスポンシブデザイン
-- モバイルファースト
+## 🔄 データフロー
 
-## 開発ガイドライン
+```
+投資家ミーティング
+    ↓
+録画・音声ファイルアップロード
+    ↓
+AI文字起こし・要約
+    ↓
+FAQ自動生成
+    ↓
+IR担当者レビュー
+    ↓
+投資家向け公開
+```
 
-### コーディング規約
-- Python: PEP 8準拠
-- HTML/CSS: BEM命名規則を参考
-- JavaScript: ES6+構文を使用
+## 🌟 特徴的な機能
 
-### コンポーネント化
-- 再利用可能なUIコンポーネントは `/shared/css/components.css` に定義
-- CMS固有のスタイルは `/cms/static/css/cms.css` に定義
+### 1. AIによる自動処理
+- 音声・動画の自動文字起こし
+- 重要ポイントの自動抽出
+- FAQの自動生成
 
-### アクセシビリティ
-- セマンティックHTML
-- 適切なARIA属性
-- キーボードナビゲーション対応
+### 2. リアルタイムダッシュボード
+- 処理状況の可視化
+- KPIのモニタリング
+- アラート機能
 
-## ライセンス
-このプロジェクトは商用プロジェクトです。無断での複製・配布は禁止されています。
+### 3. 投資家エンゲージメント
+- 24時間対応のAIチャットボット
+- パーソナライズされた情報提供
+- 多言語対応（日本語/英語）
 
-## お問い合わせ
-KAGAMI IR System開発チーム
+## 📈 今後の拡張予定
+
+1. **バックエンド実装**
+   - データベース連携（PostgreSQL）
+   - 認証・認可システム
+   - WebSocket通信
+
+2. **AI機能強化**
+   - GPT-4連携
+   - 感情分析
+   - 予測分析
+
+3. **分析機能**
+   - 投資家行動分析
+   - センチメント分析
+   - レポート自動生成
+
+## 🤝 貢献方法
+
+1. このリポジトリをフォーク
+2. 機能ブランチを作成 (`git checkout -b feature/AmazingFeature`)
+3. 変更をコミット (`git commit -m 'Add some AmazingFeature'`)
+4. ブランチにプッシュ (`git push origin feature/AmazingFeature`)
+5. プルリクエストを作成
+
+## 📝 ライセンス
+
+このプロジェクトはモックアップであり、商用利用を想定していません。
+
+## 👥 チーム
+
+- **プロジェクトリード**: KAGAMI開発チーム
+- **デザイン**: UIUXデザインチーム
+- **開発**: フルスタック開発チーム
+
+---
+
+© 2024 KAGAMI Corporation. All rights reserved.

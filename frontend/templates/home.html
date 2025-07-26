@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}ホーム{% endblock %}
+
+{% block content %}
+<!-- ヒーローセクション -->
+<section class="hero-gradient text-white py-20">
+    <div class="container mx-auto px-4">
+        <div class="max-w-3xl">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                投資家の皆様とともに<br>
+                未来を創造する
+            </h1>
+            <p class="text-xl mb-8 text-blue-100">
+                KAGAMIは、AI技術を活用した革新的なソリューションで、<br>
+                持続可能な成長と企業価値の向上を実現します。
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="/investor-qa" class="btn btn-primary bg-white text-kagami-blue hover:bg-gray-100">
+                    投資家Q&Aを見る
+                </a>
+                <a href="/ir-library" class="btn btn-secondary border-white text-white hover:bg-white hover:text-kagami-blue">
+                    最新の決算資料
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 株価情報 -->
+<section class="bg-white shadow-sm -mt-8 relative z-10">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">株価（{{ stock_info.updated }}現在）</p>
+                    <p class="text-3xl font-bold text-gray-900">¥{{ stock_info.price }}</p>
+                    <p class="text-sm {% if '+' in stock_info.change %}text-green-600{% else %}text-red-600{% endif %}">
+                        {{ stock_info.change }} ({{ stock_info.change_rate }})
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">証券コード</p>
+                    <p class="text-2xl font-semibold">{{ company_info.stock_code }}</p>
+                    <p class="text-sm text-gray-500">{{ company_info.market }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">決算期</p>
+                    <p class="text-2xl font-semibold">{{ company_info.fiscal_year_end }}月</p>
+                    <p class="text-sm text-gray-500">年次決算</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">次回決算発表</p>
+                    <p class="text-2xl font-semibold">2/15</p>
+                    <p class="text-sm text-gray-500">第3四半期</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 財務ハイライト -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">財務ハイライト</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">売上高</h3>
+                <p class="text-4xl font-bold text-kagami-blue mb-2">{{ financial_highlights.revenue }}</p>
+                <p class="text-sm text-green-600">{{ financial_highlights.revenue_growth }} YoY</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">営業利益</h3>
+                <p class="text-4xl font-bold text-kagami-blue mb-2">{{ financial_highlights.operating_profit }}</p>
+                <p class="text-sm text-green-600">{{ financial_highlights.profit_growth }} YoY</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">ROE</h3>
+                <p class="text-4xl font-bold text-kagami-blue mb-2">{{ financial_highlights.roe }}</p>
+                <p class="text-sm text-gray-500">業界平均: 8.5%</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 最新ニュース & IRカレンダー -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- 最新ニュース -->
+            <div>
+                <h2 class="text-2xl font-bold mb-6">最新ニュース</h2>
+                <div class="bg-white rounded-lg shadow-sm">
+                    <div class="divide-y">
+                        {% for news in latest_news %}
+                        <a href="{{ news.url }}" class="block p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-500 mb-1">{{ news.date }}</p>
+                                    <h3 class="font-semibold text-gray-900 hover:text-kagami-blue">
+                                        {{ news.title }}
+                                    </h3>
+                                </div>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {{ news.category }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <div class="p-4 text-center border-t">
+                        <a href="#" class="text-kagami-blue hover:text-kagami-blue-dark font-medium">
+                            すべてのニュースを見る →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- IRカレンダー -->
+            <div>
+                <h2 class="text-2xl font-bold mb-6">IRカレンダー</h2>
+                <div class="bg-white rounded-lg shadow-sm">
+                    <div class="divide-y">
+                        {% for event in ir_calendar %}
+                        <div class="p-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-16 h-16 bg-kagami-blue text-white rounded-lg flex flex-col items-center justify-center">
+                                        <p class="text-xs">{{ event.date.split('-')[1] }}月</p>
+                                        <p class="text-xl font-bold">{{ event.date.split('-')[2] }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900">{{ event.event }}</h3>
+                                    <p class="text-sm text-gray-500">{{ event.time }}〜</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="p-4 text-center border-t">
+                        <a href="#" class="text-kagami-blue hover:text-kagami-blue-dark font-medium">
+                            年間スケジュールを見る →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA セクション -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="bg-gradient-to-r from-kagami-blue to-kagami-blue-dark rounded-2xl p-12 text-center text-white">
+            <h2 class="text-3xl font-bold mb-4">AI技術で投資家の皆様の疑問に即座にお答えします</h2>
+            <p class="text-xl mb-8 text-blue-100">
+                KAGAMIのAI-IRシステムが、24時間365日、投資家の皆様のご質問にお答えします。
+            </p>
+            <a href="/investor-qa" class="btn btn-primary bg-white text-kagami-blue hover:bg-gray-100 text-lg px-8 py-3">
+                投資家Q&Aを利用する
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

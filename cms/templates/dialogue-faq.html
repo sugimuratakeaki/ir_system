@@ -1,0 +1,970 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ編集 - {{ meeting_data.title }}{% endblock %}
+
+{% block content %}
+<!-- ヘッダー：ミーティングコンテキスト -->
+<div class="meeting-context-header mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <div class="flex items-center space-x-3 mb-2">
+                <button class="text-gray-600 hover:text-gray-800" onclick="goBack()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </button>
+                <h1 class="text-2xl font-bold">FAQ編集</h1>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">ミーティング</p>
+                        <p class="font-semibold">{{ meeting_data.title }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600">{{ meeting_data.investor_name }}</p>
+                        <p class="text-sm text-gray-500">{{ meeting_data.date }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <span class="text-sm text-gray-600">
+                FAQ: <span class="font-semibold">{{ total_faqs }}件</span>
+                （AI生成: {{ ai_generated_count }}件）
+            </span>
+            <button class="btn btn-primary" onclick="publishFAQs()">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                レビューに提出
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- AI分析サマリー（コンパクト版） -->
+<div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 mb-6">
+    <div class="flex items-start space-x-4">
+        <span class="text-3xl">🤖</span>
+        <div class="flex-1">
+            <h3 class="font-semibold text-gray-800 mb-2">AI分析による重要トピック</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for topic in ai_topics %}
+                <button class="topic-tag {% if topic.has_faq %}has-faq{% else %}no-faq{% endif %}" 
+                        onclick="filterByTopic('{{ topic.id }}')">
+                    {{ topic.name }}
+                    <span class="topic-count">{{ topic.mention_count }}</span>
+                </button>
+                {% endfor %}
+            </div>
+            <p class="text-sm text-gray-600 mt-3">
+                💡 ヒント: グレーのトピックはまだFAQが作成されていません。クリックしてAIに生成させることができます。
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- メインコンテンツ：3カラムレイアウト -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- 左側：FAQ一覧（2列分） -->
+    <div class="lg:col-span-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold">📝 FAQ一覧</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="btn btn-sm btn-secondary" onclick="generateMoreFAQs()">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            AIで追加生成
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="addManualFAQ()">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            手動追加
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="faq-list">
+                    {% for faq in faqs %}
+                    <div class="faq-item {% if faq.id == selected_faq_id %}selected{% endif %}" 
+                         data-faq-id="{{ faq.id }}"
+                         onclick="selectFAQ('{{ faq.id }}')">
+                        <div class="faq-item-header">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        {% if faq.status == 'draft' %}
+                                        <span class="status-badge draft">下書き</span>
+                                        {% elif faq.status == 'approved' %}
+                                        <span class="status-badge approved">承認済</span>
+                                        {% elif faq.status == 'published' %}
+                                        <span class="status-badge published">公開中</span>
+                                        {% endif %}
+                                        
+                                        {% if faq.ai_generated %}
+                                        <span class="ai-badge">
+                                            🤖 AI生成
+                                        </span>
+                                        {% endif %}
+                                        
+                                        {% if faq.has_source %}
+                                        <span class="source-badge" title="発言根拠あり">
+                                            📎
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <h3 class="font-medium text-gray-900 mb-1">Q: {{ faq.question }}</h3>
+                                    <p class="text-sm text-gray-600 line-clamp-2">A: {{ faq.answer }}</p>
+                                </div>
+                                <div class="ml-4 flex flex-col space-y-1">
+                                    <button class="icon-btn" onclick="editFAQ('{{ faq.id }}'); event.stopPropagation();">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button class="icon-btn text-red-600" onclick="deleteFAQ('{{ faq.id }}'); event.stopPropagation();">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            {% if faq.confidence %}
+                            <div class="mt-2 flex items-center">
+                                <span class="text-xs text-gray-500 mr-2">信頼度:</span>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 max-w-xs">
+                                    <div class="confidence-bar h-2 rounded-full" style="width: {{ faq.confidence }}%"></div>
+                                </div>
+                                <span class="ml-2 text-xs text-gray-600">{{ faq.confidence }}%</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if not faqs %}
+                <div class="p-8 text-center text-gray-500">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p>まだFAQが作成されていません</p>
+                    <button class="btn btn-primary mt-4" onclick="generateInitialFAQs()">
+                        AIでFAQを生成
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 中央：編集エリア -->
+    <div class="lg:col-span-1">
+        <div class="card sticky top-4">
+            <div class="card-header">
+                <h2 class="text-lg font-semibold">✏️ 編集</h2>
+            </div>
+            <div class="card-body">
+                {% if selected_faq %}
+                <form id="faqEditForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">質問</label>
+                        <textarea class="form-control" rows="3" name="question">{{ selected_faq.question }}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">回答</label>
+                        <textarea class="form-control" rows="6" name="answer">{{ selected_faq.answer }}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">カテゴリー</label>
+                        <select class="form-control" name="category">
+                            <option value="">選択してください</option>
+                            <option {% if selected_faq.category == "財務・業績" %}selected{% endif %}>財務・業績</option>
+                            <option {% if selected_faq.category == "事業戦略" %}selected{% endif %}>事業戦略</option>
+                            <option {% if selected_faq.category == "ESG" %}selected{% endif %}>ESG</option>
+                            <option {% if selected_faq.category == "ガバナンス" %}selected{% endif %}>ガバナンス</option>
+                            <option {% if selected_faq.category == "株主還元" %}selected{% endif %}>株主還元</option>
+                            <option {% if selected_faq.category == "その他" %}selected{% endif %}>その他</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">根拠となる発言</label>
+                        {% if selected_faq.source_quotes %}
+                        <div class="source-quotes space-y-2">
+                            {% for quote in selected_faq.source_quotes %}
+                            <div class="bg-gray-50 rounded p-3 text-sm">
+                                <p class="text-gray-700">"{{ quote.text }}"</p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    - {{ quote.speaker }} ({{ quote.timestamp }})
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addSourceQuote()">
+                            根拠を追加
+                        </button>
+                        {% else %}
+                        <p class="text-sm text-gray-500 italic">根拠となる発言が紐付けられていません</p>
+                        <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addSourceQuote()">
+                            文字起こしから選択
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t">
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                            キャンセル
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            保存
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <p>編集するFAQを選択してください</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右側：文字起こし参照 -->
+    <div class="lg:col-span-1">
+        <div class="card">
+            <div class="card-header">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold">📋 文字起こし</h2>
+                    <button class="btn btn-sm btn-secondary" onclick="toggleTranscriptSearch()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="transcriptSearch" class="hidden p-4 border-b">
+                    <input type="text" class="form-control" placeholder="キーワードで検索..." 
+                           onkeyup="searchTranscript(this.value)">
+                </div>
+                <div class="transcript-viewer">
+                    {% for segment in transcript_segments %}
+                    <div class="transcript-segment {% if segment.is_highlighted %}highlighted{% endif %}"
+                         data-timestamp="{{ segment.timestamp }}"
+                         onclick="selectTranscriptSegment('{{ segment.id }}')">
+                        <div class="segment-header">
+                            <span class="speaker">{{ segment.speaker }}</span>
+                            <span class="timestamp">{{ segment.formatted_time }}</span>
+                        </div>
+                        <p class="segment-text">{{ segment.text }}</p>
+                        {% if segment.is_important %}
+                        <div class="segment-tags">
+                            {% for tag in segment.tags %}
+                            <span class="segment-tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 既存FAQ参照 -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2 class="text-lg font-semibold">🔍 類似FAQ</h2>
+            </div>
+            <div class="card-body">
+                {% if similar_faqs %}
+                <div class="space-y-3">
+                    {% for similar in similar_faqs %}
+                    <div class="border rounded p-3 cursor-pointer hover:bg-gray-50" 
+                         onclick="viewSimilarFAQ('{{ similar.id }}')">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">{{ similar.question }}</p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    類似度: {{ similar.similarity }}% | 
+                                    最終更新: {{ similar.last_updated }}
+                                </p>
+                            </div>
+                            <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded">
+                                重複注意
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500 text-center py-4">
+                    類似するFAQは見つかりませんでした
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI提案モーダル -->
+<div id="aiSuggestionModal" class="modal hidden">
+    <div class="modal-content max-w-2xl">
+        <div class="modal-header">
+            <h3 class="text-lg font-semibold">🤖 AI提案</h3>
+            <button class="modal-close" onclick="closeAISuggestion()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="ai-suggestion-content">
+                <!-- 動的に内容を挿入 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* カスタムスタイル */
+.meeting-context-header {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    margin: -1.5rem -1.5rem 1.5rem;
+    padding: 1.5rem;
+}
+
+/* トピックタグ */
+.topic-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 9999px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.topic-tag.has-faq {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.topic-tag.no-faq {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.topic-tag:hover {
+    transform: scale(1.05);
+}
+
+.topic-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+    padding: 0 0.375rem;
+    font-size: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 9999px;
+    min-width: 1.25rem;
+}
+
+/* FAQ一覧 */
+.faq-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.faq-item {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.faq-item:hover {
+    background-color: #f9fafb;
+}
+
+.faq-item.selected {
+    background-color: #eff6ff;
+    border-left: 3px solid #3b82f6;
+}
+
+/* ステータスバッジ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+}
+
+.status-badge.draft {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.published {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* AIバッジ */
+.ai-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    background-color: #ede9fe;
+    color: #5b21b6;
+    border-radius: 9999px;
+}
+
+/* 信頼度バー */
+.confidence-bar {
+    background: linear-gradient(to right, #ef4444, #eab308, #22c55e);
+}
+
+/* 文字起こしビューワー */
+.transcript-viewer {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.transcript-segment {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.transcript-segment:hover {
+    background-color: #f9fafb;
+}
+
+.transcript-segment.highlighted {
+    background-color: #fef3c7;
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.speaker {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.timestamp {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.segment-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #374151;
+}
+
+.segment-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.segment-tag {
+    display: inline-flex;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.75rem;
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border-radius: 0.25rem;
+}
+
+/* モーダル */
+.modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+/* アイコンボタン */
+.icon-btn {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.icon-btn:hover {
+    background-color: #f3f4f6;
+}
+
+/* ユーティリティ */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sticky {
+        position: relative;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// グローバル変数
+const meetingId = '{{ meeting_id }}';
+let selectedFaqId = '{{ selected_faq_id }}';
+let transcriptData = {{ transcript_segments|tojson|safe }};
+
+// FAQ選択
+function selectFAQ(faqId) {
+    selectedFaqId = faqId;
+    
+    // UI更新
+    document.querySelectorAll('.faq-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    document.querySelector(`[data-faq-id="${faqId}"]`).classList.add('selected');
+    
+    // 編集フォームをロード
+    loadFAQForEdit(faqId);
+    
+    // 類似FAQを更新
+    updateSimilarFAQs(faqId);
+}
+
+// FAQ編集フォームのロード
+async function loadFAQForEdit(faqId) {
+    try {
+        const response = await fetch(`/api/meetings/${meetingId}/faqs/${faqId}`);
+        const data = await response.json();
+        
+        // フォームに値を設定
+        document.querySelector('[name="question"]').value = data.question;
+        document.querySelector('[name="answer"]').value = data.answer;
+        document.querySelector('[name="category"]').value = data.category || '';
+        
+        // 根拠を表示
+        updateSourceQuotes(data.source_quotes);
+        
+    } catch (error) {
+        console.error('Failed to load FAQ:', error);
+    }
+}
+
+// FAQ編集
+function editFAQ(faqId) {
+    selectFAQ(faqId);
+    document.querySelector('[name="question"]').focus();
+}
+
+// FAQ削除
+async function deleteFAQ(faqId) {
+    if (!confirm('このFAQを削除しますか？')) return;
+    
+    try {
+        await fetch(`/api/meetings/${meetingId}/faqs/${faqId}`, {
+            method: 'DELETE'
+        });
+        
+        showNotification('FAQを削除しました', 'success');
+        location.reload();
+    } catch (error) {
+        showNotification('削除に失敗しました', 'error');
+    }
+}
+
+// AIでFAQを追加生成
+async function generateMoreFAQs() {
+    const modal = document.getElementById('aiSuggestionModal');
+    const content = modal.querySelector('.ai-suggestion-content');
+    
+    content.innerHTML = `
+        <div class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600">AIがFAQを生成中...</p>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    try {
+        const response = await fetch(`/api/meetings/${meetingId}/faqs/generate`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+        
+        content.innerHTML = `
+            <h4 class="font-semibold mb-4">AIが生成した新しいFAQ案（${data.faqs.length}件）</h4>
+            <div class="space-y-4 max-h-96 overflow-y-auto">
+                ${data.faqs.map(faq => `
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-start justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Q: ${faq.question}</span>
+                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                                信頼度: ${faq.confidence}%
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">A: ${faq.answer}</p>
+                        <div class="flex justify-end space-x-2">
+                            <button class="btn btn-sm btn-secondary" onclick="rejectSuggestion('${faq.temp_id}')">
+                                却下
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="acceptSuggestion('${faq.temp_id}')">
+                                採用
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button class="btn btn-secondary" onclick="closeAISuggestion()">
+                    閉じる
+                </button>
+                <button class="btn btn-primary" onclick="acceptAllSuggestions()">
+                    すべて採用
+                </button>
+            </div>
+        `;
+        
+    } catch (error) {
+        content.innerHTML = `
+            <div class="text-center py-8 text-red-600">
+                <p>生成に失敗しました</p>
+            </div>
+        `;
+    }
+}
+
+// 手動でFAQ追加
+function addManualFAQ() {
+    const newFaq = {
+        id: 'new_' + Date.now(),
+        question: '',
+        answer: '',
+        status: 'draft',
+        ai_generated: false
+    };
+    
+    // 新しいFAQをリストに追加（実際の実装ではAPIを呼び出し）
+    showNotification('新しいFAQを追加しました', 'success');
+    location.reload();
+}
+
+// トピックでフィルター
+function filterByTopic(topicId) {
+    const topic = document.querySelector(`[onclick="filterByTopic('${topicId}')"]`);
+    
+    if (topic.classList.contains('no-faq')) {
+        // FAQがないトピックの場合、AIに生成を依頼
+        generateFAQForTopic(topicId);
+    } else {
+        // FAQがあるトピックの場合、フィルター
+        document.querySelectorAll('.faq-item').forEach(item => {
+            // 実際の実装ではトピックとFAQの関連付けに基づいてフィルター
+            item.style.display = 'block';
+        });
+    }
+}
+
+// 特定トピックのFAQ生成
+async function generateFAQForTopic(topicId) {
+    showNotification(`トピック「${topicId}」のFAQを生成中...`, 'info');
+    
+    try {
+        const response = await fetch(`/api/meetings/${meetingId}/faqs/generate-for-topic`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic_id: topicId })
+        });
+        
+        const data = await response.json();
+        showNotification(`${data.count}件のFAQを生成しました`, 'success');
+        location.reload();
+        
+    } catch (error) {
+        showNotification('生成に失敗しました', 'error');
+    }
+}
+
+// 文字起こし検索トグル
+function toggleTranscriptSearch() {
+    const searchBox = document.getElementById('transcriptSearch');
+    searchBox.classList.toggle('hidden');
+    if (!searchBox.classList.contains('hidden')) {
+        searchBox.querySelector('input').focus();
+    }
+}
+
+// 文字起こし検索
+function searchTranscript(keyword) {
+    const segments = document.querySelectorAll('.transcript-segment');
+    
+    segments.forEach(segment => {
+        const text = segment.querySelector('.segment-text').textContent.toLowerCase();
+        if (keyword && !text.includes(keyword.toLowerCase())) {
+            segment.style.display = 'none';
+        } else {
+            segment.style.display = 'block';
+        }
+    });
+}
+
+// 文字起こしセグメント選択
+function selectTranscriptSegment(segmentId) {
+    const segment = transcriptData.find(s => s.id === segmentId);
+    if (!segment) return;
+    
+    // 選択したセグメントをハイライト
+    document.querySelectorAll('.transcript-segment').forEach(el => {
+        el.classList.remove('highlighted');
+    });
+    event.currentTarget.classList.add('highlighted');
+    
+    // 根拠として追加するか確認
+    if (selectedFaqId && confirm('この発言を根拠として追加しますか？')) {
+        addSourceQuoteFromSegment(segment);
+    }
+}
+
+// 根拠となる発言を追加
+function addSourceQuote() {
+    // 文字起こしから選択するUIを表示
+    document.querySelectorAll('.transcript-segment').forEach(segment => {
+        segment.style.cursor = 'pointer';
+        segment.style.border = '2px solid transparent';
+    });
+    
+    showNotification('文字起こしから根拠となる発言をクリックして選択してください', 'info');
+}
+
+// セグメントから根拠を追加
+function addSourceQuoteFromSegment(segment) {
+    const quote = {
+        text: segment.text,
+        speaker: segment.speaker,
+        timestamp: segment.formatted_time
+    };
+    
+    // 現在の根拠リストに追加（実際の実装ではAPIを呼び出し）
+    showNotification('根拠を追加しました', 'success');
+}
+
+// 類似FAQ表示
+function viewSimilarFAQ(faqId) {
+    window.open(`/faq/detail/${faqId}`, '_blank');
+}
+
+// フォーム送信
+document.getElementById('faqEditForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = {
+        question: formData.get('question'),
+        answer: formData.get('answer'),
+        category: formData.get('category')
+    };
+    
+    try {
+        await fetch(`/api/meetings/${meetingId}/faqs/${selectedFaqId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        showNotification('FAQを保存しました', 'success');
+        
+        // リストを更新
+        const faqItem = document.querySelector(`[data-faq-id="${selectedFaqId}"]`);
+        faqItem.querySelector('h3').textContent = `Q: ${data.question}`;
+        faqItem.querySelector('p').textContent = `A: ${data.answer}`;
+        
+    } catch (error) {
+        showNotification('保存に失敗しました', 'error');
+    }
+});
+
+// レビューに提出
+async function publishFAQs() {
+    const draftCount = document.querySelectorAll('.status-badge.draft').length;
+    
+    if (draftCount > 0) {
+        if (!confirm(`${draftCount}件の下書きFAQがあります。レビューに提出しますか？`)) {
+            return;
+        }
+    }
+    
+    try {
+        await fetch(`/api/meetings/${meetingId}/submit-for-review`, {
+            method: 'POST'
+        });
+        
+        showNotification('レビューに提出しました', 'success');
+        setTimeout(() => {
+            window.location.href = `/dialogue/edit?id=${meetingId}`;
+        }, 1500);
+        
+    } catch (error) {
+        showNotification('提出に失敗しました', 'error');
+    }
+}
+
+// AI提案を受け入れ
+function acceptSuggestion(tempId) {
+    // 実際の実装ではAPIを呼び出してFAQを作成
+    const suggestionEl = document.querySelector(`[onclick="acceptSuggestion('${tempId}')"]`).closest('.border');
+    suggestionEl.style.opacity = '0.5';
+    suggestionEl.querySelector('.btn-primary').textContent = '採用済';
+    suggestionEl.querySelector('.btn-primary').disabled = true;
+}
+
+// AI提案を却下
+function rejectSuggestion(tempId) {
+    const suggestionEl = document.querySelector(`[onclick="rejectSuggestion('${tempId}')"]`).closest('.border');
+    suggestionEl.style.display = 'none';
+}
+
+// すべてのAI提案を採用
+function acceptAllSuggestions() {
+    document.querySelectorAll('[onclick^="acceptSuggestion"]').forEach(btn => {
+        btn.click();
+    });
+    
+    setTimeout(() => {
+        closeAISuggestion();
+        location.reload();
+    }, 1000);
+}
+
+// モーダルを閉じる
+function closeAISuggestion() {
+    document.getElementById('aiSuggestionModal').classList.add('hidden');
+}
+
+// 戻る
+function goBack() {
+    window.location.href = `/dialogue/edit?id=${meetingId}`;
+}
+
+// 通知表示
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500 text-white' :
+        type === 'error' ? 'bg-red-500 text-white' :
+        'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// ページ読み込み時の処理
+document.addEventListener('DOMContentLoaded', function() {
+    // 初期FAQ選択
+    if (selectedFaqId) {
+        selectFAQ(selectedFaqId);
+    }
+    
+    // キーボードショートカット
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            if (e.key === 's') {
+                e.preventDefault();
+                document.getElementById('faqEditForm')?.dispatchEvent(new Event('submit'));
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

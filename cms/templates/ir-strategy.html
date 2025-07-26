@@ -1,0 +1,630 @@
+{% extends 'base.html' %}
+
+{% block title %}中長期戦略開示管理{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- タブナビゲーション -->
+<div class="tab-navigation mb-6">
+    <div class="flex border-b border-gray-200">
+        <button class="tab-button active" onclick="switchTab('active-workspace')">
+            <span class="tab-icon">🎯</span>
+            <span class="tab-label">アクティブワークスペース</span>
+            <span class="tab-badge">12</span>
+        </button>
+        <button class="tab-button" onclick="switchTab('knowledge-base')">
+            <span class="tab-icon">📚</span>
+            <span class="tab-label">ナレッジベース</span>
+        </button>
+        <button class="tab-button" onclick="switchTab('analytics')">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">分析・レポート</span>
+        </button>
+    </div>
+</div>
+
+<!-- アクティブワークスペース -->
+<div id="active-workspace" class="tab-content active">
+    <!-- 優先対応事項サマリー -->
+    <div class="priority-summary mb-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">今週の優先対応事項</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="priority-card urgent">
+                <div class="priority-header">
+                    <span class="priority-icon">🚨</span>
+                    <span class="priority-label">本日期限</span>
+                    <span class="priority-count">3件</span>
+                </div>
+                <ul class="priority-list">
+                    <li>資本効率改善計画の最終承認</li>
+                    <li>BlackRockへの回答期限</li>
+                    <li>取締役会資料の提出</li>
+                </ul>
+            </div>
+            <div class="priority-card warning">
+                <div class="priority-header">
+                    <span class="priority-icon">⚡</span>
+                    <span class="priority-label">今週中</span>
+                    <span class="priority-count">5件</span>
+                </div>
+                <ul class="priority-list">
+                    <li>ESG開示フレームワーク承認</li>
+                    <li>スモールMTG 2件の日程確定</li>
+                    <li>Q&A英訳レビュー</li>
+                </ul>
+            </div>
+            <div class="priority-card normal">
+                <div class="priority-header">
+                    <span class="priority-icon">📋</span>
+                    <span class="priority-label">進行中</span>
+                    <span class="priority-count">4件</span>
+                </div>
+                <ul class="priority-list">
+                    <li>統合報告書ドラフト作成</li>
+                    <li>投資家DB更新</li>
+                    <li>次期中計準備</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- アクティブプロジェクト -->
+    <div class="active-projects">
+        <div class="section-header mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">進行中のアクションアイテム</h3>
+            <button class="btn-primary text-sm" onclick="addNewAction()">+ 新規アクション</button>
+        </div>
+
+        <!-- プロジェクトカード形式で表示 -->
+        <div class="project-grid">
+            <!-- プロジェクト1: 資本効率改善 -->
+            <div class="project-card active">
+                <div class="project-header">
+                    <h4 class="project-title">資本効率改善プロジェクト</h4>
+                    <span class="project-status critical">要対応</span>
+                </div>
+                
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">起因</span>
+                        <span class="meta-value">BlackRock, Vanguardフィードバック</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">期限</span>
+                        <span class="meta-value text-red-600">2024/12/15</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">責任者</span>
+                        <span class="meta-value">CFO 鈴木</span>
+                    </div>
+                </div>
+
+                <div class="project-progress">
+                    <div class="progress-header">
+                        <span class="text-sm">進捗率</span>
+                        <span class="text-sm font-bold">35%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 35%"></div>
+                    </div>
+                </div>
+
+                <div class="project-tasks">
+                    <h5 class="text-sm font-medium mb-2">今週のタスク</h5>
+                    <div class="task-list">
+                        <label class="task-item">
+                            <input type="checkbox" checked>
+                            <span>事業別ROIC分析完了</span>
+                        </label>
+                        <label class="task-item active">
+                            <input type="checkbox">
+                            <span class="text-orange-600 font-medium">低収益事業の改善計画策定</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>取締役会承認取得</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="project-actions">
+                    <button class="btn-secondary text-sm" onclick="viewProjectDetail('capital-efficiency')">詳細</button>
+                    <button class="btn-secondary text-sm" onclick="updateProgress('capital-efficiency')">進捗更新</button>
+                    <button class="btn-primary text-sm" onclick="generateReport('capital-efficiency')">報告書作成</button>
+                </div>
+            </div>
+
+            <!-- プロジェクト2: ESG開示強化 -->
+            <div class="project-card active">
+                <div class="project-header">
+                    <h4 class="project-title">ESG情報開示の高度化</h4>
+                    <span class="project-status warning">進行中</span>
+                </div>
+                
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">起因</span>
+                        <span class="meta-value">機関投資家要望</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">期限</span>
+                        <span class="meta-value">2025/03/31</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">責任者</span>
+                        <span class="meta-value">CSO 田中</span>
+                    </div>
+                </div>
+
+                <div class="project-progress">
+                    <div class="progress-header">
+                        <span class="text-sm">進捗率</span>
+                        <span class="text-sm font-bold">60%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill medium" style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <div class="project-tasks">
+                    <h5 class="text-sm font-medium mb-2">今週のタスク</h5>
+                    <div class="task-list">
+                        <label class="task-item">
+                            <input type="checkbox" checked>
+                            <span>TCFD開示フレームワーク構築</span>
+                        </label>
+                        <label class="task-item active">
+                            <input type="checkbox">
+                            <span class="text-blue-600 font-medium">第三者保証機関選定</span>
+                        </label>
+                        <label class="task-item">
+                            <input type="checkbox">
+                            <span>Q1開示準備</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="project-actions">
+                    <button class="btn-secondary text-sm" onclick="viewProjectDetail('esg-disclosure')">詳細</button>
+                    <button class="btn-secondary text-sm" onclick="updateProgress('esg-disclosure')">進捗更新</button>
+                    <button class="btn-primary text-sm" onclick="scheduleReview('esg-disclosure')">レビュー設定</button>
+                </div>
+            </div>
+
+            <!-- 承認待ちミーティング -->
+            <div class="project-card meeting">
+                <div class="project-header">
+                    <h4 class="project-title">承認待ちミーティング</h4>
+                    <span class="project-status info">2件</span>
+                </div>
+
+                <div class="meeting-requests">
+                    <div class="meeting-item">
+                        <div class="meeting-info">
+                            <h5 class="font-medium">Goldman Sachs</h5>
+                            <p class="text-sm text-gray-600">ESG戦略ディスカッション</p>
+                            <p class="text-xs text-gray-500">希望: 12/18 14:00-15:00</p>
+                        </div>
+                        <div class="meeting-actions">
+                            <button class="btn-approve" onclick="approveMeeting('gs-001')">承認</button>
+                            <button class="btn-adjust" onclick="adjustMeeting('gs-001')">調整</button>
+                        </div>
+                    </div>
+                    <div class="meeting-item">
+                        <div class="meeting-info">
+                            <h5 class="font-medium">T.Rowe Price</h5>
+                            <p class="text-sm text-gray-600">中期経営計画レビュー</p>
+                            <p class="text-xs text-gray-500">希望: 12/20 10:00-11:00</p>
+                        </div>
+                        <div class="meeting-actions">
+                            <button class="btn-approve" onclick="approveMeeting('trp-001')">承認</button>
+                            <button class="btn-adjust" onclick="adjustMeeting('trp-001')">調整</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- クイックアクセスパネル -->
+    <div class="quick-access-panel mt-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">クイックアクション</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button class="quick-action-btn" onclick="createFeedbackResponse()">
+                <span class="quick-icon">📝</span>
+                <span class="quick-label">フィードバック回答作成</span>
+            </button>
+            <button class="quick-action-btn" onclick="scheduleMeeting()">
+                <span class="quick-icon">📅</span>
+                <span class="quick-label">ミーティング設定</span>
+            </button>
+            <button class="quick-action-btn" onclick="generateWeeklyReport()">
+                <span class="quick-icon">📊</span>
+                <span class="quick-label">週次レポート生成</span>
+            </button>
+            <button class="quick-action-btn" onclick="updateKPIs()">
+                <span class="quick-icon">🎯</span>
+                <span class="quick-label">KPI更新</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ナレッジベース -->
+<div id="knowledge-base" class="tab-content">
+    <!-- 検索・フィルター -->
+    <div class="knowledge-header mb-6">
+        <div class="search-section">
+            <input type="text" placeholder="過去の対応事例を検索..." class="search-input">
+            <button class="btn-primary">検索</button>
+        </div>
+        <div class="filter-section">
+            <select class="filter-select">
+                <option>すべてのカテゴリー</option>
+                <option>決算説明会</option>
+                <option>スモールミーティング</option>
+                <option>個別照会対応</option>
+                <option>フィードバック対応</option>
+            </select>
+            <select class="filter-select">
+                <option>すべての期間</option>
+                <option>過去1ヶ月</option>
+                <option>過去3ヶ月</option>
+                <option>過去1年</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 過去の対応履歴 -->
+    <div class="knowledge-grid">
+        <!-- Q&Aアーカイブ -->
+        <div class="knowledge-section">
+            <h3 class="section-title">📚 Q&Aアーカイブ</h3>
+            <div class="archive-list">
+                <div class="archive-item">
+                    <div class="archive-header">
+                        <span class="archive-date">2024/11/15</span>
+                        <span class="archive-type">決算説明会</span>
+                    </div>
+                    <h4 class="archive-title">営業利益率改善施策について</h4>
+                    <p class="archive-summary">DX投資の回収時期と具体的な改善計画...</p>
+                    <div class="archive-tags">
+                        <span class="tag">#営業利益率</span>
+                        <span class="tag">#DX投資</span>
+                    </div>
+                    <button class="archive-action" onclick="viewArchive('qa-001')">詳細を見る</button>
+                </div>
+                
+                <div class="archive-item">
+                    <div class="archive-header">
+                        <span class="archive-date">2024/11/10</span>
+                        <span class="archive-type">スモールMTG</span>
+                    </div>
+                    <h4 class="archive-title">Scope3削減計画</h4>
+                    <p class="archive-summary">サプライチェーン全体での取り組み...</p>
+                    <div class="archive-tags">
+                        <span class="tag">#ESG</span>
+                        <span class="tag">#気候変動</span>
+                    </div>
+                    <button class="archive-action" onclick="viewArchive('qa-002')">詳細を見る</button>
+                </div>
+            </div>
+            <button class="show-more-btn">もっと見る →</button>
+        </div>
+
+        <!-- 対応完了プロジェクト -->
+        <div class="knowledge-section">
+            <h3 class="section-title">✅ 対応完了案件</h3>
+            <div class="completed-list">
+                <div class="completed-item">
+                    <h4 class="completed-title">取締役会の多様性向上</h4>
+                    <p class="completed-meta">
+                        <span>投資家: CalPERS</span>
+                        <span>完了: 2024/11/30</span>
+                    </p>
+                    <p class="completed-outcome">女性取締役1名追加選任により対応完了</p>
+                    <button class="archive-action" onclick="viewCompletedCase('case-001')">詳細・学び</button>
+                </div>
+                
+                <div class="completed-item">
+                    <h4 class="completed-title">配当政策の明確化</h4>
+                    <p class="completed-meta">
+                        <span>投資家: 複数</span>
+                        <span>完了: 2024/10/15</span>
+                    </p>
+                    <p class="completed-outcome">累進配当方針を採用し開示</p>
+                    <button class="archive-action" onclick="viewCompletedCase('case-002')">詳細・学び</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ベストプラクティス -->
+        <div class="knowledge-section">
+            <h3 class="section-title">💡 ベストプラクティス</h3>
+            <div class="best-practice-list">
+                <div class="practice-item">
+                    <h4 class="practice-title">効果的な資本効率説明の方法</h4>
+                    <p class="practice-description">ROICツリーを使った説明が投資家から高評価</p>
+                    <button class="practice-action" onclick="viewPractice('bp-001')">詳細</button>
+                </div>
+                <div class="practice-item">
+                    <h4 class="practice-title">ESG目標の定量化手法</h4>
+                    <p class="practice-description">Science Based Targetsに準拠した目標設定</p>
+                    <button class="practice-action" onclick="viewPractice('bp-002')">詳細</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 分析・レポート -->
+<div id="analytics" class="tab-content">
+    <!-- KPIダッシュボード -->
+    <div class="analytics-dashboard mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">中期経営計画 KPI進捗</h3>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <h4 class="kpi-title">売上高</h4>
+                <div class="kpi-value">¥3,250億</div>
+                <div class="kpi-target">目標: ¥5,000億</div>
+                <div class="kpi-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill high" style="width: 65%"></div>
+                    </div>
+                    <span class="progress-text">65%</span>
+                </div>
+                <button class="kpi-detail-btn" onclick="showKPIDetail('revenue')">詳細分析</button>
+            </div>
+            
+            <div class="kpi-card">
+                <h4 class="kpi-title">営業利益率</h4>
+                <div class="kpi-value">12.5%</div>
+                <div class="kpi-target">目標: 15.0%</div>
+                <div class="kpi-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill high" style="width: 83%"></div>
+                    </div>
+                    <span class="progress-text">83%</span>
+                </div>
+                <button class="kpi-detail-btn" onclick="showKPIDetail('margin')">詳細分析</button>
+            </div>
+            
+            <div class="kpi-card">
+                <h4 class="kpi-title">ROE</h4>
+                <div class="kpi-value">10.2%</div>
+                <div class="kpi-target">目標: 12.0%</div>
+                <div class="kpi-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill medium" style="width: 85%"></div>
+                    </div>
+                    <span class="progress-text">85%</span>
+                </div>
+                <button class="kpi-detail-btn" onclick="showKPIDetail('roe')">詳細分析</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- トレンド分析 -->
+    <div class="trend-analysis">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">投資家フィードバックトレンド</h3>
+        <div class="trend-chart-placeholder">
+            <p class="text-gray-500 text-center py-12">グラフエリア（Chart.js等で実装）</p>
+        </div>
+    </div>
+</div>
+
+<!-- フローティングアクションボタン -->
+<div class="floating-action-button" onclick="showQuickAdd()">
+    <span class="fab-icon">+</span>
+</div>
+
+<!-- サイドパネル（コンテキスト情報） -->
+<div id="context-panel" class="context-panel">
+    <div class="panel-header">
+        <h4 class="panel-title">関連情報</h4>
+        <button class="panel-close" onclick="closeContextPanel()">×</button>
+    </div>
+    <div class="panel-content">
+        <!-- 動的にコンテンツを挿入 -->
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// タブ切り替え
+function switchTab(tabId) {
+    // タブボタンの状態を更新
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.closest('.tab-button').classList.add('active');
+    
+    // タブコンテンツの表示切り替え
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(tabId).classList.add('active');
+    
+    // タブに応じた初期化処理
+    if (tabId === 'active-workspace') {
+        loadActiveProjects();
+    } else if (tabId === 'knowledge-base') {
+        loadKnowledgeBase();
+    } else if (tabId === 'analytics') {
+        loadAnalytics();
+    }
+}
+
+// アクティブプロジェクトの読み込み
+function loadActiveProjects() {
+    console.log('アクティブプロジェクトを読み込み中...');
+    // 実際の実装では、APIからデータを取得
+}
+
+// 新規アクション追加
+function addNewAction() {
+    const modal = `
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <h3>新規アクション作成</h3>
+                <form>
+                    <label>
+                        <span>アクション名</span>
+                        <input type="text" name="action_name" required>
+                    </label>
+                    <label>
+                        <span>起因となるフィードバック</span>
+                        <select name="feedback_source">
+                            <option>BlackRock - 資本効率</option>
+                            <option>Vanguard - ESG開示</option>
+                            <option>その他</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>期限</span>
+                        <input type="date" name="due_date" required>
+                    </label>
+                    <label>
+                        <span>責任者</span>
+                        <select name="owner">
+                            <option>CEO</option>
+                            <option>CFO</option>
+                            <option>CSO</option>
+                        </select>
+                    </label>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary">作成</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal()">キャンセル</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    // 実際の実装では、モーダルを表示
+    alert('新規アクション作成フォームを表示（モック）');
+}
+
+// プロジェクト詳細表示
+function viewProjectDetail(projectId) {
+    // サイドパネルに詳細情報を表示
+    const contextPanel = document.getElementById('context-panel');
+    contextPanel.classList.add('open');
+    
+    // プロジェクトに応じた詳細情報を表示
+    const panelContent = contextPanel.querySelector('.panel-content');
+    panelContent.innerHTML = `
+        <h5 class="font-semibold mb-3">関連する過去の対応</h5>
+        <div class="related-items">
+            <div class="related-item">
+                <span class="related-date">2023/12/10</span>
+                <p class="related-title">前回の資本効率改善対応</p>
+                <button class="related-link" onclick="viewArchive('prev-001')">詳細</button>
+            </div>
+            <div class="related-item">
+                <span class="related-date">2023/09/15</span>
+                <p class="related-title">ROE改善3ヵ年計画</p>
+                <button class="related-link" onclick="viewArchive('prev-002')">詳細</button>
+            </div>
+        </div>
+        
+        <h5 class="font-semibold mt-4 mb-3">参考資料</h5>
+        <div class="reference-list">
+            <a href="#" class="reference-link">📄 資本効率改善ガイドライン</a>
+            <a href="#" class="reference-link">📊 業界ベンチマーク資料</a>
+        </div>
+    `;
+}
+
+// コンテキストパネルを閉じる
+function closeContextPanel() {
+    document.getElementById('context-panel').classList.remove('open');
+}
+
+// 進捗更新
+function updateProgress(projectId) {
+    const updateForm = prompt('進捗率を入力してください (0-100):');
+    if (updateForm) {
+        alert(`プロジェクト ${projectId} の進捗を ${updateForm}% に更新しました（モック）`);
+        // 実際の実装では、APIを呼び出して更新
+    }
+}
+
+// ミーティング承認
+function approveMeeting(meetingId) {
+    if (confirm('このミーティングを承認しますか？')) {
+        alert(`ミーティング ${meetingId} を承認しました。\nZoom URLを自動生成して送信します（モック）`);
+        // 実際の実装では、承認処理とURL生成
+    }
+}
+
+// ミーティング日程調整
+function adjustMeeting(meetingId) {
+    alert('代替日程の提案画面を表示（モック）');
+}
+
+// クイックアクション
+function createFeedbackResponse() {
+    alert('AIアシスタントが回答ドラフトを生成します（モック）');
+}
+
+function scheduleMeeting() {
+    alert('ミーティング設定画面を表示（モック）');
+}
+
+function generateWeeklyReport() {
+    alert('週次レポートを自動生成中...（モック）');
+}
+
+function updateKPIs() {
+    alert('KPI更新画面を表示（モック）');
+}
+
+// フローティングアクションボタン
+function showQuickAdd() {
+    const options = ['フィードバック追加', 'ミーティング設定', 'タスク追加', 'メモ作成'];
+    const selected = prompt('追加する項目を選択:\n1. ' + options.join('\n2. '));
+    if (selected) {
+        alert(`${options[parseInt(selected) - 1]}の画面を表示（モック）`);
+    }
+}
+
+// 通知システム（シミュレーション）
+function checkNotifications() {
+    const notifications = [
+        '新しいフィードバックが届きました',
+        'ミーティング承認が必要です',
+        'タスクの期限が近づいています'
+    ];
+    
+    // ランダムに通知を表示
+    if (Math.random() > 0.8) {
+        const notification = notifications[Math.floor(Math.random() * notifications.length)];
+        showNotification(notification);
+    }
+}
+
+function showNotification(message) {
+    const notificationEl = document.createElement('div');
+    notificationEl.className = 'notification';
+    notificationEl.textContent = message;
+    document.body.appendChild(notificationEl);
+    
+    setTimeout(() => {
+        notificationEl.remove();
+    }, 5000);
+}
+
+// 定期的な更新チェック
+setInterval(checkNotifications, 30000);
+
+// ページ読み込み時の初期化
+document.addEventListener('DOMContentLoaded', () => {
+    loadActiveProjects();
+});
+</script>
+{% endblock %}

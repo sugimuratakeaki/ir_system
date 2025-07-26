@@ -777,7 +777,8 @@ MOCK_DATA = {
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     """ダッシュボード画面"""
-    from datetime import datetime
+    from datetime import datetime, timedelta
+    import random
     
     # 新しいミーティング処理データの追加
     active_meetings = [
@@ -931,6 +932,127 @@ async def dashboard(request: Request):
     ai_improvement = 15
     investor_satisfaction = 95
     
+    # 処理完了時の追加データ
+    todays_schedule = {
+        "meetings": 3,
+        "followups": 5,
+        "reports": 2
+    }
+    
+    priority_followups = [
+        {"name": "野村アセットマネジメント", "priority": "high", "reason": "追加質問"},
+        {"name": "BlackRock Inc.", "priority": "high", "reason": "ESG懸念"},
+        {"name": "三菱UFJ信託銀行", "priority": "medium", "reason": "定期確認"},
+        {"name": "個人投資家グループ", "priority": "medium", "reason": "配当質問"}
+    ]
+    
+    executive_reports = {
+        "weekly_status": "作成中",
+        "concerns": 3,
+        "next_board_meeting": "2月15日"
+    }
+    
+    weekly_summary = {
+        "period": "2024年1月15日〜21日",
+        "total_meetings": 12,
+        "avg_processing_time": "2.3時間",
+        "ai_usage": 95,
+        "satisfaction_score": 4.3,
+        "top_topics": [
+            {"name": "AI事業戦略", "count": 8, "percentage": 67},
+            {"name": "ESG目標", "count": 6, "percentage": 50},
+            {"name": "財務見通し", "count": 5, "percentage": 42}
+        ],
+        "concerns": [
+            {"issue": "AI投資のROI明確化", "mentions": 5},
+            {"issue": "ESG目標の実現可能性", "mentions": 4}
+        ]
+    }
+    
+    performance_metrics = {
+        "transcription_accuracy": 96,
+        "summary_quality": 89,
+        "faq_efficiency": 92,
+        "ai_recommendation": "文字起こし精度が向上しています。FAQ作成時により多くのコンテキストを活用することをお勧めします。"
+    }
+    
+    investor_engagement = [
+        {"type": "機関投資家", "count": 45, "meetings": 89, "satisfaction": 4.2},
+        {"type": "海外投資家", "count": 15, "meetings": 28, "satisfaction": 3.8},
+        {"type": "個人投資家", "count": 156, "meetings": 45, "satisfaction": 4.5}
+    ]
+    
+    # 52週分の処理件数データ（モック）
+    weekly_processing_data = []
+    current_date = datetime.now()
+    for week in range(52):
+        week_date = current_date - timedelta(weeks=52-week)
+        # 季節性を考慮したランダムデータ生成
+        base_count = 5
+        if week_date.month in [2, 5, 8, 11]:  # 決算発表時期
+            base_count = 15
+        
+        institutional = random.randint(base_count, base_count + 5)
+        overseas = random.randint(int(base_count * 0.3), int(base_count * 0.7))
+        individual = random.randint(int(base_count * 0.5), int(base_count * 0.8))
+        analyst = random.randint(1, 3)
+        
+        weekly_processing_data.append({
+            "week": week_date.strftime("%m/%d"),
+            "institutional": institutional,
+            "overseas": overseas,
+            "individual": individual,
+            "analyst": analyst,
+            "total": institutional + overseas + individual + analyst
+        })
+    
+    # 直近のヒアリング質問カテゴリデータ（モック）
+    question_categories = [
+        {"category": "業績・財務", "count": 45, "percentage": 28, "color": "#3B82F6"},
+        {"category": "AI事業戦略", "count": 38, "percentage": 23, "color": "#10B981"},
+        {"category": "ESG/サステナビリティ", "count": 32, "percentage": 20, "color": "#F59E0B"},
+        {"category": "配当・株主還元", "count": 25, "percentage": 16, "color": "#EF4444"},
+        {"category": "ガバナンス", "count": 13, "percentage": 8, "color": "#8B5CF6"},
+        {"category": "その他", "count": 8, "percentage": 5, "color": "#6B7280"}
+    ]
+    
+    # 今日の投資家との予定（詳細版）
+    todays_meetings_detail = [
+        {
+            "id": "meeting_today_001",
+            "time": "10:00",
+            "investor_name": "野村アセットマネジメント",
+            "duration": "60分",
+            "topics": ["Q3決算", "AI事業進捗"],
+            "is_important": True,
+            "last_meeting_summary": "AI事業の収益化時期について懸念を表明。具体的なKPIとロードマップの提示を求められた。",
+            "pending_items": [
+                "AI事業の詳細なKPI資料の提供",
+                "競合他社との比較分析レポート"
+            ],
+            "past_questions": [
+                "AI人材の確保状況は？",
+                "R&D投資のROIは？"
+            ]
+        },
+        {
+            "id": "meeting_today_002",
+            "time": "14:00",
+            "investor_name": "BlackRock Inc.",
+            "duration": "45分",
+            "topics": ["ESG目標", "グローバル投資"],
+            "is_important": False,
+            "last_meeting_summary": "ESG目標の進捗状況を定期的にアップデート。特にカーボンニュートラルの具体的施策に関心。",
+            "pending_items": [
+                "ESGロードマップの更新版"
+            ],
+            "past_questions": [
+                "スコープ3目標の具体的施策は？",
+                "サプライチェーンのCO2排出量把握は？"
+            ]
+        }
+    ]
+    
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "title": "ミーティング処理ダッシュボード",
@@ -943,6 +1065,15 @@ async def dashboard(request: Request):
         "ai_automated_tasks": ai_automated_tasks,
         "ai_improvement": ai_improvement,
         "investor_satisfaction": investor_satisfaction,
+        "todays_schedule": todays_schedule,
+        "priority_followups": priority_followups,
+        "executive_reports": executive_reports,
+        "weekly_summary": weekly_summary,
+        "performance_metrics": performance_metrics,
+        "investor_engagement": investor_engagement,
+        "weekly_processing_data": weekly_processing_data,
+        "question_categories": question_categories,
+        "todays_meetings_detail": todays_meetings_detail,
         "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
     })
 
@@ -1507,6 +1638,174 @@ async def get_director_dashboard_data(period: str):
     }
     
     return response_data
+
+@app.get("/ir-feedback", response_class=HTMLResponse)
+async def ir_feedback(request: Request):
+    """投資家フィードバック管理画面"""
+    return templates.TemplateResponse("ir-feedback.html", {
+        "request": request,
+        "title": "投資家フィードバック管理"
+    })
+
+@app.get("/ir-meeting", response_class=HTMLResponse)
+async def ir_meeting(request: Request):
+    """IRミーティング管理画面"""
+    return templates.TemplateResponse("ir-meeting.html", {
+        "request": request,
+        "title": "IRミーティング管理"
+    })
+
+@app.get("/ir-strategy", response_class=HTMLResponse)
+async def ir_strategy(request: Request):
+    """中長期戦略開示管理画面"""
+    return templates.TemplateResponse("ir-strategy.html", {
+        "request": request,
+        "title": "中長期戦略開示管理"
+    })
+
+@app.get("/dialogue/faq/{meeting_id}", response_class=HTMLResponse)
+async def dialogue_faq_edit(request: Request, meeting_id: str):
+    """ミーティングFAQ編集画面"""
+    from datetime import datetime
+    
+    # モックデータ
+    meeting_data = {
+        "title": "野村AMとの面談記録",
+        "investor_name": "野村アセットマネジメント",
+        "date": "2024-01-22 10:00"
+    }
+    
+    # AIトピック分析
+    ai_topics = [
+        {"id": "ai_business", "name": "AI事業の成長性", "mention_count": 8, "has_faq": True},
+        {"id": "esg", "name": "ESG目標", "mention_count": 5, "has_faq": True},
+        {"id": "dividend", "name": "配当政策", "mention_count": 3, "has_faq": True},
+        {"id": "competition", "name": "競争優位性", "mention_count": 4, "has_faq": False},
+        {"id": "global_expansion", "name": "グローバル展開", "mention_count": 2, "has_faq": False}
+    ]
+    
+    # FAQリスト
+    faqs = [
+        {
+            "id": "faq_001",
+            "question": "AI事業の今後の成長性について教えてください",
+            "answer": "AI事業は当社の成長戦略の中核であり、特に金融機関向けソリューションで強い競争力を持っています。今期は前年同期比150%の成長を達成し、来期も100%以上の成長を見込んでいます。",
+            "status": "approved",
+            "ai_generated": True,
+            "confidence": 95,
+            "has_source": True,
+            "category": "事業戦略"
+        },
+        {
+            "id": "faq_002",
+            "question": "ESG目標の進捗状況は？",
+            "answer": "2030年カーボンニュートラル目標に向けて、現在詳細なロードマップを策定中です。2月末までに具体的な施策とマイルストーンを公表予定です。",
+            "status": "draft",
+            "ai_generated": True,
+            "confidence": 88,
+            "has_source": True,
+            "category": "ESG"
+        },
+        {
+            "id": "faq_003",
+            "question": "配当政策に変更はありますか？",
+            "answer": "現時点で配当政策に変更はありません。配当性合30%を維持し、安定的な株主還元を継続します。",
+            "status": "published",
+            "ai_generated": False,
+            "confidence": 100,
+            "has_source": False,
+            "category": "株主還元"
+        }
+    ]
+    
+    # 文字起こしセグメント
+    transcript_segments = [
+        {
+            "id": "seg_001",
+            "speaker": "田中（CEO）",
+            "timestamp": "00:05:23",
+            "formatted_time": "5:23",
+            "text": "AI事業については、予想を上回るペースで成長しております。特に金融機関向けのAIソリューションが好調で、前年同期比150%の成長を達成しました。",
+            "is_important": True,
+            "is_highlighted": False,
+            "tags": ["AI事業", "成長率"]
+        },
+        {
+            "id": "seg_002",
+            "speaker": "投資家",
+            "timestamp": "00:06:45",
+            "formatted_time": "6:45",
+            "text": "その成長は持続可能でしょうか？競合他社も同様の分野に参入してきていると思いますが。",
+            "is_important": True,
+            "is_highlighted": False,
+            "tags": ["競争優位性"]
+        },
+        {
+            "id": "seg_003",
+            "speaker": "田中（CEO）",
+            "timestamp": "00:07:12",
+            "formatted_time": "7:12",
+            "text": "そのご懸念はごもっともです。私たちは技術的優位性を維持するため、研究開発への投資を強化しています。特に、特許取得済みの独自アルゴリズムが強みです。",
+            "is_important": True,
+            "is_highlighted": True,
+            "tags": ["競争優位性", "技術"]
+        },
+        {
+            "id": "seg_004",
+            "speaker": "佐藤（CFO）",
+            "timestamp": "00:15:30",
+            "formatted_time": "15:30",
+            "text": "ESGに関しては、現在詳細なロードマップを策定中です。2月末には具体的なマイルストーンと予算を公表できる予定です。",
+            "is_important": True,
+            "is_highlighted": False,
+            "tags": ["ESG", "ロードマップ"]
+        }
+    ]
+    
+    # 類似FAQ
+    similar_faqs = [
+        {
+            "id": "faq_legacy_001",
+            "question": "AI事業の収益性について教えてください",
+            "similarity": 85,
+            "last_updated": "2023-10-20"
+        },
+        {
+            "id": "faq_legacy_002",
+            "question": "環境目標の進捗はどうですか？",
+            "similarity": 78,
+            "last_updated": "2023-07-15"
+        }
+    ]
+    
+    # 選択されたFAQ
+    selected_faq_id = request.query_params.get("selected", "faq_001")
+    selected_faq = next((f for f in faqs if f["id"] == selected_faq_id), faqs[0] if faqs else None)
+    
+    if selected_faq:
+        selected_faq["source_quotes"] = [
+            {
+                "text": "AI事業については、予想を上回るペースで成長しております。",
+                "speaker": "田中（CEO）",
+                "timestamp": "5:23"
+            }
+        ]
+    
+    return templates.TemplateResponse("dialogue-faq.html", {
+        "request": request,
+        "title": f"FAQ編集 - {meeting_data['title']}",
+        "meeting_id": meeting_id,
+        "meeting_data": meeting_data,
+        "ai_topics": ai_topics,
+        "faqs": faqs,
+        "total_faqs": len(faqs),
+        "ai_generated_count": len([f for f in faqs if f.get("ai_generated")]),
+        "selected_faq_id": selected_faq_id,
+        "selected_faq": selected_faq,
+        "transcript_segments": transcript_segments,
+        "similar_faqs": similar_faqs,
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
 
 @app.get("/api/faqs")
 async def get_faqs():

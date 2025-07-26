@@ -380,6 +380,278 @@
     {% endif %}
 </div>
 
+<!-- IR担当者向け追加情報セクション -->
+<!-- 今日のフォーカス -->
+<div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg shadow-sm border border-indigo-200 p-6 mt-6 mb-6">
+    <div class="flex items-start justify-between mb-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                今日のフォーカスエリア
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">ミーティング処理と並行して、次のアクションを確認しましょう</p>
+        </div>
+        <span class="text-sm text-gray-500">{{ current_time }}</span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- 今日のスケジュール（詳細版） -->
+        <div class="bg-white rounded-lg p-4 col-span-2">
+            <h4 class="font-semibold text-gray-700 mb-3 flex items-center justify-between">
+                <span class="flex items-center">
+                    <span class="text-lg mr-2">📅</span>
+                    本日の面談予定
+                </span>
+                <span class="text-xs text-gray-500">{{ todays_schedule.meetings }}件</span>
+            </h4>
+            <div class="space-y-3">
+                {% for meeting in todays_meetings_detail[:2] %}
+                <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 cursor-pointer" onclick="viewMeetingPrep('{{ meeting.id }}')">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-semibold text-gray-800">{{ meeting.time }}</span>
+                                <span class="text-sm font-medium text-gray-700 ml-2">{{ meeting.investor_name }}</span>
+                                {% if meeting.is_important %}
+                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                    重要
+                                </span>
+                                {% endif %}
+                            </div>
+                            <p class="text-xs text-gray-600 mt-1">テーマ: {{ meeting.topics|join(', ') }}</p>
+                        </div>
+                        <span class="text-xs text-gray-500">{{ meeting.duration }}</span>
+                    </div>
+                    
+                    <!-- 過去のヒアリングサマリー -->
+                    <div class="bg-white rounded p-2 mb-2">
+                        <p class="text-xs font-medium text-gray-700 mb-1">📄 前回の主要ポイント:</p>
+                        <p class="text-xs text-gray-600">{{ meeting.last_meeting_summary }}</p>
+                    </div>
+                    
+                    <!-- 宿題事項 -->
+                    {% if meeting.pending_items %}
+                    <div class="bg-yellow-50 rounded p-2">
+                        <p class="text-xs font-medium text-yellow-800 mb-1">⚠️ 宿題事項:</p>
+                        <ul class="text-xs text-yellow-700 space-y-0.5">
+                            {% for item in meeting.pending_items %}
+                            <li class="flex items-start">
+                                <span class="text-yellow-500 mr-1">•</span>
+                                {{ item }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <a href="/schedule" class="block text-center text-blue-600 hover:text-blue-700 text-xs mt-3">全ての予定を見る →</a>
+        </div>
+        
+        <!-- 質問事項の内訳 -->
+        <div class="bg-white rounded-lg p-4">
+            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                <span class="text-lg mr-2">📊</span>
+                直近の質問傾向
+            </h4>
+            <div class="relative h-48">
+                <canvas id="questionCategoryChart"></canvas>
+            </div>
+            <div class="mt-3 text-xs text-gray-600 text-center">
+                直近30日間の質問カテゴリ分析
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 処理実績の長期トレンド -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4v16" />
+            </svg>
+            ミーティング処理実績（52週間）
+        </h3>
+        <div class="flex items-center space-x-2">
+            <button onclick="changeTimeRange('quarter')" class="text-xs px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200">四半期</button>
+            <button onclick="changeTimeRange('half')" class="text-xs px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200">半期</button>
+            <button onclick="changeTimeRange('year')" class="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">年間</button>
+        </div>
+    </div>
+    
+    <!-- 棒グラフエリア -->
+    <div class="h-64 relative">
+        <canvas id="weeklyTrendChart"></canvas>
+    </div>
+    
+    <!-- 凡例 -->
+    <div class="flex items-center justify-center mt-4 space-x-6 text-xs">
+        <div class="flex items-center">
+            <div class="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+            <span>機関投資家</span>
+        </div>
+        <div class="flex items-center">
+            <div class="w-3 h-3 bg-green-500 rounded mr-2"></div>
+            <span>海外投資家</span>
+        </div>
+        <div class="flex items-center">
+            <div class="w-3 h-3 bg-yellow-500 rounded mr-2"></div>
+            <span>個人投資家</span>
+        </div>
+        <div class="flex items-center">
+            <div class="w-3 h-3 bg-purple-500 rounded mr-2"></div>
+            <span>アナリスト</span>
+        </div>
+    </div>
+</div>
+
+<!-- 今週の投資家対話サマリー -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            今週の投資家対話サマリー
+        </h3>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">期間: {{ weekly_summary.period }}</span>
+            <button onclick="exportWeeklySummary()" class="text-sm text-blue-600 hover:text-blue-700">エクスポート</button>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div class="text-center">
+            <div class="text-3xl font-bold text-gray-800">{{ weekly_summary.total_meetings }}</div>
+            <div class="text-sm text-gray-600">処理完了</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-green-600">{{ weekly_summary.avg_processing_time }}</div>
+            <div class="text-sm text-gray-600">平均処理時間</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-blue-600">{{ weekly_summary.ai_usage }}%</div>
+            <div class="text-sm text-gray-600">AI活用率</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-purple-600">{{ weekly_summary.satisfaction_score }}/5</div>
+            <div class="text-sm text-gray-600">満足度スコア</div>
+        </div>
+    </div>
+    
+    <!-- 主要トピックと懸念事項 -->
+    <div class="border-t pt-4">
+        <h4 class="font-semibold text-gray-700 mb-3">投資家の主要関心事項</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <h5 class="text-sm font-medium text-gray-600 mb-2">トップトピック</h5>
+                <div class="space-y-2">
+                    {% for topic in weekly_summary.top_topics %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-700">{{ topic.name }}</span>
+                        <div class="flex items-center">
+                            <div class="w-24 bg-gray-200 rounded-full h-2 mr-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ topic.percentage }}%"></div>
+                            </div>
+                            <span class="text-xs text-gray-500">{{ topic.count }}件</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <h5 class="text-sm font-medium text-gray-600 mb-2">要注意事項</h5>
+                <div class="space-y-2">
+                    {% for concern in weekly_summary.concerns %}
+                    <div class="bg-orange-50 rounded p-2">
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-orange-400 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-700">{{ concern.issue }}</p>
+                                <p class="text-xs text-gray-500 mt-1">言及: {{ concern.mentions }}回</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI分析インサイト -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <!-- パフォーマンス分析 -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <span class="text-xl mr-2">📈</span>
+            処理パフォーマンス分析
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm text-gray-600">文字起こし精度</span>
+                    <span class="text-sm font-semibold">{{ performance_metrics.transcription_accuracy }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ performance_metrics.transcription_accuracy }}%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm text-gray-600">AI要約品質</span>
+                    <span class="text-sm font-semibold">{{ performance_metrics.summary_quality }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-500 h-2 rounded-full" style="width: {{ performance_metrics.summary_quality }}%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm text-gray-600">FAQ作成効率</span>
+                    <span class="text-sm font-semibold">{{ performance_metrics.faq_efficiency }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-purple-500 h-2 rounded-full" style="width: {{ performance_metrics.faq_efficiency }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 pt-4 border-t">
+            <p class="text-xs text-gray-600">💡 AI推奨: {{ performance_metrics.ai_recommendation }}</p>
+        </div>
+    </div>
+    
+    <!-- 投資家エンゲージメント -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <span class="text-xl mr-2">🤝</span>
+            投資家エンゲージメント状況
+        </h3>
+        <div class="space-y-3">
+            {% for segment in investor_engagement %}
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                <div>
+                    <h4 class="font-medium text-gray-800">{{ segment.type }}</h4>
+                    <p class="text-xs text-gray-600">{{ segment.count }}社 / {{ segment.meetings }}回</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-semibold {% if segment.satisfaction >= 4.0 %}text-green-600{% elif segment.satisfaction >= 3.0 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        {{ segment.satisfaction }}/5.0
+                    </div>
+                    <p class="text-xs text-gray-500">満足度</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button onclick="viewDetailedEngagement()" class="w-full mt-4 text-center text-blue-600 hover:text-blue-700 text-sm">詳細分析を見る →</button>
+    </div>
+</div>
 <!-- サマリーカード -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
     <!-- 本日の予定 -->
@@ -665,6 +937,8 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 // 時刻更新
 function updateCurrentTime() {
@@ -756,10 +1030,226 @@ function registerMeeting() {
     location.reload();
 }
 
+// 追加機能: 処理完了時のアクション
+function showFollowupList() {
+    alert('要フォロー投資家リストを表示します');
+    // 実際の実装ではモーダルや別ページへの遷移
+}
+
+function prepareExecutiveReport() {
+    if (confirm('経営陣向けレポートを作成しますか？')) {
+        alert('レポート作成画面へ遷移します');
+        // window.location.href = '/reports/executive';
+    }
+}
+
+function exportWeeklySummary() {
+    if (confirm('週次サマリーをエクスポートしますか？')) {
+        alert('Excelファイルとしてダウンロードを開始しました');
+        // 実際の実装ではダウンロード処理
+    }
+}
+
+function viewDetailedEngagement() {
+    window.location.href = '/analytics?view=investor-engagement';
+}
+
+// 面談準備詳細表示
+function viewMeetingPrep(meetingId) {
+    window.location.href = `/meeting-prep/${meetingId}`;
+}
+
+// タイムレンジ変更
+function changeTimeRange(range) {
+    console.log('タイムレンジ変更:', range);
+    // 実際の実装ではAPIを呼び出してグラフを更新
+    updateWeeklyTrendChart(range);
+}
+
+// グラフの初期化
+let weeklyTrendChart = null;
+let questionCategoryChart = null;
+
+function initializeWeeklyTrendChart() {
+    const ctx = document.getElementById('weeklyTrendChart');
+    if (!ctx) return;
+    
+    // データの準備
+    const weeklyData = {{ weekly_processing_data | tojson }};
+    const labels = weeklyData.map(d => d.week);
+    
+    weeklyTrendChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '機関投資家',
+                    data: weeklyData.map(d => d.institutional),
+                    backgroundColor: '#3B82F6',
+                    stack: 'Stack 0'
+                },
+                {
+                    label: '海外投資家',
+                    data: weeklyData.map(d => d.overseas),
+                    backgroundColor: '#10B981',
+                    stack: 'Stack 0'
+                },
+                {
+                    label: '個人投資家',
+                    data: weeklyData.map(d => d.individual),
+                    backgroundColor: '#F59E0B',
+                    stack: 'Stack 0'
+                },
+                {
+                    label: 'アナリスト',
+                    data: weeklyData.map(d => d.analyst),
+                    backgroundColor: '#8B5CF6',
+                    stack: 'Stack 0'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: false
+                },
+                legend: {
+                    display: false // 凡例はHTMLで表示するため非表示
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        afterTitle: function(context) {
+                            const index = context[0].dataIndex;
+                            const total = weeklyData[index].total;
+                            return '合計: ' + total + '件';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        autoSkip: true,
+                        maxTicksLimit: 12 // 最大ラベル数を制限
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    },
+                    ticks: {
+                        stepSize: 5
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeQuestionCategoryChart() {
+    const ctx = document.getElementById('questionCategoryChart');
+    if (!ctx) return;
+    
+    const questionData = {{ question_categories | tojson }};
+    
+    questionCategoryChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: questionData.map(d => d.category),
+            datasets: [{
+                data: questionData.map(d => d.count),
+                backgroundColor: questionData.map(d => d.color),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 10,
+                        font: {
+                            size: 11
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map(function(label, i) {
+                                    const dataset = data.datasets[0];
+                                    const value = dataset.data[i];
+                                    const percentage = questionData[i].percentage;
+                                    return {
+                                        text: label + ' (' + percentage + '%)',
+                                        fillStyle: dataset.backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const percentage = questionData[context.dataIndex].percentage;
+                            return label + ': ' + value + '件 (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateWeeklyTrendChart(range) {
+    if (!weeklyTrendChart) return;
+    
+    // レンジに応じたフィルタリング
+    const weeklyData = {{ weekly_processing_data | tojson }};
+    let filteredData = weeklyData;
+    
+    if (range === 'quarter') {
+        filteredData = weeklyData.slice(-13); // 直近13週間
+    } else if (range === 'half') {
+        filteredData = weeklyData.slice(-26); // 直近26週間
+    }
+    
+    // データ更新
+    weeklyTrendChart.data.labels = filteredData.map(d => d.week);
+    weeklyTrendChart.data.datasets[0].data = filteredData.map(d => d.institutional);
+    weeklyTrendChart.data.datasets[1].data = filteredData.map(d => d.overseas);
+    weeklyTrendChart.data.datasets[2].data = filteredData.map(d => d.individual);
+    weeklyTrendChart.data.datasets[3].data = filteredData.map(d => d.analyst);
+    weeklyTrendChart.update();
+}
+
 // ページ読み込み時
 document.addEventListener('DOMContentLoaded', function() {
     updateCurrentTime();
     setInterval(updateCurrentTime, 60000); // 1分ごとに更新
+    
+    // グラフの初期化
+    initializeWeeklyTrendChart();
+    initializeQuestionCategoryChart();
     
     // ドラッグ&ドロップのデモ
     const dropZone = document.querySelector('.border-dashed');
@@ -778,6 +1268,18 @@ document.addEventListener('DOMContentLoaded', function() {
             dropZone.classList.remove('border-blue-500', 'bg-blue-50');
             alert('ファイルがドロップされました（デモ）');
         });
+    }
+    
+    // 処理完了時のアニメーション
+    const completedSection = document.querySelector('.bg-gradient-to-r.from-indigo-50');
+    if (completedSection) {
+        completedSection.style.opacity = '0';
+        completedSection.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            completedSection.style.transition = 'all 0.5s ease';
+            completedSection.style.opacity = '1';
+            completedSection.style.transform = 'translateY(0)';
+        }, 100);
     }
 });
 </script>

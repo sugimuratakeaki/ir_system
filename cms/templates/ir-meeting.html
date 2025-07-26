@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}IRミーティング管理{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- ミーティングカレンダー -->
+<div class="activity-feed mb-6">
+    <div class="activity-header">
+        <h2 class="activity-title">📅 IRミーティングカレンダー</h2>
+        <div class="flex items-center gap-4">
+            <button class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50" onclick="previousMonth()">◀</button>
+            <span class="font-semibold text-lg text-kagami-blue min-w-0 text-center">2024年12月</span>
+            <button class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50" onclick="nextMonth()">▶</button>
+            <button class="btn-primary" onclick="createNewMeeting()">➕ 新規ミーティング</button>
+        </div>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-6">
+        <h3 class="font-semibold text-blue-900 mb-4">今日の予定（12月26日）</h3>
+        <div class="space-y-3">
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                    <div class="font-semibold text-kagami-blue">10:00-11:00</div>
+                    <div class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium text-center">決算説明会</div>
+                    <div class="font-medium text-gray-900">Q3決算説明会（オンライン）</div>
+                    <div class="text-sm text-gray-600">参加予定: 120名</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
+                    <div class="font-semibold text-kagami-blue">14:00-15:00</div>
+                    <div class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium text-center">個別面談</div>
+                    <div class="font-medium text-gray-900">海外投資家B社 個別面談</div>
+                    <div class="text-sm text-gray-600">CFO対応・英語</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- スモールミーティング管理 -->
+<div class="activity-feed mb-6">
+    <div class="activity-header">
+        <h2 class="activity-title">🎯 新規投資家向けスモールミーティング管理</h2>
+    </div>
+    
+    <div class="mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 面談枠管理</h3>
+        <div class="dashboard-grid">
+            <div class="kpi-card text-center">
+                <div class="text-4xl mb-4">👔</div>
+                <h4 class="font-semibold text-gray-900 mb-4">CEO面談枠</h4>
+                <div class="mb-4">
+                    <div class="w-full bg-gray-200 rounded-full h-5 mb-2">
+                        <div class="bg-blue-600 h-5 rounded-full" style="width: 60%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600">今月: 3/5枠使用</p>
+                </div>
+                <div class="bg-gray-50 rounded-md p-3 mb-4">
+                    <p class="text-sm text-gray-700">次回可能日: 1/8（水）15:00-16:00</p>
+                </div>
+                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md text-sm font-medium" onclick="manageCEOSlots()">枠を管理</button>
+            </div>
+
+            <div class="kpi-card text-center">
+                <div class="text-4xl mb-4">👥</div>
+                <h4 class="font-semibold text-gray-900 mb-4">社外取締役面談枠</h4>
+                <div class="mb-4">
+                    <div class="w-full bg-gray-200 rounded-full h-5 mb-2">
+                        <div class="bg-green-600 h-5 rounded-full" style="width: 25%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600">今月: 1/4枠使用</p>
+                </div>
+                <div class="bg-gray-50 rounded-md p-3 mb-4">
+                    <p class="text-sm text-gray-700">次回可能日: 12/27（金）14:00-15:00</p>
+                </div>
+                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md text-sm font-medium" onclick="manageDirectorSlots()">枠を管理</button>
+            </div>
+
+            <div class="kpi-card text-center">
+                <div class="text-4xl mb-4">💼</div>
+                <h4 class="font-semibold text-gray-900 mb-4">CFO面談枠</h4>
+                <div class="mb-4">
+                    <div class="w-full bg-gray-200 rounded-full h-5 mb-2">
+                        <div class="bg-orange-500 h-5 rounded-full" style="width: 80%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600">今月: 8/10枠使用</p>
+                </div>
+                <div class="bg-gray-50 rounded-md p-3 mb-4">
+                    <p class="text-sm text-gray-700">次回可能日: 1/10（金）10:00-11:00</p>
+                </div>
+                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md text-sm font-medium" onclick="manageCFOSlots()">枠を管理</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 承認待ちミーティング -->
+    <div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">⏳ 承認待ちミーティング申請</h3>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-5">
+            <div class="mb-4">
+                <h4 class="font-medium text-yellow-900 mb-3">新規海外投資家C社 - CEO面談リクエスト</h4>
+                <div class="text-sm text-yellow-800 space-y-1">
+                    <p><strong>希望日時:</strong> 1/12（日）10:00-11:00 (オンライン)</p>
+                    <p><strong>投資家情報:</strong> 北米大手年金基金、運用資産$50B</p>
+                    <p><strong>面談希望テーマ:</strong> 長期成長戦略、サステナビリティ方針</p>
+                </div>
+            </div>
+            <div class="flex gap-3 flex-wrap">
+                <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium" onclick="approveMeeting('req-001')">✅ 承認</button>
+                <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium" onclick="rescheduleMeeting('req-001')">📅 日程調整</button>
+                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium" onclick="declineMeeting('req-001')">❌ 辞退</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 説明会Q&A管理 -->
+<div class="activity-feed">
+    <div class="activity-header">
+        <h2 class="activity-title">❓ 説明会Q&A管理</h2>
+    </div>
+    
+    <div class="bg-gray-50 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">📹 Q3決算説明会（2024/12/25実施）</h3>
+        
+        <div class="dashboard-grid mb-6">
+            <div class="stat-card">
+                <div class="stat-value text-kagami-blue">156</div>
+                <div class="stat-label">参加者数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-kagami-blue">23</div>
+                <div class="stat-label">質問数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value text-kagami-blue">75</div>
+                <div class="stat-label">所要時間（分）</div>
+            </div>
+        </div>
+
+        <!-- Q&A一覧 -->
+        <div>
+            <h4 class="font-medium text-gray-900 mb-4">💬 主要Q&A</h4>
+            <div class="bg-white border border-blue-200 rounded-lg p-5 border-l-4">
+                <div class="mb-3">
+                    <span class="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">00:35:00</span>
+                </div>
+                <div class="space-y-3 text-sm leading-relaxed">
+                    <div>
+                        <strong class="text-kagami-blue">Q:</strong> 自己資本比率の目標水準と達成時期について、より具体的な計画を教えてください。
+                    </div>
+                    <div>
+                        <strong class="text-kagami-blue">A (CFO):</strong> 中期的には45%を目標としており、2026年度末までの達成を目指しています。具体的には、非コア資産の売却で約200億円、運転資本の効率化で100億円の改善を見込んでいます。
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-4 flex-wrap">
+                    <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium" onclick="translateQA('qa-001')">🌐 英訳</button>
+                    <button class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded text-xs font-medium" onclick="addToFAQ('qa-001')">FAQに追加</button>
+                    <button class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded text-xs font-medium" onclick="createFollowup('qa-001')">フォローアップ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// IRミーティング管理のJavaScript
+function previousMonth() {
+    alert('前月を表示（モック）');
+}
+
+function nextMonth() {
+    alert('翌月を表示（モック）');
+}
+
+function createNewMeeting() {
+    alert('新規ミーティング作成画面を開く（モック）');
+}
+
+function manageCEOSlots() {
+    alert('CEO面談枠管理画面を開く（モック）');
+}
+
+function manageDirectorSlots() {
+    alert('社外取締役面談枠管理画面を開く（モック）');
+}
+
+function manageCFOSlots() {
+    alert('CFO面談枠管理画面を開く（モック）');
+}
+
+function approveMeeting(id) {
+    if (confirm('このミーティングを承認しますか？')) {
+        alert(`ミーティング ${id} を承認しました（モック）`);
+    }
+}
+
+function rescheduleMeeting(id) {
+    alert(`ミーティング ${id} の日程調整画面を開く（モック）`);
+}
+
+function declineMeeting(id) {
+    if (confirm('このミーティングを辞退しますか？')) {
+        alert(`ミーティング ${id} を辞退しました（モック）`);
+    }
+}
+
+function translateQA(id) {
+    alert(`Q&A ${id} を英訳中...（モック）`);
+}
+
+function addToFAQ(id) {
+    alert(`Q&A ${id} をFAQに追加しました（モック）`);
+}
+
+function createFollowup(id) {
+    alert(`Q&A ${id} のフォローアップを作成（モック）`);
+}
+
+// スタイル用のクラス定義
+document.head.insertAdjacentHTML('beforeend', `
+<style>
+.btn-primary {
+    @apply bg-kagami-blue hover:bg-kagami-blue-dark text-white px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+.btn-secondary {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+</style>
+`);
+</script>
+{% endblock %}

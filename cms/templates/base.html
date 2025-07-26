@@ -109,6 +109,18 @@
                 
                 <div class="nav-section">
                     <div class="nav-section-title">業務管理</div>
+                    <a href="/ir-feedback" class="nav-item {% if request.url.path == '/ir-feedback' %}active{% endif %}">
+                        <span class="nav-icon">💭</span>
+                        <span>投資家フィードバック管理</span>
+                    </a>
+                    <a href="/ir-meeting" class="nav-item {% if request.url.path == '/ir-meeting' %}active{% endif %}">
+                        <span class="nav-icon">🤝</span>
+                        <span>IRミーティング管理</span>
+                    </a>
+                    <a href="/ir-strategy" class="nav-item {% if request.url.path == '/ir-strategy' %}active{% endif %}">
+                        <span class="nav-icon">🎯</span>
+                        <span>中長期戦略開示管理</span>
+                    </a>
                     <a href="/investors" class="nav-item {% if request.url.path == '/investors' %}active{% endif %}">
                         <span class="nav-icon">👥</span>
                         <span>投資家管理</span>
