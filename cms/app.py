@@ -1970,13 +1970,189 @@ async def ir_calendar_workspace(request: Request):
 @app.get("/dialogue-center", response_class=HTMLResponse)
 async def dialogue_center(request: Request):
     """対話記録センター画面（統合ワークスペース）"""
-    from datetime import datetime
+    from datetime import datetime, timedelta
     
-    # 既存の対話記録管理ページへリダイレクト（統合UIは将来実装）
-    return templates.TemplateResponse("dialogue.html", {
+    # 現在日時の取得
+    current_time = datetime.now()
+    today = current_time.date()
+    
+    # モック対話記録データ
+    activity_data = {
+        "activity-001": {
+            "id": "activity-001",
+            "title": "野村AM決算説明会",
+            "investor": "野村アセットマネジメント",
+            "type": "決算説明会",
+            "duration": "90分",
+            "timestamp": "2時間前",
+            "status": "処理停滞",
+            "urgency": "urgent",
+            "progress": {
+                "stage": "ai_summary",
+                "percentage": 65,
+                "stages": {
+                    "upload": "completed",
+                    "transcription": "completed", 
+                    "ai_summary": "processing",
+                    "faq": "waiting",
+                    "review": "waiting",
+                    "publish": "waiting"
+                }
+            },
+            "meta": {
+                "file_size": "234MB",
+                "transcript_chars": 15680,
+                "accuracy": 96,
+                "assignee": "IR担当者A",
+                "participants": ["CEO", "CFO", "IR部長"]
+            }
+        },
+        "activity-002": {
+            "id": "activity-002",
+            "title": "BlackRock個別面談",
+            "investor": "BlackRock Inc.",
+            "type": "個別面談",
+            "duration": "45分",
+            "timestamp": "5時間前",
+            "status": "FAQ作成中",
+            "urgency": "processing",
+            "progress": {
+                "stage": "faq",
+                "percentage": 75,
+                "stages": {
+                    "upload": "completed",
+                    "transcription": "completed",
+                    "ai_summary": "completed",
+                    "faq": "processing",
+                    "review": "waiting",
+                    "publish": "waiting"
+                }
+            },
+            "meta": {
+                "file_size": "123MB",
+                "transcript_chars": 8240,
+                "accuracy": 98,
+                "assignee": "IR担当者B",
+                "participants": ["CFO", "IR部長"]
+            }
+        },
+        "activity-003": {
+            "id": "activity-003",
+            "title": "個人投資家説明会",
+            "investor": "個人投資家",
+            "type": "説明会",
+            "duration": "2時間",
+            "timestamp": "1日前",
+            "status": "公開済み",
+            "urgency": "completed",
+            "progress": {
+                "stage": "publish",
+                "percentage": 100,
+                "stages": {
+                    "upload": "completed",
+                    "transcription": "completed",
+                    "ai_summary": "completed",
+                    "faq": "completed",
+                    "review": "completed",
+                    "publish": "completed"
+                }
+            },
+            "meta": {
+                "file_size": "456MB",
+                "transcript_chars": 24560,
+                "accuracy": 94,
+                "assignee": "IR担当者C",
+                "participants": ["CEO", "CFO", "IR部長", "経営企画部長"]
+            }
+        },
+        "activity-004": {
+            "id": "activity-004",
+            "title": "Vanguard定期面談",
+            "investor": "Vanguard",
+            "type": "定期面談",
+            "duration": "60分",
+            "timestamp": "14:00予定",
+            "status": "準備完了",
+            "urgency": "scheduled",
+            "progress": {
+                "stage": "upload",
+                "percentage": 0,
+                "stages": {
+                    "upload": "waiting",
+                    "transcription": "waiting",
+                    "ai_summary": "waiting",
+                    "faq": "waiting",
+                    "review": "waiting",
+                    "publish": "waiting"
+                }
+            },
+            "meta": {
+                "assignee": "IR担当者A",
+                "participants": ["CFO", "IR部長"]
+            }
+        }
+    }
+    
+    # 統計データ
+    statistics = {
+        "processing": 12,
+        "urgent": 3,
+        "completed_today": 8,
+        "avg_processing_time": "2.3h",
+        "ai_accuracy": 96,
+        "efficiency_improvement": 20
+    }
+    
+    # AI洞察データ
+    ai_insights = [
+        {
+            "type": "improvement",
+            "message": "今日の処理効率が20%向上しています",
+            "icon": "💡"
+        },
+        {
+            "type": "warning",
+            "message": "3件の記録で処理遅延が発生中",
+            "icon": "⚠️"
+        },
+        {
+            "type": "trend",
+            "message": "ESG関連の質問が急増しています",
+            "icon": "📈"
+        }
+    ]
+    
+    # アクションアイテム
+    action_items = [
+        {
+            "title": "BlackRockへの回答",
+            "priority": "high",
+            "deadline": "今日",
+            "assignee": "IR担当者A"
+        },
+        {
+            "title": "FAQ承認",
+            "priority": "medium", 
+            "deadline": "明日",
+            "assignee": "IR部長"
+        },
+        {
+            "title": "レポート作成",
+            "priority": "low",
+            "deadline": "来週",
+            "assignee": "IR担当者C"
+        }
+    ]
+    
+    return templates.TemplateResponse("dialogue-center-workspace.html", {
         "request": request,
         "title": "対話記録センター",
-        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+        "activity_data": activity_data,
+        "statistics": statistics,
+        "ai_insights": ai_insights,
+        "action_items": action_items,
+        "current_time": current_time.strftime("%Y年%m月%d日 %H:%M"),
+        "today": today.strftime("%Y-%m-%d")
     })
 
 @app.get("/investor-relations", response_class=HTMLResponse)
