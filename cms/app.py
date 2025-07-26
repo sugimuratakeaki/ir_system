@@ -1819,6 +1819,192 @@ async def strategy_disclosure_assistant(request: Request):
         "title": "中長期計画開示支援ツール"
     })
 
+@app.get("/ir-calendar-workspace", response_class=HTMLResponse)
+async def ir_calendar_workspace(request: Request):
+    """IRカレンダー・面談ワークスペース画面"""
+    from datetime import datetime, timedelta
+    
+    # 現在日時の取得
+    current_time = datetime.now()
+    today = current_time.date()
+    
+    # モック面談データ
+    meeting_data = {
+        "meeting-001": {
+            "id": "meeting-001",
+            "investor": "北米年金基金C社",
+            "avatar": "C",
+            "title": "CEO面談リクエスト",
+            "status": "承認待ち",
+            "urgency": "urgent",
+            "date": "2024-01-12",
+            "time": "10:00-11:00",
+            "format": "オンライン (Zoom)",
+            "participants": "CEO必須",
+            "theme": "長期成長戦略",
+            "priority": 4,
+            "asset_size": "$50B",
+            "investment_style": "ESG重視",
+            "last_meeting": "初回",
+            "deadline": "2時間後"
+        },
+        "meeting-002": {
+            "id": "meeting-002", 
+            "investor": "BlackRock",
+            "avatar": "B",
+            "title": "ESG戦略個別面談",
+            "status": "実施準備完了",
+            "urgency": "today",
+            "date": "2024-12-26",
+            "time": "14:00-15:00",
+            "format": "対面会議",
+            "participants": "CFO、IR部長",
+            "theme": "ESG戦略、サステナビリティ",
+            "priority": 5,
+            "asset_size": "$8.5T",
+            "investment_style": "長期投資",
+            "last_meeting": "2023-11-15"
+        },
+        "meeting-003": {
+            "id": "meeting-003",
+            "investor": "Vanguard", 
+            "avatar": "V",
+            "title": "決算説明フォローアップ",
+            "status": "資料準備中",
+            "urgency": "tomorrow",
+            "date": "2024-12-27",
+            "time": "10:00-11:00",
+            "format": "オンライン",
+            "participants": "CFO、経営企画部長",
+            "theme": "Q3決算、業績見通し",
+            "priority": 3,
+            "asset_size": "$7.2T",
+            "investment_style": "インデックス投資",
+            "last_meeting": "2024-10-25"
+        },
+        "meeting-004": {
+            "id": "meeting-004",
+            "investor": "Fidelity",
+            "avatar": "F", 
+            "title": "中期戦略ディスカッション",
+            "status": "承認済み",
+            "urgency": "scheduled",
+            "date": "2025-01-03",
+            "time": "15:00-16:00",
+            "format": "対面会議",
+            "participants": "CEO、CFO",
+            "theme": "中期経営計画、M&A戦略",
+            "priority": 4,
+            "asset_size": "$4.2T",
+            "investment_style": "アクティブ投資",
+            "last_meeting": "2024-08-20"
+        }
+    }
+    
+    # カレンダーイベントデータ
+    calendar_events = [
+        {
+            "date": "2024-12-26",
+            "events": [
+                {
+                    "id": "meeting-002",
+                    "title": "BlackRock 14:00",
+                    "type": "approved",
+                    "meeting_data": meeting_data["meeting-002"]
+                }
+            ]
+        },
+        {
+            "date": "2024-12-27", 
+            "events": [
+                {
+                    "id": "meeting-003",
+                    "title": "Vanguard 10:00",
+                    "type": "pending",
+                    "meeting_data": meeting_data["meeting-003"]
+                }
+            ]
+        },
+        {
+            "date": "2025-01-03",
+            "events": [
+                {
+                    "id": "meeting-004", 
+                    "title": "Fidelity 15:00",
+                    "type": "approved",
+                    "meeting_data": meeting_data["meeting-004"]
+                }
+            ]
+        },
+        {
+            "date": "2025-01-12",
+            "events": [
+                {
+                    "id": "meeting-001",
+                    "title": "北米年金C社 (承認待ち)",
+                    "type": "urgent", 
+                    "meeting_data": meeting_data["meeting-001"]
+                }
+            ]
+        }
+    ]
+    
+    # 統計データ
+    statistics = {
+        "today_meetings": 2,
+        "pending_approvals": 3,
+        "this_month_total": 24,
+        "satisfaction_rate": 95
+    }
+    
+    return templates.TemplateResponse("ir-calendar-workspace.html", {
+        "request": request,
+        "title": "IRカレンダー・面談ワークスペース",
+        "meeting_data": meeting_data,
+        "calendar_events": calendar_events,
+        "statistics": statistics,
+        "current_time": current_time.strftime("%Y年%m月%d日 %H:%M"),
+        "today": today.strftime("%Y-%m-%d")
+    })
+
+@app.get("/dialogue-center", response_class=HTMLResponse)
+async def dialogue_center(request: Request):
+    """対話記録センター画面（統合ワークスペース）"""
+    from datetime import datetime
+    
+    # 既存の対話記録管理ページへリダイレクト（統合UIは将来実装）
+    return templates.TemplateResponse("dialogue.html", {
+        "request": request,
+        "title": "対話記録センター",
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
+
+@app.get("/investor-relations", response_class=HTMLResponse)
+async def investor_relations(request: Request):
+    """投資家・フィードバック統合管理画面"""
+    from datetime import datetime
+    
+    # 投資家管理とフィードバックを統合した画面（現在は投資家管理ページを表示）
+    return templates.TemplateResponse("investors.html", {
+        "request": request,
+        "title": "投資家・フィードバック統合管理",
+        "investors": MOCK_DATA["investors"],
+        "total_investors": len(MOCK_DATA["investors"]),
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
+
+@app.get("/strategy-workspace", response_class=HTMLResponse) 
+async def strategy_workspace(request: Request):
+    """戦略・開示ワークスペース画面"""
+    from datetime import datetime
+    
+    # IR戦略管理と開示支援ツールを統合した画面（現在はIR戦略ページを表示）
+    return templates.TemplateResponse("ir-strategy.html", {
+        "request": request,
+        "title": "戦略・開示ワークスペース",
+        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
+    })
+
 @app.get("/dialogue/faq/{meeting_id}", response_class=HTMLResponse)
 async def dialogue_faq_edit(request: Request, meeting_id: str):
     """ミーティングFAQ編集画面"""

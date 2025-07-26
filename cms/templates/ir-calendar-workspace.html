@@ -1,0 +1,986 @@
+{% extends 'base.html' %}
+
+{% block title %}IRカレンダー・面談ワークスペース{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
+<style>
+/* 革新的なワークスペース型UI */
+.ir-workspace {
+    display: grid;
+    grid-template-columns: 320px 1fr 380px;
+    grid-template-rows: auto 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+    grid-template-areas: 
+        "sidebar main-header side-panel"
+        "sidebar main-content side-panel";
+}
+
+/* 左サイドバー: 面談リスト & フィルター */
+.workspace-sidebar {
+    grid-area: sidebar;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* メインコンテンツエリア */
+.workspace-main {
+    grid-area: main-content;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+.workspace-header {
+    grid-area: main-header;
+    background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 右サイドパネル: 詳細情報 */
+.workspace-sidepanel {
+    grid-area: side-panel;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 面談カード（タイムライン形式） */
+.meeting-timeline {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.meeting-card {
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: white;
+}
+
+.meeting-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.meeting-card.selected {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.meeting-card.urgent {
+    border-left: 4px solid #ef4444;
+}
+
+.meeting-card.approved {
+    border-left: 4px solid #10b981;
+}
+
+.meeting-card.pending {
+    border-left: 4px solid #f59e0b;
+}
+
+/* ステータスインジケーター */
+.status-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+}
+
+.status-dot.active {
+    background: #3b82f6;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.completed {
+    background: #10b981;
+}
+
+/* カレンダーグリッド */
+.calendar-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.calendar-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}
+
+.calendar-day-header {
+    background: #f8fafc;
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #475569;
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.calendar-day {
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    min-height: 100px;
+    position: relative;
+    background: white;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background: #f8fafc;
+}
+
+.calendar-day.today {
+    background: #fef3c7;
+}
+
+.calendar-day-number {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.calendar-event {
+    background: #3b82f6;
+    color: white;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-bottom: 0.125rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calendar-event:hover {
+    background: #2563eb;
+    transform: scale(1.02);
+}
+
+.calendar-event.urgent {
+    background: #ef4444;
+}
+
+.calendar-event.approved {
+    background: #10b981;
+}
+
+/* 詳細パネル */
+.detail-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.meeting-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.investor-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+/* ワークフロープログレス */
+.workflow-progress {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e5e7eb;
+    z-index: 1;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    background: white;
+    padding: 0 0.5rem;
+}
+
+.step-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.step-circle.active {
+    background: #3b82f6;
+    color: white;
+}
+
+.step-circle.completed {
+    background: #10b981;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.625rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* アクションボタン */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.btn-action {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+}
+
+/* 投資家情報カード */
+.investor-info {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.investor-metric {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.metric-label {
+    color: #6b7280;
+}
+
+.metric-value {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1200px) {
+    .ir-workspace {
+        grid-template-columns: 280px 1fr 320px;
+    }
+}
+
+@media (max-width: 992px) {
+    .ir-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        grid-template-areas: 
+            "main-header"
+            "sidebar"
+            "main-content";
+    }
+    
+    .workspace-sidepanel {
+        display: none;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ir-workspace">
+    <!-- 左サイドバー: 面談リスト -->
+    <div class="workspace-sidebar">
+        <!-- フィルターヘッダー -->
+        <div class="p-4 bg-gray-50 border-b">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-lg">🎯</span>
+                <h3 class="font-semibold text-gray-900">面談管理</h3>
+            </div>
+            
+            <!-- クイックフィルター -->
+            <div class="flex gap-1">
+                <button class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800" onclick="filterMeetings('all')">
+                    全て (24)
+                </button>
+                <button class="px-2 py-1 text-xs rounded text-gray-600 hover:bg-gray-100" onclick="filterMeetings('pending')">
+                    承認待ち (3)
+                </button>
+                <button class="px-2 py-1 text-xs rounded text-gray-600 hover:bg-gray-100" onclick="filterMeetings('today')">
+                    今日 (2)
+                </button>
+            </div>
+        </div>
+        
+        <!-- 面談タイムライン -->
+        <div class="meeting-timeline">
+            <!-- 緊急対応必要 -->
+            <div class="meeting-card urgent selected" onclick="selectMeeting('meeting-001')">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium">🚨 承認期限迫る</span>
+                        <span class="text-xs text-gray-500">2時間後</span>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-gray-900 mb-1">北米年金基金C社</h4>
+                <p class="text-sm text-gray-600 mb-2">CEO面談リクエスト</p>
+                <div class="status-flow">
+                    <div class="status-dot active"></div>
+                    <span>承認待ち</span>
+                    <span class="text-xs text-red-600 ml-auto">要対応</span>
+                </div>
+            </div>
+            
+            <!-- 今日の面談 -->
+            <div class="meeting-card approved" onclick="selectMeeting('meeting-002')">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium">📅 今日 14:00</span>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-gray-900 mb-1">BlackRock</h4>
+                <p class="text-sm text-gray-600 mb-2">ESG戦略個別面談</p>
+                <div class="status-flow">
+                    <div class="status-dot completed"></div>
+                    <div class="status-dot completed"></div>
+                    <div class="status-dot active"></div>
+                    <span>実施準備完了</span>
+                </div>
+            </div>
+            
+            <!-- 準備中の面談 -->
+            <div class="meeting-card pending" onclick="selectMeeting('meeting-003')">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium">📋 明日 10:00</span>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-gray-900 mb-1">Vanguard</h4>
+                <p class="text-sm text-gray-600 mb-2">決算説明フォローアップ</p>
+                <div class="status-flow">
+                    <div class="status-dot completed"></div>
+                    <div class="status-dot active"></div>
+                    <span>資料準備中</span>
+                </div>
+            </div>
+            
+            <!-- 追加の面談... -->
+            <div class="meeting-card" onclick="selectMeeting('meeting-004')">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium">📅 1/3 15:00</span>
+                    </div>
+                </div>
+                <h4 class="font-semibold text-gray-900 mb-1">Fidelity</h4>
+                <p class="text-sm text-gray-600 mb-2">中期戦略ディスカッション</p>
+                <div class="status-flow">
+                    <div class="status-dot completed"></div>
+                    <span>承認済み</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新規面談ボタン -->
+        <div class="p-4 border-t">
+            <button class="w-full btn-primary py-2.5 px-4 rounded-lg" onclick="createNewMeeting()">
+                <span>➕</span>
+                <span>新規面談登録</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- ヘッダー -->
+    <div class="workspace-header">
+        <div>
+            <h1 class="text-2xl font-bold mb-1">IRカレンダー・面談ワークスペース</h1>
+            <p class="text-blue-100">統合された面談管理で効率的なIR業務を実現</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <p class="text-sm text-blue-200">今日の面談</p>
+                <p class="text-2xl font-bold">2件</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-blue-200">承認待ち</p>
+                <p class="text-2xl font-bold text-yellow-300">3件</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- メインカレンダー -->
+    <div class="workspace-main">
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="flex items-center gap-4">
+                    <button class="p-2 hover:bg-gray-100 rounded" onclick="previousMonth()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="text-xl font-bold">2024年12月</h2>
+                    <button class="p-2 hover:bg-gray-100 rounded" onclick="nextMonth()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 text-sm bg-blue-100 text-blue-800 rounded-md" onclick="setView('month')">
+                        月表示
+                    </button>
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md" onclick="setView('week')">
+                        週表示
+                    </button>
+                    <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md" onclick="setView('day')">
+                        日表示
+                    </button>
+                </div>
+            </div>
+            
+            <div class="calendar-grid">
+                <!-- 曜日ヘッダー -->
+                <div class="calendar-day-header">日</div>
+                <div class="calendar-day-header">月</div>
+                <div class="calendar-day-header">火</div>
+                <div class="calendar-day-header">水</div>
+                <div class="calendar-day-header">木</div>
+                <div class="calendar-day-header">金</div>
+                <div class="calendar-day-header">土</div>
+                
+                <!-- カレンダーの日付 -->
+                <!-- 1週目 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">1</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">2</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">3</div>
+                    <div class="calendar-event approved" onclick="selectMeeting('meeting-004')">
+                        Fidelity 15:00
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">4</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">5</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">6</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">7</div>
+                </div>
+                
+                <!-- 2週目 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">8</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">9</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">10</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">11</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">12</div>
+                    <div class="calendar-event urgent" onclick="selectMeeting('meeting-001')">
+                        北米年金C社 (承認待ち)
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">13</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">14</div>
+                </div>
+                
+                <!-- 今日を含む週 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">15</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">16</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">17</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">18</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">19</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">20</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">21</div>
+                </div>
+                
+                <!-- 今週 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">22</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">23</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">24</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">25</div>
+                </div>
+                <div class="calendar-day today">
+                    <div class="calendar-day-number">26</div>
+                    <div class="calendar-event approved" onclick="selectMeeting('meeting-002')">
+                        BlackRock 14:00
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">27</div>
+                    <div class="calendar-event pending" onclick="selectMeeting('meeting-003')">
+                        Vanguard 10:00
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">28</div>
+                </div>
+                
+                <!-- 月末 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">29</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">30</div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">31</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右サイドパネル: 詳細情報 -->
+    <div class="workspace-sidepanel">
+        <div class="detail-panel">
+            <!-- 選択された面談の詳細情報 -->
+            <div id="meeting-detail-001" class="meeting-detail">
+                <div class="meeting-detail-header">
+                    <div class="investor-avatar">C</div>
+                    <div>
+                        <h3 class="font-bold text-lg text-gray-900">北米年金基金C社</h3>
+                        <p class="text-sm text-gray-600">CEO面談リクエスト</p>
+                        <p class="text-xs text-red-600 font-medium mt-1">⏰ 承認期限: 2時間後</p>
+                    </div>
+                </div>
+                
+                <!-- ワークフロープログレス -->
+                <div class="workflow-progress">
+                    <div class="progress-steps">
+                        <div class="progress-step">
+                            <div class="step-circle active">1</div>
+                            <div class="step-label">申請受付</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">承認</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">準備</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-circle">4</div>
+                            <div class="step-label">実施</div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-circle">5</div>
+                            <div class="step-label">完了</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 面談詳細 -->
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">希望日時</span>
+                        <span class="font-medium">1/12（日）10:00-11:00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">形式</span>
+                        <span class="font-medium">オンライン (Zoom)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">参加希望者</span>
+                        <span class="font-medium">CEO必須</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">面談テーマ</span>
+                        <span class="font-medium">長期成長戦略</span>
+                    </div>
+                </div>
+                
+                <!-- 投資家情報 -->
+                <div class="investor-info">
+                    <h4 class="font-semibold mb-2">投資家情報</h4>
+                    <div class="investor-metric">
+                        <span class="metric-label">運用資産</span>
+                        <span class="metric-value">$50B</span>
+                    </div>
+                    <div class="investor-metric">
+                        <span class="metric-label">投資スタイル</span>
+                        <span class="metric-value">ESG重視</span>
+                    </div>
+                    <div class="investor-metric">
+                        <span class="metric-label">前回面談</span>
+                        <span class="metric-value">初回</span>
+                    </div>
+                    <div class="investor-metric">
+                        <span class="metric-label">重要度</span>
+                        <span class="metric-value text-orange-600">⭐⭐⭐⭐</span>
+                    </div>
+                </div>
+                
+                <!-- アクションボタン -->
+                <div class="action-buttons">
+                    <button class="btn-action btn-success" onclick="approveMeeting('meeting-001')">
+                        <span>✅</span>
+                        <span>承認</span>
+                    </button>
+                    <button class="btn-action btn-warning" onclick="rescheduleMeeting('meeting-001')">
+                        <span>📅</span>
+                        <span>日程調整</span>
+                    </button>
+                    <button class="btn-action btn-primary" onclick="viewInvestorHistory('meeting-001')">
+                        <span>📊</span>
+                        <span>履歴</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- クイックアクションモーダル -->
+<div id="quickActionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">面談承認</h3>
+                <button onclick="closeQuickAction()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">参加者選択</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded" checked>
+                            <span class="ml-2 text-sm">CEO - 田中一郎</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded">
+                            <span class="ml-2 text-sm">CFO - 佐藤二郎</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="rounded" checked>
+                            <span class="ml-2 text-sm">IR部長 - 山本三郎</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">事前準備メモ</label>
+                    <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" rows="3" placeholder="準備すべき資料や確認事項を記入..."></textarea>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button class="flex-1 btn-action btn-success" onclick="confirmApproval()">
+                        承認して準備開始
+                    </button>
+                    <button class="px-4 py-2 text-gray-600 hover:text-gray-800" onclick="closeQuickAction()">
+                        キャンセル
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// グローバル状態管理
+let selectedMeetingId = 'meeting-001';
+let currentView = 'month';
+
+// 面談選択
+function selectMeeting(meetingId) {
+    // 前の選択を解除
+    document.querySelectorAll('.meeting-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // 新しい選択を設定
+    event.target.closest('.meeting-card').classList.add('selected');
+    selectedMeetingId = meetingId;
+    
+    // 詳細パネルを更新
+    updateDetailPanel(meetingId);
+}
+
+// 詳細パネル更新
+function updateDetailPanel(meetingId) {
+    // 実際の実装では、meetingIdに基づいてAPIからデータを取得
+    console.log('詳細パネル更新:', meetingId);
+    
+    // デモ用: 異なる面談の詳細を表示
+    const meetingDetails = {
+        'meeting-002': {
+            investor: 'BlackRock',
+            avatar: 'B',
+            title: 'ESG戦略個別面談',
+            status: '実施準備完了',
+            urgency: 'today'
+        },
+        'meeting-003': {
+            investor: 'Vanguard', 
+            avatar: 'V',
+            title: '決算説明フォローアップ',
+            status: '資料準備中',
+            urgency: 'tomorrow'
+        }
+    };
+    
+    if (meetingDetails[meetingId]) {
+        // 詳細パネルのコンテンツを動的に更新
+        // 実装詳細は省略
+        console.log('面談詳細を更新:', meetingDetails[meetingId]);
+    }
+}
+
+// カレンダー操作
+function previousMonth() {
+    // 前月表示
+    console.log('前月を表示');
+}
+
+function nextMonth() {
+    // 翌月表示
+    console.log('翌月を表示');
+}
+
+function setView(view) {
+    currentView = view;
+    console.log('表示モード変更:', view);
+    
+    // ボタンのアクティブ状態を更新
+    document.querySelectorAll('[onclick^="setView"]').forEach(btn => {
+        btn.className = btn.className.replace('bg-blue-100 text-blue-800', 'text-gray-600 hover:bg-gray-100');
+    });
+    event.target.className = event.target.className.replace('text-gray-600 hover:bg-gray-100', 'bg-blue-100 text-blue-800');
+}
+
+// フィルター
+function filterMeetings(filter) {
+    console.log('フィルター適用:', filter);
+    
+    // フィルターボタンのアクティブ状態を更新
+    document.querySelectorAll('[onclick^="filterMeetings"]').forEach(btn => {
+        btn.className = btn.className.replace('bg-blue-100 text-blue-800', 'text-gray-600 hover:bg-gray-100');
+    });
+    event.target.className = event.target.className.replace('text-gray-600 hover:bg-gray-100', 'bg-blue-100 text-blue-800');
+}
+
+// アクション処理
+function approveMeeting(meetingId) {
+    document.getElementById('quickActionModal').classList.remove('hidden');
+}
+
+function closeQuickAction() {
+    document.getElementById('quickActionModal').classList.add('hidden');
+}
+
+function confirmApproval() {
+    // 承認処理
+    alert('面談を承認し、準備フェーズに移行しました');
+    closeQuickAction();
+    
+    // UIを更新（実際の実装では状態管理ライブラリを使用）
+    updateMeetingStatus(selectedMeetingId, 'approved');
+}
+
+function rescheduleMeeting(meetingId) {
+    alert('日程調整画面を開きます');
+}
+
+function viewInvestorHistory(meetingId) {
+    alert('投資家履歴を表示します');
+}
+
+function createNewMeeting() {
+    alert('新規面談登録画面を開きます');
+}
+
+// ステータス更新
+function updateMeetingStatus(meetingId, status) {
+    // 実際の実装ではAPIを呼び出してステータスを更新
+    console.log('ステータス更新:', meetingId, status);
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // 初期選択状態を設定
+    selectMeeting('meeting-001');
+    
+    // リアルタイム更新のWebSocket接続（実際の実装では）
+    // connectWebSocket();
+});
+
+// キーボードショートカット
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key) {
+            case 'n':
+                e.preventDefault();
+                createNewMeeting();
+                break;
+            case 'a':
+                e.preventDefault();
+                if (selectedMeetingId) {
+                    approveMeeting(selectedMeetingId);
+                }
+                break;
+        }
+    }
+});
+</script>
+{% endblock %} 
