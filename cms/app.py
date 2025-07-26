@@ -2181,6 +2181,143 @@ async def strategy_workspace(request: Request):
         "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
     })
 
+@app.get("/ir-content-center", response_class=HTMLResponse)
+async def ir_content_center(request: Request):
+    """IR情報統合センター画面"""
+    from datetime import datetime, timedelta
+    
+    # 現在日時の取得
+    current_time = datetime.now()
+    today = current_time.date()
+    
+    # モックFAQデータ
+    faq_data = [
+        {
+            "id": "faq-001",
+            "title": "2024年第3四半期の業績見通しについて",
+            "category": "財務・業績",
+            "answer": "第3四半期の売上高は前年同期比15%増の見込みです。主力事業の好調な推移により、通期業績予想を上方修正いたします。",
+            "status": "published",
+            "view_count": 128,
+            "last_updated": "2時間前",
+            "confidence": 94,
+            "type": "faq"
+        },
+        {
+            "id": "faq-002", 
+            "title": "ESG経営の取り組みについて",
+            "category": "ESG",
+            "answer": "2030年までにカーボンニュートラル達成を目指し、再生可能エネルギー導入を進めています。",
+            "status": "published",
+            "view_count": 89,
+            "last_updated": "2日前",
+            "confidence": 96,
+            "type": "faq"
+        }
+    ]
+    
+    # モックドキュメントデータ
+    document_data = [
+        {
+            "id": "doc-001",
+            "title": "2024年第3四半期決算短信",
+            "category": "決算短信",
+            "file_size": "2.4MB",
+            "download_count": 45,
+            "uploaded": "5時間前",
+            "status": "published",
+            "type": "document"
+        },
+        {
+            "id": "doc-002",
+            "title": "中期経営計画説明資料",
+            "category": "説明会資料", 
+            "file_size": "8.7MB",
+            "download_count": 167,
+            "uploaded": "3日前",
+            "status": "published",
+            "type": "document"
+        }
+    ]
+    
+    # モックニュースデータ
+    news_data = [
+        {
+            "id": "news-001",
+            "title": "第3四半期決算説明会の開催について",
+            "category": "イベント",
+            "published": "1日前",
+            "view_count": 234,
+            "status": "published",
+            "type": "news"
+        },
+        {
+            "id": "news-002",
+            "title": "株主優待制度の変更について",
+            "category": "株主還元",
+            "published": "1週間前",
+            "view_count": 456,
+            "status": "published",
+            "type": "news"
+        }
+    ]
+    
+    # 統計データ
+    statistics = {
+        "total_faq": 156,
+        "total_documents": 67,
+        "total_news": 25,
+        "total_views": 12547,
+        "monthly_growth": {
+            "faq": 12,
+            "documents": 5,
+            "news": 8,
+            "views": 18
+        }
+    }
+    
+    # 統合コンテンツリスト（時系列順）
+    all_content = []
+    
+    # FAQを追加
+    for faq in faq_data:
+        all_content.append({
+            **faq,
+            "content_type": "faq",
+            "timestamp": faq["last_updated"]
+        })
+    
+    # ドキュメントを追加  
+    for doc in document_data:
+        all_content.append({
+            **doc,
+            "content_type": "document",
+            "timestamp": doc["uploaded"]
+        })
+    
+    # ニュースを追加
+    for news in news_data:
+        all_content.append({
+            **news,
+            "content_type": "news", 
+            "timestamp": news["published"]
+        })
+    
+    # 時系列でソート（最新順）
+    all_content.sort(key=lambda x: x["timestamp"], reverse=True)
+    
+    return templates.TemplateResponse("ir-content-center.html", {
+        "request": request,
+        "title": "IR情報統合センター",
+        "all_content": all_content,
+        "faq_data": faq_data,
+        "document_data": document_data,
+        "news_data": news_data,
+        "statistics": statistics,
+        "current_time": current_time.strftime("%Y年%m月%d日 %H:%M"),
+        "today": today.strftime("%Y-%m-%d")
+    })
+
 @app.get("/dialogue/faq/{meeting_id}", response_class=HTMLResponse)
 async def dialogue_faq_edit(request: Request, meeting_id: str):
     """ミーティングFAQ編集画面"""

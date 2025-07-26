@@ -1,0 +1,1453 @@
+{% extends 'base.html' %}
+
+{% block title %}IR情報統合センター{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
+<style>
+/* IR情報統合センター専用スタイル */
+.ir-content-center {
+    display: grid;
+    grid-template-columns: 320px 1fr 400px;
+    grid-template-rows: auto 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+    grid-template-areas: 
+        "content-stream workspace-header insight-panel"
+        "content-stream workspace-main insight-panel";
+    transition: grid-template-columns 0.3s ease;
+}
+
+.ir-content-center.insight-collapsed {
+    grid-template-columns: 320px 1fr 0px;
+    grid-template-areas: 
+        "content-stream workspace-header insight-panel"
+        "content-stream workspace-main insight-panel";
+}
+
+/* コンテンツストリーム（左サイドバー） */
+.content-stream {
+    grid-area: content-stream;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.stream-header {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    color: white;
+    padding: 1.5rem;
+}
+
+.stream-filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.filter-chip.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.stream-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+/* コンテンツカード */
+.content-card {
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: white;
+    border-left: 4px solid #e5e7eb;
+}
+
+.content-card:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-card.selected {
+    border-color: #7c3aed;
+    background: #faf5ff;
+}
+
+.content-card.faq {
+    border-left-color: #3b82f6;
+}
+
+.content-card.document {
+    border-left-color: #10b981;
+}
+
+.content-card.news {
+    border-left-color: #f59e0b;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.content-type {
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.625rem;
+    font-weight: 600;
+}
+
+.content-type.faq {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.content-type.document {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.content-type.news {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.content-title {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.content-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.content-status {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.status-badge {
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-size: 0.625rem;
+    font-weight: 500;
+}
+
+.status-published {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-draft {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.status-scheduled {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+/* メインワークスペース */
+.workspace-header {
+    grid-area: workspace-header;
+    background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.workspace-main {
+    grid-area: workspace-main;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ツールバー */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.toolbar-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-toolbar {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: #374151;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-toolbar:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.btn-toolbar.active {
+    background: #7c3aed;
+    color: white;
+    border-color: #6d28d9;
+}
+
+/* ビューコンテンツ */
+.view-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.view-content.hidden {
+    display: none;
+}
+
+/* ダッシュボードビュー */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.stat-change {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-change.positive {
+    color: #10b981;
+}
+
+.stat-change.negative {
+    color: #ef4444;
+}
+
+/* コンテンツライフサイクル */
+.lifecycle-flow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.lifecycle-stage {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.lifecycle-stage:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: -25px;
+    width: 50px;
+    height: 2px;
+    background: #e2e8f0;
+}
+
+.stage-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    font-weight: 600;
+}
+
+.stage-icon.active {
+    background: #7c3aed;
+    color: white;
+}
+
+.stage-label {
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+.stage-count {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* インサイトパネル（右サイドバー） */
+.insight-panel {
+    grid-area: insight-panel;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.insight-panel.collapsed {
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.insight-toggle {
+    position: fixed;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 80px;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    border-radius: 20px 0 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s ease;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.insight-toggle:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #9333ea 100%);
+    transform: translateY(-50%) translateX(-3px);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.ir-content-center.insight-collapsed .insight-toggle {
+    right: 0px;
+    border-radius: 0 20px 20px 0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.ir-content-center.insight-collapsed .insight-toggle:hover {
+    transform: translateY(-50%) translateX(3px);
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.insight-toggle-icon {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.insight-toggle-text {
+    writing-mode: sideways-lr;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.ir-content-center.insight-collapsed .insight-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.ir-content-center.insight-collapsed .insight-toggle-text {
+    writing-mode: sideways-rl;
+}
+
+.insight-header {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.insight-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+/* 関連コンテンツ */
+.related-content {
+    margin-bottom: 1.5rem;
+}
+
+.related-item {
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.related-item:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.related-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.related-meta {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* アナリティクス */
+.analytics-widget {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.widget-title {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.metric-item:last-child {
+    border-bottom: none;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.metric-value {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* アクションパネル */
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-item:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.action-priority {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.action-priority.high {
+    background: #ef4444;
+}
+
+.action-priority.medium {
+    background: #f59e0b;
+}
+
+.action-priority.low {
+    background: #10b981;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .ir-content-center {
+        grid-template-columns: 280px 1fr 350px;
+    }
+    
+    .ir-content-center.insight-collapsed {
+        grid-template-columns: 280px 1fr 0px;
+    }
+}
+
+@media (max-width: 768px) {
+    .ir-content-center {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        grid-template-areas: 
+            "workspace-header"
+            "content-stream"
+            "workspace-main";
+    }
+    
+    .insight-panel {
+        display: none;
+    }
+    
+    .insight-toggle {
+        display: none;
+    }
+    
+    .content-stream {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .insight-toggle {
+        width: 35px;
+        height: 70px;
+        right: 10px;
+    }
+    
+    .ir-content-center.insight-collapsed .insight-toggle {
+        right: -5px;
+    }
+    
+    .insight-toggle-icon {
+        font-size: 1.2rem;
+    }
+    
+    .insight-toggle-text {
+        font-size: 0.6rem;
+    }
+}
+
+/* カスタムスクロールバー */
+.stream-content::-webkit-scrollbar,
+.view-content::-webkit-scrollbar,
+.insight-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.stream-content::-webkit-scrollbar-track,
+.view-content::-webkit-scrollbar-track,
+.insight-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.stream-content::-webkit-scrollbar-thumb,
+.view-content::-webkit-scrollbar-thumb,
+.insight-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.stream-content::-webkit-scrollbar-thumb:hover,
+.view-content::-webkit-scrollbar-thumb:hover,
+.insight-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ir-content-center">
+    <!-- コンテンツストリーム（左サイドバー） -->
+    <div class="content-stream">
+        <div class="stream-header">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold">IR情報ストリーム</h3>
+                <span id="streamCount" class="text-sm opacity-75">248件</span>
+            </div>
+            <div class="stream-filters">
+                <div class="filter-chip active" onclick="filterContent('all')">全て</div>
+                <div class="filter-chip" onclick="filterContent('faq')">FAQ (156)</div>
+                <div class="filter-chip" onclick="filterContent('document')">資料 (67)</div>
+                <div class="filter-chip" onclick="filterContent('news')">ニュース (25)</div>
+                <div class="filter-chip" onclick="filterContent('urgent')">緊急 (8)</div>
+                <div class="filter-chip" onclick="filterContent('today')">今日 (12)</div>
+            </div>
+        </div>
+        
+        <div class="stream-content">
+            <!-- FAQコンテンツ -->
+            <div class="content-card faq selected" onclick="selectContent('content-001', 'faq')">
+                <div class="content-header">
+                    <span class="content-type faq">FAQ</span>
+                    <div class="content-meta">
+                        <span>2時間前</span>
+                    </div>
+                </div>
+                <div class="content-title">2024年第3四半期の業績見通しについて</div>
+                <div class="content-meta">
+                    <span>📊 財務・業績</span>
+                    <span>•</span>
+                    <span>👁️ 128回</span>
+                </div>
+                <div class="content-status">
+                    <span class="status-badge status-published">公開済み</span>
+                    <div class="action-priority high"></div>
+                </div>
+            </div>
+            
+            <!-- ドキュメントコンテンツ -->
+            <div class="content-card document" onclick="selectContent('content-002', 'document')">
+                <div class="content-header">
+                    <span class="content-type document">資料</span>
+                    <div class="content-meta">
+                        <span>5時間前</span>
+                    </div>
+                </div>
+                <div class="content-title">2024年第3四半期決算短信</div>
+                <div class="content-meta">
+                    <span>📄 決算短信</span>
+                    <span>•</span>
+                    <span>⬇️ 45回</span>
+                </div>
+                <div class="content-status">
+                    <span class="status-badge status-published">公開済み</span>
+                    <div class="action-priority medium"></div>
+                </div>
+            </div>
+            
+            <!-- ニュースコンテンツ -->
+            <div class="content-card news" onclick="selectContent('content-003', 'news')">
+                <div class="content-header">
+                    <span class="content-type news">ニュース</span>
+                    <div class="content-meta">
+                        <span>1日前</span>
+                    </div>
+                </div>
+                <div class="content-title">第3四半期決算説明会の開催について</div>
+                <div class="content-meta">
+                    <span>📢 イベント</span>
+                    <span>•</span>
+                    <span>👁️ 234回</span>
+                </div>
+                <div class="content-status">
+                    <span class="status-badge status-published">公開済み</span>
+                    <div class="action-priority low"></div>
+                </div>
+            </div>
+            
+            <!-- その他のコンテンツカード -->
+            <div class="content-card faq" onclick="selectContent('content-004', 'faq')">
+                <div class="content-header">
+                    <span class="content-type faq">FAQ</span>
+                    <div class="content-meta">
+                        <span>2日前</span>
+                    </div>
+                </div>
+                <div class="content-title">ESG経営の取り組みについて</div>
+                <div class="content-meta">
+                    <span>🌱 ESG</span>
+                    <span>•</span>
+                    <span>👁️ 89回</span>
+                </div>
+                <div class="content-status">
+                    <span class="status-badge status-published">公開済み</span>
+                    <div class="action-priority medium"></div>
+                </div>
+            </div>
+            
+            <div class="content-card document" onclick="selectContent('content-005', 'document')">
+                <div class="content-header">
+                    <span class="content-type document">資料</span>
+                    <div class="content-meta">
+                        <span>3日前</span>
+                    </div>
+                </div>
+                <div class="content-title">中期経営計画説明資料</div>
+                <div class="content-meta">
+                    <span>📊 説明会資料</span>
+                    <span>•</span>
+                    <span>⬇️ 167回</span>
+                </div>
+                <div class="content-status">
+                    <span class="status-badge status-published">公開済み</span>
+                    <div class="action-priority low"></div>
+                </div>
+            </div>
+            
+            <div class="content-card news" onclick="selectContent('content-006', 'news')">
+                <div class="content-header">
+                    <span class="content-type news">ニュース</span>
+                    <div class="content-meta">
+                        <span>1週間前</span>
+                    </div>
+                </div>
+                <div class="content-title">株主優待制度の変更について</div>
+                <div class="content-meta">
+                    <span>🎁 株主還元</span>
+                    <span>•</span>
+                    <span>👁️ 456回</span>
+                </div>
+                <div class="content-status">
+                    <span class="status-badge status-published">公開済み</span>
+                    <div class="action-priority medium"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ワークスペースヘッダー -->
+    <div class="workspace-header">
+        <div>
+            <h1 class="text-2xl font-bold mb-1">IR情報統合センター</h1>
+            <p class="text-blue-100">投資家向け情報のライフサイクル管理</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <p class="text-sm text-blue-200">公開コンテンツ</p>
+                <p class="text-2xl font-bold">182件</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-blue-200">今月更新</p>
+                <p class="text-2xl font-bold text-yellow-300">45件</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-blue-200">平均閲覧数</p>
+                <p class="text-2xl font-bold text-green-300">234回</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- メインワークスペース -->
+    <div class="workspace-main">
+        <!-- ツールバー -->
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button class="btn-toolbar active" onclick="setViewMode('dashboard')">
+                    <span>📊</span>
+                    <span>ダッシュボード</span>
+                </button>
+                <button class="btn-toolbar" onclick="setViewMode('content')">
+                    <span>📝</span>
+                    <span>コンテンツ</span>
+                </button>
+                <button class="btn-toolbar" onclick="setViewMode('lifecycle')">
+                    <span>🔄</span>
+                    <span>ライフサイクル</span>
+                </button>
+                <button class="btn-toolbar" onclick="setViewMode('analytics')">
+                    <span>📈</span>
+                    <span>アナリティクス</span>
+                </button>
+            </div>
+            
+            <div class="toolbar-group">
+                <button class="btn-toolbar" onclick="showCreateModal()">
+                    <span>➕</span>
+                    <span>新規作成</span>
+                </button>
+                <button class="btn-toolbar" onclick="showImportModal()">
+                    <span>📥</span>
+                    <span>インポート</span>
+                </button>
+                <button class="btn-toolbar" onclick="exportContent()">
+                    <span>📤</span>
+                    <span>エクスポート</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- ダッシュボードビュー -->
+        <div id="view-dashboard" class="view-content">
+            <!-- 統計カード -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">FAQ総数</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>+12% 先月比</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">67</div>
+                    <div class="stat-label">公開資料</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>+5% 先月比</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">25</div>
+                    <div class="stat-label">ニュース記事</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>+8% 先月比</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">12,547</div>
+                    <div class="stat-label">総閲覧数</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>+18% 先月比</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- コンテンツライフサイクル概要 -->
+            <div class="lifecycle-flow">
+                <div class="lifecycle-stage">
+                    <div class="stage-icon active">1</div>
+                    <div class="stage-label">作成・準備</div>
+                    <div class="stage-count">15件</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon active">2</div>
+                    <div class="stage-label">レビュー・承認</div>
+                    <div class="stage-count">8件</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon">3</div>
+                    <div class="stage-label">公開・配信</div>
+                    <div class="stage-count">182件</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon">4</div>
+                    <div class="stage-label">フィードバック</div>
+                    <div class="stage-count">156件</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon">5</div>
+                    <div class="stage-label">更新・改善</div>
+                    <div class="stage-count">23件</div>
+                </div>
+            </div>
+            
+            <!-- 最近のアクティビティ -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">📈 最近のハイライト</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">第3四半期決算FAQ 10件を公開</div>
+                            <div class="text-sm text-gray-500">2時間前 • 平均閲覧数: 89回</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">中期経営計画資料のダウンロード急増</div>
+                            <div class="text-sm text-gray-500">5時間前 • +167% 前日比</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">ESG関連のFAQ更新完了</div>
+                            <div class="text-sm text-gray-500">1日前 • 信頼度スコア: 95%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- コンテンツビュー -->
+        <div id="view-content" class="view-content hidden">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">選択中のコンテンツ</h3>
+                <p class="text-gray-600">左側のストリームからコンテンツを選択すると、ここに詳細が表示されます。</p>
+            </div>
+        </div>
+        
+        <!-- ライフサイクルビュー -->
+        <div id="view-lifecycle" class="view-content hidden">
+            <div class="lifecycle-flow mb-6">
+                <div class="lifecycle-stage">
+                    <div class="stage-icon active">📝</div>
+                    <div class="stage-label">作成・準備</div>
+                    <div class="stage-count">15件処理中</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon active">👀</div>
+                    <div class="stage-label">レビュー・承認</div>
+                    <div class="stage-count">8件待機中</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon">🚀</div>
+                    <div class="stage-label">公開・配信</div>
+                    <div class="stage-count">182件公開中</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon">💬</div>
+                    <div class="stage-label">フィードバック</div>
+                    <div class="stage-count">156件収集済</div>
+                </div>
+                <div class="lifecycle-stage">
+                    <div class="stage-icon">🔄</div>
+                    <div class="stage-label">更新・改善</div>
+                    <div class="stage-count">23件計画中</div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">ライフサイクル管理</h3>
+                <p class="text-gray-600">コンテンツのライフサイクル全体を通じた管理機能を提供します。</p>
+            </div>
+        </div>
+        
+        <!-- アナリティクスビュー -->
+        <div id="view-analytics" class="view-content hidden">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="font-semibold text-gray-800 mb-4">📊 詳細分析</h3>
+                <p class="text-gray-600">投資家の行動パターンや人気コンテンツの分析結果を表示します。</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- インサイトパネル開閉ボタン（固定位置） -->
+    <div class="insight-toggle" onclick="toggleInsightPanel()" title="インサイトパネルを開閉">
+        <div class="insight-toggle-icon">‹</div>
+        <div class="insight-toggle-text">インサイト</div>
+    </div>
+    
+    <!-- インサイトパネル（右サイドバー） -->
+    <div class="insight-panel" id="insightPanel">
+        
+        <div class="insight-header">
+            <h3 class="font-semibold text-white">🧠 インサイト</h3>
+            <button class="text-white opacity-75 hover:opacity-100" onclick="toggleInsightPanel()" title="パネルを閉じる">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="insight-content">
+            <!-- 関連コンテンツ -->
+            <div class="related-content">
+                <h4 class="font-semibold text-gray-800 mb-3">🔗 関連コンテンツ</h4>
+                <div class="related-item">
+                    <div class="related-title">同期決算資料</div>
+                    <div class="related-meta">決算短信 • 3日前</div>
+                </div>
+                <div class="related-item">
+                    <div class="related-title">業績見通しFAQ</div>
+                    <div class="related-meta">FAQ • 信頼度95%</div>
+                </div>
+                <div class="related-item">
+                    <div class="related-title">投資家説明会資料</div>
+                    <div class="related-meta">プレゼン • 1週間前</div>
+                </div>
+            </div>
+            
+            <!-- パフォーマンス分析 -->
+            <div class="analytics-widget">
+                <div class="widget-title">📈 パフォーマンス</div>
+                <div class="metric-item">
+                    <span class="metric-label">閲覧数</span>
+                    <span class="metric-value">128回</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">平均滞在時間</span>
+                    <span class="metric-value">2分45秒</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">フィードバック</span>
+                    <span class="metric-value">12件</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">信頼度スコア</span>
+                    <span class="metric-value">94%</span>
+                </div>
+            </div>
+            
+            <!-- 要対応アクション -->
+            <div>
+                <h4 class="font-semibold text-gray-800 mb-3">⚡ 要対応</h4>
+                <div class="action-item">
+                    <div class="action-priority high"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-sm">FAQ更新の確認</div>
+                        <div class="text-xs text-gray-500">期限: 今日</div>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <div class="action-priority medium"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-sm">資料の承認待ち</div>
+                        <div class="text-xs text-gray-500">期限: 明日</div>
+                    </div>
+                </div>
+                <div class="action-item">
+                    <div class="action-priority low"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-sm">統計レポート作成</div>
+                        <div class="text-xs text-gray-500">期限: 来週</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// グローバル変数
+let currentViewMode = 'dashboard';
+let selectedContent = null;
+let insightPanelCollapsed = false;
+
+// ビューモード切り替え
+function setViewMode(mode) {
+    // ツールバーボタンの状態更新
+    document.querySelectorAll('.btn-toolbar').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.closest('.btn-toolbar').classList.add('active');
+    
+    // ビューコンテンツの切り替え
+    document.querySelectorAll('.view-content').forEach(view => {
+        view.classList.add('hidden');
+    });
+    document.getElementById(`view-${mode}`).classList.remove('hidden');
+    
+    currentViewMode = mode;
+    console.log('ビューモード変更:', mode);
+}
+
+// コンテンツフィルター
+function filterContent(type) {
+    // フィルターチップの状態更新
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // コンテンツカードの表示制御
+    const cards = document.querySelectorAll('.content-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const shouldShow = type === 'all' || 
+                          card.classList.contains(type) ||
+                          (type === 'urgent' && card.querySelector('.action-priority.high')) ||
+                          (type === 'today' && card.textContent.includes('時間前'));
+        
+        if (shouldShow) {
+            card.style.display = '';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // 件数表示を更新
+    document.getElementById('streamCount').textContent = `${visibleCount}件`;
+    
+    console.log('フィルター適用:', type, '表示件数:', visibleCount);
+}
+
+// コンテンツ選択
+function selectContent(contentId, contentType) {
+    // 既存の選択状態をクリア
+    document.querySelectorAll('.content-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // 新しい選択状態を設定
+    event.target.closest('.content-card').classList.add('selected');
+    
+    selectedContent = { id: contentId, type: contentType };
+    
+    // コンテンツビューの場合、詳細を表示
+    if (currentViewMode === 'content') {
+        showContentDetails(contentId, contentType);
+    }
+    
+    console.log('コンテンツ選択:', selectedContent);
+}
+
+// コンテンツ詳細表示
+function showContentDetails(contentId, contentType) {
+    const contentView = document.getElementById('view-content');
+    
+    // モックデータに基づく詳細表示
+    const mockDetails = {
+        'content-001': {
+            title: '2024年第3四半期の業績見通しについて',
+            type: 'FAQ',
+            category: '財務・業績',
+            content: '第3四半期の売上高は前年同期比15%増の見込みです。主力事業の好調な推移により、通期業績予想を上方修正いたします。',
+            viewCount: 128,
+            lastUpdated: '2024年1月20日',
+            status: '公開済み'
+        }
+    };
+    
+    const details = mockDetails[contentId];
+    if (details) {
+        contentView.innerHTML = `
+            <div class="bg-white rounded-lg border p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="content-type ${contentType}">${details.type}</span>
+                        <span class="text-sm text-gray-500">${details.category}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn-toolbar" onclick="editContent('${contentId}')">
+                            <span>✏️</span>
+                            <span>編集</span>
+                        </button>
+                        <button class="btn-toolbar" onclick="duplicateContent('${contentId}')">
+                            <span>📋</span>
+                            <span>複製</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <h2 class="text-xl font-bold text-gray-800 mb-4">${details.title}</h2>
+                
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <p class="text-gray-700">${details.content}</p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <div class="text-gray-500">閲覧数</div>
+                        <div class="font-semibold">${details.viewCount}回</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">最終更新</div>
+                        <div class="font-semibold">${details.lastUpdated}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">ステータス</div>
+                        <div class="font-semibold text-green-600">${details.status}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">信頼度</div>
+                        <div class="font-semibold">94%</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// インサイトパネル開閉機能
+function toggleInsightPanel() {
+    const irContentCenter = document.querySelector('.ir-content-center');
+    const insightPanel = document.getElementById('insightPanel');
+    const toggleButton = document.querySelector('.insight-toggle');
+    
+    if (!irContentCenter || !insightPanel || !toggleButton) {
+        console.error('必要な要素が見つかりません');
+        return;
+    }
+    
+    insightPanelCollapsed = !insightPanelCollapsed;
+    
+    if (insightPanelCollapsed) {
+        irContentCenter.classList.add('insight-collapsed');
+        insightPanel.classList.add('collapsed');
+        toggleButton.title = 'インサイトパネルを開く';
+        
+        // 成功通知
+        showNotification('📚 インサイトパネルを閉じました', 'info');
+    } else {
+        irContentCenter.classList.remove('insight-collapsed');
+        insightPanel.classList.remove('collapsed');
+        toggleButton.title = 'インサイトパネルを閉じる';
+        
+        // 成功通知
+        showNotification('🧠 インサイトパネルを開きました', 'success');
+    }
+    
+    // 状態をローカルストレージに保存
+    localStorage.setItem('insightPanelCollapsed', insightPanelCollapsed);
+    
+    console.log('インサイトパネル:', insightPanelCollapsed ? '閉じる' : '開く');
+}
+
+// インサイトパネル初期化
+function initializeInsightPanel() {
+    console.log('インサイトパネル初期化開始');
+    
+    // ローカルストレージから前回の状態を復元
+    const saved = localStorage.getItem('insightPanelCollapsed');
+    console.log('保存された状態:', saved);
+    
+    const irContentCenter = document.querySelector('.ir-content-center');
+    const insightPanel = document.getElementById('insightPanel');
+    const toggleButton = document.querySelector('.insight-toggle');
+    
+    if (!irContentCenter || !insightPanel || !toggleButton) {
+        console.error('初期化: 必要な要素が見つかりません', {
+            irContentCenter: !!irContentCenter,
+            insightPanel: !!insightPanel,
+            toggleButton: !!toggleButton
+        });
+        return;
+    }
+    
+    if (saved !== null) {
+        insightPanelCollapsed = JSON.parse(saved);
+        console.log('復元された状態:', insightPanelCollapsed);
+        
+        if (insightPanelCollapsed) {
+            console.log('初期化: パネルを閉じた状態で復元');
+            irContentCenter.classList.add('insight-collapsed');
+            insightPanel.classList.add('collapsed');
+            toggleButton.title = 'インサイトパネルを開く';
+        } else {
+            toggleButton.title = 'インサイトパネルを閉じる';
+        }
+    } else {
+        console.log('保存された状態なし、デフォルト状態を使用');
+        toggleButton.title = 'インサイトパネルを閉じる';
+    }
+    
+    // 初期化完了の通知
+    setTimeout(() => {
+        showNotification('🚀 IR情報統合センターが読み込まれました', 'success');
+    }, 500);
+}
+
+// 各種アクション（モック）
+function showCreateModal() {
+    alert('新規コンテンツ作成モーダルを表示します');
+}
+
+function showImportModal() {
+    alert('インポートモーダルを表示します');
+}
+
+function exportContent() {
+    alert('コンテンツをエクスポートします');
+}
+
+function editContent(contentId) {
+    alert(`コンテンツ ${contentId} の編集画面を開きます`);
+}
+
+function duplicateContent(contentId) {
+    alert(`コンテンツ ${contentId} を複製します`);
+}
+
+// 通知表示機能
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-500 translate-x-0 z-50`;
+    
+    // タイプに応じた色を設定
+    if (type === 'success') {
+        notification.className += ' bg-green-500 text-white';
+    } else if (type === 'info') {
+        notification.className += ' bg-blue-500 text-white';
+    } else if (type === 'warning') {
+        notification.className += ' bg-yellow-500 text-white';
+    } else if (type === 'error') {
+        notification.className += ' bg-red-500 text-white';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // アニメーション
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0px)';
+        notification.style.opacity = '1';
+    }, 100);
+    
+    // 3秒後に非表示
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
+}
+
+// キーボードヘルプの表示
+function showKeyboardHelp() {
+    const helpModal = document.createElement('div');
+    helpModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    helpModal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">⌨️ キーボードショートカット</h3>
+                <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">インサイトパネル開閉</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">Ctrl+I</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">ダッシュボード表示</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">1</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">コンテンツ表示</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">2</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">ライフサイクル表示</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">3</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">アナリティクス表示</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">4</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">このヘルプ</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">H</kbd>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(helpModal);
+    
+    // クリックで閉じる
+    helpModal.addEventListener('click', function(e) {
+        if (e.target === helpModal) {
+            helpModal.remove();
+        }
+    });
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('IR情報統合センター初期化開始');
+    
+    // インサイトパネルの状態を初期化
+    initializeInsightPanel();
+    
+    // キーボードショートカット
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+I でインサイトパネル開閉
+        if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+            e.preventDefault();
+            toggleInsightPanel();
+            showNotification('⌨️ キーボードショートカット: Ctrl+I', 'info');
+        }
+        
+        // 1-4キーでビューモード切り替え
+        if (e.key >= '1' && e.key <= '4' && !e.ctrlKey && !e.altKey) {
+            const modes = ['dashboard', 'content', 'lifecycle', 'analytics'];
+            const mode = modes[parseInt(e.key) - 1];
+            if (mode) {
+                const button = document.querySelector(`[onclick="setViewMode('${mode}')"]`);
+                if (button) {
+                    button.click();
+                    showNotification(`🔢 ビュー切り替え: ${e.key}キー`, 'info');
+                }
+            }
+        }
+        
+        // Hキーでヘルプ表示
+        if (e.key === 'h' || e.key === 'H') {
+            if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+                showKeyboardHelp();
+            }
+        }
+    });
+    
+    console.log('初期化完了');
+});
+</script>
+{% endblock %} 

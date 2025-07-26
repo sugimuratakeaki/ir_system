@@ -235,47 +235,75 @@
     padding: 1rem;
 }
 
-/* インテリジェンス開閉ボタン */
+/* インテリジェンス開閉ボタン（固定位置） */
 .intelligence-toggle {
-    position: absolute;
-    left: -15px;
+    position: fixed;
+    right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    width: 30px;
-    height: 60px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-right: none;
-    border-radius: 15px 0 0 15px;
+    width: 45px;
+    height: 120px;
+    background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+    border-radius: 22px 0 0 22px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-    z-index: 10;
+    z-index: 100;
+    transition: all 0.3s ease;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 0;
 }
 
 .intelligence-toggle:hover {
-    background: #f8fafc;
-    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.15);
-}
-
-.intelligence-toggle-icon {
-    font-size: 1.25rem;
-    color: #6b7280;
-    transition: transform 0.3s ease;
+    background: linear-gradient(135deg, #047857 0%, #0f766e 100%);
+    transform: translateY(-50%) translateX(-3px);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.25);
 }
 
 .dialogue-center.intelligence-collapsed .intelligence-toggle {
-    left: -30px;
-    border-left: 1px solid #e5e7eb;
-    border-right: none;
-    border-radius: 15px 0 0 15px;
+    right: 0px;
+    border-radius: 0 22px 22px 0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.dialogue-center.intelligence-collapsed .intelligence-toggle:hover {
+    transform: translateY(-50%) translateX(3px);
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.intelligence-toggle-icon {
+    color: white;
+    font-size: 1.6rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+.intelligence-toggle-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: 0.75rem;
+    text-align: center;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
 }
 
 .dialogue-center.intelligence-collapsed .intelligence-toggle-icon {
     transform: rotate(180deg);
+}
+
+.dialogue-center.intelligence-collapsed .intelligence-toggle-text {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
 }
 
 /* 処理パイプライン表示 */
@@ -1039,7 +1067,23 @@
     }
     
     .intelligence-toggle {
-        display: none;
+        width: 40px;
+        height: 100px;
+        right: 10px;
+        padding: 6px 0;
+    }
+    
+    .dialogue-center.intelligence-collapsed .intelligence-toggle {
+        right: -5px;
+    }
+    
+    .intelligence-toggle-icon {
+        font-size: 1.2rem;
+    }
+    
+    .intelligence-toggle-text {
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
     }
 }
 
@@ -1052,6 +1096,10 @@
     
     .activity-stream {
         max-height: 150px;
+    }
+    
+    .intelligence-toggle {
+        display: none;
     }
 }
 
@@ -1865,12 +1913,14 @@
         </div>
     </div>
     
+    <!-- インテリジェンスパネル開閉ボタン（固定位置） -->
+    <div class="intelligence-toggle" onclick="toggleIntelligencePanel()" title="インテリジェンスパネルを開閉">
+        <div class="intelligence-toggle-icon">‹</div>
+        <div class="intelligence-toggle-text">知能分析</div>
+    </div>
+    
     <!-- インテリジェンスパネル（右サイドバー） -->
     <div class="intelligence-panel" id="intelligencePanel">
-        <!-- 開閉ボタン -->
-        <div class="intelligence-toggle" onclick="toggleIntelligencePanel()" title="インテリジェンスパネルを開閉">
-            <div class="intelligence-toggle-icon">‹</div>
-        </div>
         
         <div class="intelligence-header">
             <h3 class="font-semibold text-gray-800">🧠 インテリジェンス</h3>
@@ -2983,8 +3033,9 @@ function startRealtimeUpdates() {
 function toggleIntelligencePanel() {
     const dialogueCenter = document.querySelector('.dialogue-center');
     const intelligencePanel = document.getElementById('intelligencePanel');
+    const toggleButton = document.querySelector('.intelligence-toggle');
     
-    if (!dialogueCenter || !intelligencePanel) {
+    if (!dialogueCenter || !intelligencePanel || !toggleButton) {
         console.error('必要な要素が見つかりません');
         return;
     }
@@ -2992,19 +3043,98 @@ function toggleIntelligencePanel() {
     intelligencePanelCollapsed = !intelligencePanelCollapsed;
     
     if (intelligencePanelCollapsed) {
-        // パネルを閉じる: 同時実行で確実に
         dialogueCenter.classList.add('intelligence-collapsed');
         intelligencePanel.classList.add('collapsed');
+        toggleButton.title = 'インテリジェンスパネルを開く';
+        
+        // 成功通知
+        showNotification('🔍 知能分析パネルを閉じました', 'info');
     } else {
-        // パネルを開く: 同時実行で確実に
         dialogueCenter.classList.remove('intelligence-collapsed');
         intelligencePanel.classList.remove('collapsed');
+        toggleButton.title = 'インテリジェンスパネルを閉じる';
+        
+        // 成功通知
+        showNotification('🧠 知能分析パネルを開きました', 'success');
     }
     
     // 状態をローカルストレージに保存
     localStorage.setItem('intelligencePanelCollapsed', intelligencePanelCollapsed);
     
     console.log('インテリジェンスパネル:', intelligencePanelCollapsed ? '閉じる' : '開く');
+}
+
+// 通知表示機能
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-500 translate-x-0 z-50`;
+    
+    // タイプに応じた色を設定
+    if (type === 'success') {
+        notification.className += ' bg-green-500 text-white';
+    } else if (type === 'info') {
+        notification.className += ' bg-blue-500 text-white';
+    } else if (type === 'warning') {
+        notification.className += ' bg-yellow-500 text-white';
+    } else if (type === 'error') {
+        notification.className += ' bg-red-500 text-white';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // アニメーション
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0px)';
+        notification.style.opacity = '1';
+    }, 100);
+    
+    // 3秒後に非表示
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
+}
+
+// キーボードヘルプの表示
+function showKeyboardHelp() {
+    const helpModal = document.createElement('div');
+    helpModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    helpModal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">⌨️ キーボードショートカット</h3>
+                <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">インテリジェンスパネル開閉</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">Ctrl+I</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">一括処理</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">B</kbd>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">このヘルプ</span>
+                    <kbd class="px-2 py-1 bg-gray-100 rounded">H</kbd>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(helpModal);
+    
+    // クリックで閉じる
+    helpModal.addEventListener('click', function(e) {
+        if (e.target === helpModal) {
+            helpModal.remove();
+        }
+    });
 }
 
 function initializeIntelligencePanel() {
@@ -3014,28 +3144,40 @@ function initializeIntelligencePanel() {
     const saved = localStorage.getItem('intelligencePanelCollapsed');
     console.log('保存された状態:', saved);
     
+    const dialogueCenter = document.querySelector('.dialogue-center');
+    const intelligencePanel = document.getElementById('intelligencePanel');
+    const toggleButton = document.querySelector('.intelligence-toggle');
+    
+    if (!dialogueCenter || !intelligencePanel || !toggleButton) {
+        console.error('初期化: 必要な要素が見つかりません', {
+            dialogueCenter: !!dialogueCenter,
+            intelligencePanel: !!intelligencePanel,
+            toggleButton: !!toggleButton
+        });
+        return;
+    }
+    
     if (saved !== null) {
         intelligencePanelCollapsed = JSON.parse(saved);
         console.log('復元された状態:', intelligencePanelCollapsed);
         
         if (intelligencePanelCollapsed) {
-            const dialogueCenter = document.querySelector('.dialogue-center');
-            const intelligencePanel = document.getElementById('intelligencePanel');
-            
-            if (dialogueCenter && intelligencePanel) {
-                console.log('初期化: パネルを閉じた状態で復元');
-                dialogueCenter.classList.add('intelligence-collapsed');
-                intelligencePanel.classList.add('collapsed');
-            } else {
-                console.error('初期化: 必要な要素が見つかりません', {
-                    dialogueCenter: !!dialogueCenter,
-                    intelligencePanel: !!intelligencePanel
-                });
-            }
+            console.log('初期化: パネルを閉じた状態で復元');
+            dialogueCenter.classList.add('intelligence-collapsed');
+            intelligencePanel.classList.add('collapsed');
+            toggleButton.title = 'インテリジェンスパネルを開く';
+        } else {
+            toggleButton.title = 'インテリジェンスパネルを閉じる';
         }
     } else {
         console.log('保存された状態なし、デフォルト状態を使用');
+        toggleButton.title = 'インテリジェンスパネルを閉じる';
     }
+    
+    // 初期化完了の通知
+    setTimeout(() => {
+        showNotification('💬 対話記録センターが読み込まれました', 'success');
+    }, 500);
 }
 
 // 初期化
