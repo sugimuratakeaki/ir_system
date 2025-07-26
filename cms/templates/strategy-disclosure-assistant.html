@@ -3,80 +3,9 @@
 {% block title %}中長期計画開示支援ツール{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
 <style>
-/* デザインシステム定義 */
-:root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-/* ボタンデザインシステム */
-.btn-primary {
-    @apply relative inline-flex items-center justify-center px-6 py-3 text-white font-medium rounded-lg overflow-hidden transition-all duration-300 transform hover:scale-105;
-    background: var(--primary-gradient);
-    box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 5px 20px 0 rgba(102, 126, 234, 0.6);
-}
-
-.btn-primary:active {
-    transform: scale(0.98);
-}
-
-.btn-primary:disabled {
-    @apply opacity-60 cursor-not-allowed transform-none;
-    box-shadow: none;
-}
-
-.btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border-2 border-gray-300 transition-all duration-300 hover:border-gray-400 hover:bg-gray-50;
-}
-
-.btn-success {
-    @apply relative inline-flex items-center justify-center px-6 py-3 text-white font-medium rounded-lg overflow-hidden transition-all duration-300 transform hover:scale-105;
-    background: var(--success-gradient);
-    box-shadow: 0 4px 15px 0 rgba(17, 153, 142, 0.4);
-}
-
-.btn-warning {
-    @apply relative inline-flex items-center justify-center px-6 py-3 text-white font-medium rounded-lg overflow-hidden transition-all duration-300;
-    background: var(--warning-gradient);
-    box-shadow: 0 4px 15px 0 rgba(245, 87, 108, 0.4);
-}
-
-.btn-info {
-    @apply relative inline-flex items-center justify-center px-6 py-3 text-white font-medium rounded-lg overflow-hidden transition-all duration-300;
-    background: var(--info-gradient);
-    box-shadow: 0 4px 15px 0 rgba(79, 172, 254, 0.4);
-}
-
-/* フローティングアクションボタン */
-.fab {
-    @apply fixed bottom-8 right-8 w-14 h-14 rounded-full text-white flex items-center justify-center transition-all duration-300 transform hover:scale-110 z-50;
-    background: var(--primary-gradient);
-    box-shadow: 0 4px 20px 0 rgba(102, 126, 234, 0.5);
-}
-
-.fab:hover {
-    box-shadow: 0 6px 25px 0 rgba(102, 126, 234, 0.7);
-}
-
-/* アイコンボタン */
-.btn-icon {
-    @apply inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 text-gray-600 transition-all duration-200 hover:bg-gray-200;
-}
-
-.btn-icon-primary {
-    @apply inline-flex items-center justify-center w-10 h-10 rounded-lg text-white transition-all duration-200;
-    background: var(--primary-gradient);
-}
-
-
-/* ステップ進行インジケーター */
+/* ステップインジケーター */
 .step-indicator {
     display: flex;
     justify-content: space-between;
@@ -99,163 +28,164 @@
     left: 50%;
     width: 100%;
     height: 2px;
-    background-color: #e5e7eb;
+    background-color: var(--gray-300);
 }
 
 .step.completed:not(:last-child)::after {
-    background-color: #14b8a6;
+    background-color: var(--accent-teal);
 }
 
 .step-circle {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #e5e7eb;
-    color: #6b7280;
+    background-color: var(--gray-300);
+    color: var(--gray-600);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-weight: var(--font-bold);
     z-index: 1;
-    transition: all 0.3s ease;
+    transition: all var(--transition-normal);
 }
 
 .step.active .step-circle {
-    background-color: #1a365d;
+    background-color: var(--kagami-blue);
     color: white;
     transform: scale(1.1);
 }
 
 .step.completed .step-circle {
-    background-color: #14b8a6;
+    background-color: var(--accent-teal);
     color: white;
 }
 
 .step-label {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
+    margin-top: var(--space-sm);
+    font-size: var(--text-sm);
+    color: var(--gray-600);
     text-align: center;
 }
 
 .step.active .step-label {
-    color: #1a365d;
-    font-weight: 600;
+    color: var(--kagami-blue);
+    font-weight: var(--font-semibold);
 }
 
 /* ファイルアップロードエリア */
 .upload-area {
-    border: 2px dashed #d1d5db;
-    border-radius: 0.5rem;
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius-lg);
     padding: 3rem;
     text-align: center;
-    background-color: #f9fafb;
-    transition: all 0.3s ease;
+    background-color: var(--gray-50);
+    transition: all var(--transition-normal);
     cursor: pointer;
 }
 
 .upload-area:hover {
-    border-color: #14b8a6;
-    background-color: #f0fdfa;
+    border-color: var(--accent-teal);
+    background-color: rgba(20, 184, 166, 0.05);
 }
 
 .upload-area.dragover {
-    border-color: #1a365d;
-    background-color: #eff6ff;
+    border-color: var(--kagami-blue);
+    background-color: rgba(26, 54, 93, 0.05);
 }
 
 /* 質問カード */
 .question-card {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+    transition: all var(--transition-normal);
 }
 
 .question-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .question-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-md);
 }
 
 .question-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
 }
 
 .priority-high {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error-red);
 }
 
 .priority-medium {
-    background-color: #fef3c7;
-    color: #d97706;
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning-orange);
 }
 
 .priority-low {
-    background-color: #dbeafe;
-    color: #2563eb;
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--info-blue);
 }
 
 /* 回答エリア */
 .answer-area {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.375rem;
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
 }
 
 .answer-textarea {
     width: 100%;
     min-height: 120px;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
     resize: vertical;
-    font-size: 0.875rem;
-    line-height: 1.5;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    transition: border-color var(--transition-fast);
 }
 
 .answer-textarea:focus {
     outline: none;
-    border-color: #14b8a6;
-    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+    border-color: var(--kagami-blue);
+    box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 /* AI提案セクション */
 .ai-suggestion {
-    background-color: #f0fdfa;
-    border: 1px solid #14b8a6;
-    border-radius: 0.375rem;
-    padding: 1rem;
-    margin-top: 0.5rem;
+    background-color: rgba(20, 184, 166, 0.05);
+    border: 1px solid var(--accent-teal);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    margin-top: var(--space-sm);
 }
 
 .ai-suggestion-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    color: #0f766e;
-    margin-bottom: 0.5rem;
+    gap: var(--space-sm);
+    font-weight: var(--font-semibold);
+    color: var(--accent-teal-dark);
+    margin-bottom: var(--space-sm);
 }
 
 /* プレビューエリア */
 .preview-section {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
     padding: 2rem;
     margin-top: 2rem;
 }
@@ -264,9 +194,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border-color);
 }
 
 /* ローディング状態 */
@@ -280,21 +210,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: var(--z-modal);
 }
 
 .loading-content {
     background: white;
     padding: 2rem;
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius-lg);
     text-align: center;
 }
 
 .loading-spinner {
     width: 50px;
     height: 50px;
-    border: 3px solid #f3f4f6;
-    border-top: 3px solid #1a365d;
+    border: 3px solid var(--gray-200);
+    border-top: 3px solid var(--kagami-blue);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 1rem;
@@ -312,7 +242,7 @@
     }
     
     .step-label {
-        font-size: 0.75rem;
+        font-size: var(--text-xs);
     }
     
     .upload-area {
@@ -325,13 +255,13 @@
 {% block content %}
 <div class="container mx-auto px-4 py-6">
     <!-- ヘッダー -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">中長期計画開示支援ツール</h1>
+    <div class="mb-lg">
+        <h1 class="text-3xl font-bold text-gray-900 mb-md">中長期計画開示支援ツール</h1>
         <p class="text-gray-600">AIが投資家視点で質問を生成し、効果的な中長期計画の開示資料作成をサポートします</p>
     </div>
 
     <!-- ステップインジケーター -->
-    <div class="step-indicator mb-8">
+    <div class="step-indicator mb-lg">
         <div class="step active" id="step1">
             <div class="step-circle">1</div>
             <div class="step-label">資料アップロード</div>
@@ -352,10 +282,11 @@
 
     <!-- ステップ1: ファイルアップロード -->
     <div id="step1-content" class="step-content">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">
-                <span class="text-accent-teal">ステップ1:</span> 企業情報と決算資料
-            </h2>
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <span class="text-accent-teal">ステップ1:</span> 企業情報と決算資料
+                </h2>
             
             <!-- 企業プロファイル入力 -->
             <div class="mb-6 p-4 bg-blue-50 rounded-lg">
@@ -365,10 +296,10 @@
                     </svg>
                     企業プロファイル（AIがより適切な質問を生成するための情報）
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">業種</label>
-                        <select id="industry" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div class="form-group">
+                        <label class="form-label">業種</label>
+                        <select id="industry" class="form-control">
                             <option value="">選択してください</option>
                             <option value="manufacturing">製造業</option>
                             <option value="it">情報通信業</option>
@@ -381,9 +312,9 @@
                             <option value="other">その他</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">上場市場</label>
-                        <select id="market" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div class="form-group">
+                        <label class="form-label">上場市場</label>
+                        <select id="market" class="form-control">
                             <option value="">選択してください</option>
                             <option value="prime">東証プライム</option>
                             <option value="standard">東証スタンダード</option>
@@ -391,13 +322,13 @@
                             <option value="non-listed">非上場</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">主な競合他社（任意）</label>
-                        <input type="text" id="competitors" placeholder="例：A社、B社、C社" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div class="form-group">
+                        <label class="form-label">主な競合他社（任意）</label>
+                        <input type="text" id="competitors" placeholder="例：A社、B社、C社" class="form-control">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">重点事業領域（任意）</label>
-                        <input type="text" id="focus-areas" placeholder="例：AI、DX、海外展開" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div class="form-group">
+                        <label class="form-label">重点事業領域（任意）</label>
+                        <input type="text" id="focus-areas" placeholder="例：AI、DX、海外展開" class="form-control">
                     </div>
                 </div>
             </div>
@@ -423,11 +354,11 @@
                 <div id="fileItems"></div>
             </div>
 
-            <div class="mt-6 flex justify-end gap-3">
-                <button class="btn-secondary" onclick="skipToManualQuestions()">
+            <div class="mt-6 flex justify-end gap-md">
+                <button class="btn btn-secondary" onclick="skipToManualQuestions()">
                     資料なしで進む
                 </button>
-                <button id="analyzeBtn" class="btn-primary flex items-center gap-2" 
+                <button id="analyzeBtn" class="btn btn-primary flex items-center gap-sm" 
                         onclick="startAnalysis()" disabled>
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -435,29 +366,32 @@
                     AIで分析開始
                 </button>
             </div>
+            </div>
         </div>
     </div>
 
     <!-- ステップ2: AI分析中 -->
     <div id="step2-content" class="step-content hidden">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">
-                <span class="text-accent-teal">ステップ2:</span> AI分析中...
-            </h2>
-            
-            <div class="text-center py-8">
-                <div class="loading-spinner mx-auto mb-4"></div>
-                <p class="text-gray-600 mb-2">決算資料を分析しています...</p>
-                <p class="text-sm text-gray-500">投資家視点での重要な質問を生成中</p>
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <span class="text-accent-teal">ステップ2:</span> AI分析中...
+                </h2>
                 
-                <div class="mt-6 bg-gray-50 rounded-lg p-4 max-w-md mx-auto">
-                    <p class="text-sm text-gray-700 font-medium mb-2">分析中の項目:</p>
-                    <ul class="text-sm text-gray-600 space-y-1">
-                        <li id="analysis-item-1">・財務パフォーマンスの分析</li>
-                        <li id="analysis-item-2">・事業戦略の評価</li>
-                        <li id="analysis-item-3">・ESG要素の確認</li>
-                        <li id="analysis-item-4">・投資家の関心事項の特定</li>
-                    </ul>
+                <div class="text-center py-8">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-600 mb-2">決算資料を分析しています...</p>
+                    <p class="text-sm text-gray-500">投資家視点での重要な質問を生成中</p>
+                    
+                    <div class="mt-6 bg-gray-50 rounded-lg p-4 max-w-md mx-auto">
+                        <p class="text-sm text-gray-700 font-medium mb-2">分析中の項目:</p>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li id="analysis-item-1">・財務パフォーマンスの分析</li>
+                            <li id="analysis-item-2">・事業戦略の評価</li>
+                            <li id="analysis-item-3">・ESG要素の確認</li>
+                            <li id="analysis-item-4">・投資家の関心事項の特定</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -465,14 +399,15 @@
 
     <!-- ステップ3: 質問への回答 -->
     <div id="step3-content" class="step-content hidden">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">
-                <span class="text-accent-teal">ステップ3:</span> 投資家視点の質問に回答
-            </h2>
-            
-            <p class="text-gray-600 mb-6">
-                AIが生成した質問に回答してください。これらは投資家が中長期計画について最も知りたい事項です。
-            </p>
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <span class="text-accent-teal">ステップ3:</span> 投資家視点の質問に回答
+                </h2>
+                
+                <p class="text-gray-600 mb-6">
+                    AIが生成した質問に回答してください。これらは投資家が中長期計画について最も知りたい事項です。
+                </p>
 
             <div id="questionsContainer">
                 <!-- 質問カードがここに動的に追加されます -->
@@ -489,20 +424,20 @@
                     </h4>
                     <span id="additionalQuestionsCount" class="text-sm text-purple-600">0件追加済み</span>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <button class="btn-info text-sm" onclick="generateSpecificQuestions('competitor')">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+                    <button class="btn btn-primary btn-sm text-sm" onclick="generateSpecificQuestions('competitor')">
                         <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         競合比較質問を追加
                     </button>
-                    <button class="btn-info text-sm" onclick="generateSpecificQuestions('industry')">
+                    <button class="btn btn-primary btn-sm text-sm" onclick="generateSpecificQuestions('industry')">
                         <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                         業界特有の質問を追加
                     </button>
-                    <button class="btn-info text-sm" onclick="generateSpecificQuestions('deep')">
+                    <button class="btn btn-primary btn-sm text-sm" onclick="generateSpecificQuestions('deep')">
                         <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
@@ -510,11 +445,11 @@
                     </button>
                 </div>
                 <div class="mt-3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">または、特定のトピックについて質問を追加：</label>
-                    <div class="flex gap-2">
+                    <label class="form-label">または、特定のトピックについて質問を追加：</label>
+                    <div class="flex gap-sm">
                         <input type="text" id="customTopic" placeholder="例：M&A戦略、研究開発投資、サプライチェーン" 
-                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                        <button class="btn-primary" onclick="generateCustomQuestions()">
+                               class="form-control flex-1">
+                        <button class="btn btn-primary" onclick="generateCustomQuestions()">
                             AIで質問生成
                         </button>
                     </div>
@@ -522,24 +457,25 @@
             </div>
 
             <div class="mt-6 flex justify-between">
-                <button class="btn-secondary" onclick="previousStep()">
+                <button class="btn btn-secondary" onclick="previousStep()">
                     戻る
                 </button>
-                <div class="flex gap-3">
-                    <button class="btn-secondary" onclick="saveProgress()">
+                <div class="flex gap-md">
+                    <button class="btn btn-secondary" onclick="saveProgress()">
                         一時保存
                     </button>
-                    <button class="btn-primary" onclick="generateDisclosure()">
+                    <button class="btn btn-primary" onclick="generateDisclosure()">
                         開示資料を生成
                     </button>
                 </div>
+            </div>
             </div>
         </div>
     </div>
 
     <!-- ステップ4: 開示資料作成 -->
     <div id="step4-content" class="step-content hidden">
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="card">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">
                 <span class="text-accent-teal">ステップ4:</span> 中長期計画開示資料
             </h2>
@@ -547,11 +483,11 @@
             <div class="preview-section">
                 <div class="preview-header">
                     <h3 class="text-lg font-semibold text-gray-900">生成された開示資料</h3>
-                    <div class="flex gap-2">
-                        <button class="btn-secondary text-sm" onclick="editDocument()">
+                    <div class="flex gap-sm">
+                        <button class="btn btn-secondary btn-sm" onclick="editDocument()">
                             編集
                         </button>
-                        <button class="btn-primary text-sm" onclick="downloadDocument()">
+                        <button class="btn btn-primary btn-sm" onclick="downloadDocument()">
                             ダウンロード
                         </button>
                     </div>
@@ -649,7 +585,7 @@ function displayFiles(files) {
                 <span class="text-sm text-gray-700">${file.name}</span>
                 <span class="text-xs text-gray-500 ml-2">(${formatFileSize(file.size)})</span>
             </div>
-            <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
+            <button onclick="removeFile(${index})" class="btn-icon text-red-500 hover:text-red-700">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -867,7 +803,7 @@ function displayQuestions() {
             </div>
             
             <div class="answer-area">
-                <label class="block text-sm font-medium text-gray-700 mb-2">回答を入力してください</label>
+                <label class="form-label">回答を入力してください</label>
                 <textarea 
                     id="answer-${q.id}" 
                     class="answer-textarea" 
@@ -875,7 +811,7 @@ function displayQuestions() {
                     onchange="saveAnswer(${q.id}, this.value)"
                 ></textarea>
                 <div class="mt-2 flex justify-end">
-                    <button class="text-sm text-accent-teal hover:text-teal-700" onclick="generateAISuggestion(${q.id})">
+                    <button class="btn btn-secondary btn-sm" onclick="generateAISuggestion(${q.id})">
                         AI回答案を生成
                     </button>
                 </div>
