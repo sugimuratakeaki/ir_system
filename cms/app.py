@@ -131,7 +131,7 @@ MOCK_DATA = {
         {
             "id": 1, 
             "question": "2024年度の業績見通しは？", 
-            "answer": "売上高は前年比15%増の見込みです。", 
+            "answer": "売上高は前年比15%増の見込みです。利益面では営業利益率が改善し、ROEも向上する予定です。特にAI事業の成長が全体業績を牽引しています。", 
             "status": "published", 
             "confidence": 98,
             "data_sources": [
@@ -146,13 +146,13 @@ MOCK_DATA = {
             "created_by": "IR担当者A",
             "tags": ["決算", "業績見通し", "売上高"],
             "similar_faqs": [2, 5],
-            "view_count": 156,
+            "view_count": 256,
             "is_current": True
         },
         {
             "id": 2, 
             "question": "配当政策について教えてください", 
-            "answer": "配当性向30%を目標としています。", 
+            "answer": "配当性向30%を目標とし、安定的な配当の継続を基本方針としています。業績向上に伴い、段階的な増配も検討しています。", 
             "status": "published", 
             "confidence": 95,
             "data_sources": [
@@ -166,15 +166,15 @@ MOCK_DATA = {
             "last_updated": "2024-01-20 14:25:00",
             "created_by": "IR担当者B",
             "tags": ["配当", "株主還元", "配当性向"],
-            "similar_faqs": [],
-            "view_count": 89,
+            "similar_faqs": [8],
+            "view_count": 189,
             "is_current": True
         },
         {
             "id": 3, 
             "question": "ESGへの取り組みは？", 
-            "answer": "2030年までにカーボンニュートラルを目指します。", 
-            "status": "draft", 
+            "answer": "2030年までにカーボンニュートラルを目指し、再生可能エネルギーの活用やデジタル化による効率化を推進しています。ESG経営委員会を設置し、持続可能な成長を追求しています。", 
+            "status": "published", 
             "confidence": 92,
             "data_sources": [
                 {"id": 4, "name": "統合報告書2023", "type": "IR資料", "date": "2023-12-15", "relevance": 90}
@@ -182,12 +182,154 @@ MOCK_DATA = {
             "valid_from": "2023-12-15",
             "valid_until": "2024-12-31",
             "category": "ESG",
-            "version": "2023",
+            "version": "2024-Q3",
             "last_updated": "2024-01-15 10:20:00",
             "created_by": "IR担当者A",
             "tags": ["ESG", "カーボンニュートラル", "環境"],
+            "similar_faqs": [4],
+            "view_count": 145,
+            "is_current": True
+        },
+        {
+            "id": 4,
+            "question": "中期経営計画の進捗状況はいかがですか？",
+            "answer": "2022年に策定した3カ年計画は順調に進捗しており、売上高・利益とも計画を上回るペースです。特にデジタルトランスフォーメーション投資の効果が表れています。",
+            "status": "published",
+            "confidence": 94,
+            "data_sources": [
+                {"id": 3, "name": "中期経営計画", "type": "経営計画", "date": "2024-01-10", "relevance": 95},
+                {"id": 1, "name": "2024年度第3四半期決算短信", "type": "決算資料", "date": "2024-01-20", "relevance": 88}
+            ],
+            "valid_from": "2024-01-10",
+            "valid_until": "2025-03-31",
+            "category": "経営戦略",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-18 11:15:00",
+            "created_by": "IR担当者A",
+            "tags": ["中期経営計画", "戦略", "DX"],
+            "similar_faqs": [1, 5],
+            "view_count": 134,
+            "is_current": True
+        },
+        {
+            "id": 5,
+            "question": "AI事業の成長戦略について詳しく教えてください",
+            "answer": "AI事業は今後5年間で売上を10倍に拡大する計画です。金融・製造・ヘルスケア分野での展開を加速し、独自技術を活かした差別化戦略を推進します。",
+            "status": "published",
+            "confidence": 96,
+            "data_sources": [
+                {"id": 3, "name": "中期経営計画", "type": "経営計画", "date": "2024-01-10", "relevance": 92},
+                {"id": 5, "name": "AI事業戦略説明会", "type": "説明会", "date": "2024-01-15", "relevance": 95}
+            ],
+            "valid_from": "2024-01-15",
+            "valid_until": "2025-01-31",
+            "category": "経営戦略",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-19 16:45:00",
+            "created_by": "IR担当者C",
+            "tags": ["AI", "成長戦略", "新規事業"],
+            "similar_faqs": [1, 4],
+            "view_count": 178,
+            "is_current": True
+        },
+        {
+            "id": 6,
+            "question": "株主総会の開催予定について教えてください",
+            "answer": "第95期定時株主総会は2024年6月25日に開催予定です。今年も一部オンライン配信を実施し、より多くの株主様にご参加いただけるよう準備しています。",
+            "status": "published",
+            "confidence": 100,
+            "data_sources": [
+                {"id": 6, "name": "株主総会招集通知", "type": "株主総会資料", "date": "2024-01-22", "relevance": 100}
+            ],
+            "valid_from": "2024-01-22",
+            "valid_until": "2024-06-30",
+            "category": "株主還元",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-22 09:30:00",
+            "created_by": "IR担当者B",
+            "tags": ["株主総会", "開催予定", "オンライン"],
             "similar_faqs": [],
-            "view_count": 45,
+            "view_count": 89,
+            "is_current": True
+        },
+        {
+            "id": 7,
+            "question": "海外展開の状況と今後の計画は？",
+            "answer": "アジア・太平洋地域での売上が全体の20%を占めるまで成長しました。今後は欧州・北米市場への展開も視野に入れ、グローバル企業としての基盤強化を図ります。",
+            "status": "published",
+            "confidence": 91,
+            "data_sources": [
+                {"id": 7, "name": "グローバル戦略説明資料", "type": "戦略資料", "date": "2024-01-12", "relevance": 93}
+            ],
+            "valid_from": "2024-01-12",
+            "valid_until": "2024-12-31",
+            "category": "経営戦略",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-17 14:20:00",
+            "created_by": "IR担当者A",
+            "tags": ["海外展開", "グローバル", "成長戦略"],
+            "similar_faqs": [4, 5],
+            "view_count": 67,
+            "is_current": True
+        },
+        {
+            "id": 8,
+            "question": "自社株買いの実施予定はありますか？",
+            "answer": "資本効率の向上を目的として、適切なタイミングでの自社株買いを検討しています。財務状況と投資機会のバランスを見ながら判断します。",
+            "status": "draft",
+            "confidence": 87,
+            "data_sources": [
+                {"id": 8, "name": "財務戦略委員会議事録", "type": "内部資料", "date": "2024-01-19", "relevance": 85}
+            ],
+            "valid_from": "2024-01-19",
+            "valid_until": "2024-03-31",
+            "category": "株主還元",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-21 13:40:00",
+            "created_by": "IR担当者B",
+            "tags": ["自社株買い", "資本効率", "株主還元"],
+            "similar_faqs": [2],
+            "view_count": 52,
+            "is_current": True
+        },
+        {
+            "id": 9,
+            "question": "サステナビリティ経営の具体的な取り組みは？",
+            "answer": "気候変動対応、多様性推進、サプライチェーン管理の3つを柱として取り組んでいます。2024年にはサステナビリティ委員会を新設し、より体系的な推進体制を構築しました。",
+            "status": "published",
+            "confidence": 93,
+            "data_sources": [
+                {"id": 9, "name": "サステナビリティレポート2024", "type": "ESG資料", "date": "2024-01-08", "relevance": 96}
+            ],
+            "valid_from": "2024-01-08",
+            "valid_until": "2024-12-31",
+            "category": "ESG",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-16 10:55:00",
+            "created_by": "IR担当者A",
+            "tags": ["サステナビリティ", "ESG", "委員会"],
+            "similar_faqs": [3],
+            "view_count": 98,
+            "is_current": True
+        },
+        {
+            "id": 10,
+            "question": "競合他社との差別化要因は何ですか？",
+            "answer": "独自のAI技術、豊富な顧客データ、強固なパートナーシップが当社の主要な差別化要因です。特に特許技術による技術的優位性は今後も維持していく予定です。",
+            "status": "published",
+            "confidence": 89,
+            "data_sources": [
+                {"id": 10, "name": "競合分析レポート", "type": "分析資料", "date": "2024-01-05", "relevance": 91}
+            ],
+            "valid_from": "2024-01-05",
+            "valid_until": "2024-06-30",
+            "category": "経営戦略",
+            "version": "2024-Q3",
+            "last_updated": "2024-01-14 15:10:00",
+            "created_by": "IR担当者C",
+            "tags": ["競合優位性", "差別化", "技術"],
+            "similar_faqs": [5, 7],
+            "view_count": 76,
             "is_current": True
         }
     ],
@@ -196,8 +338,14 @@ MOCK_DATA = {
         {"id": 2, "name": "2024年度第3四半期決算説明会", "type": "説明会", "date": "2024-01-21", "status": "公開", "url": "/events/1"},
         {"id": 3, "name": "中期経営計画", "type": "経営計画", "date": "2024-01-10", "status": "公開", "url": "/documents/2"},
         {"id": 4, "name": "統合報告書2023", "type": "IR資料", "date": "2023-12-15", "status": "公開", "url": "/documents/3"},
-        {"id": 5, "name": "2024年度第2四半期決算短信", "type": "決算資料", "date": "2023-10-20", "status": "公開", "url": "/documents/4"},
-        {"id": 6, "name": "2024年度第1四半期決算短信", "type": "決算資料", "date": "2023-07-20", "status": "公開", "url": "/documents/5"}
+        {"id": 5, "name": "AI事業戦略説明会", "type": "説明会", "date": "2024-01-15", "status": "公開", "url": "/events/2"},
+        {"id": 6, "name": "株主総会招集通知", "type": "株主総会資料", "date": "2024-01-22", "status": "公開", "url": "/documents/4"},
+        {"id": 7, "name": "グローバル戦略説明資料", "type": "戦略資料", "date": "2024-01-12", "status": "公開", "url": "/documents/5"},
+        {"id": 8, "name": "財務戦略委員会議事録", "type": "内部資料", "date": "2024-01-19", "status": "限定公開", "url": "/documents/6"},
+        {"id": 9, "name": "サステナビリティレポート2024", "type": "ESG資料", "date": "2024-01-08", "status": "公開", "url": "/documents/7"},
+        {"id": 10, "name": "競合分析レポート", "type": "分析資料", "date": "2024-01-05", "status": "公開", "url": "/documents/8"},
+        {"id": 11, "name": "2024年度第2四半期決算短信", "type": "決算資料", "date": "2023-10-20", "status": "公開", "url": "/documents/9"},
+        {"id": 12, "name": "2024年度第1四半期決算短信", "type": "決算資料", "date": "2023-07-20", "status": "公開", "url": "/documents/10"}
     ],
     "faq_versions": [
         {

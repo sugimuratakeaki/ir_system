@@ -3,6 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
 <style>
 /* FAQ管理画面専用スタイル */
 .faq-outdated {
@@ -212,6 +213,145 @@
 {% endblock %}
 
 {% block content %}
+<!-- 主要テーマ分析セクション -->
+<div class="activity-feed mb-6">
+    <div class="activity-header">
+        <h2 class="activity-title">📊 FAQ主要テーマ分析</h2>
+        <button class="btn btn-secondary" onclick="refreshThemeAnalysis()">
+            <span>🔄</span> 分析を更新
+        </button>
+    </div>
+    
+    <div class="bg-gray-50 rounded-lg p-6">
+        <!-- カテゴリ別頻出度 -->
+        <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-4">🎯 カテゴリ別FAQ数（頻出度順）</h4>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-6">
+                        <div class="bg-kagami-blue h-6 rounded-full flex items-center justify-end pr-3" style="width: 75%;">
+                            <span class="text-white text-xs font-medium">75%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between min-w-0 flex-1">
+                        <span class="text-sm font-medium text-gray-900">財務・業績</span>
+                        <span class="text-sm text-gray-500">18件</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-6">
+                        <div class="bg-kagami-blue h-6 rounded-full flex items-center justify-end pr-3" style="width: 60%;">
+                            <span class="text-white text-xs font-medium">60%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between min-w-0 flex-1">
+                        <span class="text-sm font-medium text-gray-900">経営戦略</span>
+                        <span class="text-sm text-gray-500">15件</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-6">
+                        <div class="bg-kagami-blue h-6 rounded-full flex items-center justify-end pr-3" style="width: 45%;">
+                            <span class="text-white text-xs font-medium">45%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between min-w-0 flex-1">
+                        <span class="text-sm font-medium text-gray-900">ESG</span>
+                        <span class="text-sm text-gray-500">11件</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 bg-gray-200 rounded-full h-6">
+                        <div class="bg-kagami-blue h-6 rounded-full flex items-center justify-end pr-3" style="width: 35%;">
+                            <span class="text-white text-xs font-medium">35%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between min-w-0 flex-1">
+                        <span class="text-sm font-medium text-gray-900">株主還元</span>
+                        <span class="text-sm text-gray-500">8件</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 経営課題とFAQの関連 -->
+        <div class="mb-6">
+            <h4 class="font-medium text-gray-900 mb-4">⚡ 重要経営課題と関連FAQ</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white border border-red-200 rounded-lg p-4">
+                    <h5 class="font-medium text-red-800 mb-2">🔴 資本効率の改善</h5>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• ROE向上の具体策（3件のFAQ）</li>
+                        <li>• 投資と還元のバランス（2件のFAQ）</li>
+                        <li>• キャッシュフロー経営（1件のFAQ）</li>
+                    </ul>
+                    <button class="mt-2 text-xs text-blue-600 hover:underline" onclick="filterByChallenge('capital-efficiency')">
+                        関連FAQを表示 →
+                    </button>
+                </div>
+                <div class="bg-white border border-yellow-200 rounded-lg p-4">
+                    <h5 class="font-medium text-yellow-800 mb-2">🟡 ESG経営の推進</h5>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• 環境目標の達成状況（4件のFAQ）</li>
+                        <li>• ガバナンス体制（3件のFAQ）</li>
+                        <li>• 社会貢献活動（2件のFAQ）</li>
+                    </ul>
+                    <button class="mt-2 text-xs text-blue-600 hover:underline" onclick="filterByChallenge('esg')">
+                        関連FAQを表示 →
+                    </button>
+                </div>
+                <div class="bg-white border border-blue-200 rounded-lg p-4">
+                    <h5 class="font-medium text-blue-800 mb-2">🔵 成長戦略の実行</h5>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• M&A戦略（2件のFAQ）</li>
+                        <li>• 新規事業展開（3件のFAQ）</li>
+                        <li>• DX推進（2件のFAQ）</li>
+                    </ul>
+                    <button class="mt-2 text-xs text-blue-600 hover:underline" onclick="filterByChallenge('growth')">
+                        関連FAQを表示 →
+                    </button>
+                </div>
+                <div class="bg-white border border-green-200 rounded-lg p-4">
+                    <h5 class="font-medium text-green-800 mb-2">🟢 株主還元の充実</h5>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• 配当政策（3件のFAQ）</li>
+                        <li>• 自社株買い（2件のFAQ）</li>
+                        <li>• 総還元性向（1件のFAQ）</li>
+                    </ul>
+                    <button class="mt-2 text-xs text-blue-600 hover:underline" onclick="filterByChallenge('shareholder-return')">
+                        関連FAQを表示 →
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 投資家の関心トレンド -->
+        <div>
+            <h4 class="font-medium text-gray-900 mb-4">📈 投資家の関心トレンド（直近3ヶ月）</h4>
+            <div class="bg-white rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600">上昇傾向のテーマ:</span>
+                    <span class="text-xs text-green-600">↑ 前月比</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">• サステナビリティ経営</span>
+                        <span class="text-sm text-green-600">+45%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">• AI・DX投資の詳細</span>
+                        <span class="text-sm text-green-600">+32%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium">• 人的資本の開示</span>
+                        <span class="text-sm text-green-600">+28%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- FAQ統計 -->
 <div class="faq-stats">
     <button class="stat-card stat-button" onclick="filterByStatus('all')" id="stat-all">
@@ -322,12 +462,13 @@
                     <input type="checkbox" onchange="toggleAllCheckboxes(this)">
                 </th>
                 <th>質問</th>
+                <th style="width: 150px;">カテゴリ・テーマ</th>
                 <th>回答（要約）</th>
-                <th style="width: 120px;">時点・バージョン</th>
+                <th style="width: 100px;">時点</th>
                 <th style="width: 100px;">有効期限</th>
                 <th style="width: 80px;">ステータス</th>
-                <th style="width: 100px;">信頼度</th>
-                <th style="width: 150px;">アクション</th>
+                <th style="width: 80px;">信頼度</th>
+                <th style="width: 120px;">アクション</th>
             </tr>
         </thead>
         <tbody>
@@ -339,12 +480,25 @@
                 <td>
                     <div class="faq-question-cell">
                         <div class="font-semibold">{{ faq.question }}</div>
-                        <div class="text-sm text-muted">
-                            <span class="badge badge-xs badge-secondary">{{ faq.category }}</span>
+                        <div class="text-sm text-muted mt-xs">
                             {% for tag in faq.tags[:3] %}
                             <span class="badge badge-xs badge-light">{{ tag }}</span>
                             {% endfor %}
                         </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="category-cell">
+                        <span class="badge badge-secondary">{{ faq.category }}</span>
+                        {% if faq.category == '財務・業績' %}
+                            <div class="text-xs text-red-600 mt-1">🔴 資本効率</div>
+                        {% elif faq.category == 'ESG' %}
+                            <div class="text-xs text-yellow-600 mt-1">🟡 ESG経営</div>
+                        {% elif faq.category == '経営戦略' %}
+                            <div class="text-xs text-blue-600 mt-1">🔵 成長戦略</div>
+                        {% elif faq.category == '株主還元' %}
+                            <div class="text-xs text-green-600 mt-1">🟢 株主還元</div>
+                        {% endif %}
                     </div>
                 </td>
                 <td>
@@ -358,12 +512,7 @@
                 </td>
                 <td>
                     <div class="version-info">
-                        <div class="font-semibold">{{ faq.version }}</div>
-                        <div class="text-sm text-muted">
-                            {% if faq.data_sources %}
-                            <span>📚 {{ faq.data_sources|length }}件の資料</span>
-                            {% endif %}
-                        </div>
+                        <div class="text-sm">{{ faq.version }}</div>
                         {% if not faq.is_current %}
                         <span class="badge badge-warning badge-xs">旧版</span>
                         {% endif %}
@@ -397,7 +546,6 @@
                     <div class="flex gap-sm">
                         <button class="btn btn-sm btn-secondary" onclick="editFAQ({{ faq.id }})">編集</button>
                         <button class="btn btn-sm btn-info" onclick="showDataSources({{ faq.id }})">資料</button>
-                        <button class="btn btn-sm btn-warning" onclick="showVersionHistory({{ faq.id }})">履歴</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteFAQ({{ faq.id }})">削除</button>
                     </div>
                 </td>
@@ -589,7 +737,8 @@ let currentFilter = {
     version: 'all',
     category: '',
     expiry: '',
-    search: ''
+    search: '',
+    challenge: '' // 経営課題フィルターを追加
 };
 
 function filterFAQs() {
@@ -806,6 +955,86 @@ function toggleAllCheckboxes(source) {
     checkboxes.forEach(checkbox => {
         checkbox.checked = source.checked;
     });
+}
+
+// 経営課題でフィルター
+function filterByChallenge(challenge) {
+    // 他のフィルターをリセット
+    document.getElementById('version-filter').value = 'all';
+    document.getElementById('category-filter').value = '';
+    document.getElementById('expiry-filter').value = '';
+    document.getElementById('search-input').value = '';
+    
+    // フィルター状態を更新
+    currentFilter.challenge = challenge;
+    currentFilter.status = 'all';
+    currentFilter.version = 'all';
+    currentFilter.category = '';
+    currentFilter.expiry = '';
+    currentFilter.search = '';
+    
+    // 統計カードのアクティブ状態をリセット
+    document.querySelectorAll('.faq-stats .stat-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // 経営課題に応じたカテゴリとキーワードでフィルター
+    const challengeFilters = {
+        'capital-efficiency': {
+            categories: ['財務・業績'],
+            keywords: ['ROE', '資本効率', 'キャッシュフロー', '投資', '還元']
+        },
+        'esg': {
+            categories: ['ESG'],
+            keywords: ['環境', 'ガバナンス', '社会貢献', 'サステナビリティ', 'ESG']
+        },
+        'growth': {
+            categories: ['経営戦略'],
+            keywords: ['M&A', '新規事業', 'DX', '成長戦略', 'イノベーション']
+        },
+        'shareholder-return': {
+            categories: ['株主還元'],
+            keywords: ['配当', '自社株買い', '還元', '株主価値']
+        }
+    };
+    
+    const filter = challengeFilters[challenge];
+    if (filter) {
+        // テーブル行をフィルター
+        const rows = document.querySelectorAll('.faq-table tbody tr');
+        rows.forEach(row => {
+            let show = false;
+            
+            // カテゴリでチェック
+            const categoryElement = row.querySelector('.badge-secondary');
+            if (categoryElement && filter.categories.includes(categoryElement.textContent)) {
+                show = true;
+            }
+            
+            // キーワードでチェック
+            if (!show) {
+                const question = row.querySelector('.faq-question-cell .font-semibold').textContent.toLowerCase();
+                const answer = row.querySelector('.faq-answer-cell div').textContent.toLowerCase();
+                for (const keyword of filter.keywords) {
+                    if (question.includes(keyword.toLowerCase()) || answer.includes(keyword.toLowerCase())) {
+                        show = true;
+                        break;
+                    }
+                }
+            }
+            
+            // 表示/非表示を切り替え
+            row.style.display = show ? '' : 'none';
+        });
+        
+        // フィルター結果の件数を表示
+        updateFilterCount();
+    }
+}
+
+// テーマ分析を更新（モック）
+function refreshThemeAnalysis() {
+    alert('テーマ分析を更新しています...（デモ）');
 }
 </script>
 {% endblock %}
