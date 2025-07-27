@@ -71,91 +71,97 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    🔮 KAGAMI CMS
+                    <span class="logo-icon">🔮</span>
+                    <span class="logo-text">KAGAMI CMS</span>
                 </div>
+                <button class="sidebar-toggle" id="sidebarToggle" title="サイドバーを閉じる">
+                    <svg class="toggle-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 6L8 10L12 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
             
             <nav class="sidebar-nav">
-                <a href="/" class="nav-item {% if request.url.path == '/' %}active{% endif %}">
+                <a href="/" class="nav-item {% if request.url.path == '/' %}active{% endif %}" title="ダッシュボード">
                     <span class="nav-icon">📊</span>
-                    <span>ダッシュボード</span>
+                    <span class="nav-text">ダッシュボード</span>
                 </a>
                 
-                <a href="/executive-dashboard" class="nav-item {% if request.url.path == '/executive-dashboard' %}active{% endif %}">
+                <a href="/executive-dashboard" class="nav-item {% if request.url.path == '/executive-dashboard' %}active{% endif %}" title="経営陣ダッシュボード">
                     <span class="nav-icon">👔</span>
-                    <span>経営陣ダッシュボード</span>
+                    <span class="nav-text">経営陣ダッシュボード</span>
                 </a>
                 
-                <a href="/director-dashboard" class="nav-item {% if request.url.path == '/director-dashboard' %}active{% endif %}">
+                <a href="/director-dashboard" class="nav-item {% if request.url.path == '/director-dashboard' %}active{% endif %}" title="社外取締役ダッシュボード">
                     <span class="nav-icon">🎭</span>
-                    <span>社外取締役ダッシュボード</span>
+                    <span class="nav-text">社外取締役ダッシュボード</span>
                 </a>
                 
                 <div class="nav-section">
                     <div class="nav-section-title">コンテンツ管理</div>
-                    <a href="/faq" class="nav-item {% if request.url.path == '/faq' %}active{% endif %}">
+                    <a href="/faq" class="nav-item {% if request.url.path == '/faq' %}active{% endif %}" title="AI-FAQ管理">
                         <span class="nav-icon">🤖</span>
-                        <span>AI-FAQ管理</span>
+                        <span class="nav-text">AI-FAQ管理</span>
                     </a>
-                    <a href="/documents" class="nav-item {% if request.url.path == '/documents' %}active{% endif %}">
+                    <a href="/documents" class="nav-item {% if request.url.path == '/documents' %}active{% endif %}" title="ドキュメント">
                         <span class="nav-icon">📄</span>
-                        <span>ドキュメント</span>
+                        <span class="nav-text">ドキュメント</span>
                     </a>
-                    <a href="/news" class="nav-item {% if request.url.path == '/news' %}active{% endif %}">
+                    <a href="/news" class="nav-item {% if request.url.path == '/news' %}active{% endif %}" title="ニュース・お知らせ">
                         <span class="nav-icon">📰</span>
-                        <span>ニュース・お知らせ</span>
+                        <span class="nav-text">ニュース・お知らせ</span>
                     </a>
                 </div>
                 
                 <div class="nav-section">
                     <div class="nav-section-title">🎯 IR業務統合</div>
-                    <a href="/ir-calendar-workspace" class="nav-item {% if request.url.path == '/ir-calendar-workspace' %}active{% endif %}">
+                    <a href="/ir-calendar-workspace" class="nav-item {% if request.url.path == '/ir-calendar-workspace' %}active{% endif %}" title="IRカレンダー・面談ワークスペース">
                         <span class="nav-icon">🤝</span>
-                        <span>IRカレンダー・面談ワークスペース</span>
+                        <span class="nav-text">IRカレンダー・面談ワークスペース</span>
                     </a>
-                    <a href="/dialogue-center" class="nav-item {% if request.url.path == '/dialogue-center' %}active{% endif %}">
+                    <a href="/dialogue-center" class="nav-item {% if request.url.path == '/dialogue-center' %}active{% endif %}" title="外部MTG議事録">
                         <span class="nav-icon">💬</span>
-                        <span>外部MTG議事録</span>
+                        <span class="nav-text">外部MTG議事録</span>
                     </a>
-                    <a href="/ir-content-center" class="nav-item {% if request.url.path == '/ir-content-center' %}active{% endif %}">
+                    <a href="/ir-content-center" class="nav-item {% if request.url.path == '/ir-content-center' %}active{% endif %}" title="IR情報統合センター">
                         <span class="nav-icon">📚</span>
-                        <span>IR情報統合センター</span>
+                        <span class="nav-text">IR情報統合センター</span>
                     </a>
-                    <a href="/investor-relations" class="nav-item {% if request.url.path == '/investor-relations' %}active{% endif %}">
+                    <a href="/investor-relations" class="nav-item {% if request.url.path == '/investor-relations' %}active{% endif %}" title="投資家・フィードバック統合">
                         <span class="nav-icon">👥</span>
-                        <span>投資家・フィードバック統合</span>
+                        <span class="nav-text">投資家・フィードバック統合</span>
                     </a>
-                    <a href="/strategy-workspace" class="nav-item {% if request.url.path == '/strategy-workspace' %}active{% endif %}">
+                    <a href="/strategy-workspace" class="nav-item {% if request.url.path == '/strategy-workspace' %}active{% endif %}" title="戦略・開示ワークスペース">
                         <span class="nav-icon">🎯</span>
-                        <span>戦略・開示ワークスペース</span>
+                        <span class="nav-text">戦略・開示ワークスペース</span>
                     </a>
-                    <a href="/email-campaigns" class="nav-item {% if request.url.path == '/email-campaigns' %}active{% endif %}">
+                    <a href="/email-campaigns" class="nav-item {% if request.url.path == '/email-campaigns' %}active{% endif %}" title="メール配信">
                         <span class="nav-icon">✉️</span>
-                        <span>メール配信</span>
+                        <span class="nav-text">メール配信</span>
                     </a>
-                    <a href="/analytics" class="nav-item {% if request.url.path == '/analytics' %}active{% endif %}">
+                    <a href="/analytics" class="nav-item {% if request.url.path == '/analytics' %}active{% endif %}" title="統合分析ダッシュボード">
                         <span class="nav-icon">📈</span>
-                        <span>統合分析ダッシュボード</span>
+                        <span class="nav-text">統合分析ダッシュボード</span>
                     </a>
                 </div>
                 
                 <div class="nav-section">
                     <div class="nav-section-title">システム管理</div>
-                    <a href="/users" class="nav-item {% if request.url.path == '/users' %}active{% endif %}">
+                    <a href="/users" class="nav-item {% if request.url.path == '/users' %}active{% endif %}" title="ユーザー管理">
                         <span class="nav-icon">👤</span>
-                        <span>ユーザー管理</span>
+                        <span class="nav-text">ユーザー管理</span>
                     </a>
-                    <a href="/permissions" class="nav-item {% if request.url.path == '/permissions' %}active{% endif %}">
+                    <a href="/permissions" class="nav-item {% if request.url.path == '/permissions' %}active{% endif %}" title="権限管理">
                         <span class="nav-icon">🔐</span>
-                        <span>権限管理</span>
+                        <span class="nav-text">権限管理</span>
                     </a>
-                    <a href="/audit-logs" class="nav-item {% if request.url.path == '/audit-logs' %}active{% endif %}">
+                    <a href="/audit-logs" class="nav-item {% if request.url.path == '/audit-logs' %}active{% endif %}" title="監査ログ">
                         <span class="nav-icon">🔍</span>
-                        <span>監査ログ</span>
+                        <span class="nav-text">監査ログ</span>
                     </a>
-                    <a href="/settings" class="nav-item {% if request.url.path == '/settings' %}active{% endif %}">
+                    <a href="/settings" class="nav-item {% if request.url.path == '/settings' %}active{% endif %}" title="設定">
                         <span class="nav-icon">⚙️</span>
-                        <span>設定</span>
+                        <span class="nav-text">設定</span>
                     </a>
                 </div>
             </nav>
@@ -199,15 +205,63 @@
         // サイドバートグル（モバイル対応）
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
+            if (sidebar) {
+                sidebar.classList.toggle('open');
+            }
         }
         
-        // クリック外で閉じる
+        // サイドバーを折りたたみ
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const layout = document.querySelector('.cms-layout');
+            
+            // 要素が存在しない場合は処理を中断
+            if (!sidebar || !sidebarToggle || !layout) {
+                console.error('Required elements not found');
+                return;
+            }
+            
+            // ローカルストレージから状態を復元
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                layout.classList.add('sidebar-collapsed');
+                sidebarToggle.title = 'サイドバーを開く';
+            }
+            
+            // トグルボタンのクリックイベント（イベントバブリング対策）
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                sidebar.classList.toggle('collapsed');
+                layout.classList.toggle('sidebar-collapsed');
+                
+                // 状態を保存
+                const isNowCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                
+                // ボタンのtitleを更新
+                sidebarToggle.title = isNowCollapsed ? 'サイドバーを開く' : 'サイドバーを閉じる';
+                
+                // デバッグ用
+                console.log('Sidebar toggled:', isNowCollapsed ? 'collapsed' : 'expanded');
+            });
+            
+            // SVG要素のクリックもボタンクリックとして処理
+            const toggleIcon = sidebarToggle.querySelector('svg');
+            if (toggleIcon) {
+                toggleIcon.style.pointerEvents = 'none';
+            }
+        });
+        
+        // クリック外で閉じる（モバイル）
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = event.target.closest('.btn-icon');
             
-            if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !toggleBtn) {
+            if (sidebar && window.innerWidth <= 768 && !sidebar.contains(event.target) && !toggleBtn) {
                 sidebar.classList.remove('open');
             }
         });
