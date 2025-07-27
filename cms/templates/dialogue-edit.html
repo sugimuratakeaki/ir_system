@@ -1,907 +1,1126 @@
 {% extends "base.html" %}
 
-{% block title %}ミーティング処理詳細{% endblock %}
+{% block title %}{{ meeting_data.title }} - 統合処理ワークスペース{% endblock %}
 
-{% block content %}
-<!-- パイプライン進捗バー -->
-<div class="pipeline-progress mb-6">
-    <div class="flex items-center justify-between mb-4">
-        <div>
-            <h1 class="text-2xl font-bold">{{ meeting_data.title }}</h1>
-            <p class="text-sm text-gray-600 mt-1">
-                {{ meeting_data.investor_name }} | {{ meeting_data.date }} | ID: {{ meeting_id }}
-            </p>
-        </div>
-        <div class="flex items-center space-x-3">
-            {% if meeting_data.priority == 'high' %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-                優先度高
-            </span>
-            {% endif %}
-            {% if meeting_data.days_elapsed > 3 %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                ⚠️ {{ meeting_data.days_elapsed }}日経過
-            </span>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- プログレスバー -->
-    <div class="relative">
-        <div class="absolute top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200"></div>
-        <div class="relative flex justify-between">
-            {% set stages = [
-                {'id': 'upload', 'icon': '📹', 'label': 'アップロード'},
-                {'id': 'transcription', 'icon': '📝', 'label': '文字起こし'},
-                {'id': 'ai_summary', 'icon': '🤖', 'label': 'AI要約'},
-                {'id': 'faq', 'icon': '❓', 'label': 'FAQ作成'},
-                {'id': 'review', 'icon': '✅', 'label': 'レビュー'},
-                {'id': 'publish', 'icon': '🌐', 'label': '公開'}
-            ] %}
-            
-            {% for stage in stages %}
-            <div class="flex flex-col items-center">
-                <div class="stage-indicator 
-                    {% if meeting_data.stages[stage.id].status in ['completed', 'approved', 'published'] %}completed{% elif meeting_data.stages[stage.id].status in ['processing', 'in_progress', 'pending'] %}active{% else %}inactive{% endif %}">
-                    <span class="text-2xl">{{ stage.icon }}</span>
-                </div>
-                <span class="text-xs mt-2 {% if meeting_data.current_stage == stage.id %}font-bold text-blue-600{% else %}text-gray-600{% endif %}">
-                    {{ stage.label }}
-                </span>
-                {% if meeting_data.stages[stage.id].status == 'processing' %}
-                <div class="w-20 bg-gray-200 rounded-full h-1 mt-1">
-                    <div class="bg-blue-600 h-1 rounded-full animate-pulse" style="width: {{ meeting_data.stages[stage.id].progress }}%"></div>
-                </div>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-<!-- 現在のステータスに応じたアクションバー -->
-{% if meeting_data.current_stage_info.action_required %}
-<div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center">
-            <svg class="w-5 h-5 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-                <h3 class="text-sm font-medium text-blue-800">次のアクション</h3>
-                <p class="text-sm text-blue-700 mt-1">{{ meeting_data.current_stage_info.message }}</p>
-            </div>
-        </div>
-        <button class="btn btn-primary" onclick="{{ meeting_data.current_stage_info.action_function }}">
-            {{ meeting_data.current_stage_info.action_label }}
-        </button>
-    </div>
-</div>
-{% endif %}
-
-<!-- メインコンテンツ -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- 左側：基本情報とAI処理結果（2列分） -->
-    <div class="lg:col-span-2 space-y-6">
-        <!-- 基本情報カード -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="text-lg font-semibold flex items-center justify-between">
-                    <span>📋 ミーティング情報</span>
-                    {% if meeting_data.can_edit_basic_info %}
-                    <button class="btn btn-sm btn-secondary" onclick="enableBasicInfoEdit()">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        編集
-                    </button>
-                    {% endif %}
-                </h2>
-            </div>
-            <div class="card-body">
-                <form id="basicInfoForm" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-sm font-medium text-gray-700">会議種別</label>
-                            <p class="mt-1 text-sm text-gray-900 basic-info-field" data-field="type">
-                                {{ meeting_data.type }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-700">開催日時</label>
-                            <p class="mt-1 text-sm text-gray-900">
-                                {{ meeting_data.formatted_date }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-700">投資家タイプ</label>
-                            <p class="mt-1 text-sm text-gray-900 basic-info-field" data-field="investor_type">
-                                {{ meeting_data.investor_type }}
-                                {% if meeting_data.investor_type == '大口機関投資家' %}
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 ml-2">
-                                    VIP
-                                </span>
-                                {% endif %}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-700">参加者数</label>
-                            <p class="mt-1 text-sm text-gray-900">
-                                {{ meeting_data.participants }}名
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">自社参加者</label>
-                        <div class="mt-1 flex flex-wrap gap-2">
-                            {% for participant in meeting_data.company_participants %}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800">
-                                {{ participant }}
-                            </span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">タグ</label>
-                        <div class="mt-1 flex flex-wrap gap-2">
-                            {% for tag in meeting_data.tags %}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                                #{{ tag }}
-                            </span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- AI処理結果表示エリア -->
-        {% if meeting_data.stages.transcription.status == 'completed' %}
-        <div class="card">
-            <div class="card-header bg-gradient-to-r from-purple-50 to-blue-50">
-                <h2 class="text-lg font-semibold flex items-center justify-between">
-                    <span class="flex items-center">
-                        <span class="text-2xl mr-2">📝</span>
-                        文字起こし結果
-                    </span>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-gray-600">
-                            処理時間: {{ meeting_data.stages.transcription.duration }}
-                        </span>
-                        <button class="btn btn-sm btn-secondary" onclick="viewFullTranscript()">
-                            全文表示
-                        </button>
-                    </div>
-                </h2>
-            </div>
-            <div class="card-body">
-                <div class="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto">
-                    <p class="text-sm text-gray-700 leading-relaxed">
-                        {{ meeting_data.transcript_preview }}...
-                    </p>
-                </div>
-                <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
-                    <span>総文字数: {{ meeting_data.transcript_stats.total_chars }}文字</span>
-                    <span>推定読了時間: {{ meeting_data.transcript_stats.reading_time }}分</span>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        {% if meeting_data.stages.ai_summary.status == 'completed' %}
-        <div class="card">
-            <div class="card-header bg-gradient-to-r from-purple-50 to-pink-50">
-                <h2 class="text-lg font-semibold flex items-center justify-between">
-                    <span class="flex items-center">
-                        <span class="text-2xl mr-2">🤖</span>
-                        AI要約・分析結果
-                    </span>
-                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
-                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        AI処理完了
-                    </span>
-                </h2>
-            </div>
-            <div class="card-body space-y-4">
-                <!-- エグゼクティブサマリー -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-2">📌 エグゼクティブサマリー</h3>
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <p class="text-sm text-gray-800">{{ meeting_data.ai_summary.executive_summary }}</p>
-                    </div>
-                </div>
-                
-                <!-- 重要ポイント -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-2">🎯 重要ポイント</h3>
-                    <ul class="space-y-2">
-                        {% for point in meeting_data.ai_summary.key_points %}
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-2">✓</span>
-                            <span class="text-sm text-gray-700">{{ point }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                
-                <!-- 投資家の関心事項 -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-2">💡 投資家の主な関心事項</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        {% for concern in meeting_data.ai_summary.investor_concerns %}
-                        <div class="bg-yellow-50 rounded-lg p-3">
-                            <h4 class="text-sm font-medium text-gray-800">{{ concern.topic }}</h4>
-                            <p class="text-xs text-gray-600 mt-1">{{ concern.detail }}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                
-                <!-- 推奨アクション -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-2">🚀 推奨アクション</h3>
-                    <div class="bg-green-50 rounded-lg p-4">
-                        <ul class="space-y-2">
-                            {% for action in meeting_data.ai_summary.recommended_actions %}
-                            <li class="flex items-start">
-                                <span class="text-green-600 mr-2">→</span>
-                                <span class="text-sm text-gray-700">{{ action }}</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        {% if meeting_data.stages.faq.status in ['in_progress', 'completed'] %}
-        <div class="card">
-            <div class="card-header bg-gradient-to-r from-green-50 to-teal-50">
-                <h2 class="text-lg font-semibold flex items-center justify-between">
-                    <span class="flex items-center">
-                        <span class="text-2xl mr-2">❓</span>
-                        FAQ案
-                        {% if meeting_data.stages.faq.status == 'completed' %}
-                        <span class="ml-2 text-sm text-gray-600">({{ meeting_data.stages.faq.count }}件)</span>
-                        {% else %}
-                        <span class="ml-2 text-sm text-gray-600">({{ meeting_data.stages.faq.draft_count }}件作成中)</span>
-                        {% endif %}
-                    </span>
-                    <button class="btn btn-sm btn-primary" onclick="manageFAQs()">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        編集
-                    </button>
-                </h2>
-            </div>
-            <div class="card-body">
-                <div class="space-y-3">
-                    {% for faq in meeting_data.faq_drafts %}
-                    <div class="border rounded-lg p-4 {% if faq.ai_generated %}bg-purple-50 border-purple-200{% else %}bg-gray-50{% endif %}">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <div class="flex items-center mb-2">
-                                    <span class="text-sm font-semibold text-gray-800">Q: {{ faq.question }}</span>
-                                    {% if faq.ai_generated %}
-                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                                        🤖 AI生成
-                                    </span>
-                                    {% endif %}
-                                </div>
-                                <p class="text-sm text-gray-700">A: {{ faq.answer }}</p>
-                                {% if faq.confidence %}
-                                <div class="mt-2 flex items-center">
-                                    <span class="text-xs text-gray-500">信頼度:</span>
-                                    <div class="ml-2 w-20 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ faq.confidence }}%"></div>
-                                    </div>
-                                    <span class="ml-2 text-xs text-gray-600">{{ faq.confidence }}%</span>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="ml-4 flex items-center space-x-2">
-                                <button class="text-green-600 hover:text-green-700" title="承認">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                                <button class="text-red-600 hover:text-red-700" title="削除">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                {% if meeting_data.can_generate_more_faqs %}
-                <div class="mt-4 text-center">
-                    <button class="btn btn-secondary" onclick="generateMoreFAQs()">
-                        🤖 さらにFAQを生成
-                    </button>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
-    </div>
-    
-    <!-- 右側：ファイル情報と処理履歴 -->
-    <div class="lg:col-span-1 space-y-6">
-        <!-- ファイル情報 -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold">📎 ファイル情報</h3>
-            </div>
-            <div class="card-body">
-                <div class="space-y-3">
-                    {% for file in meeting_data.files %}
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-2xl">
-                                {% if file.type == 'video' %}🎥{% elif file.type == 'audio' %}🎤{% else %}📄{% endif %}
-                            </span>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ file.name }}</p>
-                                <p class="text-xs text-gray-500">{{ file.size }} | {{ file.duration }}</p>
-                            </div>
-                        </div>
-                        <button class="text-blue-600 hover:text-blue-700" onclick="downloadFile('{{ file.id }}')">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </button>
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                {% if meeting_data.can_upload_more %}
-                <div class="mt-4">
-                    <button class="btn btn-sm btn-secondary w-full" onclick="uploadMoreFiles()">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        ファイル追加
-                    </button>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <!-- 処理ステータス -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold">📊 処理ステータス</h3>
-            </div>
-            <div class="card-body">
-                <div class="space-y-3">
-                    {% for stage_id, stage in meeting_data.stages.items() %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-700">
-                            {% if stage_id == 'upload' %}📹 アップロード
-                            {% elif stage_id == 'transcription' %}📝 文字起こし
-                            {% elif stage_id == 'ai_summary' %}🤖 AI要約
-                            {% elif stage_id == 'faq' %}❓ FAQ作成
-                            {% elif stage_id == 'review' %}✅ レビュー
-                            {% elif stage_id == 'publish' %}🌐 公開
-                            {% endif %}
-                        </span>
-                        <span class="text-sm">
-                            {% if stage.status in ['completed', 'approved', 'published'] %}
-                            <span class="text-green-600">✓ 完了</span>
-                            {% elif stage.status in ['processing', 'in_progress'] %}
-                            <span class="text-blue-600 animate-pulse">処理中...</span>
-                            {% elif stage.status == 'pending' %}
-                            <span class="text-yellow-600">待機中</span>
-                            {% elif stage.status == 'ready' %}
-                            <span class="text-blue-600">実行可能</span>
-                            {% else %}
-                            <span class="text-gray-400">-</span>
-                            {% endif %}
-                        </span>
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-gray-600">総処理時間</span>
-                        <span class="font-medium">{{ meeting_data.total_processing_time }}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm mt-2">
-                        <span class="text-gray-600">進捗率</span>
-                        <span class="font-medium">{{ meeting_data.progress_percentage }}%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 処理履歴 -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold">📜 処理履歴</h3>
-            </div>
-            <div class="card-body">
-                <div class="timeline">
-                    {% for event in meeting_data.timeline %}
-                    <div class="timeline-item">
-                        <div class="timeline-marker {% if event.type == 'success' %}bg-green-500{% elif event.type == 'processing' %}bg-blue-500{% else %}bg-gray-400{% endif %}"></div>
-                        <div class="timeline-content">
-                            <p class="text-sm font-medium text-gray-900">{{ event.title }}</p>
-                            <p class="text-xs text-gray-500">{{ event.timestamp }}</p>
-                            {% if event.user %}
-                            <p class="text-xs text-gray-600">by {{ event.user }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- クイックアクション -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold">⚡ クイックアクション</h3>
-            </div>
-            <div class="card-body space-y-2">
-                <button class="btn btn-sm btn-secondary w-full" onclick="exportReport()">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    レポート出力
-                </button>
-                <button class="btn btn-sm btn-secondary w-full" onclick="shareWithTeam()">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-5.432 0m5.432 0A3 3 0 0115 12m0 0a3 3 0 00-3 3m0 0a3 3 0 01-3 3" />
-                    </svg>
-                    チーム共有
-                </button>
-                <button class="btn btn-sm btn-secondary w-full" onclick="duplicateMeeting()">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    複製
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- フローティングアクションバー（ステータスに応じて表示） -->
-{% if meeting_data.show_action_bar %}
-<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-10">
-    <div class="max-w-7xl mx-auto px-4 py-4">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <button class="btn btn-secondary" onclick="goBack()">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    戻る
-                </button>
-                <span class="text-sm text-gray-600">
-                    最終更新: {{ meeting_data.last_updated }}
-                </span>
-            </div>
-            <div class="flex items-center space-x-3">
-                {% if meeting_data.can_save %}
-                <button class="btn btn-secondary" onclick="saveDraft()">
-                    下書き保存
-                </button>
-                {% endif %}
-                {% if meeting_data.primary_action %}
-                <button class="btn btn-primary" onclick="{{ meeting_data.primary_action.function }}">
-                    {{ meeting_data.primary_action.label }}
-                </button>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/ir-management.css">
 <style>
-/* パイプライン進捗インジケーター */
-.stage-indicator {
-    width: 60px;
-    height: 60px;
+/* 対話編集ワークスペース専用スタイル */
+.dialogue-workspace {
+    display: grid;
+    grid-template-columns: 320px 1fr 400px;
+    grid-template-rows: auto 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+    grid-template-areas: 
+        "progress-stream workspace-header context-panel"
+        "progress-stream workspace-main context-panel";
+    transition: grid-template-columns 0.3s ease;
+}
+
+.dialogue-workspace.context-collapsed {
+    grid-template-columns: 320px 1fr 0px;
+    grid-template-areas: 
+        "progress-stream workspace-header context-panel"
+        "progress-stream workspace-main context-panel";
+}
+
+/* 進捗ストリーム（左サイドバー） */
+.progress-stream {
+    grid-area: progress-stream;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.stream-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+}
+
+.stream-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.stream-subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* 進捗ステージ */
+.progress-stages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.stage-item {
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: white;
+    border-left: 4px solid #e5e7eb;
+}
+
+.stage-item:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stage-item.completed {
+    border-left-color: #10b981;
+    background: #f0fdf4;
+}
+
+.stage-item.active {
+    border-left-color: #667eea;
+    background: #f3f4ff;
+}
+
+.stage-item.processing {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.stage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.stage-icon {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f3f4f6;
-    position: relative;
-    z-index: 1;
+    font-size: 1rem;
+    margin-right: 0.75rem;
 }
 
-.stage-indicator.completed {
-    background-color: #10b981;
+.stage-item.completed .stage-icon {
+    background: #10b981;
     color: white;
 }
 
-.stage-indicator.active {
-    background-color: #3b82f6;
+.stage-item.active .stage-icon {
+    background: #667eea;
     color: white;
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.stage-indicator.inactive {
-    background-color: #e5e7eb;
-    color: #9ca3af;
+.stage-item.processing .stage-icon {
+    background: #f59e0b;
+    color: white;
 }
 
-/* タイムライン */
-.timeline {
-    position: relative;
-    padding-left: 2rem;
+.stage-item:not(.completed):not(.active):not(.processing) .stage-icon {
+    background: #e5e7eb;
+    color: #6b7280;
 }
 
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.75rem;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    width: 2px;
-    background-color: #e5e7eb;
+.stage-title {
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+    font-size: 0.875rem;
 }
 
-.timeline-item {
-    position: relative;
-    padding-bottom: 1rem;
+.stage-progress {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
 }
 
-.timeline-marker {
-    position: absolute;
-    left: -1.5rem;
-    width: 1rem;
-    height: 1rem;
+.stage-progress.processing {
+    color: #f59e0b;
+    font-weight: 500;
+}
+
+/* ワークスペースヘッダー */
+.workspace-header {
+    grid-area: workspace-header;
+    background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.meeting-avatar {
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.125rem;
 }
 
-.timeline-content {
-    padding-left: 0.5rem;
+.meeting-info h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 
-/* カード */
-.card {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.meeting-meta {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* メインワークスペース */
+.workspace-main {
+    grid-area: workspace-main;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ステップコンテンツ */
+.step-content {
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+}
+
+.step-content.active {
+    display: block;
+}
+
+.content-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.content-body {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+/* アップロードエリアスタイル */
+.upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.75rem;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.upload-area:hover {
+    border-color: #667eea;
+    background: #f8faff;
+}
+
+/* AI分析結果の改善されたスタイル */
+.analysis-results {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    border: 1px solid #e5e7eb;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.result-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.result-card.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.result-card.primary .card-title {
+    color: white;
+}
+
+.result-card.primary .card-content {
+    color: rgba(255, 255, 255, 0.95);
 }
 
 .card-header {
-    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.result-card.primary .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.card-content {
+    color: #4b5563;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.highlight-box {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+/* コンテキストパネル（右サイドバー） */
+.context-panel {
+    grid-area: context-panel;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.context-panel.collapsed {
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.panel-header {
+    background: #f8fafc;
+    padding: 1rem;
     border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.card-body {
-    padding: 1.5rem;
+.panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
 }
 
-/* ボタン */
+/* コンテンツ開閉ボタン */
+.context-toggle {
+    position: fixed;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 120px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 22px 0 0 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s ease;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 0;
+}
+
+.context-toggle:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-50%) translateX(-5px);
+}
+
+.toggle-icon {
+    color: white;
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.context-collapsed .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* ボタンスタイル */
 .btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.5rem;
     padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
     font-size: 0.875rem;
     font-weight: 500;
-    border-radius: 0.375rem;
-    transition: all 0.2s;
     cursor: pointer;
-    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
 }
 
 .btn-primary {
-    background-color: #3b82f6;
+    background: #667eea;
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #2563eb;
+    background: #5a67d8;
 }
 
 .btn-secondary {
-    background-color: #f3f4f6;
+    background: #e5e7eb;
     color: #374151;
 }
 
 .btn-secondary:hover {
-    background-color: #e5e7eb;
+    background: #d1d5db;
 }
 
-.btn-sm {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
+.btn-success {
+    background: #10b981;
+    color: white;
 }
 
-/* アニメーション */
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: .5;
-    }
+.btn-success:hover {
+    background: #059669;
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 0.375rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ユーティリティ */
+.separator {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0.5rem;
 }
 
 /* レスポンシブ対応 */
 @media (max-width: 1024px) {
-    .grid {
-        grid-template-columns: 1fr;
+    .dialogue-workspace {
+        grid-template-columns: 280px 1fr 0px;
+        grid-template-areas: 
+            "progress-stream workspace-header context-panel"
+            "progress-stream workspace-main context-panel";
     }
     
-    .pipeline-progress {
+    .context-panel {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .dialogue-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        grid-template-areas: 
+            "workspace-header"
+            "progress-stream"
+            "workspace-main";
+    }
+    
+    .progress-stream {
+        max-height: 200px;
+    }
+    
+    .progress-stages {
+        display: flex;
         overflow-x: auto;
+        flex-direction: row;
+        padding: 1rem;
+        gap: 1rem;
         -webkit-overflow-scrolling: touch;
+    }
+    
+    .stage-item {
+        min-width: 200px;
+        margin-bottom: 0;
+    }
+    
+    .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .meeting-info h1 {
+        font-size: 1.125rem;
     }
 }
 </style>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-// 現在のミーティングID
-const meetingId = '{{ meeting_id }}';
-
-// 基本情報の編集を有効化
-function enableBasicInfoEdit() {
-    const fields = document.querySelectorAll('.basic-info-field');
-    fields.forEach(field => {
-        const value = field.textContent.trim();
-        const fieldName = field.dataset.field;
+{% block content %}
+<!-- 対話編集ワークスペース -->
+<div class="dialogue-workspace" data-meeting-id="{{ meeting_id }}">
+    <!-- 進捗ストリーム（左サイドバー） -->
+    <div class="progress-stream">
+        <div class="stream-header">
+            <h2 class="stream-title">処理進捗</h2>
+            <p class="stream-subtitle">{{ meeting_data.progress_percentage|default(65) }}% 完了</p>
+        </div>
         
-        if (fieldName === 'type' || fieldName === 'investor_type') {
-            // セレクトボックスに変換
-            const select = document.createElement('select');
-            select.className = 'form-control text-sm';
-            // オプションを追加（実際の実装では動的に取得）
-            const options = fieldName === 'type' 
-                ? ['個別面談', '決算説明会', 'スモールミーティング', 'カンファレンス', '電話会議']
-                : ['国内機関投資家', '海外機関投資家', '個人投資家', 'アナリスト'];
+        <div class="progress-stages">
+            {% set stages = [
+                {'id': 'upload', 'icon': '☁️', 'title': 'ファイルアップロード', 'status': meeting_data.stages.upload.status|default('completed')},
+                {'id': 'transcription', 'icon': '🎤', 'title': '文字起こし', 'status': meeting_data.stages.transcription.status|default('completed')},
+                {'id': 'ai_summary', 'icon': '🧠', 'title': 'AI分析', 'status': meeting_data.stages.ai_summary.status|default('active')},
+                {'id': 'faq', 'icon': '❓', 'title': 'FAQ作成', 'status': meeting_data.stages.faq.status|default('pending')},
+                {'id': 'review', 'icon': '✅', 'title': 'レビュー', 'status': meeting_data.stages.review.status|default('pending')},
+                {'id': 'publish', 'icon': '🌐', 'title': '公開', 'status': meeting_data.stages.publish.status|default('pending')}
+            ] %}
             
-            options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt;
-                option.textContent = opt;
-                if (opt === value) option.selected = true;
-                select.appendChild(option);
-            });
+            {% for stage in stages %}
+            <div class="stage-item {{ stage.status }}" data-stage="{{ stage.id }}" onclick="switchToStage('{{ stage.id }}')">
+                <div class="stage-header">
+                    <div class="stage-icon">
+                        {{ stage.icon }}
+                    </div>
+                </div>
+                <h3 class="stage-title">{{ stage.title }}</h3>
+                <div class="stage-progress {{ stage.status }}">
+                    {% if stage.status == 'completed' %}
+                    完了
+                    {% elif stage.status == 'active' %}
+                    処理中...
+                    {% elif stage.status == 'processing' %}
+                    {{ meeting_data.stages[stage.id].progress|default(45) }}%
+                    {% else %}
+                    待機中
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ワークスペースヘッダー -->
+    <div class="workspace-header">
+        <div class="header-left">
+            <div class="meeting-avatar">
+                {{ meeting_data.investor_name[:2]|default('IR') }}
+            </div>
+            <div class="meeting-info">
+                <h1>{{ meeting_data.title|default('投資家面談議事録処理') }}</h1>
+                <div class="meeting-meta">
+                    {{ meeting_data.formatted_date|default('2024年1月15日') }}
+                    <span class="separator">•</span>
+                    {{ meeting_data.duration|default('60分') }}
+                    <span class="separator">•</span>
+                    参加者 {{ meeting_data.participants|default(3) }}名
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-actions">
+            <button class="btn-icon" onclick="showTimeline()" title="処理履歴">
+                📈
+            </button>
+            <button class="btn-icon" onclick="shareProgress()" title="進捗共有">
+                📤
+            </button>
+            <button class="btn-icon" onclick="toggleAIAssistant()" title="AIアシスタント">
+                🤖
+            </button>
+        </div>
+    </div>
+
+    <!-- メインワークスペース -->
+    <div class="workspace-main">
+        <!-- アップロードステップ -->
+        <div id="step-upload" class="step-content active">
+            <div class="content-header">
+                <h2>☁️ ファイルアップロード</h2>
+            </div>
+            <div class="content-body">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-prompt">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">☁️</div>
+                        <p>録音・録画ファイルをドラッグ＆ドロップ</p>
+                        <p style="color: #6b7280; font-size: 0.875rem;">または</p>
+                        <button class="btn btn-primary" onclick="selectFiles()">
+                            ファイルを選択
+                        </button>
+                    </div>
+                    <input type="file" id="fileInput" multiple accept="video/*,audio/*,.pdf" style="display: none;">
+                </div>
+                
+                <div style="background: #f3f4ff; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; display: flex; gap: 1rem;">
+                    <div style="color: #667eea; font-size: 1.25rem;">
+                        💡
+                    </div>
+                    <div style="flex: 1; font-size: 0.875rem; color: #4c51bf;">
+                        <p>{{ meeting_data.investor_name|default('投資家') }}との過去の面談では、音声ファイルと資料PDFの組み合わせで最良の結果が得られています。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文字起こしステップ -->
+        <div id="step-transcription" class="step-content">
+            <div class="content-header">
+                <h2>🎤 文字起こし</h2>
+            </div>
+            <div class="content-body">
+                <div style="text-align: center; padding: 3rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎤</div>
+                    <h3>文字起こし処理完了</h3>
+                    <p style="color: #6b7280;">音声の解析が完了し、高精度なテキストが生成されました。</p>
+                    <button class="btn btn-primary" onclick="switchToStage('ai_summary')">
+                        ➡️ AI分析に進む
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI分析ステップ -->
+        <div id="step-ai_summary" class="step-content">
+            <div class="content-header">
+                <h2>🧠 AI分析・要約</h2>
+            </div>
+            <div class="content-body">
+                <div class="ai-analysis-section">
+                    <!-- カスタムプロンプト入力 -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3>分析の視点を追加</h3>
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                            <textarea id="customPrompt" 
+                                     placeholder="特に注目したい点や、追加の分析視点があれば入力してください..."
+                                     style="flex: 1; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; resize: none; min-height: 80px;"></textarea>
+                            <button class="btn btn-primary" onclick="reanalyzeWithPrompt()">
+                                🔄 再分析
+                            </button>
+                        </div>
+                        
+                        <!-- プロンプトテンプレート -->
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <span style="font-size: 0.875rem; color: #6b7280;">テンプレート:</span>
+                            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;" onclick="usePromptTemplate('competition')">
+                                競合比較
+                            </button>
+                            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;" onclick="usePromptTemplate('risk')">
+                                リスク分析
+                            </button>
+                            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;" onclick="usePromptTemplate('opportunity')">
+                                機会発見
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- AI分析結果（改善版） -->
+                    <div class="analysis-results">
+                        <div class="result-card primary">
+                            <div class="card-header">
+                                <div class="card-icon">📋</div>
+                                <h3 class="card-title">面談サマリー</h3>
+                            </div>
+                            <div class="card-content">
+                                {{ meeting_data.ai_summary.executive_summary|default('今回の面談では、AI事業の成長戦略について詳細な議論が行われました。投資家からは特に競合優位性と収益性について関心が示され、技術的な差別化要因についても深く検討されました。') }}
+                            </div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="card-header">
+                                <div class="card-icon">⚡</div>
+                                <h3 class="card-title">重要ポイント</h3>
+                            </div>
+                            <div class="highlight-box">
+                                <ul style="margin: 0; padding-left: 1.5rem;">
+                                    <li>AI技術の競合優位性について詳細な説明を要求</li>
+                                    <li>収益性の向上タイムラインに強い関心</li>
+                                    <li>ESG観点での企業価値創造について質問</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="card-header">
+                                <div class="card-icon">💼</div>
+                                <h3 class="card-title">投資家の関心領域</h3>
+                            </div>
+                            <div class="card-content">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                    <div style="background: #f0f9ff; padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #0ea5e9;">
+                                        <strong>技術競争力</strong>
+                                        <p style="margin: 0.25rem 0 0; font-size: 0.875rem;">独自アルゴリズムの優位性</p>
+                                    </div>
+                                    <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; border-left: 3px solid #22c55e;">
+                                        <strong>市場拡大性</strong>
+                                        <p style="margin: 0.25rem 0 0; font-size: 0.875rem;">TAM（市場規模）の成長性</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1.5rem; text-align: center;">
+                        <button class="btn btn-success" onclick="switchToStage('faq')">
+                            ➡️ FAQ作成に進む
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ作成ステップ -->
+        <div id="step-faq" class="step-content">
+            <div class="content-header">
+                <h2>❓ FAQ作成・管理</h2>
+            </div>
+            <div class="content-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="generateMoreFAQs()">
+                            ✨ AIで追加生成
+                        </button>
+                        <button class="btn btn-secondary" onclick="createManualFAQ()">
+                            ➕ 手動で追加
+                        </button>
+                    </div>
+                    <div style="font-size: 0.875rem; color: #6b7280;">
+                        AI生成: 3件 • 手動作成: 1件
+                    </div>
+                </div>
+                
+                <!-- FAQ一覧プレビュー -->
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for i in range(3) %}
+                    <div style="background: #f8fafc; border-left: 3px solid #667eea; border-radius: 0.5rem; padding: 1rem;">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500;">
+                                🤖 AI生成
+                            </span>
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Q:</strong> AI事業の競合優位性はどのような点にありますか？
+                        </div>
+                        <div>
+                            <strong>A:</strong> 当社のAI事業は、独自のデータセットと機械学習アルゴリズムにより、業界トップクラスの精度を実現しています...
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <button class="btn btn-success" onclick="switchToStage('review')">
+                        ➡️ レビューに進む
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- レビューステップ -->
+        <div id="step-review" class="step-content">
+            <div class="content-header">
+                <h2>✅ レビュー・承認</h2>
+            </div>
+            <div class="content-body">
+                <div style="background: #f8fafc; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                    <h3>公開前チェックリスト</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>文字起こしの精度確認</span>
+                            <span style="background: #d1fae5; color: #065f46; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: auto;">OK</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>機密情報の除外確認</span>
+                            <span style="background: #d1fae5; color: #065f46; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: auto;">OK</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox">
+                            <span>FAQ内容の正確性確認</span>
+                            <span style="background: #fef3c7; color: #92400e; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: auto;">要確認</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="btn btn-success" onclick="switchToStage('publish')">
+                        ➡️ 公開設定に進む
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 公開ステップ -->
+        <div id="step-publish" class="step-content">
+            <div class="content-header">
+                <h2>🌐 公開設定</h2>
+            </div>
+            <div class="content-body">
+                <div style="background: #f8fafc; padding: 1.5rem; border-radius: 0.5rem;">
+                    <h3>公開範囲設定</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="publish_scope" value="internal" checked>
+                            <div>
+                                🏢 <strong>社内のみ</strong>
+                                <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">IR部門・経営陣のみ閲覧可能</div>
+                            </div>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="publish_scope" value="investors">
+                            <div>
+                                👥 <strong>投資家向け</strong>
+                                <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">FAQのみ投資家サイトで公開</div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button class="btn btn-success btn-lg" onclick="publishContent()">
+                            🚀 公開実行
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- コンテキストパネル（右サイドバー） -->
+    <div class="context-panel">
+        <div class="panel-header">
+            <h3>👤 投資家プロファイル</h3>
+            <button class="btn-icon" onclick="toggleContextPanel()" style="color: #6b7280;">
+                ❌
+            </button>
+        </div>
+        <div class="panel-content">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; margin: 0 auto 0.75rem;">
+                    {{ meeting_data.investor_name[:2]|default('IR') }}
+                </div>
+                <h4 style="margin: 0;">{{ meeting_data.investor_name|default('投資家名') }}</h4>
+                <p style="color: #6b7280; font-size: 0.875rem;">{{ meeting_data.investor_type|default('機関投資家') }}</p>
+            </div>
             
-            field.parentNode.replaceChild(select, field);
-        } else {
-            // テキスト入力に変換
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'form-control text-sm';
-            input.value = value;
-            field.parentNode.replaceChild(input, field);
-        }
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <span style="font-size: 0.875rem; color: #6b7280;">投資スタイル</span>
+                    <div style="font-weight: 500;">{{ meeting_data.investor_profile.investment_style|default('長期成長') }}</div>
+                </div>
+                <div>
+                    <span style="font-size: 0.875rem; color: #6b7280;">ESG重視度</span>
+                    <div style="font-weight: 500;">{{ meeting_data.investor_profile.esg_focus|default('高') }}</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h4>🧠 AIインサイト</h4>
+                <div style="background: #f3f4ff; padding: 1rem; border-radius: 0.5rem; margin-top: 0.5rem;">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.875rem; color: #6b7280;">満足度</span>
+                        <span style="font-weight: 600; color: #667eea;">{{ meeting_data.ai_analysis.sentiment_score|default(85) }}%</span>
+                    </div>
+                    <div style="font-size: 0.875rem; color: #4c51bf;">
+                        投資家の関心度が前回より15%上昇しています
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- コンテキスト開閉ボタン -->
+    <div class="context-toggle" onclick="toggleContextPanel()">
+        <span class="toggle-icon">‹</span>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+// グローバル変数
+const meetingId = '{{ meeting_id }}';
+let currentStep = 'upload';
+let contextPanelCollapsed = false;
+
+// ページ初期化
+document.addEventListener('DOMContentLoaded', function() {
+    initializeWorkspace();
+    setupEventListeners();
+    
+    // 現在のステージに基づいて表示を更新
+    const activeStage = '{{ meeting_data.current_stage|default("ai_summary") }}';
+    switchToStage(activeStage);
+});
+
+// ワークスペース初期化
+function initializeWorkspace() {
+    setupDragAndDrop();
+    
+    // デスクトップでは右パネルを表示（重要：1024px以下の自動非表示を削除）
+    // モバイルのみCSSで非表示になるように修正
+}
+
+// イベントリスナー設定
+function setupEventListeners() {
+    document.getElementById('fileInput')?.addEventListener('change', handleFileSelect);
+    
+    // リサイズ対応（右パネル強制非表示を削除）
+    window.addEventListener('resize', function() {
+        // モバイル時の処理は CSS media queries に委譲
+    });
+}
+
+// ステージ切り替え
+function switchToStage(stageId) {
+    // 全てのステップコンテンツを非表示
+    document.querySelectorAll('.step-content').forEach(step => {
+        step.classList.remove('active');
     });
     
-    // 編集ボタンを保存ボタンに変更
-    const editBtn = document.querySelector('button[onclick="enableBasicInfoEdit()"]');
-    editBtn.textContent = '保存';
-    editBtn.onclick = saveBasicInfo;
+    // 指定されたステップを表示
+    const targetStep = document.getElementById(`step-${stageId}`);
+    if (targetStep) {
+        targetStep.classList.add('active');
+        currentStep = stageId;
+    }
+    
+    // 進捗ストリームの状態更新
+    document.querySelectorAll('.stage-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    const activeStageItem = document.querySelector(`[data-stage="${stageId}"]`);
+    if (activeStageItem) {
+        activeStageItem.classList.add('active');
+    }
 }
 
-// 基本情報を保存
-function saveBasicInfo() {
-    showNotification('基本情報を保存しました', 'success');
-    location.reload();
+// コンテキストパネル切り替え
+function toggleContextPanel() {
+    const workspace = document.querySelector('.dialogue-workspace');
+    const panel = document.querySelector('.context-panel');
+    const toggle = document.querySelector('.context-toggle');
+    
+    contextPanelCollapsed = !contextPanelCollapsed;
+    
+    if (contextPanelCollapsed) {
+        workspace.classList.add('context-collapsed');
+        panel.classList.add('collapsed');
+    } else {
+        workspace.classList.remove('context-collapsed');
+        panel.classList.remove('collapsed');
+    }
 }
 
-// 全文表示
-function viewFullTranscript() {
-    window.open(`/dialogue/transcript/${meetingId}`, '_blank');
+// ドラッグ&ドロップ設定
+function setupDragAndDrop() {
+    const uploadArea = document.getElementById('uploadArea');
+    if (!uploadArea) return;
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '#f8faff';
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.style.borderColor = '#d1d5db';
+            uploadArea.style.background = '#fafafa';
+        });
+    });
+    
+    uploadArea.addEventListener('drop', handleDrop);
 }
 
-// FAQ管理
-function manageFAQs() {
-    window.location.href = `/dialogue/faq/${meetingId}`;
+// ファイル処理
+function selectFiles() {
+    document.getElementById('fileInput').click();
 }
 
-// さらにFAQを生成
-function generateMoreFAQs() {
-    showNotification('AIがFAQを生成中...', 'info');
-    // 実際の実装ではAPIを呼び出し
+function handleFileSelect(e) {
+    const files = e.target.files;
+    handleFiles(files);
+}
+
+function handleDrop(e) {
+    const files = e.dataTransfer.files;
+    handleFiles(files);
+}
+
+function handleFiles(files) {
+    console.log('Files selected:', files.length);
+    showNotification('ファイルアップロードを開始しました', 'info');
+    
+    // モック：アップロード処理
     setTimeout(() => {
-        showNotification('3件の新しいFAQを生成しました', 'success');
-        location.reload();
+        showNotification('ファイルアップロードが完了しました', 'success');
+        switchToStage('transcription');
     }, 2000);
 }
 
-// ファイルダウンロード
-function downloadFile(fileId) {
-    window.location.href = `/api/files/${fileId}/download`;
-}
-
-// ファイル追加アップロード
-function uploadMoreFiles() {
-    // ファイル選択ダイアログを開く
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    input.accept = 'video/*,audio/*,.pdf';
-    input.onchange = (e) => {
-        const files = e.target.files;
-        if (files.length > 0) {
-            showNotification(`${files.length}個のファイルをアップロード中...`, 'info');
-            // 実際の実装ではファイルアップロード処理
-        }
+// プロンプトテンプレート
+function usePromptTemplate(type) {
+    const templates = {
+        competition: '競合他社との比較観点で分析してください。特に技術的優位性、市場シェア、成長性の観点から。',
+        risk: 'リスク要因を特定し、その影響度と発生可能性を評価してください。',
+        opportunity: '新たなビジネス機会や成長可能性について分析してください。'
     };
-    input.click();
+    
+    document.getElementById('customPrompt').value = templates[type];
 }
 
-// レポート出力
-function exportReport() {
-    showNotification('レポートを生成中...', 'info');
+// 再分析
+function reanalyzeWithPrompt() {
+    const prompt = document.getElementById('customPrompt').value;
+    if (!prompt.trim()) {
+        showNotification('プロンプトを入力してください', 'warning');
+        return;
+    }
+    
+    showNotification('AIが再分析を実行中...', 'info');
+    
     setTimeout(() => {
-        window.open(`/api/meetings/${meetingId}/report`, '_blank');
-    }, 1000);
+        showNotification('再分析が完了しました', 'success');
+    }, 2000);
 }
 
-// チーム共有
-function shareWithTeam() {
-    const modal = createShareModal();
-    document.body.appendChild(modal);
+// FAQ生成
+function generateMoreFAQs() {
+    showNotification('AIがFAQを生成中...', 'info');
+    
+    setTimeout(() => {
+        showNotification('3件の新しいFAQを生成しました', 'success');
+    }, 1500);
 }
 
-// 複製
-function duplicateMeeting() {
-    if (confirm('このミーティング記録を複製しますか？')) {
-        showNotification('ミーティング記録を複製しました', 'success');
-        // 実際の実装では複製処理後、新しいIDにリダイレクト
-    }
+function createManualFAQ() {
+    showNotification('手動FAQ作成機能を開発中です', 'info');
 }
 
-// 戻る
-function goBack() {
-    window.location.href = '/';
-}
-
-// 下書き保存
-function saveDraft() {
-    showNotification('下書きを保存しました', 'success');
-}
-
-// ステージごとのアクション関数
-function startUpload() {
-    window.location.href = `/upload?meeting_id=${meetingId}`;
-}
-
-function startTranscription() {
-    if (confirm('文字起こしを開始しますか？')) {
-        showNotification('文字起こしを開始しました', 'info');
-        // APIを呼び出して処理開始
-        setTimeout(() => location.reload(), 1000);
-    }
-}
-
-function startAISummary() {
-    if (confirm('AI要約を開始しますか？')) {
-        showNotification('AI要約処理を開始しました', 'info');
-        // APIを呼び出して処理開始
-        setTimeout(() => location.reload(), 1000);
-    }
-}
-
-function createFAQ() {
-    window.location.href = `/dialogue/faq/${meetingId}`;
-}
-
-function submitForReview() {
-    if (confirm('レビューに提出しますか？')) {
-        showNotification('レビューに提出しました', 'success');
-        setTimeout(() => location.reload(), 1000);
-    }
-}
-
+// 公開処理
 function publishContent() {
-    window.location.href = `/dialogue/publish?id=${meetingId}`;
+    showNotification('公開処理を開始しました', 'info');
+    
+    setTimeout(() => {
+        showNotification('コンテンツが正常に公開されました', 'success');
+    }, 2000);
 }
 
-// 通知表示
+// ユーティリティ関数
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 ${
-        type === 'success' ? 'bg-green-500 text-white' :
-        type === 'error' ? 'bg-red-500 text-white' :
-        'bg-blue-500 text-white'
-    }`;
-    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        padding: 1rem 1.5rem;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 3000;
+        border-left: 4px solid ${type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+        color: ${type === 'success' ? '#065f46' : type === 'warning' ? '#92400e' : '#1e40af'};
+    `;
+    
+    const icon = type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+    notification.innerHTML = `${icon} <span>${message}</span>`;
     
     document.body.appendChild(notification);
     
-    // アニメーション
     setTimeout(() => {
         notification.style.transform = 'translateX(0)';
     }, 10);
     
-    // 3秒後に削除
     setTimeout(() => {
         notification.style.transform = 'translateX(400px)';
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// 共有モーダルを作成
-function createShareModal() {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-    modal.innerHTML = `
-        <div class="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 class="text-lg font-semibold mb-4">チーム共有</h3>
-            <div class="space-y-3">
-                <label class="flex items-center">
-                    <input type="checkbox" class="mr-2" checked>
-                    <span>IR部門全体</span>
-                </label>
-                <label class="flex items-center">
-                    <input type="checkbox" class="mr-2">
-                    <span>経営陣</span>
-                </label>
-                <label class="flex items-center">
-                    <input type="checkbox" class="mr-2">
-                    <span>関連部署</span>
-                </label>
-            </div>
-            <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    共有メッセージ（任意）
-                </label>
-                <textarea class="form-control" rows="3" placeholder="共有時のメッセージを入力..."></textarea>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button class="btn btn-secondary" onclick="this.closest('.fixed').remove()">
-                    キャンセル
-                </button>
-                <button class="btn btn-primary" onclick="performShare()">
-                    共有
-                </button>
-            </div>
-        </div>
-    `;
-    
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.remove();
-    };
-    
-    return modal;
+function showTimeline() {
+    showNotification('処理履歴機能を開発中です', 'info');
 }
 
-// 共有実行
-function performShare() {
-    showNotification('チームに共有しました', 'success');
-    document.querySelector('.fixed').remove();
+function shareProgress() {
+    showNotification('進捗共有機能を開発中です', 'info');
 }
 
-// ページ読み込み時の処理
-document.addEventListener('DOMContentLoaded', function() {
-    // 自動更新（処理中の場合）
-    const processingStages = document.querySelectorAll('.animate-pulse');
-    if (processingStages.length > 0) {
-        // 30秒ごとに自動更新
-        setInterval(() => {
-            location.reload();
-        }, 30000);
-    }
-});
+function toggleAIAssistant() {
+    showNotification('AIアシスタント機能を開発中です', 'info');
+}
 </script>
 {% endblock %}
