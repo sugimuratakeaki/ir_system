@@ -1327,13 +1327,14 @@ async def dialogue_publish(request: Request):
     })
 
 @app.get("/dialogue/edit", response_class=HTMLResponse)
-async def dialogue_edit(request: Request):
-    """ミーティング処理詳細画面"""
+async def dialogue_edit_unified(request: Request):
+    """統合議事録編集画面（段階適応型UI）"""
     # URLパラメータからIDを取得
     meeting_id = request.query_params.get("id", "meeting_001")
     
     # モックデータ（実際はデータベースから取得）
-    mock_meeting_data = {
+    # 基本データを先に定義
+    base_meeting_data = {
         "meeting_001": {
             "title": "野村AMとの面談記録",
             "investor_name": "野村アセットマネジメント",
@@ -1399,6 +1400,68 @@ async def dialogue_edit(request: Request):
             "transcript_stats": {
                 "total_chars": 15680,
                 "reading_time": 12
+            },
+            "investor_profile": {
+                "investment_style": "長期バリュー投資",
+                "esg_focus": "高",
+                "holding_period": "平均3.2年",
+                "total_meetings": 12,
+                "last_meeting_date": "2023-10-15",
+                "satisfaction_trend": "向上",
+                "key_interests": ["技術優位性", "ESG戦略", "収益性"],
+                "risk_tolerance": "中",
+                "typical_concerns": ["競合優位性", "長期成長性", "リスク管理"]
+            },
+            "past_meetings": [
+                {
+                    "id": "meeting_20231015",
+                    "date": "2023-10-15",
+                    "title": "Q2決算説明会",
+                    "topics": ["Q2業績", "中期戦略", "ESG進捗"],
+                    "investor_satisfaction": 8.5,
+                    "key_concerns": ["AI投資効率", "競合対応"]
+                },
+                {
+                    "id": "meeting_20230715", 
+                    "date": "2023-07-15",
+                    "title": "中期経営計画説明",
+                    "topics": ["3ヵ年計画", "M&A戦略", "DX推進"],
+                    "investor_satisfaction": 7.8,
+                    "key_concerns": ["計画実現性", "投資回収"]
+                }
+            ],
+            "ai_analysis": {
+                "sentiment_score": 78,
+                "engagement_level": 8.2,
+                "understanding_level": 6.5, 
+                "satisfaction_level": 7.8,
+                "key_topics": [
+                    {"topic": "AI事業戦略", "mentions": 23, "sentiment": "positive"},
+                    {"topic": "競合優位性", "mentions": 18, "sentiment": "concerned"},
+                    {"topic": "ESG目標", "mentions": 15, "sentiment": "interested"},
+                    {"topic": "収益性", "mentions": 12, "sentiment": "positive"}
+                ],
+                "concerns_detected": [
+                    {
+                        "topic": "AI事業の競争優位性",
+                        "confidence": 0.94,
+                        "urgency": "high",
+                        "detail": "競合他社との技術的差別化について複数回質問",
+                        "suggested_response": "特許ポートフォリオと独自技術の詳細説明"
+                    },
+                    {
+                        "topic": "ESG目標の実現可能性", 
+                        "confidence": 0.87,
+                        "urgency": "medium",
+                        "detail": "2030年カーボンニュートラル目標の具体性への疑問",
+                        "suggested_response": "詳細ロードマップと投資計画の提示"
+                    }
+                ],
+                "recommendations": [
+                    "次回面談時に特許技術の詳細資料を準備",
+                    "競合比較分析レポートの作成",
+                    "ESGロードマップの早期公表"
+                ]
             },
             "ai_summary": {
                 "executive_summary": "第3四半期の業績は全体的に好調で、特にAI事業が予想を上回る成長を示しました。投資家からは今後の成長性と競争優位性について高い関心が寄せられました。",
@@ -1494,7 +1557,28 @@ async def dialogue_edit(request: Request):
             },
             "total_processing_time": "2時間30分",
             "progress_percentage": 65,
-            "last_updated": "2024-01-22 14:30"
+            "last_updated": "2024-01-22 14:30",
+            "action_items": [
+                {"id": "action_001", "title": "特許ポートフォリオの詳細資料作成", "assignee": "法務部", "due_date": "2024-02-15", "priority": "high", "status": "pending", "estimated_hours": 16},
+                {"id": "action_002", "title": "ESGロードマップの最終確認・公表準備", "assignee": "サステナビリティ部", "due_date": "2024-02-28", "priority": "high", "status": "in_progress", "estimated_hours": 24},
+                {"id": "action_003", "title": "競合他社比較分析レポート作成", "assignee": "戦略企画部", "due_date": "2024-03-10", "priority": "medium", "status": "pending", "estimated_hours": 20}
+            ],
+            "next_meeting_suggestion": {
+                "recommended_date": "2024-04-15", "reason": "Q4決算発表後のフォローアップ",
+                "agenda_items": ["Q4業績説明", "ESG進捗報告", "特許戦略詳細", "競合分析結果"],
+                "preparation_materials": ["決算説明資料", "ESGロードマップ更新版", "特許ポートフォリオ詳細版", "競合比較分析"]
+            },
+            "comparison_data": {
+                "previous_meeting": {
+                    "date": "2023-10-15", "key_topics": ["Q2業績", "一般的な技術説明", "ESG検討段階"],
+                    "investor_satisfaction": 7.5, "concerns": ["技術優位性", "成長持続性"],
+                    "changes_since": [
+                        {"aspect": "技術説明", "change": "一般的→具体的特許技術", "trend": "positive"},
+                        {"aspect": "投資家関心", "change": "中程度→高い関心", "trend": "positive"},
+                        {"aspect": "懸念レベル", "change": "低→中程度", "trend": "attention"}
+                    ]
+                }
+            }
         },
         "meeting_002": {
             "title": "BlackRock定例ミーティング",
@@ -1563,7 +1647,7 @@ async def dialogue_edit(request: Request):
             ],
             "current_stage_info": {
                 "action_required": False,
-                "message": "文字起こしを処理中です。完了まで約 15分かかります。"
+                "message": "文字起こしを処理中です。完了まで約 15分かかります。"
             },
             "can_edit_basic_info": True,
             "can_upload_more": False,
@@ -1571,15 +1655,68 @@ async def dialogue_edit(request: Request):
             "total_processing_time": "1時間",
             "progress_percentage": 30,
             "last_updated": "2024-01-21 18:15"
+        },
+        "activity-002": {
+            "title": "BlackRock個別面談",
+            "investor_name": "BlackRock Inc.",
+            "investor_type": "海外機関投資家",
+            "type": "個別面談",
+            "date": "2024-01-21 15:00",
+            "formatted_date": "2024年1月21日 15:00",
+            "participants": 2,
+            "company_participants": ["CFO - 佐藤二郎", "IR部長 - 山本三郎"],
+            "tags": ["ESG", "個別面談", "海外投資家"],
+            "priority": "high",
+            "days_elapsed": 3,
+            "current_stage": "faq",
+            "stages": {
+                "upload": {"status": "completed"},
+                "transcription": {"status": "completed"},
+                "ai_summary": {"status": "completed"},
+                "faq": {"status": "processing", "progress": 75},
+                "review": {"status": "waiting"},
+                "publish": {"status": "waiting"}
+            },
+            "files": [
+                {
+                    "id": "file_004",
+                    "name": "BlackRock_meeting_20240121.mp4",
+                    "type": "video",
+                    "size": "234.5MB",
+                    "duration": "45分"
+                }
+            ],
+            "transcript_preview": "【佐藤（CFO）】ESG目標の進捗についてご説明いたします。\n\n【投資家】特に環境目標の具体的なロードマップについて詳しくお聞きしたいです。",
+            "investor_profile": {
+                "investment_style": "ESG重視投資",
+                "esg_focus": "非常に高",
+                "total_meetings": 8,
+                "satisfaction_trend": "安定"
+            },
+            "current_stage_info": {
+                "action_required": True,
+                "message": "FAQ作成・確認が必要です。"
+            }
         }
     }
+    
+    # 循環参照を避けるため、activity-001は別途作成
+    mock_meeting_data = base_meeting_data.copy()
+    if "meeting_001" in base_meeting_data:
+        activity_001_data = base_meeting_data["meeting_001"].copy()
+        activity_001_data.update({
+            "title": "野村AM決算説明会",
+            "current_stage": "ai_summary",
+            "urgency": "urgent"
+        })
+        mock_meeting_data["activity-001"] = activity_001_data
     
     # 指定されたIDのデータを取得（デフォルトはmeeting_001）
     meeting_data = mock_meeting_data.get(meeting_id, mock_meeting_data["meeting_001"])
     
-    return templates.TemplateResponse("dialogue-edit.html", {
+    return templates.TemplateResponse("dialogue-edit-unified.html", {
         "request": request,
-        "title": "ミーティング処理詳細",
+        "title": f"{meeting_data['title']} - 議事録編集",
         "meeting_id": meeting_id,
         "meeting_data": meeting_data,
         "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
@@ -1969,7 +2106,7 @@ async def ir_calendar_workspace(request: Request):
 
 @app.get("/dialogue-center", response_class=HTMLResponse)
 async def dialogue_center(request: Request):
-    """対話記録センター画面（統合ワークスペース）"""
+    """外部MTG議事録画面（統合ワークスペース）"""
     from datetime import datetime, timedelta
     
     # 現在日時の取得
@@ -2146,7 +2283,7 @@ async def dialogue_center(request: Request):
     
     return templates.TemplateResponse("dialogue-center-workspace.html", {
         "request": request,
-        "title": "対話記録センター",
+        "title": "外部MTG議事録",
         "activity_data": activity_data,
         "statistics": statistics,
         "ai_insights": ai_insights,
@@ -2518,6 +2655,8 @@ async def export_faqs():
 async def import_faqs(request: Request):
     """FAQインポートAPI"""
     return {"status": "success", "message": "FAQをインポートしました"}
+
+# 重複エンドポイント削除 - dialogue/edit に統合
 
 # ===== アプリケーション起動 =====
 if __name__ == "__main__":

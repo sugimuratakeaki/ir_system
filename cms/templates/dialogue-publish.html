@@ -944,7 +944,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 前へ戻る
 function goBack() {
-    window.location.href = '/dialogue-analysis';
+    const recordId = new URLSearchParams(window.location.search).get('id') || 'meeting_001';
+    window.location.href = `/dialogue/edit?id=${recordId}`;
 }
 
 // 公開処理

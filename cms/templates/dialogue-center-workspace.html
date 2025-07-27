@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}対話記録センター{% endblock %}
+{% block title %}外部MTG議事録{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', path='/css/ir-management.css') }}">
+<link rel="stylesheet" href="/static/css/ir-management.css">
 <style>
 /* 次世代対話記録管理ワークスペース */
 .dialogue-center {
@@ -85,6 +85,22 @@
 .activity-card:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+.activity-card:hover::after {
+    content: "ダブルクリックで編集";
+    position: absolute;
+    top: -10px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    pointer-events: none;
+    opacity: 0.9;
+    z-index: 10;
 }
 
 .activity-card.selected {
@@ -1159,7 +1175,7 @@
         
         <div class="stream-content">
             <!-- 緊急対応が必要な記録 -->
-            <div class="activity-card urgent selected" onclick="selectActivity('activity-001')">
+                                <div class="activity-card urgent selected" onclick="selectActivity('activity-001')" ondblclick="editRecord('activity-001')" title="ダブルクリックで編集">
                 <div class="activity-header">
                     <div class="activity-title">野村AM決算説明会</div>
                     <div class="activity-time">2時間前</div>
@@ -1185,7 +1201,7 @@
             </div>
             
             <!-- 処理中の記録 -->
-            <div class="activity-card processing" onclick="selectActivity('activity-002')">
+                                <div class="activity-card processing" onclick="selectActivity('activity-002')" ondblclick="editRecord('activity-002')" title="ダブルクリックで編集">
                 <div class="activity-header">
                     <div class="activity-title">BlackRock個別面談</div>
                     <div class="activity-time">5時間前</div>
@@ -1211,7 +1227,7 @@
             </div>
             
             <!-- 完了済みの記録 -->
-            <div class="activity-card completed" onclick="selectActivity('activity-003')">
+                                <div class="activity-card completed" onclick="selectActivity('activity-003')" ondblclick="editRecord('activity-003')" title="ダブルクリックで編集">
                 <div class="activity-header">
                     <div class="activity-title">個人投資家説明会</div>
                     <div class="activity-time">1日前</div>
@@ -1237,7 +1253,7 @@
             </div>
             
             <!-- 今日予定の記録 -->
-            <div class="activity-card" onclick="selectActivity('activity-004')">
+                                <div class="activity-card" onclick="selectActivity('activity-004')" ondblclick="editRecord('activity-004')" title="ダブルクリックで編集">
                 <div class="activity-header">
                     <div class="activity-title">Vanguard定期面談</div>
                     <div class="activity-time">14:00予定</div>
@@ -1263,7 +1279,7 @@
             </div>
             
             <!-- 追加の記録... -->
-            <div class="activity-card" onclick="selectActivity('activity-005')">
+                                <div class="activity-card" onclick="selectActivity('activity-005')" ondblclick="editRecord('activity-005')" title="ダブルクリックで編集">
                 <div class="activity-header">
                     <div class="activity-title">アナリスト向け説明会</div>
                     <div class="activity-time">2日前</div>
@@ -1293,7 +1309,7 @@
     <!-- ワークスペースヘッダー -->
     <div class="workspace-header">
         <div>
-            <h1 class="text-2xl font-bold mb-1">対話記録センター</h1>
+            <h1 class="text-2xl font-bold mb-1">外部MTG議事録</h1>
             <p class="text-blue-100">統合されたアクティビティストリーム管理</p>
         </div>
         <div class="flex items-center gap-4">
@@ -2608,7 +2624,18 @@ function nextTablePage() {
 
 function editRecord(activityId) {
     console.log(`記録編集: ${activityId}`);
-    showNotification('編集画面を開きます');
+    const activity = activityData[activityId];
+    if (!activity) {
+        showNotification('⚠️ 記録が見つかりません', 'error');
+        return;
+    }
+    
+    showNotification(`📝 ${activity.title} の編集画面を開いています...`, 'info');
+    
+    // 統合議事録編集画面にリダイレクト  
+    setTimeout(() => {
+        window.location.href = `/dialogue/edit?id=${activityId}`;
+    }, 500);
 }
 
 function viewRecord(activityId) {
@@ -3176,7 +3203,7 @@ function initializeIntelligencePanel() {
     
     // 初期化完了の通知
     setTimeout(() => {
-        showNotification('💬 対話記録センターが読み込まれました', 'success');
+        showNotification('💬 外部MTG議事録が読み込まれました', 'success');
     }, 500);
 }
 

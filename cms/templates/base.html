@@ -59,7 +59,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/cms.css') }}">
+    <link rel="stylesheet" href="/static/css/cms.css">
     {% block extra_css %}{% endblock %}
     
     <!-- Favicon -->
@@ -115,7 +115,7 @@
                     </a>
                     <a href="/dialogue-center" class="nav-item {% if request.url.path == '/dialogue-center' %}active{% endif %}">
                         <span class="nav-icon">💬</span>
-                        <span>対話記録センター</span>
+                        <span>外部MTG議事録</span>
                     </a>
                     <a href="/ir-content-center" class="nav-item {% if request.url.path == '/ir-content-center' %}active{% endif %}">
                         <span class="nav-icon">📚</span>

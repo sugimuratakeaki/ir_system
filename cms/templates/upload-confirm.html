@@ -1943,14 +1943,16 @@ function saveDraft() {
 // キャンセル
 function cancelUpload() {
     if (confirm('入力した内容は保存されません。本当にキャンセルしますか？')) {
-        window.location.href = '/upload';
+        const meetingId = new URLSearchParams(window.location.search).get('meeting_id') || 'meeting_001';
+        window.location.href = `/dialogue/edit?id=${meetingId}`;
     }
 }
 
 // 前へ戻る
 function goBack() {
     if (confirm('入力した内容は保存されません。前のページに戻りますか？')) {
-        window.location.href = '/upload';
+        const meetingId = new URLSearchParams(window.location.search).get('meeting_id') || 'meeting_001';
+        window.location.href = `/dialogue/edit?id=${meetingId}`;
     }
 }
 
@@ -1965,8 +1967,9 @@ function proceedToAnalysis() {
     const formData = collectFormData();
     console.log('AI詳細分析へ進む:', formData);
     
-    // 次のページへ遷移（実際はデータをPOSTして遷移）
-    window.location.href = '/dialogue-analysis';
+    // 統合編集画面の次のステージへ遷移
+    const meetingId = new URLSearchParams(window.location.search).get('meeting_id') || 'meeting_001';
+    window.location.href = `/dialogue/edit?id=${meetingId}`;
 }
 
 // フォームデータ収集
