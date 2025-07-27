@@ -1,0 +1,713 @@
+{% extends "base.html" %}
+
+{% block title %}ファイルアップロード - {{ meeting_data.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/ir-management.css">
+<style>
+/* Upload専用画面スタイル */
+.upload-workspace {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+}
+
+/* コンパクトな進捗バー */
+.compact-progress {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.compact-title {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.compact-meta {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+.step-navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.nav-step {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-step.active {
+    background: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+.nav-step:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* メインアップロード画面 */
+.upload-main {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.upload-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.drop-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #fafafa;
+}
+
+.drop-area:hover {
+    border-color: #3b82f6;
+    background: #f8fafc;
+}
+
+.drop-area.drag-over {
+    border-color: #10b981;
+    background: #f0fdf4;
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+.upload-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.upload-description {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.upload-specs {
+    font-size: 0.875rem;
+    color: #6b7280;
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.file-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.file-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.file-type-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.file-type-icon.video {
+    background: #3b82f6;
+    color: white;
+}
+
+.file-type-icon.audio {
+    background: #10b981;
+    color: white;
+}
+
+.file-type-icon.document {
+    background: #f59e0b;
+    color: white;
+}
+
+.file-details h4 {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.file-meta {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.action-btn {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.action-btn.danger:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+/* サイドパネル */
+.upload-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.sidebar-title {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.meeting-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 6px;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #111827;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.action-bar {
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 12px 12px;
+    margin: -2rem -2rem 0;
+    margin-top: auto;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-workspace">
+    <!-- コンパクト進捗バー -->
+    <div class="compact-progress">
+        <div class="compact-header">
+            <div>
+                <h1 class="compact-title">{{ meeting_data.title }}</h1>
+                <div class="compact-meta">
+                    {{ meeting_data.investor_name }} • {{ meeting_data.formatted_date }} • {{ meeting_data.type }}
+                </div>
+            </div>
+            <div class="step-navigation">
+                <div class="nav-step active" onclick="goToStep('upload')">📁 アップロード</div>
+                <div class="nav-step" onclick="goToStep('transcription')">📝 文字起こし</div>
+                <div class="nav-step" onclick="goToStep('ai_summary')">🤖 AI要約</div>
+                <div class="nav-step" onclick="goToStep('faq')">❓ FAQ</div>
+                <div class="nav-step" onclick="goToStep('review')">✅ レビュー</div>
+                <div class="nav-step" onclick="goToStep('publish')">🌐 公開</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインアップロード領域 -->
+    <div class="upload-main">
+        <div class="upload-zone">
+            <!-- ドロップエリア -->
+            <div class="drop-area" onclick="selectFiles()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+                <div class="upload-icon">📁</div>
+                <h2 class="upload-title">ファイルアップロード</h2>
+                <p class="upload-description">
+                    面談の音声・動画ファイルや関連資料をドラッグ&ドロップ<br>
+                    またはクリックしてファイルを選択してください
+                </p>
+                <div class="upload-specs">
+                    <strong>📋 対応形式・制限</strong><br>
+                    🎥 動画: MP4, MOV, AVI (最大2GB)<br>
+                    🎵 音声: MP3, WAV, M4A (最大500MB)<br>
+                    📄 資料: PDF, PPT, DOCX (最大100MB)<br>
+                    ⏱️ 推奨時間: 3時間以内
+                </div>
+            </div>
+
+            <!-- アップロード済みファイル -->
+            {% if meeting_data.files %}
+            <div>
+                <h3 style="margin-bottom: 1rem; color: #111827; font-weight: 600;">
+                    📂 アップロード済みファイル ({{ meeting_data.files|length }}件)
+                </h3>
+                <div class="file-grid">
+                    {% for file in meeting_data.files %}
+                    <div class="file-card">
+                        <div class="file-header">
+                            <div class="file-type-icon {{ file.type }}">
+                                {% if file.type == 'video' %}🎥
+                                {% elif file.type == 'audio' %}🎵
+                                {% else %}📄{% endif %}
+                            </div>
+                            <div class="file-details">
+                                <h4>{{ file.name }}</h4>
+                                <div class="file-meta">
+                                    {{ file.size }}
+                                    {% if file.duration %} • {{ file.duration }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="action-btn" onclick="previewFile('{{ file.id }}')">
+                                👁️ プレビュー
+                            </button>
+                            <button class="action-btn" onclick="downloadFile('{{ file.id }}')">
+                                📥 DL
+                            </button>
+                            <button class="action-btn danger" onclick="deleteFile('{{ file.id }}')">
+                                🗑️ 削除
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- サイドパネル -->
+        <div class="upload-sidebar">
+            <!-- 基本情報 -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">📝 基本情報</h3>
+                <div class="form-group">
+                    <label class="form-label">会議種別</label>
+                    <select class="form-control" onchange="updateMeetingType(this.value)">
+                        <option value="individual" {{ 'selected' if meeting_data.type == '個別面談' }}>個別面談</option>
+                        <option value="earnings" {{ 'selected' if meeting_data.type == '決算説明会' }}>決算説明会</option>
+                        <option value="small_meeting">スモールミーティング</option>
+                        <option value="conference">カンファレンス</option>
+                        <option value="roadshow">ロードショー</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">優先度</label>
+                    <select class="form-control" onchange="updatePriority(this.value)">
+                        <option value="high" {{ 'selected' if meeting_data.priority == 'high' }}>🔥 高</option>
+                        <option value="medium">🟡 中</option>
+                        <option value="low">🟢 低</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">参加者数</label>
+                    <input type="number" class="form-control" value="{{ meeting_data.participants }}" 
+                           onchange="updateParticipants(this.value)">
+                </div>
+            </div>
+
+            <!-- ファイル統計 -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">📊 アップロード状況</h3>
+                <div class="meeting-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">{{ meeting_data.files|length }}</div>
+                        <div class="stat-label">ファイル数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">
+                            {% set total_size = 0 %}
+                            {% for file in meeting_data.files %}
+                                {% set size_mb = file.size.replace('MB', '')|float %}
+                                {% set total_size = total_size + size_mb %}
+                            {% endfor %}
+                            {{ '%.1f'|format(total_size) }}MB
+                        </div>
+                        <div class="stat-label">合計サイズ</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 0.75rem; background: white; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.75rem; color: #6b7280;">進捗状況</span>
+                        <span style="font-size: 0.75rem; font-weight: 600;">85%</span>
+                    </div>
+                    <div style="width: 100%; height: 4px; background: #e5e7eb; border-radius: 2px;">
+                        <div style="width: 85%; height: 100%; background: #10b981; border-radius: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- クイックアクション -->
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">⚡ クイックアクション</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="openRecordingTips()">
+                        🎤 録音品質チェック
+                    </button>
+                    <button class="btn btn-secondary" onclick="testTranscription()">
+                        🧪 文字起こしテスト
+                    </button>
+                    <button class="btn btn-secondary" onclick="addMetadata()">
+                        🏷️ メタデータ追加
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- アクションバー -->
+        <div class="action-bar">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></div>
+                最終保存: {{ current_time }}
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="btn btn-secondary" onclick="saveDraft()">
+                    💾 下書き保存
+                </button>
+                <button class="btn btn-primary" onclick="proceedToTranscription()">
+                    📝 文字起こしへ進む
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// グローバル変数
+const meetingId = '{{ meeting_id }}';
+
+// ファイル選択
+function selectFiles() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = 'video/*,audio/*,.pdf,.ppt,.pptx,.doc,.docx';
+    input.onchange = handleFileSelect;
+    input.click();
+}
+
+function handleFileSelect(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+        showNotification(`${files.length}個のファイルをアップロード中...`, 'info');
+        uploadFiles(files);
+    }
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    event.currentTarget.classList.remove('drag-over');
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        handleFileSelect({target: {files: files}});
+    }
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+    event.currentTarget.classList.add('drag-over');
+}
+
+// ファイルアップロード
+function uploadFiles(files) {
+    Array.from(files).forEach(file => {
+        // ファイルサイズチェック
+        const maxSize = file.type.startsWith('video/') ? 2048 : 
+                       file.type.startsWith('audio/') ? 512 : 100;
+        
+        if (file.size > maxSize * 1024 * 1024) {
+            showNotification(`${file.name} のサイズが上限を超えています`, 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('meeting_id', meetingId);
+        
+        fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            showNotification(`✅ ${file.name} アップロード完了`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        })
+        .catch(error => {
+            showNotification(`❌ ${file.name} アップロード失敗`, 'error');
+        });
+    });
+}
+
+// ナビゲーション
+function goToStep(step) {
+    const stepUrls = {
+        'upload': `/upload-step?id=${meetingId}`,
+        'transcription': `/transcription-step?id=${meetingId}`,
+        'ai_summary': `/ai-summary-step?id=${meetingId}`,
+        'faq': `/faq-step?id=${meetingId}`,
+        'review': `/review-step?id=${meetingId}`,
+        'publish': `/publish-step?id=${meetingId}`
+    };
+    
+    if (stepUrls[step]) {
+        window.location.href = stepUrls[step];
+    }
+}
+
+function proceedToTranscription() {
+    if ({{ meeting_data.files|length }} === 0) {
+        showNotification('⚠️ まずファイルをアップロードしてください', 'warning');
+        return;
+    }
+    goToStep('transcription');
+}
+
+// フォーム更新
+function updateMeetingType(type) {
+    saveDraft();
+}
+
+function updatePriority(priority) {
+    saveDraft();
+}
+
+function updateParticipants(count) {
+    saveDraft();
+}
+
+// ファイル操作
+function previewFile(fileId) {
+    window.open(`/api/files/${fileId}/preview`, '_blank');
+}
+
+function downloadFile(fileId) {
+    window.open(`/api/files/${fileId}/download`, '_blank');
+}
+
+function deleteFile(fileId) {
+    if (confirm('このファイルを削除しますか？')) {
+        fetch(`/api/files/${fileId}`, {method: 'DELETE'})
+        .then(() => {
+            showNotification('ファイルを削除しました', 'success');
+            location.reload();
+        });
+    }
+}
+
+// クイックアクション
+function openRecordingTips() {
+    showNotification('録音品質ガイドを開いています...', 'info');
+}
+
+function testTranscription() {
+    showNotification('文字起こし精度をテスト中...', 'info');
+}
+
+function addMetadata() {
+    showNotification('メタデータエディタを開いています...', 'info');
+}
+
+function saveDraft() {
+    showNotification('💾 下書きを保存しました', 'success');
+}
+
+// 通知システム
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 transform transition-all duration-300';
+    
+    const colors = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-500 text-white',
+        warning: 'bg-yellow-500 text-white',
+        info: 'bg-blue-500 text-white'
+    };
+    
+    notification.className += ' ' + (colors[type] || colors.info);
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// ドラッグ&ドロップの改善
+document.addEventListener('dragenter', function(e) {
+    e.preventDefault();
+});
+
+document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+});
+
+document.addEventListener('dragleave', function(e) {
+    if (e.target.classList.contains('drop-area')) {
+        e.target.classList.remove('drag-over');
+    }
+});
+</script>
+{% endblock %} 

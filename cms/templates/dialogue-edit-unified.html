@@ -9,7 +9,7 @@
 .unified-editor {
     display: grid;
     grid-template-columns: 300px 1fr 320px;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: min-content 1fr;
     height: calc(100vh - 140px);
     gap: 1rem;
     grid-template-areas: 
@@ -17,35 +17,39 @@
         "context-sidebar work-area ai-assistant";
 }
 
-/* パイプライン進捗バー（拡張版） */
+/* パイプライン進捗バー（コンパクト版）*/
 .pipeline-progress {
     background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
     color: white;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .pipeline-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
 .meeting-info h1 {
-    font-size: 1.875rem;
+    font-size: 1.25rem;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
 }
 
 .meeting-meta {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     align-items: center;
     opacity: 0.9;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
 }
 
 .meeting-actions {
@@ -82,10 +86,10 @@
 .stage-pipeline::before {
     content: '';
     position: absolute;
-    top: 2rem;
+    top: 1.25rem;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 1px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 1px;
 }
@@ -112,15 +116,15 @@
 }
 
 .stage-indicator {
-    width: 4rem;
-    height: 4rem;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     position: relative;
     transition: all 0.3s ease;
 }
@@ -152,13 +156,14 @@
 }
 
 .stage-label {
-    font-size: 0.75rem;
+    font-size: 0.625rem;
     font-weight: 600;
     text-align: center;
     opacity: 0.9;
-    min-height: 2.5rem;
+    min-height: 1.5rem;
     display: flex;
     align-items: center;
+    line-height: 1.1;
 }
 
 .stage-item.current .stage-label {
@@ -167,11 +172,11 @@
 }
 
 .stage-progress {
-    width: 5rem;
-    height: 4px;
+    width: 3rem;
+    height: 3px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 2px;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
     overflow: hidden;
 }
 

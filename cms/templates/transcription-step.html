@@ -1,0 +1,1307 @@
+{% extends "base.html" %}
+
+{% block title %}文字起こし・編集 - {{ meeting_data.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/ir-management.css">
+<style>
+/* 文字起こし専用画面スタイル */
+.transcription-workspace {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+}
+
+/* コンパクト進捗バー */
+.compact-progress {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.compact-title {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.compact-meta {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+.step-navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.nav-step {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-step.active {
+    background: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+/* メイン作業エリア */
+.transcription-main {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 0;
+    overflow: hidden;
+}
+
+.transcript-editor-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* 音声プレイヤー（固定ヘッダー） */
+.audio-player {
+    background: #f8fafc;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 1.5rem;
+    flex-shrink: 0;
+}
+
+.player-main {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.play-button {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.2s;
+}
+
+.play-button:hover {
+    background: #2563eb;
+    transform: scale(1.05);
+}
+
+.playback-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.progress-container {
+    position: relative;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1e40af);
+    border-radius: 6px;
+    width: 25%;
+    transition: width 0.1s;
+}
+
+.progress-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    pointer-events: none;
+}
+
+.progress-marker {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: #f59e0b;
+    border-radius: 1px;
+}
+
+.time-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.playback-speed {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.speed-btn {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.speed-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+/* エディターエリア */
+.editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.editor-toolbar {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.toolbar-section {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.toolbar-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toolbar-btn:hover {
+    background: #f3f4f6;
+}
+
+.toolbar-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.search-box {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    width: 200px;
+}
+
+/* 文字起こしコンテンツ */
+.transcript-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.transcript-segment {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+}
+
+.transcript-segment:hover {
+    background: #f8fafc;
+    border-color: #e5e7eb;
+}
+
+.transcript-segment.current {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+    border-color: #fbbf24;
+}
+
+.transcript-segment.highlighted {
+    background: #dbeafe;
+    border-left-color: #3b82f6;
+    border-color: #93c5fd;
+}
+
+.transcript-segment.important {
+    background: #fee2e2;
+    border-left-color: #ef4444;
+    border-color: #fca5a5;
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.speaker-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.speaker-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.speaker-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.875rem;
+}
+
+.timestamp-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.timestamp-link {
+    font-family: monospace;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.timestamp-link:hover {
+    background: #e5e7eb;
+    color: #3b82f6;
+}
+
+.segment-text {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.segment-text:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.segment-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.transcript-segment:hover .segment-actions {
+    opacity: 1;
+}
+
+.segment-btn {
+    padding: 0.375rem 0.75rem;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.segment-btn:hover {
+    background: #e5e7eb;
+}
+
+.segment-btn.active {
+    background: #3b82f6;
+    color: white;
+}
+
+/* サイドパネル */
+.transcription-sidebar {
+    background: #f8fafc;
+    border-left: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: white;
+}
+
+.sidebar-title {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.stat-value {
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #111827;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.sidebar-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.sidebar-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.speaker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.speaker-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.speaker-item:hover {
+    background: #f3f4f6;
+}
+
+.speaker-item.active {
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+}
+
+.action-shortcuts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.shortcut-btn {
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+}
+
+.shortcut-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.shortcut-key {
+    float: right;
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-family: monospace;
+}
+
+/* フッターアクションバー */
+.action-bar {
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.save-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.save-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.save-indicator.saving {
+    background: #f59e0b;
+    animation: pulse 2s infinite;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="transcription-workspace">
+    <!-- コンパクト進捗バー -->
+    <div class="compact-progress">
+        <div class="compact-header">
+            <div>
+                <h1 class="compact-title">{{ meeting_data.title }}</h1>
+                <div class="compact-meta">
+                    {{ meeting_data.investor_name }} • {{ meeting_data.formatted_date }} • 文字起こし・編集
+                </div>
+            </div>
+            <div class="step-navigation">
+                <div class="nav-step" onclick="goToStep('upload')">📁 アップロード</div>
+                <div class="nav-step active" onclick="goToStep('transcription')">📝 文字起こし</div>
+                <div class="nav-step" onclick="goToStep('ai_summary')">🤖 AI要約</div>
+                <div class="nav-step" onclick="goToStep('faq')">❓ FAQ</div>
+                <div class="nav-step" onclick="goToStep('review')">✅ レビュー</div>
+                <div class="nav-step" onclick="goToStep('publish')">🌐 公開</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メイン作業エリア -->
+    <div class="transcription-main">
+        <!-- エディターエリア -->
+        <div class="transcript-editor-area">
+            <!-- 音声プレイヤー -->
+            <div class="audio-player">
+                <div class="player-main">
+                    <button class="play-button" onclick="togglePlayback()">
+                        <span id="play-icon">▶️</span>
+                    </button>
+                    <div class="playback-controls">
+                        <div class="progress-container">
+                            <div class="progress-bar" onclick="seekAudio(event)">
+                                <div class="progress-fill" id="progress-fill"></div>
+                                <div class="progress-markers">
+                                    <div class="progress-marker" style="left: 15%;"></div>
+                                    <div class="progress-marker" style="left: 35%;"></div>
+                                    <div class="progress-marker" style="left: 67%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="time-info">
+                            <span id="current-time">12:34</span>
+                            <span>{{ meeting_data.files[0].duration if meeting_data.files else '1:30:45' }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="playback-speed">
+                    <span style="font-size: 0.75rem; color: #6b7280; margin-right: 0.5rem;">再生速度:</span>
+                    <button class="speed-btn" onclick="setPlaybackSpeed(0.75)">0.75x</button>
+                    <button class="speed-btn active" onclick="setPlaybackSpeed(1.0)">1.0x</button>
+                    <button class="speed-btn" onclick="setPlaybackSpeed(1.25)">1.25x</button>
+                    <button class="speed-btn" onclick="setPlaybackSpeed(1.5)">1.5x</button>
+                    <span style="margin-left: 1rem; font-size: 0.75rem; color: #6b7280;">
+                        🎤 認識精度: {{ meeting_data.transcript_stats.accuracy if meeting_data.transcript_stats else '96' }}%
+                    </span>
+                </div>
+            </div>
+
+            <!-- エディターツールバー -->
+            <div class="editor-toolbar">
+                <div class="toolbar-section">
+                    <button class="toolbar-btn" onclick="highlightMode()">
+                        🖍️ ハイライト
+                    </button>
+                    <button class="toolbar-btn" onclick="importantMode()">
+                        ⭐ 重要
+                    </button>
+                    <button class="toolbar-btn" onclick="speakerMode()">
+                        👤 話者分離
+                    </button>
+                </div>
+                <div class="toolbar-section">
+                    <button class="toolbar-btn" onclick="undoAction()">
+                        ↶ 元に戻す
+                    </button>
+                    <button class="toolbar-btn" onclick="redoAction()">
+                        ↷ やり直し
+                    </button>
+                </div>
+                <div class="toolbar-section">
+                    <input type="text" class="search-box" placeholder="🔍 文字起こし内を検索..." onkeyup="searchTranscript(this.value)">
+                </div>
+                <div class="toolbar-section" style="margin-left: auto;">
+                    <span style="font-size: 0.75rem; color: #6b7280;">
+                        総文字数: {{ meeting_data.transcript_stats.total_chars if meeting_data.transcript_stats else '15,680' }}文字 | 
+                        読了時間: 約{{ meeting_data.transcript_stats.reading_time if meeting_data.transcript_stats else '12' }}分
+                    </span>
+                </div>
+            </div>
+
+            <!-- 文字起こしコンテンツ -->
+            <div class="transcript-content">
+                {% if meeting_data.transcript_preview %}
+                {% set segments = meeting_data.transcript_preview.split('\n\n') %}
+                {% for segment in segments %}
+                {% if segment.strip() %}
+                <div class="transcript-segment" data-timestamp="00:{{ loop.index }}:{{ loop.index * 5 }}" id="segment-{{ loop.index }}">
+                    <div class="segment-header">
+                        <div class="speaker-info">
+                            <div class="speaker-avatar">
+                                {% if '田中（CEO）' in segment %}T
+                                {% elif '佐藤（CFO）' in segment %}S
+                                {% elif '投資家' in segment %}I
+                                {% else %}?{% endif %}
+                            </div>
+                            <span class="speaker-name">
+                                {% if '田中（CEO）' in segment %}田中（CEO）
+                                {% elif '佐藤（CFO）' in segment %}佐藤（CFO）
+                                {% elif '投資家' in segment %}{{ meeting_data.investor_name }}
+                                {% else %}発言者{% endif %}
+                            </span>
+                        </div>
+                        <div class="timestamp-info">
+                            <span class="timestamp-link" onclick="jumpToTime('00:{{ loop.index }}:{{ loop.index * 5 }}')">
+                                {{ loop.index }}:{{ '%02d'|format(loop.index * 5) }}
+                            </span>
+                            <span>•</span>
+                            <span>{{ loop.index * 30 }}文字</span>
+                        </div>
+                    </div>
+                    <textarea class="segment-text" oninput="markAsEdited(this)" onblur="autoSave()">{{ segment.replace('【田中（CEO）】', '').replace('【佐藤（CFO）】', '').replace('【投資家】', '').strip() }}</textarea>
+                    <div class="segment-actions">
+                        <button class="segment-btn" onclick="highlightSegment({{ loop.index }})">
+                            🖍️ ハイライト
+                        </button>
+                        <button class="segment-btn" onclick="markImportant({{ loop.index }})">
+                            ⭐ 重要
+                        </button>
+                        <button class="segment-btn" onclick="addNote({{ loop.index }})">
+                            📝 メモ
+                        </button>
+                        <button class="segment-btn" onclick="splitSegment({{ loop.index }})">
+                            ✂️ 分割
+                        </button>
+                        <button class="segment-btn" onclick="deleteSegment({{ loop.index }})">
+                            🗑️ 削除
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <div style="text-align: center; padding: 4rem; color: #6b7280;">
+                    <div style="font-size: 4rem; margin-bottom: 1.5rem;">📝</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">文字起こしを開始</h3>
+                    <p>音声ファイルのAI文字起こしを開始するか、手動で文字起こしを入力してください。</p>
+                    <button class="btn btn-primary" onclick="startTranscription()" style="margin-top: 1.5rem;">
+                        🤖 AI文字起こし開始
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- アクションバー -->
+            <div class="action-bar">
+                <div class="save-status">
+                    <div class="save-indicator" id="save-indicator"></div>
+                    <span>最終保存: {{ current_time }}</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="exportTranscript()">
+                        📤 書き出し
+                    </button>
+                    <button class="btn btn-secondary" onclick="saveDraft()">
+                        💾 保存
+                    </button>
+                    <button class="btn btn-primary" onclick="proceedToSummary()">
+                        🤖 AI要約へ進む
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- サイドパネル -->
+        <div class="transcription-sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">📊 文字起こし情報</h3>
+                <div class="sidebar-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ segments|length if segments else '8' }}</div>
+                        <div class="stat-label">セグメント</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">96%</div>
+                        <div class="stat-label">認識精度</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- 話者一覧 -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">👥 話者一覧</h4>
+                    <div class="speaker-list">
+                        <div class="speaker-item active" onclick="filterBySpeaker('田中CEO')">
+                            <div class="speaker-avatar">T</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.875rem;">田中（CEO）</div>
+                                <div style="font-size: 0.75rem; color: #6b7280;">45% (3,200文字)</div>
+                            </div>
+                        </div>
+                        <div class="speaker-item" onclick="filterBySpeaker('佐藤CFO')">
+                            <div class="speaker-avatar">S</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.875rem;">佐藤（CFO）</div>
+                                <div style="font-size: 0.75rem; color: #6b7280;">25% (1,800文字)</div>
+                            </div>
+                        </div>
+                        <div class="speaker-item" onclick="filterBySpeaker('投資家')">
+                            <div class="speaker-avatar">I</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.875rem;">{{ meeting_data.investor_name }}</div>
+                                <div style="font-size: 0.75rem; color: #6b7280;">30% (2,100文字)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- クイックアクション -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">⚡ クイックアクション</h4>
+                    <div class="action-shortcuts">
+                        <button class="shortcut-btn" onclick="jumpToImportant()">
+                            ⭐ 重要箇所へジャンプ
+                            <span class="shortcut-key">Ctrl+I</span>
+                        </button>
+                        <button class="shortcut-btn" onclick="jumpToHighlighted()">
+                            🖍️ ハイライト箇所へ
+                            <span class="shortcut-key">Ctrl+H</span>
+                        </button>
+                        <button class="shortcut-btn" onclick="togglePlayback()">
+                            ▶️ 再生/停止
+                            <span class="shortcut-key">Space</span>
+                        </button>
+                        <button class="shortcut-btn" onclick="jumpBackward()">
+                            ⏪ 10秒戻る
+                            <span class="shortcut-key">←</span>
+                        </button>
+                        <button class="shortcut-btn" onclick="jumpForward()">
+                            ⏩ 10秒進む
+                            <span class="shortcut-key">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI支援 -->
+                <div class="sidebar-section">
+                    <h4 class="section-title">🤖 AI支援</h4>
+                    <div class="action-shortcuts">
+                        <button class="shortcut-btn" onclick="improveAccuracy()">
+                            🎯 認識精度向上
+                        </button>
+                        <button class="shortcut-btn" onclick="autoCorrect()">
+                            ✨ 自動校正
+                        </button>
+                        <button class="shortcut-btn" onclick="detectKeyPoints()">
+                            🔍 重要ポイント検出
+                        </button>
+                        <button class="shortcut-btn" onclick="generateSummary()">
+                            📝 要約生成
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// グローバル変数
+const meetingId = '{{ meeting_id }}';
+let isPlaying = false;
+let currentTime = 0;
+let totalDuration = 5445; // 1:30:45 in seconds
+let autoSaveInterval;
+let editHistory = [];
+let historyIndex = -1;
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    startAutoSave();
+    initializeKeyboardShortcuts();
+    updateTimeDisplay();
+});
+
+// キーボードショートカット
+function initializeKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 's':
+                    e.preventDefault();
+                    saveDraft();
+                    break;
+                case 'z':
+                    e.preventDefault();
+                    undoAction();
+                    break;
+                case 'y':
+                    e.preventDefault();
+                    redoAction();
+                    break;
+                case 'i':
+                    e.preventDefault();
+                    jumpToImportant();
+                    break;
+                case 'h':
+                    e.preventDefault();
+                    jumpToHighlighted();
+                    break;
+            }
+        } else if (e.key === ' ' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            togglePlayback();
+        } else if (e.key === 'ArrowLeft' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            jumpBackward();
+        } else if (e.key === 'ArrowRight' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            jumpForward();
+        }
+    });
+}
+
+// 音声プレイヤー機能
+function togglePlayback() {
+    isPlaying = !isPlaying;
+    const playIcon = document.getElementById('play-icon');
+    if (playIcon) {
+        playIcon.textContent = isPlaying ? '⏸️' : '▶️';
+    }
+    
+    if (isPlaying) {
+        startPlaybackTimer();
+    } else {
+        stopPlaybackTimer();
+    }
+    
+    showNotification(isPlaying ? '再生開始' : '再生停止', 'info');
+}
+
+function startPlaybackTimer() {
+    window.playbackTimer = setInterval(function() {
+        currentTime += 1;
+        if (currentTime >= totalDuration) {
+            currentTime = totalDuration;
+            togglePlayback();
+        }
+        updateTimeDisplay();
+        updateProgressBar();
+        highlightCurrentSegment();
+    }, 1000);
+}
+
+function stopPlaybackTimer() {
+    if (window.playbackTimer) {
+        clearInterval(window.playbackTimer);
+    }
+}
+
+function updateTimeDisplay() {
+    const currentTimeElement = document.getElementById('current-time');
+    if (currentTimeElement) {
+        currentTimeElement.textContent = formatTime(currentTime);
+    }
+}
+
+function updateProgressBar() {
+    const progressFill = document.getElementById('progress-fill');
+    if (progressFill) {
+        const percentage = (currentTime / totalDuration) * 100;
+        progressFill.style.width = percentage + '%';
+    }
+}
+
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+}
+
+function seekAudio(event) {
+    const progressBar = event.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const percentage = clickX / rect.width;
+    
+    currentTime = totalDuration * percentage;
+    updateTimeDisplay();
+    updateProgressBar();
+    highlightCurrentSegment();
+}
+
+function jumpToTime(timestamp) {
+    const parts = timestamp.split(':').map(Number);
+    let seconds = 0;
+    
+    if (parts.length === 2) {
+        seconds = parts[0] * 60 + parts[1];
+    } else if (parts.length === 3) {
+        seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+    
+    currentTime = seconds;
+    updateTimeDisplay();
+    updateProgressBar();
+    highlightCurrentSegment();
+    showNotification(`⏭️ ${timestamp} にジャンプしました`, 'info');
+}
+
+function jumpBackward() {
+    currentTime = Math.max(0, currentTime - 10);
+    updateTimeDisplay();
+    updateProgressBar();
+    highlightCurrentSegment();
+}
+
+function jumpForward() {
+    currentTime = Math.min(totalDuration, currentTime + 10);
+    updateTimeDisplay();
+    updateProgressBar();
+    highlightCurrentSegment();
+}
+
+function setPlaybackSpeed(speed) {
+    document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    showNotification(`再生速度を ${speed}x に変更しました`, 'info');
+}
+
+function highlightCurrentSegment() {
+    document.querySelectorAll('.transcript-segment').forEach(segment => {
+        segment.classList.remove('current');
+    });
+    
+    // 現在の時間に対応するセグメントをハイライト
+    const currentSegmentIndex = Math.floor(currentTime / 60) + 1;
+    const currentSegment = document.getElementById(`segment-${currentSegmentIndex}`);
+    if (currentSegment) {
+        currentSegment.classList.add('current');
+        currentSegment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+// 編集機能
+function markAsEdited(textarea) {
+    const segment = textarea.closest('.transcript-segment');
+    if (!segment.classList.contains('edited')) {
+        segment.classList.add('edited');
+        addToHistory('edit', segment.id, textarea.value);
+    }
+    
+    // 自動保存インジケーター
+    const indicator = document.getElementById('save-indicator');
+    if (indicator) {
+        indicator.classList.add('saving');
+    }
+}
+
+function addToHistory(action, targetId, data) {
+    editHistory = editHistory.slice(0, historyIndex + 1);
+    editHistory.push({ action, targetId, data, timestamp: Date.now() });
+    historyIndex = editHistory.length - 1;
+}
+
+function undoAction() {
+    if (historyIndex > 0) {
+        historyIndex--;
+        const action = editHistory[historyIndex];
+        // 実装: アクションを元に戻す
+        showNotification('変更を元に戻しました', 'info');
+    }
+}
+
+function redoAction() {
+    if (historyIndex < editHistory.length - 1) {
+        historyIndex++;
+        const action = editHistory[historyIndex];
+        // 実装: アクションをやり直す
+        showNotification('変更をやり直しました', 'info');
+    }
+}
+
+function highlightSegment(segmentId) {
+    const segment = document.getElementById(`segment-${segmentId}`);
+    if (segment) {
+        segment.classList.toggle('highlighted');
+        const isHighlighted = segment.classList.contains('highlighted');
+        showNotification(isHighlighted ? 'ハイライトしました' : 'ハイライトを解除しました', 'success');
+        addToHistory('highlight', `segment-${segmentId}`, isHighlighted);
+    }
+}
+
+function markImportant(segmentId) {
+    const segment = document.getElementById(`segment-${segmentId}`);
+    if (segment) {
+        segment.classList.toggle('important');
+        const isImportant = segment.classList.contains('important');
+        showNotification(isImportant ? '重要箇所にマークしました' : '重要マークを解除しました', 'success');
+        addToHistory('important', `segment-${segmentId}`, isImportant);
+    }
+}
+
+function addNote(segmentId) {
+    const noteText = prompt('メモを入力してください:');
+    if (noteText) {
+        const segment = document.getElementById(`segment-${segmentId}`);
+        let noteElement = segment.querySelector('.segment-note');
+        if (!noteElement) {
+            noteElement = document.createElement('div');
+            noteElement.className = 'segment-note';
+            noteElement.style.cssText = 'margin-top: 0.75rem; padding: 0.75rem; background: #fef3c7; border-radius: 6px; border-left: 3px solid #f59e0b;';
+            segment.appendChild(noteElement);
+        }
+        noteElement.innerHTML = `<span style="font-weight: 600; color: #92400e; font-size: 0.75rem;">📝 メモ:</span> <span style="color: #451a03; font-size: 0.875rem;">${noteText}</span>`;
+        showNotification('メモを追加しました', 'success');
+        addToHistory('note', `segment-${segmentId}`, noteText);
+    }
+}
+
+function splitSegment(segmentId) {
+    if (confirm('このセグメントを分割しますか？')) {
+        showNotification('セグメント分割機能を実装中...', 'info');
+    }
+}
+
+function deleteSegment(segmentId) {
+    if (confirm('このセグメントを削除しますか？')) {
+        const segment = document.getElementById(`segment-${segmentId}`);
+        if (segment) {
+            segment.style.display = 'none';
+            showNotification('セグメントを削除しました', 'success');
+            addToHistory('delete', `segment-${segmentId}`, true);
+        }
+    }
+}
+
+// 検索機能
+function searchTranscript(query) {
+    const segments = document.querySelectorAll('.transcript-segment');
+    segments.forEach(segment => {
+        const text = segment.querySelector('.segment-text').value.toLowerCase();
+        if (query && text.includes(query.toLowerCase())) {
+            segment.style.border = '2px solid #3b82f6';
+            segment.style.background = '#dbeafe';
+        } else {
+            segment.style.border = '';
+            segment.style.background = '';
+        }
+    });
+}
+
+// サイドバー機能
+function filterBySpeaker(speaker) {
+    document.querySelectorAll('.speaker-item').forEach(item => item.classList.remove('active'));
+    event.target.closest('.speaker-item').classList.add('active');
+    
+    const segments = document.querySelectorAll('.transcript-segment');
+    segments.forEach(segment => {
+        // 話者フィルタリングの実装
+        segment.style.opacity = '1';
+    });
+    
+    showNotification(`${speaker}の発言をフィルタリングしました`, 'info');
+}
+
+function jumpToImportant() {
+    const importantSegment = document.querySelector('.transcript-segment.important');
+    if (importantSegment) {
+        importantSegment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showNotification('重要箇所にジャンプしました', 'info');
+    } else {
+        showNotification('重要箇所が見つかりません', 'warning');
+    }
+}
+
+function jumpToHighlighted() {
+    const highlightedSegment = document.querySelector('.transcript-segment.highlighted');
+    if (highlightedSegment) {
+        highlightedSegment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showNotification('ハイライト箇所にジャンプしました', 'info');
+    } else {
+        showNotification('ハイライト箇所が見つかりません', 'warning');
+    }
+}
+
+// AI機能
+function improveAccuracy() {
+    showNotification('🤖 AI認識精度向上を開始しています...', 'info');
+    setTimeout(() => {
+        showNotification('✨ 認識精度が98%に向上しました！', 'success');
+    }, 3000);
+}
+
+function autoCorrect() {
+    showNotification('🤖 自動校正を実行中...', 'info');
+    setTimeout(() => {
+        showNotification('✅ 12箇所の誤字・脱字を修正しました', 'success');
+    }, 2000);
+}
+
+function detectKeyPoints() {
+    showNotification('🔍 重要ポイントを検出中...', 'info');
+    setTimeout(() => {
+        showNotification('⭐ 5箇所の重要ポイントを検出しました', 'success');
+    }, 2500);
+}
+
+function generateSummary() {
+    showNotification('📝 要約を生成中...', 'info');
+    setTimeout(() => {
+        showNotification('📋 要約が完成しました', 'success');
+    }, 4000);
+}
+
+// ナビゲーション
+function goToStep(step) {
+    const stepUrls = {
+        'upload': `/upload-step?id=${meetingId}`,
+        'transcription': `/transcription-step?id=${meetingId}`,
+        'ai_summary': `/ai-summary-step?id=${meetingId}`,
+        'faq': `/faq-step?id=${meetingId}`,
+        'review': `/review-step?id=${meetingId}`,
+        'publish': `/publish-step?id=${meetingId}`
+    };
+    
+    if (stepUrls[step]) {
+        window.location.href = stepUrls[step];
+    }
+}
+
+function proceedToSummary() {
+    if (confirm('文字起こし編集を完了してAI要約に進みますか？')) {
+        saveDraft();
+        setTimeout(() => {
+            goToStep('ai_summary');
+        }, 1000);
+    }
+}
+
+// 保存・書き出し
+function autoSave() {
+    const indicator = document.getElementById('save-indicator');
+    if (indicator) {
+        indicator.classList.add('saving');
+        setTimeout(() => {
+            indicator.classList.remove('saving');
+        }, 1000);
+    }
+}
+
+function startAutoSave() {
+    autoSaveInterval = setInterval(autoSave, 30000);
+}
+
+function saveDraft() {
+    showNotification('💾 文字起こしを保存しました', 'success');
+    autoSave();
+}
+
+function exportTranscript() {
+    showNotification('📤 文字起こしを書き出し中...', 'info');
+    setTimeout(() => {
+        showNotification('✅ 書き出しが完了しました', 'success');
+    }, 2000);
+}
+
+function startTranscription() {
+    showNotification('🤖 AI文字起こしを開始します...', 'info');
+    setTimeout(() => {
+        location.reload();
+    }, 3000);
+}
+
+// 通知システム
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 transform transition-all duration-300';
+    
+    const colors = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-500 text-white',
+        warning: 'bg-yellow-500 text-white',
+        info: 'bg-blue-500 text-white'
+    };
+    
+    notification.className += ' ' + (colors[type] || colors.info);
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+</script>
+{% endblock %} 
