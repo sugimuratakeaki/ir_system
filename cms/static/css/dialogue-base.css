@@ -1,0 +1,225 @@
+/* 
+ * KAGAMI CMS - Dialogue Base Styles
+ * 対話編集の基本レイアウトスタイル
+ */
+
+/* ===== 基本レイアウト ===== */
+.dialogue-workspace {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    grid-template-rows: auto 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+    grid-template-areas: 
+        "progress-stream workspace-header context-panel"
+        "progress-stream workspace-main context-panel";
+    transition: grid-template-columns var(--transition-normal);
+}
+
+.dialogue-workspace.context-collapsed {
+    grid-template-columns: 280px 1fr 48px;
+}
+
+/* ===== 進捗ストリーム（左サイドバー） ===== */
+.progress-stream {
+    grid-area: progress-stream;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.stream-header {
+    background: linear-gradient(135deg, var(--kagami-blue) 0%, var(--kagami-blue-dark) 100%);
+    color: white;
+    padding: var(--space-xl);
+}
+
+.stream-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-sm);
+}
+
+.stream-subtitle {
+    font-size: var(--text-sm);
+    opacity: 0.9;
+}
+
+/* 進捗プログレスバー */
+.stream-progress {
+    margin-top: var(--space-lg);
+}
+
+.stream-progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+}
+
+.stream-progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: var(--border-radius-sm);
+    transition: width var(--transition-slow);
+}
+
+/* ===== ワークスペースヘッダー ===== */
+.workspace-header {
+    grid-area: workspace-header;
+    background: linear-gradient(135deg, var(--kagami-blue) 0%, var(--kagami-blue-light) 100%);
+    color: white;
+    padding: var(--space-xl);
+    border-radius: var(--border-radius-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.meeting-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius-full);
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-bold);
+    font-size: var(--text-xl);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.meeting-info h1 {
+    margin: 0;
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+}
+
+.meeting-meta {
+    margin-top: var(--space-xs);
+    font-size: var(--text-sm);
+    opacity: 0.9;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* ===== メインワークスペース ===== */
+.workspace-main {
+    grid-area: workspace-main;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== ステップコンテンツ ===== */
+.step-content {
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all var(--transition-normal);
+    pointer-events: none;
+}
+
+.step-content.active {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.content-header {
+    padding: var(--space-xl);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.content-header h2 {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.content-body {
+    padding: var(--space-xl);
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* ===== レスポンシブ対応 ===== */
+@media (max-width: 1280px) {
+    .dialogue-workspace {
+        grid-template-columns: 260px 1fr 280px;
+    }
+    
+    .dialogue-workspace.context-collapsed {
+        grid-template-columns: 260px 1fr 48px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dialogue-workspace {
+        grid-template-columns: 240px 1fr 0;
+    }
+    
+    .context-panel {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .dialogue-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        grid-template-areas: 
+            "workspace-header"
+            "progress-stream"
+            "workspace-main";
+        height: auto;
+    }
+    
+    .progress-stream {
+        max-height: 200px;
+    }
+    
+    .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+    
+    .meeting-avatar {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .meeting-info h1 {
+        font-size: var(--text-lg);
+    }
+    
+    .header-actions {
+        display: none;
+    }
+} 

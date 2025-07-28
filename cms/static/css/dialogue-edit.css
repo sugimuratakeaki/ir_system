@@ -1,0 +1,1397 @@
+/* 
+ * KAGAMI CMS - Dialogue Edit Styles
+ * 対話編集ワークスペース専用スタイル
+ */
+
+/* ===== 基本レイアウト ===== */
+.dialogue-workspace {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    grid-template-rows: auto 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+    grid-template-areas: 
+        "progress-stream workspace-header context-panel"
+        "progress-stream workspace-main context-panel";
+    transition: grid-template-columns 0.3s ease;
+}
+
+.dialogue-workspace.context-collapsed {
+    grid-template-columns: 280px 1fr 48px;
+}
+
+/* ===== 進捗ストリーム（左サイドバー） ===== */
+.progress-stream {
+    grid-area: progress-stream;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.stream-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+}
+
+.stream-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.stream-subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* 進捗プログレスバー */
+.stream-progress {
+    margin-top: 1rem;
+}
+
+.stream-progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.stream-progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* ===== 進捗ステージ ===== */
+.progress-stages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.stage-item {
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: white;
+    border-left: 4px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.stage-item:hover {
+    background: #f8fafc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stage-item.completed {
+    border-left-color: #10b981;
+    background: #f0fdf4;
+}
+
+.stage-item.active {
+    border-left-color: #667eea;
+    background: #f3f4ff;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.stage-item.processing {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+/* ステージアイコン */
+.stage-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.stage-item.completed .stage-icon {
+    background: #10b981;
+    color: white;
+}
+
+.stage-item.active .stage-icon {
+    background: #667eea;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.stage-item.processing .stage-icon {
+    background: #f59e0b;
+    color: white;
+}
+
+.stage-item:not(.completed):not(.active):not(.processing) .stage-icon {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+/* ステージ情報 */
+.stage-info {
+    flex: 1;
+}
+
+.stage-title {
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.stage-progress {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.stage-progress.processing {
+    color: #f59e0b;
+    font-weight: 500;
+}
+
+/* ===== ワークスペースヘッダー ===== */
+.workspace-header {
+    grid-area: workspace-header;
+    background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.meeting-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.meeting-info h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.meeting-meta {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ===== メインワークスペース ===== */
+.workspace-main {
+    grid-area: workspace-main;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== ステップコンテンツ ===== */
+.step-content {
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+}
+
+.step-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.content-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.content-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.content-body {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* ===== アップロードエリア ===== */
+.upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 1rem;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #fafafa;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #667eea;
+    background: #f8faff;
+}
+
+.upload-area.drag-over {
+    border-color: #667eea;
+    background: #f3f4ff;
+    transform: scale(1.02);
+}
+
+.upload-prompt {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #374151;
+}
+
+.upload-prompt h3 {
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.upload-prompt p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+/* ファイルリスト表示 */
+.file-list-container {
+    margin-top: 1.5rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.file-size {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* 文字起こし処理状態 */
+.transcription-processing {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.processing-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.processing-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.processing-subtitle {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.processing-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.5rem;
+}
+
+/* 統計グリッド */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+    line-height: 1;
+}
+
+.stat-value.primary {
+    color: #667eea;
+}
+
+.stat-value.success {
+    color: #10b981;
+}
+
+.stat-value.warning {
+    color: #f59e0b;
+}
+
+.stat-value.purple {
+    color: #8b5cf6;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* 文字起こしプレビュー */
+.transcript-preview {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.transcript-preview h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.transcript-content {
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #374151;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 6px;
+    border: 1px solid #f3f4f6;
+}
+
+.transcript-content p {
+    margin-bottom: 1rem;
+}
+
+.transcript-content strong {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.transcript-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* AI分析結果の改善 */
+.analysis-insight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.insight-card {
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.insight-card.tech {
+    background: #f0f9ff;
+    border-left-color: #0ea5e9;
+}
+
+.insight-card.market {
+    background: #f0fdf4;
+    border-left-color: #22c55e;
+}
+
+.insight-card.revenue {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+}
+
+.insight-card.esg {
+    background: #f3e8ff;
+    border-left-color: #9333ea;
+}
+
+.insight-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.insight-card.tech .insight-title {
+    color: #0369a1;
+}
+
+.insight-card.market .insight-title {
+    color: #059669;
+}
+
+.insight-card.revenue .insight-title {
+    color: #d97706;
+}
+
+.insight-card.esg .insight-title {
+    color: #7c3aed;
+}
+
+.insight-description {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.insight-rating {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.insight-card.tech .insight-rating {
+    color: #0c4a6e;
+}
+
+.insight-card.market .insight-rating {
+    color: #065f46;
+}
+
+.insight-card.revenue .insight-rating {
+    color: #92400e;
+}
+
+.insight-card.esg .insight-rating {
+    color: #6b21a8;
+}
+
+/* AI洞察アイテム */
+.ai-insight-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ai-insight-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #f3f4f6;
+    transition: all 0.2s ease;
+}
+
+.ai-insight-item:hover {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
+.insight-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.insight-content {
+    flex: 1;
+}
+
+.insight-content strong {
+    display: block;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.insight-content p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+/* FAQ フィルター改善 */
+.faq-filters {
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.filter-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+/* FAQ統計表示 */
+.faq-stats-panel {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.faq-stats-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #111827;
+}
+
+.faq-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+/* レビュー承認状況 */
+.approval-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.approval-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.approval-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.approval-card.approved {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.approval-card.pending {
+    background: #fef3c7;
+    border-color: #fde047;
+}
+
+.approval-card.info {
+    background: #e0e7ff;
+    border-color: #c7d2fe;
+}
+
+.approval-icon {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.approval-card.approved .approval-icon {
+    color: #10b981;
+}
+
+.approval-card.pending .approval-icon {
+    color: #f59e0b;
+}
+
+.approval-card.info .approval-icon {
+    color: #667eea;
+}
+
+.approval-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.approval-card.approved .approval-count {
+    color: #059669;
+}
+
+.approval-card.pending .approval-count {
+    color: #d97706;
+}
+
+.approval-card.info .approval-count {
+    color: #4338ca;
+}
+
+.approval-label {
+    font-size: 0.875rem;
+}
+
+.approval-card.approved .approval-label {
+    color: #047857;
+}
+
+.approval-card.pending .approval-label {
+    color: #92400e;
+}
+
+.approval-card.info .approval-label {
+    color: #4338ca;
+}
+
+/* コメントシステム */
+.comment-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.comment-item:hover {
+    background: #f9fafb;
+}
+
+.comment-item.legal {
+    border-left-color: #667eea;
+}
+
+.comment-item.ir {
+    border-left-color: #10b981;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.comment-author {
+    font-weight: 600;
+}
+
+.comment-item.legal .comment-author {
+    color: #4338ca;
+}
+
+.comment-item.ir .comment-author {
+    color: #059669;
+}
+
+.comment-date {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.comment-content {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.comment-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.comment-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    resize: none;
+    transition: border-color 0.2s ease;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 承認アクション */
+.approval-action-panel {
+    background: #f0f9ff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    text-align: center;
+    border: 1px solid #bfdbfe;
+}
+
+.approval-action-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: #0369a1;
+}
+
+.approval-action-description {
+    font-size: 0.875rem;
+    color: #0c4a6e;
+    margin-bottom: 1rem;
+}
+
+.approval-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 公開設定の改善 */
+.publish-summary {
+    background: #f0f9ff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid #bfdbfe;
+}
+
+.publish-summary-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: #0369a1;
+}
+
+.publish-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.publish-info-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.publish-info-label {
+    color: #0c4a6e;
+    font-weight: 500;
+}
+
+.publish-info-value {
+    font-weight: 600;
+}
+
+.publish-info-value.ready {
+    color: #059669;
+}
+
+/* 詳細設定パネル */
+.settings-panel {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.settings-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: #111827;
+}
+
+.setting-group {
+    margin-bottom: 1rem;
+}
+
+.setting-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.setting-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.setting-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+}
+
+.setting-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
+}
+
+.checkbox-item span {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+/* 最終確認パネル */
+.final-confirmation {
+    background: #fef2f2;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    border-left: 4px solid #ef4444;
+}
+
+.confirmation-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #dc2626;
+}
+
+.confirmation-warning {
+    font-size: 0.875rem;
+    color: #7f1d1d;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.confirmation-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.confirmation-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #dc2626;
+}
+
+.confirmation-checkbox span {
+    font-size: 0.875rem;
+    color: #7f1d1d;
+    font-weight: 500;
+}
+
+/* アクションボタンエリア */
+.action-button-area {
+    margin-top: 2rem;
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.action-button-area .btn {
+    margin: 0 0.5rem;
+}
+
+/* プログレス表示の動的設定 */
+.stream-progress-fill[data-progress] {
+    transition: width 0.5s ease;
+}
+
+/* ヒント表示の改善 */
+.hint-panel {
+    background: #f3f4ff;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    border: 1px solid #e0e7ff;
+}
+
+.hint-icon {
+    color: #667eea;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.hint-content {
+    flex: 1;
+}
+
+.hint-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #4c51bf;
+    margin: 0 0 0.5rem 0;
+}
+
+.hint-list {
+    font-size: 0.875rem;
+    color: #4c51bf;
+    margin: 0;
+    padding-left: 1.25rem;
+    line-height: 1.5;
+}
+
+.hint-list li {
+    margin-bottom: 0.25rem;
+}
+
+/* 現在アクティブなステップの強調 */
+.step-content {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.step-content.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* ===== ボタンスタイル ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* ===== ユーティリティ ===== */
+.separator {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0.5rem;
+}
+
+.text-success {
+    color: #10b981;
+}
+
+.text-warning {
+    color: #f59e0b;
+}
+
+.text-error {
+    color: #ef4444;
+}
+
+/* ===== アニメーション ===== */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(0.95);
+    }
+}
+
+.processing-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #f59e0b;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    margin-left: 0.5rem;
+}
+
+/* ===== 通知 ===== */
+.notification {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 3000;
+    border-left: 4px solid #3b82f6;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    border-left-color: #10b981;
+}
+
+.notification.warning {
+    border-left-color: #f59e0b;
+}
+
+.notification.error {
+    border-left-color: #ef4444;
+}
+
+/* ===== レスポンシブ対応 ===== */
+@media (max-width: 1280px) {
+    .dialogue-workspace {
+        grid-template-columns: 260px 1fr 280px;
+    }
+    
+    .dialogue-workspace.context-collapsed {
+        grid-template-columns: 260px 1fr 48px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dialogue-workspace {
+        grid-template-columns: 240px 1fr 0;
+    }
+    
+    .context-panel {
+        display: none;
+    }
+    
+    .context-toggle {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .dialogue-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        grid-template-areas: 
+            "workspace-header"
+            "progress-stream"
+            "workspace-main";
+        height: auto;
+    }
+    
+    .progress-stream {
+        max-height: 200px;
+    }
+    
+    .progress-stages {
+        display: flex;
+        overflow-x: auto;
+        flex-direction: row;
+        padding: 1rem;
+        gap: 1rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .stage-item {
+        min-width: 180px;
+        margin-bottom: 0;
+    }
+    
+    .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .meeting-avatar {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .meeting-info h1 {
+        font-size: 1.125rem;
+    }
+    
+    .header-actions {
+        display: none;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .analysis-insight-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .approval-summary {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .publish-info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .setting-buttons {
+        flex-direction: column;
+    }
+    
+    .approval-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-button-area .btn {
+        margin: 0.25rem;
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* ===== ヒントツールチップ ===== */
+.hint-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.hint-tooltip::after {
+    content: attr(data-hint);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 0.5rem;
+}
+
+.hint-tooltip:hover::after {
+    opacity: 1;
+}
+
+/* ===== プログレスドット ===== */
+.progress-dots {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    transition: all 0.2s;
+}
+
+.progress-dot.completed {
+    background: #10b981;
+}
+
+.progress-dot.active {
+    background: #667eea;
+    animation: pulse 2s infinite;
+}
+
+.progress-dot.processing {
+    background: #f59e0b;
+}

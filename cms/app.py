@@ -1824,8 +1824,9 @@ async def transcription_step(request: Request):
 @app.get("/dialogue/edit", response_class=HTMLResponse)
 async def dialogue_edit_unified(request: Request):
     """統合議事録編集画面（段階適応型UI）"""
-    # URLパラメータからIDを取得
+    # URLパラメータからIDとステージを取得
     meeting_id = request.query_params.get("id", "meeting_001")
+    requested_stage = request.query_params.get("stage")
     
     # モックデータ（実際はデータベースから取得）
     # 基本データを先に定義
@@ -2208,6 +2209,13 @@ async def dialogue_edit_unified(request: Request):
     
     # 指定されたIDのデータを取得（デフォルトはmeeting_001）
     meeting_data = mock_meeting_data.get(meeting_id, mock_meeting_data["meeting_001"])
+    
+    # URLパラメータでステージが指定されている場合は上書き
+    if requested_stage:
+        valid_stages = ['upload', 'transcription', 'ai_summary', 'faq', 'review', 'publish']
+        if requested_stage in valid_stages:
+            meeting_data = meeting_data.copy()  # 元データを変更しないよう複製
+            meeting_data["current_stage"] = requested_stage
     
     return templates.TemplateResponse("dialogue-edit-unified.html", {
         "request": request,
@@ -2950,247 +2958,7 @@ async def ir_content_center(request: Request):
         "today": today.strftime("%Y-%m-%d")
     })
 
-@app.get("/dialogue/edit-workspace", response_class=HTMLResponse)
-async def dialogue_edit_workspace(request: Request):
-    """統合処理ワークスペース画面（dialogue-edit.html専用）"""
-    # URLパラメータからIDを取得
-    meeting_id = request.query_params.get("id", "meeting_001")
-    
-    # モックデータ（実際はデータベースから取得）
-    # 基本データを先に定義
-    base_meeting_data = {
-        "meeting_001": {
-            "title": "野村AMとの面談記録",
-            "investor_name": "野村アセットマネジメント",
-            "investor_type": "大口機関投資家",
-            "type": "個別面談",
-            "date": "2024-01-22 10:00",
-            "formatted_date": "2024年1月22日 10:00",
-            "duration": "1時間30分",
-            "participants": 4,
-            "company_participants": ["CEO - 田中一郎", "CFO - 佐藤二郎"],
-            "tags": ["決算", "Q3", "AI事業", "成長戦略"],
-            "priority": "high",
-            "days_elapsed": 2,
-            "current_stage": "faq",
-            "progress_percentage": 65,
-            "stages": {
-                "upload": {
-                    "status": "completed",
-                    "files": ["🎥", "🎤", "📄"]
-                },
-                "transcription": {
-                    "status": "completed",
-                    "duration": "15分",
-                    "progress": 100
-                },
-                "ai_summary": {
-                    "status": "completed"
-                },
-                "faq": {
-                    "status": "in_progress",
-                    "ai_generated_count": 3,
-                    "manual_count": 1,
-                    "draft_count": 3,
-                    "count": 0
-                },
-                "review": {
-                    "status": "waiting"
-                },
-                "publish": {
-                    "status": "waiting"
-                }
-            },
-            "files": [
-                {
-                    "id": "file_001",
-                    "name": "野村AM_面談_20240122.mp4",
-                    "type": "video",
-                    "size": "456.2MB",
-                    "duration": "1時間30分"
-                },
-                {
-                    "id": "file_002",
-                    "name": "野村AM_面談_音声.mp3",
-                    "type": "audio",
-                    "size": "89.5MB",
-                    "duration": "1時間30分"
-                },
-                {
-                    "id": "file_003",
-                    "name": "説明資料.pdf",
-                    "type": "document",
-                    "size": "12.3MB",
-                    "duration": "-"
-                }
-            ],
-            "transcript_preview": "【田中（CEO）】本日はお忙しい中、お時間をいただきありがとうございます。第3四半期の決算についてご説明させていただきます。\n\n【投資家】ありがとうございます。特にAI事業の進捗について詳しくお聞きしたいです。\n\n【田中（CEO）】AI事業については、予想を上回るペースで成長しております。特に金融機関向けのAIソリューションが好調で...",
-            "transcript_stats": {
-                "total_chars": 15680,
-                "reading_time": 12,
-                "accuracy": 96
-            },
-            "investor_profile": {
-                "investment_style": "長期バリュー投資",
-                "esg_focus": "高",
-                "holding_period": "平均3.2年",
-                "total_meetings": 12,
-                "last_meeting_date": "2023-10-15",
-                "satisfaction_trend": "向上",
-                "key_interests": ["技術優位性", "ESG戦略", "収益性"],
-                "risk_tolerance": "中",
-                "typical_concerns": ["競合優位性", "長期成長性", "リスク管理"]
-            },
-            "past_meetings": [
-                {
-                    "id": "meeting_20231015",
-                    "date": "2023-10-15",
-                    "title": "Q2決算説明会",
-                    "topics": ["Q2業績", "中期戦略", "ESG進捗"],
-                    "investor_satisfaction": 8.5,
-                    "key_concerns": ["AI投資効率", "競合対応"]
-                },
-                {
-                    "id": "meeting_20230715", 
-                    "date": "2023-07-15",
-                    "title": "中期経営計画説明",
-                    "topics": ["3ヵ年計画", "M&A戦略", "DX推進"],
-                    "investor_satisfaction": 7.8,
-                    "key_concerns": ["計画実現性", "投資回収"]
-                }
-            ],
-            "ai_analysis": {
-                "sentiment_score": 78,
-                "engagement_level": 8.2,
-                "understanding_level": 6.5, 
-                "satisfaction_level": 7.8,
-                "key_topics": [
-                    {"topic": "AI事業戦略", "mentions": 23, "sentiment": "positive"},
-                    {"topic": "競合優位性", "mentions": 18, "sentiment": "concerned"},
-                    {"topic": "ESG目標", "mentions": 15, "sentiment": "interested"},
-                    {"topic": "収益性", "mentions": 12, "sentiment": "positive"}
-                ],
-                "concerns_detected": [
-                    {
-                        "topic": "AI事業の競争優位性",
-                        "confidence": 0.94,
-                        "urgency": "high",
-                        "detail": "競合他社との技術的差別化について複数回質問",
-                        "suggested_response": "特許ポートフォリオと独自技術の詳細説明"
-                    },
-                    {
-                        "topic": "ESG目標の実現可能性", 
-                        "confidence": 0.87,
-                        "urgency": "medium",
-                        "detail": "2030年カーボンニュートラル目標の具体性への疑問",
-                        "suggested_response": "詳細ロードマップと投資計画の提示"
-                    }
-                ],
-                "recommendations": [
-                    "次回面談時に特許技術の詳細資料を準備",
-                    "競合比較分析レポートの作成",
-                    "ESGロードマップの早期公表"
-                ]
-            },
-            "ai_summary": {
-                "executive_summary": "第3四半期の業績は全体的に好調で、特にAI事業が予想を上回る成長を示しました。投資家からは今後の成長性と競争優位性について高い関心が寄せられました。",
-                "key_points": [
-                    "AI事業の売上が前年同期比150%成長",
-                    "金融機関向けAIソリューションの契約数が倍増",
-                    "2024年度の業績予想を上方修正の可能性",
-                    "ESG目標達成に向けた具体的なロードマップを策定中"
-                ],
-                "investor_concerns": [
-                    {
-                        "topic": "AI事業の競争優位性",
-                        "detail": "競合他社との差別化要因、技術的優位性の持続可能性"
-                    },
-                    {
-                        "topic": "投資効率",
-                        "detail": "AI開発への投資額とROIの具体的な数値"
-                    },
-                    {
-                        "topic": "ESG目標",
-                        "detail": "2030年カーボンニュートラルの実現可能性とコスト"
-                    }
-                ],
-                "recommended_actions": [
-                    "AI事業の詳細な事業計画とKPIを次回決算説明会で公表",
-                    "ESGロードマップを2月末までに公開",
-                    "競合分析レポートを作成し、投資家向けに共有"
-                ]
-            },
-            "faq_drafts": [
-                {
-                    "id": "faq_001",
-                    "question": "AI事業の今後の成長性について教えてください",
-                    "answer": "AI事業は当社の成長戦略の中核であり、特に金融機関向けソリューションで強い競争力を持っています。今期は前年同期比150%の成長を達成し、来期も100%以上の成長を見込んでいます。",
-                    "ai_generated": True,
-                    "confidence": 95,
-                    "tags": ["決算", "AI事業"]
-                },
-                {
-                    "id": "faq_002",
-                    "question": "ESG目標の進捗状況は？",
-                    "answer": "2030年カーボンニュートラル目標に向けて、現在詳細なロードマップを策定中です。2月末までに具体的な施策とマイルストーンを公表予定です。",
-                    "ai_generated": True,
-                    "confidence": 88,
-                    "tags": ["ESG", "カーボンニュートラル"]
-                },
-                {
-                    "id": "faq_003",
-                    "question": "配当政策に変更はありますか？",
-                    "answer": "現時点で配当政策に変更はありません。配当性合30%を維持し、安定的な株主還元を継続します。",
-                    "ai_generated": False,
-                    "confidence": 100,
-                    "tags": ["配当", "株主還元"]
-                }
-            ],
-            "timeline": [
-                {
-                    "type": "success",
-                    "title": "ファイルアップロード完了",
-                    "timestamp": "2024-01-22 11:35",
-                    "user": "IR担当者A"
-                },
-                {
-                    "type": "success",
-                    "title": "文字起こし完了",
-                    "timestamp": "2024-01-22 11:50",
-                    "user": "AI自動処理"
-                },
-                {
-                    "type": "success",
-                    "title": "AI要約完了",
-                    "timestamp": "2024-01-22 12:05",
-                    "user": "AI自動処理"
-                },
-                {
-                    "type": "processing",
-                    "title": "FAQ作成中",
-                    "timestamp": "2024-01-22 14:30",
-                    "user": "IR担当者A"
-                }
-            ],
-            "current_stage_info": {
-                "action_required": True,
-                "message": "FAQの作成・確認が必要です。AIが生成した3件のFAQ案を確認し、必要に応じて編集・追加してください。",
-                "action_label": "FAQを編集",
-                "action_function": "manageFAQs()"
-            }
-        }
-    }
-    
-    # 指定されたIDのデータを取得（デフォルトはmeeting_001）
-    meeting_data = base_meeting_data.get(meeting_id, base_meeting_data["meeting_001"])
-    
-    return templates.TemplateResponse("dialogue-edit.html", {
-        "request": request,
-        "title": f"{meeting_data['title']} - 統合処理ワークスペース",
-        "meeting_id": meeting_id,
-        "meeting_data": meeting_data,
-        "current_time": datetime.now().strftime("%Y年%m月%d日 %H:%M")
-    })
+
 
 @app.get("/dialogue/faq/{meeting_id}", response_class=HTMLResponse)
 async def dialogue_faq_edit(request: Request, meeting_id: str):

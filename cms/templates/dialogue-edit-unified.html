@@ -868,57 +868,325 @@
 {% endblock %}
 
 {% block right_panel_content %}
-<!-- リアルタイムAI提案 -->
-<div class="ai-suggestion">
-    <div class="suggestion-header">
-        <span class="suggestion-title">📝 FAQ候補を検出</span>
-        <span class="confidence-badge">信頼度: 94%</span>
+<!-- ステップ別AIアシスタント -->
+{% if meeting_data.current_stage == 'upload' %}
+<!-- アップロードステップ - ヘルプ表示 -->
+<div class="help-panel">
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #111827; display: flex; align-items: center; gap: 0.5rem;">
+        <span>📚</span> アップロードガイド
+    </h4>
+    
+    <div class="help-section">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📋 推奨ファイル形式</h5>
+        <ul style="font-size: 0.75rem; color: #6b7280; margin: 0; padding-left: 1rem; line-height: 1.5;">
+            <li><strong>音声:</strong> MP3, WAV, M4A</li>
+            <li><strong>動画:</strong> MP4, MOV, AVI</li>
+            <li><strong>資料:</strong> PDF, DOCX, PPTX</li>
+        </ul>
     </div>
-    <div class="suggestion-content">
-        「AI事業の競争優位性について」のFAQを作成することを推奨します。この質問は過去3回の面談でも言及されています。
+    
+    <div class="help-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">💡 品質向上のコツ</h5>
+        <ul style="font-size: 0.75rem; color: #6b7280; margin: 0; padding-left: 1rem; line-height: 1.5;">
+            <li>音声は静かな環境で録音</li>
+            <li>話者は明確に発話</li>
+            <li>資料PDFも同時アップロード</li>
+            <li>ファイル名は日付_会社名形式</li>
+        </ul>
     </div>
-    <div class="suggestion-actions">
-        <button class="suggestion-btn primary" onclick="createFAQ('ai_competition')">FAQを作成</button>
-        <button class="suggestion-btn secondary" onclick="dismissSuggestion(1)">後で</button>
+    
+    <div class="help-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">⚠️ 注意事項</h5>
+        <ul style="font-size: 0.75rem; color: #6b7280; margin: 0; padding-left: 1rem; line-height: 1.5;">
+            <li>最大ファイルサイズ: 500MB</li>
+            <li>機密情報を含む場合は暗号化</li>
+            <li>複数ファイル同時選択可能</li>
+        </ul>
     </div>
 </div>
 
-<div class="ai-suggestion">
-    <div class="suggestion-header">
-        <span class="suggestion-title">⚠️ 重要な変化を検出</span>
-        <span class="confidence-badge">信頼度: 87%</span>
+{% elif meeting_data.current_stage == 'transcription' %}
+<!-- 文字起こしステップ - ヘルプ表示 -->
+<div class="help-panel">
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #111827; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🎤</span> 文字起こしガイド
+    </h4>
+    
+    <div class="help-section">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 処理状況</h5>
+        <div style="background: #f3f4f6; padding: 0.75rem; border-radius: 6px; font-size: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>進捗率</span>
+                <span style="font-weight: 600; color: #3b82f6;">{{ meeting_data.stages.transcription.progress|default(75) }}%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>予想精度</span>
+                <span style="font-weight: 600; color: #10b981;">96%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>残り時間</span>
+                <span style="font-weight: 600; color: #f59e0b;">約2分</span>
+            </div>
+        </div>
     </div>
-    <div class="suggestion-content">
-        前回面談と比較して、技術優位性への関心が45%増加しています。追加資料の準備を推奨します。
+    
+    <div class="help-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">✏️ 編集のヒント</h5>
+        <ul style="font-size: 0.75rem; color: #6b7280; margin: 0; padding-left: 1rem; line-height: 1.5;">
+            <li>不明箇所は「※※※」で表記</li>
+            <li>話者名は統一して記載</li>
+            <li>時間スタンプを活用</li>
+            <li>専門用語は正確に修正</li>
+        </ul>
     </div>
-    <div class="suggestion-actions">
-        <button class="suggestion-btn primary" onclick="prepareDocument('tech_advantage')">資料準備</button>
-        <button class="suggestion-btn secondary" onclick="dismissSuggestion(2)">無視</button>
+    
+    <div class="help-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">⌨️ ショートカット</h5>
+        <div style="font-size: 0.75rem; color: #6b7280; line-height: 1.5;">
+            <div>Ctrl+Space: 再生/停止</div>
+            <div>Ctrl+← / →: 10秒戻る/進む</div>
+            <div>Ctrl+S: 保存</div>
+        </div>
     </div>
 </div>
 
-<!-- AI分析結果 -->
-<div style="margin-top: 2rem;">
-    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem; color: #111827;">📊 今回面談の分析</h4>
-    <div style="padding: 1rem; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="font-size: 0.75rem; color: #6b7280;">感情分析</span>
-            <span style="font-size: 0.75rem; font-weight: 600; color: #10b981;">ポジティブ 78%</span>
+{% elif meeting_data.current_stage == 'ai_summary' %}
+<!-- AI要約ステップ - AI分析アシスタント -->
+<div class="ai-assistant">
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #111827; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🤖</span> AI分析アシスタント
+    </h4>
+    
+    <!-- 分析設定 -->
+    <div class="ai-section">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">🎯 分析フォーカス</h5>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;">
+                <input type="checkbox" checked style="accent-color: #3b82f6;">
+                <span>競合優位性分析</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;">
+                <input type="checkbox" checked style="accent-color: #3b82f6;">
+                <span>投資家関心度分析</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;">
+                <input type="checkbox" style="accent-color: #3b82f6;">
+                <span>リスク要因分析</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;">
+                <input type="checkbox" style="accent-color: #3b82f6;">
+                <span>ESG要素分析</span>
+            </label>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="font-size: 0.75rem; color: #6b7280;">関心度</span>
-            <span style="font-size: 0.75rem; font-weight: 600; color: #3b82f6;">高 (8.2/10)</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="font-size: 0.75rem; color: #6b7280;">理解度</span>
-            <span style="font-size: 0.75rem; font-weight: 600; color: #f59e0b;">中 (6.5/10)</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.75rem; color: #6b7280;">満足度</span>
-            <span style="font-size: 0.75rem; font-weight: 600; color: #10b981;">高 (7.8/10)</span>
+    </div>
+    
+    <!-- カスタムプロンプト -->
+    <div class="ai-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">💭 追加指示</h5>
+        <textarea placeholder="特別な分析視点があれば入力..." style="width: 100%; height: 60px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.75rem; resize: none;"></textarea>
+        <button style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">
+            🔄 再分析実行
+        </button>
+    </div>
+    
+    <!-- 分析結果サマリー -->
+    <div class="ai-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 分析結果</h5>
+        <div style="background: #f3f4f6; padding: 0.75rem; border-radius: 6px; font-size: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>感情分析</span>
+                <span style="font-weight: 600; color: #10b981;">ポジティブ 78%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>重要度</span>
+                <span style="font-weight: 600; color: #3b82f6;">高 (8.2/10)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>信頼度</span>
+                <span style="font-weight: 600; color: #10b981;">95%</span>
+            </div>
         </div>
     </div>
 </div>
+
+{% elif meeting_data.current_stage == 'faq' %}
+<!-- FAQ作成ステップ - FAQ作成アシスタント -->
+<div class="ai-assistant">
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #111827; display: flex; align-items: center; gap: 0.5rem;">
+        <span>❓</span> FAQ作成アシスタント
+    </h4>
+    
+    <!-- AI提案 -->
+    <div class="ai-suggestion">
+        <div class="suggestion-header">
+            <span class="suggestion-title">📝 FAQ候補を検出</span>
+            <span class="confidence-badge">信頼度: 94%</span>
+        </div>
+        <div class="suggestion-content">
+            「AI事業の競争優位性について」のFAQを作成することを推奨します。この質問は過去3回の面談でも言及されています。
+        </div>
+        <div class="suggestion-actions">
+            <button class="suggestion-btn primary" onclick="createFAQ('ai_competition')">FAQを作成</button>
+            <button class="suggestion-btn secondary" onclick="dismissSuggestion(1)">後で</button>
+        </div>
+    </div>
+    
+    <div class="ai-suggestion">
+        <div class="suggestion-header">
+            <span class="suggestion-title">⚠️ 重要な変化を検出</span>
+            <span class="confidence-badge">信頼度: 87%</span>
+        </div>
+        <div class="suggestion-content">
+            前回面談と比較して、技術優位性への関心が45%増加しています。追加資料の準備を推奨します。
+        </div>
+        <div class="suggestion-actions">
+            <button class="suggestion-btn primary" onclick="prepareDocument('tech_advantage')">資料準備</button>
+            <button class="suggestion-btn secondary" onclick="dismissSuggestion(2)">無視</button>
+        </div>
+    </div>
+    
+    <!-- 過去FAQ参照 -->
+    <div class="ai-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📚 過去FAQ参照</h5>
+        <div style="font-size: 0.75rem; color: #6b7280;">
+            <div style="padding: 0.5rem; background: #f9fafb; border-radius: 4px; margin-bottom: 0.5rem; cursor: pointer;" onclick="importPastFAQ('tech_advantage')">
+                🏆 技術的優位性 (5回使用)
+            </div>
+            <div style="padding: 0.5rem; background: #f9fafb; border-radius: 4px; margin-bottom: 0.5rem; cursor: pointer;" onclick="importPastFAQ('market_share')">
+                📈 市場シェア戦略 (3回使用)
+            </div>
+            <div style="padding: 0.5rem; background: #f9fafb; border-radius: 4px; cursor: pointer;" onclick="importPastFAQ('esg_policy')">
+                🌱 ESG取り組み (7回使用)
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif meeting_data.current_stage == 'review' %}
+<!-- レビューステップ - レビューアシスタント -->
+<div class="ai-assistant">
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #111827; display: flex; align-items: center; gap: 0.5rem;">
+        <span>✅</span> レビューアシスタント
+    </h4>
+    
+    <!-- チェックポイント -->
+    <div class="ai-section">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📋 自動チェック結果</h5>
+        <div style="font-size: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="color: #10b981;">✓</span>
+                <span>機密情報スキャン完了</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="color: #10b981;">✓</span>
+                <span>数値データ整合性確認</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="color: #f59e0b;">⚠</span>
+                <span>コンプライアンス要確認</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: #ef4444;">✗</span>
+                <span>法務承認待ち</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- コンプライアンス確認 -->
+    <div class="ai-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">⚖️ コンプライアンス</h5>
+        <div style="background: #fef3c7; padding: 0.75rem; border-radius: 6px; font-size: 0.75rem; color: #92400e;">
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">⚠️ 注意が必要な項目</div>
+            <div>競合他社名の具体的言及 (2箇所)</div>
+            <div>将来予測に関する表現 (1箇所)</div>
+        </div>
+        <button style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #f59e0b; color: white; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">
+            📋 詳細確認
+        </button>
+    </div>
+    
+    <!-- 承認フロー -->
+    <div class="ai-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">🔄 承認フロー</h5>
+        <div style="font-size: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="color: #10b981;">✓</span>
+                <span>IR部長承認済み</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="color: #f59e0b;">⏳</span>
+                <span>法務部確認中</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: #6b7280;">○</span>
+                <span>最終承認待ち</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif meeting_data.current_stage == 'publish' %}
+<!-- 公開ステップ - 公開アシスタント -->
+<div class="ai-assistant">
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #111827; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🌐</span> 公開アシスタント
+    </h4>
+    
+    <!-- リスク分析 -->
+    <div class="ai-section">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">⚠️ リスク分析</h5>
+        <div style="background: #f0f9ff; padding: 0.75rem; border-radius: 6px; font-size: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>情報漏洩リスク</span>
+                <span style="font-weight: 600; color: #10b981;">低</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>法的リスク</span>
+                <span style="font-weight: 600; color: #f59e0b;">中</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>影響度</span>
+                <span style="font-weight: 600; color: #3b82f6;">高</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 公開範囲推奨 -->
+    <div class="ai-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">🎯 推奨公開設定</h5>
+        <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 6px; font-size: 0.75rem; color: #065f46;">
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">💡 AI推奨</div>
+            <div>範囲: 投資家向け限定公開</div>
+            <div>タイミング: 営業時間終了後</div>
+            <div>通知: 関係者のみ</div>
+        </div>
+        <button style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">
+            ✨ 推奨設定を適用
+        </button>
+    </div>
+    
+    <!-- 配信予測 -->
+    <div class="ai-section" style="margin-top: 1rem;">
+        <h5 style="font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">📊 配信予測</h5>
+        <div style="font-size: 0.75rem; color: #6b7280;">
+            <div>予想閲覧数: 150-200名</div>
+            <div>ピークアクセス: 公開後2時間</div>
+            <div>想定質問数: 3-5件</div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- デフォルト表示 -->
+<div class="ai-assistant">
+    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #111827; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🤖</span> AIアシスタント
+    </h4>
+    <div style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.875rem;">
+        現在のステップ用のアシスタント機能を準備中です...
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block three_column_extra_js %}
@@ -935,7 +1203,35 @@ let autoSaveInterval;
 document.addEventListener('DOMContentLoaded', function() {
     initializeEditor();
     startAutoSave();
+    
+    // 各ステージに適したUIの初期化
+    initializeCurrentStage();
 });
+
+// 現在のステージに適した初期化
+function initializeCurrentStage() {
+    // アップロードと文字起こしステップの場合、右パネルの有用性を示すヒント表示
+    if (currentStage === 'upload' || currentStage === 'transcription') {
+        showHelpHint();
+    }
+}
+
+// ヘルプヒント表示
+function showHelpHint() {
+    let message = '';
+    
+    if (currentStage === 'upload') {
+        message = '💡 右パネルでアップロードガイドを確認できます';
+    } else if (currentStage === 'transcription') {
+        message = '💡 右パネルで文字起こしガイドを確認できます';
+    }
+    
+    if (message) {
+        setTimeout(() => {
+            showNotification(message, 'info');
+        }, 2000); // 2秒後に表示
+    }
+}
 
 // エディター初期化
 function initializeEditor() {
@@ -1006,14 +1302,14 @@ function initializePublish() {
     refreshPreview();
 }
 
-// ステージ切り替え
+// ステージ切り替え - 元の設計を尊重したサーバーサイドベース
 function switchStage(stageId) {
     if (stageId === currentStage) return;
     
     // 現在の作業を保存
     saveCurrentWork();
     
-    // 新しいステージに移動
+    // サーバーサイドレンダリングを利用して正しいページに移動
     window.location.href = `/dialogue/edit?id=${meetingId}&stage=${stageId}`;
 }
 
@@ -1177,12 +1473,35 @@ function formatTime(seconds) {
     }
 }
 
-// 通知表示
+// デバウンス関数
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// 通知システム
 function showNotification(message, type = 'info') {
-    // 通知要素を作成
     const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    
+    const icons = {
+        success: '✅',
+        warning: '⚠️',
+        error: '❌',
+        info: 'ℹ️'
+    };
+    
+    notification.innerHTML = `
+        <span style="font-size: 1.25rem; margin-right: 0.5rem;">${icons[type]}</span>
+        <span>${message}</span>
+    `;
     
     // スタイル設定
     Object.assign(notification.style, {
@@ -1195,7 +1514,11 @@ function showNotification(message, type = 'info') {
         fontWeight: '500',
         zIndex: '9999',
         minWidth: '200px',
-        textAlign: 'center'
+        display: 'flex',
+        alignItems: 'center',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        transform: 'translateX(100%)',
+        transition: 'transform 0.3s ease'
     });
     
     // タイプ別色設定
@@ -1215,25 +1538,20 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // 3秒後に削除
+    // アニメーション
     setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // 自動的に非表示
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
     }, 3000);
-}
-
-// デバウンス関数
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
 }
 
 // その他のユーティリティ関数
