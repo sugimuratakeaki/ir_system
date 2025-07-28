@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/ir-management.css">
+<link rel="stylesheet" href="/static/css/three-column-layout.css">
+{% block three_column_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="three-column-layout" id="threeColumnLayout">
+    <!-- 左サイドバー -->
+    <div class="left-sidebar">
+        <div class="sidebar-header">
+            {% block left_sidebar_header %}
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold">{% block left_sidebar_title %}サイドバー{% endblock %}</h3>
+                {% block left_sidebar_header_actions %}{% endblock %}
+            </div>
+            {% block left_sidebar_filters %}{% endblock %}
+            {% endblock %}
+        </div>
+        
+        <div class="sidebar-content">
+            {% block left_sidebar_content %}
+            <div class="text-center text-gray-500 p-4">
+                左サイドバーのコンテンツ
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+    
+    <!-- メインヘッダー -->
+    <div class="main-header">
+        {% block main_header %}
+        <div>
+            <h1 class="text-2xl font-bold mb-1">{% block main_title %}タイトル{% endblock %}</h1>
+            <p class="text-blue-100">{% block main_subtitle %}サブタイトル{% endblock %}</p>
+        </div>
+        <div class="flex items-center gap-4">
+            {% block main_header_stats %}{% endblock %}
+            {% block main_header_actions %}{% endblock %}
+        </div>
+        {% endblock %}
+    </div>
+    
+    <!-- メインコンテンツ -->
+    <div class="main-content">
+        {% block main_content %}
+        <div class="p-6">
+            <div class="text-center text-gray-500">
+                メインコンテンツエリア
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+    
+    <!-- 右パネル開閉ボタン（固定位置） -->
+    <div class="right-panel-toggle" onclick="toggleRightPanel()" title="{% block right_panel_toggle_title %}右パネルを開閉{% endblock %}">
+        <div class="right-panel-toggle-icon">‹</div>
+        <div class="right-panel-toggle-text">{% block right_panel_toggle_text %}パネル{% endblock %}</div>
+    </div>
+    
+    <!-- 右パネル -->
+    <div class="right-panel" id="rightPanel">
+        <div class="right-panel-header">
+            <h3 class="font-semibold text-gray-800">{% block right_panel_title %}右パネル{% endblock %}</h3>
+            <button class="text-gray-400 hover:text-gray-600" onclick="toggleRightPanel()" title="パネルを閉じる">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="right-panel-content">
+            {% block right_panel_content %}
+            <div class="text-center text-gray-500 p-4">
+                右パネルのコンテンツ
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 右パネル開閉機能
+let rightPanelCollapsed = false;
+
+// 右パネル開閉機能
+function toggleRightPanel() {
+    const layout = document.getElementById('threeColumnLayout');
+    const rightPanel = document.getElementById('rightPanel');
+    const toggleButton = document.querySelector('.right-panel-toggle');
+    
+    if (!layout || !rightPanel || !toggleButton) {
+        console.error('必要な要素が見つかりません');
+        return;
+    }
+    
+    rightPanelCollapsed = !rightPanelCollapsed;
+    
+    if (rightPanelCollapsed) {
+        layout.classList.add('right-panel-collapsed');
+        rightPanel.classList.add('collapsed');
+        toggleButton.title = '右パネルを開く';
+        
+        // 通知
+        showNotification('右パネルを閉じました', 'info');
+    } else {
+        layout.classList.remove('right-panel-collapsed');
+        rightPanel.classList.remove('collapsed');
+        toggleButton.title = '右パネルを閉じる';
+        
+        // 通知
+        showNotification('右パネルを開きました', 'success');
+    }
+    
+    // 状態をローカルストレージに保存
+    localStorage.setItem('rightPanelCollapsed', rightPanelCollapsed);
+    
+    console.log('右パネル:', rightPanelCollapsed ? '閉じる' : '開く');
+}
+
+// 通知表示機能
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-500 translate-x-0 z-50`;
+    
+    // タイプに応じた色を設定
+    if (type === 'success') {
+        notification.className += ' bg-green-500 text-white';
+    } else if (type === 'info') {
+        notification.className += ' bg-blue-500 text-white';
+    } else if (type === 'warning') {
+        notification.className += ' bg-yellow-500 text-white';
+    } else if (type === 'error') {
+        notification.className += ' bg-red-500 text-white';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // アニメーション
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0px)';
+        notification.style.opacity = '1';
+    }, 100);
+    
+    // 3秒後に非表示
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
+}
+
+// 初期化
+function initializeThreeColumnLayout() {
+    console.log('3カラムレイアウト初期化開始');
+    
+    // ローカルストレージから前回の状態を復元
+    const saved = localStorage.getItem('rightPanelCollapsed');
+    console.log('保存された状態:', saved);
+    
+    const layout = document.getElementById('threeColumnLayout');
+    const rightPanel = document.getElementById('rightPanel');
+    const toggleButton = document.querySelector('.right-panel-toggle');
+    
+    if (!layout || !rightPanel || !toggleButton) {
+        console.error('初期化: 必要な要素が見つかりません', {
+            layout: !!layout,
+            rightPanel: !!rightPanel,
+            toggleButton: !!toggleButton
+        });
+        return;
+    }
+    
+    if (saved !== null) {
+        rightPanelCollapsed = JSON.parse(saved);
+        console.log('復元された状態:', rightPanelCollapsed);
+        
+        if (rightPanelCollapsed) {
+            console.log('初期化: パネルを閉じた状態で復元');
+            layout.classList.add('right-panel-collapsed');
+            rightPanel.classList.add('collapsed');
+            toggleButton.title = '右パネルを開く';
+        } else {
+            toggleButton.title = '右パネルを閉じる';
+        }
+    } else {
+        console.log('保存された状態なし、デフォルト状態を使用');
+        toggleButton.title = '右パネルを閉じる';
+    }
+    
+    // 初期化完了の通知
+    setTimeout(() => {
+        showNotification('ページが読み込まれました', 'success');
+    }, 500);
+}
+
+// キーボードショートカット
+function initializeKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 'i':
+                    e.preventDefault();
+                    toggleRightPanel();
+                    break;
+            }
+        }
+    });
+}
+
+// ページ読み込み完了時の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('ページ読み込み完了、3カラムレイアウト初期化開始');
+    
+    // 3カラムレイアウトの初期化
+    initializeThreeColumnLayout();
+    
+    // キーボードショートカットの初期化
+    initializeKeyboardShortcuts();
+});
+
+// 追加のカスタマイズ用（継承ページで使用）
+// このスペースは継承ページでカスタムJavaScriptを追加するためのものです
+</script>
+
+{% block three_column_extra_js %}{% endblock %}
+{% endblock %} 
