@@ -1014,7 +1014,7 @@ function switchStage(stageId) {
     saveCurrentWork();
     
     // 新しいステージに移動
-    window.location.href = `/dialogue-edit/${meetingId}?stage=${stageId}`;
+    window.location.href = `/dialogue/edit?id=${meetingId}&stage=${stageId}`;
 }
 
 // 自動保存開始
