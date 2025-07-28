@@ -594,7 +594,7 @@
 .btn-sm.btn-secondary:hover {
     background: #e5e7eb;
     border-color: #9ca3af;
-}
+    }
 
 /* プログレスバー */
 .progress-bar-mini {
@@ -608,21 +608,21 @@
     height: 100%;
     background: #3b82f6;
     transition: width 0.3s ease;
-}
-
+    }
+    
 .progress-fill.stalled {
     background: #ef4444;
     animation: pulse 1s infinite;
-}
-
+    }
+    
 .progress-fill.processing {
     background: #f59e0b;
-}
-
+    }
+    
 .progress-fill.completed {
     background: #10b981;
-}
-
+    }
+    
 .progress-bar-table {
     width: 60px;
     height: 6px;
@@ -630,12 +630,12 @@
     border-radius: 3px;
     overflow: hidden;
     margin: 0 auto;
-}
-
+    }
+    
 .ai-score-container {
     text-align: center;
-}
-
+    }
+    
 .ai-score {
     font-weight: 600;
     font-size: 0.875rem;
@@ -647,12 +647,12 @@
 
 .ai-score.medium {
     color: #d97706;
-}
-
+    }
+    
 .ai-score.low {
     color: #dc2626;
-}
-
+    }
+    
 .action-buttons {
     display: flex;
     gap: 0.25rem;
@@ -709,433 +709,433 @@
 {% endblock %}
 
 {% block left_sidebar_header_actions %}
-<span class="text-sm opacity-75">156件</span>
+                <span class="text-sm opacity-75">156件</span>
 {% endblock %}
 
 {% block left_sidebar_filters %}
 <div class="flex gap-0.5rem mt-4">
-    <div class="filter-chip active" onclick="filterStream('all')">全て</div>
-    <div class="filter-chip" onclick="filterStream('urgent')">緊急 (3)</div>
-    <div class="filter-chip" onclick="filterStream('processing')">処理中 (12)</div>
-    <div class="filter-chip" onclick="filterStream('today')">今日 (5)</div>
-</div>
+                <div class="filter-chip active" onclick="filterStream('all')">全て</div>
+                <div class="filter-chip" onclick="filterStream('urgent')">緊急 (3)</div>
+                <div class="filter-chip" onclick="filterStream('processing')">処理中 (12)</div>
+                <div class="filter-chip" onclick="filterStream('today')">今日 (5)</div>
+            </div>
 {% endblock %}
-
+        
 {% block left_sidebar_content %}
-<!-- 緊急対応が必要な記録 -->
+            <!-- 緊急対応が必要な記録 -->
 <div class="activity-card urgent selected card" onclick="selectActivity('activity-001')" ondblclick="editRecord('activity-001')" title="ダブルクリックで編集">
-    <div class="activity-header">
-        <div class="activity-title">野村AM決算説明会</div>
-        <div class="activity-time">2時間前</div>
-    </div>
-    <div class="activity-meta">
-        <span class="investor-badge">機関投資家</span>
-        <span>•</span>
-        <span>90分</span>
-        <span>•</span>
-        <span class="text-red-600 font-medium">処理停滞</span>
-    </div>
-    <div class="activity-progress">
-        <div class="progress-dots">
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot active"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-        </div>
-        <div class="progress-label">AI要約中</div>
-    </div>
-</div>
-
-<!-- 処理中の記録 -->
+                <div class="activity-header">
+                    <div class="activity-title">野村AM決算説明会</div>
+                    <div class="activity-time">2時間前</div>
+                </div>
+                <div class="activity-meta">
+                    <span class="investor-badge">機関投資家</span>
+                    <span>•</span>
+                    <span>90分</span>
+                    <span>•</span>
+                    <span class="text-red-600 font-medium">処理停滞</span>
+                </div>
+                <div class="activity-progress">
+                    <div class="progress-dots">
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot active"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                    <div class="progress-label">AI要約中</div>
+                </div>
+            </div>
+            
+            <!-- 処理中の記録 -->
 <div class="activity-card processing card" onclick="selectActivity('activity-002')" ondblclick="editRecord('activity-002')" title="ダブルクリックで編集">
-    <div class="activity-header">
-        <div class="activity-title">BlackRock個別面談</div>
-        <div class="activity-time">5時間前</div>
-    </div>
-    <div class="activity-meta">
-        <span class="investor-badge">海外投資家</span>
-        <span>•</span>
-        <span>45分</span>
-        <span>•</span>
-        <span class="text-yellow-600 font-medium">FAQ作成中</span>
-    </div>
-    <div class="activity-progress">
-        <div class="progress-dots">
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot active"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-        </div>
-        <div class="progress-label">FAQ生成中</div>
-    </div>
-</div>
-
-<!-- 完了済みの記録 -->
+                <div class="activity-header">
+                    <div class="activity-title">BlackRock個別面談</div>
+                    <div class="activity-time">5時間前</div>
+                </div>
+                <div class="activity-meta">
+                    <span class="investor-badge">海外投資家</span>
+                    <span>•</span>
+                    <span>45分</span>
+                    <span>•</span>
+                    <span class="text-yellow-600 font-medium">FAQ作成中</span>
+                </div>
+                <div class="activity-progress">
+                    <div class="progress-dots">
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot active"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                    <div class="progress-label">FAQ生成中</div>
+                </div>
+            </div>
+            
+            <!-- 完了済みの記録 -->
 <div class="activity-card completed card" onclick="selectActivity('activity-003')" ondblclick="editRecord('activity-003')" title="ダブルクリックで編集">
-    <div class="activity-header">
-        <div class="activity-title">個人投資家説明会</div>
-        <div class="activity-time">1日前</div>
-    </div>
-    <div class="activity-meta">
-        <span class="investor-badge">個人投資家</span>
-        <span>•</span>
-        <span>2時間</span>
-        <span>•</span>
-        <span class="text-green-600 font-medium">公開済み</span>
-    </div>
-    <div class="activity-progress">
-        <div class="progress-dots">
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-        </div>
-        <div class="progress-label">完了</div>
-    </div>
-</div>
-
-<!-- 今日予定の記録 -->
+                <div class="activity-header">
+                    <div class="activity-title">個人投資家説明会</div>
+                    <div class="activity-time">1日前</div>
+                </div>
+                <div class="activity-meta">
+                    <span class="investor-badge">個人投資家</span>
+                    <span>•</span>
+                    <span>2時間</span>
+                    <span>•</span>
+                    <span class="text-green-600 font-medium">公開済み</span>
+                </div>
+                <div class="activity-progress">
+                    <div class="progress-dots">
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                    </div>
+                    <div class="progress-label">完了</div>
+                </div>
+            </div>
+            
+            <!-- 今日予定の記録 -->
 <div class="activity-card card" onclick="selectActivity('activity-004')" ondblclick="editRecord('activity-004')" title="ダブルクリックで編集">
-    <div class="activity-header">
-        <div class="activity-title">Vanguard定期面談</div>
-        <div class="activity-time">14:00予定</div>
-    </div>
-    <div class="activity-meta">
-        <span class="investor-badge">海外投資家</span>
-        <span>•</span>
-        <span>60分</span>
-        <span>•</span>
-        <span class="text-blue-600 font-medium">準備完了</span>
-    </div>
-    <div class="activity-progress">
-        <div class="progress-dots">
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
-        </div>
-        <div class="progress-label">実施待ち</div>
-    </div>
-</div>
-
-<!-- 追加の記録... -->
+                <div class="activity-header">
+                    <div class="activity-title">Vanguard定期面談</div>
+                    <div class="activity-time">14:00予定</div>
+                </div>
+                <div class="activity-meta">
+                    <span class="investor-badge">海外投資家</span>
+                    <span>•</span>
+                    <span>60分</span>
+                    <span>•</span>
+                    <span class="text-blue-600 font-medium">準備完了</span>
+                </div>
+                <div class="activity-progress">
+                    <div class="progress-dots">
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                    <div class="progress-label">実施待ち</div>
+                </div>
+            </div>
+            
+            <!-- 追加の記録... -->
 <div class="activity-card card" onclick="selectActivity('activity-005')" ondblclick="editRecord('activity-005')" title="ダブルクリックで編集">
-    <div class="activity-header">
-        <div class="activity-title">アナリスト向け説明会</div>
-        <div class="activity-time">2日前</div>
-    </div>
-    <div class="activity-meta">
-        <span class="investor-badge">アナリスト</span>
-        <span>•</span>
-        <span>75分</span>
-        <span>•</span>
-        <span class="text-yellow-600 font-medium">レビュー待ち</span>
-    </div>
-    <div class="activity-progress">
-        <div class="progress-dots">
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot completed"></div>
-            <div class="progress-dot active"></div>
-            <div class="progress-dot"></div>
-        </div>
-        <div class="progress-label">承認待ち</div>
-    </div>
-</div>
+                <div class="activity-header">
+                    <div class="activity-title">アナリスト向け説明会</div>
+                    <div class="activity-time">2日前</div>
+                </div>
+                <div class="activity-meta">
+                    <span class="investor-badge">アナリスト</span>
+                    <span>•</span>
+                    <span>75分</span>
+                    <span>•</span>
+                    <span class="text-yellow-600 font-medium">レビュー待ち</span>
+                </div>
+                <div class="activity-progress">
+                    <div class="progress-dots">
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot active"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                    <div class="progress-label">承認待ち</div>
+                </div>
+            </div>
 {% endblock %}
 
 {% block main_header_stats %}
-<div class="text-right">
-    <p class="text-sm text-blue-200">処理中</p>
-    <p class="text-2xl font-bold">12件</p>
-</div>
-<div class="text-right">
-    <p class="text-sm text-blue-200">緊急対応</p>
-    <p class="text-2xl font-bold text-yellow-300">3件</p>
-</div>
-<div class="text-right">
-    <p class="text-sm text-blue-200">今日完了</p>
-    <p class="text-2xl font-bold text-green-300">8件</p>
-</div>
+            <div class="text-right">
+                <p class="text-sm text-blue-200">処理中</p>
+                <p class="text-2xl font-bold">12件</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-blue-200">緊急対応</p>
+                <p class="text-2xl font-bold text-yellow-300">3件</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-blue-200">今日完了</p>
+                <p class="text-2xl font-bold text-green-300">8件</p>
+            </div>
 {% endblock %}
-
-{% block main_content %}
-<!-- ツールバー -->
-<div class="toolbar">
-    <div class="toolbar-group">
-        <button class="btn-toolbar" onclick="bulkProcess()">
-            <span>⚡</span>
-            <span>一括処理</span>
-        </button>
-        <button class="btn-toolbar" onclick="exportData()">
-            <span>📥</span>
-            <span>エクスポート</span>
-        </button>
-    </div>
-    <div class="toolbar-separator"></div>
-    <div class="toolbar-group">
-        <button class="btn-toolbar active" onclick="setViewMode('stream')">
-            <span>📊</span>
-            <span>ストリーム</span>
-        </button>
-        <button class="btn-toolbar" onclick="setViewMode('kanban')">
-            <span>📋</span>
-            <span>かんばん</span>
-        </button>
-        <button class="btn-toolbar" onclick="setViewMode('table')">
-            <span>📑</span>
-            <span>テーブル</span>
-        </button>
-    </div>
-    <div class="toolbar-separator"></div>
-    <div class="toolbar-group">
-        <button class="btn-toolbar" onclick="showFilters()">
-            <span>🔍</span>
-            <span>詳細フィルタ</span>
-        </button>
-    </div>
-</div>
-
-<!-- タブシステム（ビューモード時は非表示、選択記録の詳細時に表示） -->
-<div class="workspace-tabs" id="detailTabs" style="display: none;">
-    <div class="workspace-tab active" onclick="switchDetailTab('overview')">
-        <span>📊 概要</span>
-    </div>
-    <div class="workspace-tab" onclick="switchDetailTab('transcript')">
-        <span>📝 文字起こし</span>
-    </div>
-    <div class="workspace-tab" onclick="switchDetailTab('analysis')">
-        <span>🤖 AI分析</span>
-    </div>
-    <div class="workspace-tab" onclick="switchDetailTab('timeline')">
-        <span>⏰ タイムライン</span>
-    </div>
-</div>
-
-<!-- ストリームビュー -->
-<div id="view-stream" class="view-content active">
-    <!-- 選択された記録の処理パイプライン -->
-    <div class="pipeline-viewer">
-        <h3 class="font-semibold text-gray-800 mb-3">処理パイプライン - 野村AM決算説明会</h3>
-        <div class="pipeline-stages">
-            <div class="pipeline-stage">
-                <div class="stage-circle completed">✓</div>
-                <div class="stage-label">アップロード</div>
-            </div>
-            <div class="pipeline-stage">
-                <div class="stage-circle completed">✓</div>
-                <div class="stage-label">文字起こし</div>
-            </div>
-            <div class="pipeline-stage">
-                <div class="stage-circle processing">⏳</div>
-                <div class="stage-label">AI要約</div>
-            </div>
-            <div class="pipeline-stage">
-                <div class="stage-circle">4</div>
-                <div class="stage-label">FAQ作成</div>
-            </div>
-            <div class="pipeline-stage">
-                <div class="stage-circle">5</div>
-                <div class="stage-label">レビュー</div>
-            </div>
-            <div class="pipeline-stage">
-                <div class="stage-circle">6</div>
-                <div class="stage-label">公開</div>
-            </div>
-        </div>
-        <div class="bg-blue-50 rounded-lg p-3 mt-3">
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                <span class="text-sm text-blue-800 font-medium">AI要約処理中...</span>
-                <span class="text-sm text-blue-600">推定残り時間: 3分</span>
-            </div>
-            <div class="w-full bg-blue-200 rounded-full h-2 mt-2">
-                <div class="bg-blue-600 h-2 rounded-full animate-pulse" style="width: 65%"></div>
-            </div>
-        </div>
-    </div>
     
-    <!-- 基本情報カード -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div class="bg-gray-50 rounded-lg p-4">
-            <h4 class="font-semibold text-gray-800 mb-3">📋 基本情報</h4>
-            <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                    <span class="text-gray-600">投資家</span>
-                    <span class="font-medium">野村アセットマネジメント</span>
+{% block main_content %}
+        <!-- ツールバー -->
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button class="btn-toolbar" onclick="bulkProcess()">
+                    <span>⚡</span>
+                    <span>一括処理</span>
+                </button>
+                <button class="btn-toolbar" onclick="exportData()">
+                    <span>📥</span>
+                    <span>エクスポート</span>
+                </button>
+            </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group">
+                <button class="btn-toolbar active" onclick="setViewMode('stream')">
+                    <span>📊</span>
+                    <span>ストリーム</span>
+                </button>
+                <button class="btn-toolbar" onclick="setViewMode('kanban')">
+                    <span>📋</span>
+                    <span>かんばん</span>
+                </button>
+                <button class="btn-toolbar" onclick="setViewMode('table')">
+                    <span>📑</span>
+                    <span>テーブル</span>
+                </button>
+            </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group">
+                <button class="btn-toolbar" onclick="showFilters()">
+                    <span>🔍</span>
+                    <span>詳細フィルタ</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- タブシステム（ビューモード時は非表示、選択記録の詳細時に表示） -->
+        <div class="workspace-tabs" id="detailTabs" style="display: none;">
+            <div class="workspace-tab active" onclick="switchDetailTab('overview')">
+                <span>📊 概要</span>
+            </div>
+            <div class="workspace-tab" onclick="switchDetailTab('transcript')">
+                <span>📝 文字起こし</span>
+            </div>
+            <div class="workspace-tab" onclick="switchDetailTab('analysis')">
+                <span>🤖 AI分析</span>
+            </div>
+            <div class="workspace-tab" onclick="switchDetailTab('timeline')">
+                <span>⏰ タイムライン</span>
+            </div>
+        </div>
+        
+        <!-- ストリームビュー -->
+        <div id="view-stream" class="view-content active">
+            <!-- 選択された記録の処理パイプライン -->
+            <div class="pipeline-viewer">
+                <h3 class="font-semibold text-gray-800 mb-3">処理パイプライン - 野村AM決算説明会</h3>
+                <div class="pipeline-stages">
+                    <div class="pipeline-stage">
+                        <div class="stage-circle completed">✓</div>
+                        <div class="stage-label">アップロード</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle completed">✓</div>
+                        <div class="stage-label">文字起こし</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle processing">⏳</div>
+                        <div class="stage-label">AI要約</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle">4</div>
+                        <div class="stage-label">FAQ作成</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle">5</div>
+                        <div class="stage-label">レビュー</div>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle">6</div>
+                        <div class="stage-label">公開</div>
+                    </div>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">種別</span>
-                    <span class="font-medium">決算説明会</span>
+                <div class="bg-blue-50 rounded-lg p-3 mt-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-blue-800 font-medium">AI要約処理中...</span>
+                        <span class="text-sm text-blue-600">推定残り時間: 3分</span>
+                    </div>
+                    <div class="w-full bg-blue-200 rounded-full h-2 mt-2">
+                        <div class="bg-blue-600 h-2 rounded-full animate-pulse" style="width: 65%"></div>
+                    </div>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">日時</span>
-                    <span class="font-medium">2024/12/26 15:00</span>
+            </div>
+            
+            <!-- 基本情報カード -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-3">📋 基本情報</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">投資家</span>
+                            <span class="font-medium">野村アセットマネジメント</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">種別</span>
+                            <span class="font-medium">決算説明会</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">日時</span>
+                            <span class="font-medium">2024/12/26 15:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">時間</span>
+                            <span class="font-medium">90分</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">参加者</span>
+                            <span class="font-medium">CEO, CFO, IR部長</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">時間</span>
-                    <span class="font-medium">90分</span>
+                
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-800 mb-3">📊 処理統計</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">文字数</span>
+                            <span class="font-medium">15,680文字</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">文字起こし精度</span>
+                            <span class="font-medium text-green-600">96%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">処理開始</span>
+                            <span class="font-medium">2時間前</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">進捗</span>
+                            <span class="font-medium text-blue-600">65%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">担当者</span>
+                            <span class="font-medium">IR担当者A</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">参加者</span>
-                    <span class="font-medium">CEO, CFO, IR部長</span>
+            </div>
+            
+            <!-- 次のアクション -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xl">⚡</span>
+                    <h4 class="font-semibold text-yellow-800">次のアクション</h4>
+                </div>
+                <p class="text-sm text-yellow-700 mb-3">AI要約が完了次第、FAQ生成に進みます。手動で介入する場合は下記ボタンをクリックしてください。</p>
+                <div class="flex gap-2">
+                    <button class="px-3 py-1.5 bg-yellow-500 text-white rounded text-sm font-medium hover:bg-yellow-600" onclick="forceNextStage()">
+                        強制的に次へ進む
+                    </button>
+                    <button class="px-3 py-1.5 bg-white text-yellow-700 border border-yellow-300 rounded text-sm font-medium hover:bg-yellow-50" onclick="cancelProcessing()">
+                        処理を中断
+                    </button>
                 </div>
             </div>
         </div>
         
-        <div class="bg-gray-50 rounded-lg p-4">
-            <h4 class="font-semibold text-gray-800 mb-3">📊 処理統計</h4>
-            <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                    <span class="text-gray-600">文字数</span>
-                    <span class="font-medium">15,680文字</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">文字起こし精度</span>
-                    <span class="font-medium text-green-600">96%</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">処理開始</span>
-                    <span class="font-medium">2時間前</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">進捗</span>
-                    <span class="font-medium text-blue-600">65%</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">担当者</span>
-                    <span class="font-medium">IR担当者A</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 次のアクション -->
-    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div class="flex items-center gap-2 mb-2">
-            <span class="text-xl">⚡</span>
-            <h4 class="font-semibold text-yellow-800">次のアクション</h4>
-        </div>
-        <p class="text-sm text-yellow-700 mb-3">AI要約が完了次第、FAQ生成に進みます。手動で介入する場合は下記ボタンをクリックしてください。</p>
-        <div class="flex gap-2">
-            <button class="px-3 py-1.5 bg-yellow-500 text-white rounded text-sm font-medium hover:bg-yellow-600" onclick="forceNextStage()">
-                強制的に次へ進む
-            </button>
-            <button class="px-3 py-1.5 bg-white text-yellow-700 border border-yellow-300 rounded text-sm font-medium hover:bg-yellow-50" onclick="cancelProcessing()">
-                処理を中断
-            </button>
-        </div>
-    </div>
-</div>
-
 <!-- かんばんビューとテーブルビューは省略（同様に移行） -->
 {% endblock %}
 
 {% block right_panel_content %}
-<!-- 統計ウィジェット -->
-<div class="stats-widget">
-    <h4 class="font-semibold text-gray-800 mb-3">📊 今日の統計</h4>
-    <div class="stats-grid">
-        <div class="stat-item">
-            <div class="stat-value">8</div>
-            <div class="stat-label">処理完了</div>
-            <div class="stat-trend positive">+3</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">12</div>
-            <div class="stat-label">処理中</div>
-            <div class="stat-trend positive">-2</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">96%</div>
-            <div class="stat-label">AI精度</div>
-            <div class="stat-trend positive">+1%</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">2.3h</div>
-            <div class="stat-label">平均時間</div>
-            <div class="stat-trend positive">-0.5h</div>
-        </div>
-    </div>
-</div>
-
-<!-- AI洞察 -->
-<div class="ai-insights">
-    <div class="insight-header">
-        <span class="text-xl">🤖</span>
-        <span>AI洞察</span>
-    </div>
-    <ul class="insight-list">
-        <li class="insight-item">
-            <span class="insight-icon">💡</span>
-            <span>今日の処理効率が20%向上しています</span>
-        </li>
-        <li class="insight-item">
-            <span class="insight-icon">⚠️</span>
-            <span>3件の記録で処理遅延が発生中</span>
-        </li>
-        <li class="insight-item">
-            <span class="insight-icon">📈</span>
-            <span>ESG関連の質問が急増しています</span>
-        </li>
-    </ul>
-</div>
-
-<!-- アクションパネル -->
-<div class="action-panel">
-    <div class="action-header">
-        <div class="action-title">🎯 要対応アクション</div>
-        <div class="action-count">5</div>
-    </div>
-    <ul class="action-list">
-        <li class="action-item">
-            <div class="action-priority high"></div>
-            <div class="flex-1">
-                <div class="font-medium">BlackRockへの回答</div>
-                <div class="text-xs text-gray-500">期限: 今日</div>
+            <!-- 統計ウィジェット -->
+            <div class="stats-widget">
+                <h4 class="font-semibold text-gray-800 mb-3">📊 今日の統計</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">処理完了</div>
+                        <div class="stat-trend positive">+3</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">処理中</div>
+                        <div class="stat-trend positive">-2</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">96%</div>
+                        <div class="stat-label">AI精度</div>
+                        <div class="stat-trend positive">+1%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2.3h</div>
+                        <div class="stat-label">平均時間</div>
+                        <div class="stat-trend positive">-0.5h</div>
+                    </div>
+                </div>
             </div>
-        </li>
-        <li class="action-item">
-            <div class="action-priority medium"></div>
-            <div class="flex-1">
-                <div class="font-medium">FAQ承認</div>
-                <div class="text-xs text-gray-500">期限: 明日</div>
+            
+            <!-- AI洞察 -->
+            <div class="ai-insights">
+                <div class="insight-header">
+                    <span class="text-xl">🤖</span>
+                    <span>AI洞察</span>
+                </div>
+                <ul class="insight-list">
+                    <li class="insight-item">
+                        <span class="insight-icon">💡</span>
+                        <span>今日の処理効率が20%向上しています</span>
+                    </li>
+                    <li class="insight-item">
+                        <span class="insight-icon">⚠️</span>
+                        <span>3件の記録で処理遅延が発生中</span>
+                    </li>
+                    <li class="insight-item">
+                        <span class="insight-icon">📈</span>
+                        <span>ESG関連の質問が急増しています</span>
+                    </li>
+                </ul>
             </div>
-        </li>
-        <li class="action-item">
-            <div class="action-priority low"></div>
-            <div class="flex-1">
-                <div class="font-medium">レポート作成</div>
-                <div class="text-xs text-gray-500">期限: 来週</div>
+            
+            <!-- アクションパネル -->
+            <div class="action-panel">
+                <div class="action-header">
+                    <div class="action-title">🎯 要対応アクション</div>
+                    <div class="action-count">5</div>
+                </div>
+                <ul class="action-list">
+                    <li class="action-item">
+                        <div class="action-priority high"></div>
+                        <div class="flex-1">
+                            <div class="font-medium">BlackRockへの回答</div>
+                            <div class="text-xs text-gray-500">期限: 今日</div>
+                        </div>
+                    </li>
+                    <li class="action-item">
+                        <div class="action-priority medium"></div>
+                        <div class="flex-1">
+                            <div class="font-medium">FAQ承認</div>
+                            <div class="text-xs text-gray-500">期限: 明日</div>
+                        </div>
+                    </li>
+                    <li class="action-item">
+                        <div class="action-priority low"></div>
+                        <div class="flex-1">
+                            <div class="font-medium">レポート作成</div>
+                            <div class="text-xs text-gray-500">期限: 来週</div>
+                        </div>
+                    </li>
+                </ul>
             </div>
-        </li>
-    </ul>
-</div>
-
-<!-- 最近の活動 -->
-<div class="bg-gray-50 rounded-lg p-3">
-    <h4 class="font-semibold text-gray-800 mb-2">📝 最近の活動</h4>
-    <div class="space-y-2 text-sm">
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>FAQ 3件が公開されました</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <span>新しい音声ファイルがアップロード</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
-            <span>レビュー待ちが2件追加</span>
+            
+            <!-- 最近の活動 -->
+            <div class="bg-gray-50 rounded-lg p-3">
+                <h4 class="font-semibold text-gray-800 mb-2">📝 最近の活動</h4>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span>FAQ 3件が公開されました</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span>新しい音声ファイルがアップロード</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <span>レビュー待ちが2件追加</span>
         </div>
     </div>
 </div>
@@ -1293,14 +1293,14 @@ document.addEventListener('DOMContentLoaded', function() {
     selectActivity('activity-001');
     
     // リアルタイム更新のシミュレーション
-    setTimeout(() => {
+setTimeout(() => {
         const processingCircle = document.querySelector('.stage-circle.processing');
         if (processingCircle) {
             processingCircle.classList.remove('processing');
             processingCircle.classList.add('completed');
             processingCircle.innerHTML = '✓';
         }
-    }, 5000);
+}, 5000);
 });
 </script>
 {% endblock %} 
