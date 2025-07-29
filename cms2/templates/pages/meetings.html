@@ -1,15 +1,8 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}ミーティング管理{% endblock %}
+{% block title %}ミーティング管理 - {{ super() }}{% endblock %}
 {% block page_icon %}🤝{% endblock %}
 {% block page_title %}ミーティング管理{% endblock %}
-
-{% block breadcrumb %}
-<div class="breadcrumb-item">
-    <a href="#" class="breadcrumb-link">IR業務統合</a>
-    <span class="breadcrumb-separator">›</span>
-</div>
-{% endblock %}
 {% block breadcrumb_current %}ミーティング管理{% endblock %}
 
 {% block content %}

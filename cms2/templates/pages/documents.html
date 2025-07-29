@@ -1,15 +1,8 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}ドキュメント管理{% endblock %}
+{% block title %}ドキュメント管理 - {{ super() }}{% endblock %}
 {% block page_icon %}📄{% endblock %}
 {% block page_title %}ドキュメント管理{% endblock %}
-
-{% block breadcrumb %}
-<div class="breadcrumb-item">
-    <a href="#" class="breadcrumb-link">コンテンツ管理</a>
-    <span class="breadcrumb-separator">›</span>
-</div>
-{% endblock %}
 {% block breadcrumb_current %}ドキュメント管理{% endblock %}
 
 {% block content %}

@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}音声アップロード{% endblock %}
+{% block title %}ファイルアップロード - {{ super() }}{% endblock %}
+{% block page_icon %}📤{% endblock %}
+{% block page_title %}ファイルアップロード{% endblock %}
+{% block breadcrumb_current %}ファイルアップロード{% endblock %}
 
 {% block extra_css %}
 <style>
