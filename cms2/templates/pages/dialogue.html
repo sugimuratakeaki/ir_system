@@ -190,56 +190,134 @@
     </div>
 </div>
 
-<!-- 検索・フィルター -->
+<!-- 統合検索バー -->
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
     <div class="flex flex-col lg:flex-row gap-4">
-        <!-- 検索ボックス -->
+        <!-- メイン検索 -->
         <div class="flex-1">
-            <div class="search-box">
-                <svg class="search-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+            <div class="relative">
                 <input 
                     type="text" 
-                    placeholder="投資家名、キーワード、日付で検索..."
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-teal focus:border-transparent"
-                    onkeyup="searchDialogues(this.value)"
+                    id="unifiedSearch"
+                    placeholder="投資家名、キーワード、タグで検索..."
+                    class="w-full pl-10 pr-32 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-kagami-blue focus:border-transparent transition-all"
+                    onkeyup="handleUnifiedSearch(event)"
                 >
-            </div>
-        </div>
-        
-        <!-- フィルター -->
-        <div class="flex flex-wrap gap-2">
-            <div class="filter-chip active" onclick="toggleFilter(this, 'all')">
-                すべて
-            </div>
-            <div class="filter-chip" onclick="toggleFilter(this, 'draft')">
-                下書き
-            </div>
-            <div class="filter-chip" onclick="toggleFilter(this, 'review')">
-                レビュー中
-            </div>
-            <div class="filter-chip" onclick="toggleFilter(this, 'approved')">
-                承認済み
-            </div>
-            <div class="filter-chip" onclick="toggleFilter(this, 'published')">
-                公開済み
-            </div>
-        </div>
-        
-        <!-- その他のオプション -->
-        <div class="flex gap-2">
-            <button onclick="showAdvancedSearch()" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="詳細検索">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-            </button>
-            <button onclick="exportDialogues()" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="エクスポート">
+                <div class="absolute right-2 top-2 flex items-center gap-1">
+                    <button 
+                        onclick="toggleAdvancedSearch()" 
+                        class="p-1.5 text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+                        title="詳細検索"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                    </button>
+                    <button 
+                        onclick="clearSearch()" 
+                        class="p-1.5 text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+                        title="クリア"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 詳細検索パネル（デフォルトは非表示） -->
+            <div id="advancedSearchPanel" class="hidden mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="text-xs font-medium text-gray-600 mb-1 block">投資家</label>
+                        <input 
+                            type="text" 
+                            id="searchInvestor"
+                            placeholder="投資家名・ファンド名"
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-kagami-blue focus:border-kagami-blue"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-600 mb-1 block">開始日</label>
+                        <input 
+                            type="date" 
+                            id="searchDateFrom"
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-kagami-blue focus:border-kagami-blue"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-600 mb-1 block">終了日</label>
+                        <input 
+                            type="date" 
+                            id="searchDateTo"
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-kagami-blue focus:border-kagami-blue"
+                        >
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                    <div class="flex gap-2">
+                        <button onclick="setDateRange('week')" class="text-xs px-2 py-1 text-gray-600 hover:bg-gray-200 rounded transition-colors">今週</button>
+                        <button onclick="setDateRange('month')" class="text-xs px-2 py-1 text-gray-600 hover:bg-gray-200 rounded transition-colors">今月</button>
+                        <button onclick="setDateRange('quarter')" class="text-xs px-2 py-1 text-gray-600 hover:bg-gray-200 rounded transition-colors">四半期</button>
+                        <button onclick="setDateRange('year')" class="text-xs px-2 py-1 text-gray-600 hover:bg-gray-200 rounded transition-colors">今年</button>
+                    </div>
+                    <button 
+                        onclick="applyAdvancedSearch()" 
+                        class="text-xs px-3 py-1 bg-kagami-blue text-white rounded hover:bg-kagami-blue-dark transition-colors"
+                    >
+                        適用
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- クイックフィルター -->
+        <div class="flex items-center gap-2">
+            <!-- ステータスフィルター -->
+            <div class="relative">
+                <button 
+                    onclick="toggleStatusFilter()" 
+                    class="px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-2"
+                >
+                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    <span class="text-sm font-medium" id="statusFilterLabel">すべて</span>
+                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                
+                <!-- ステータスドロップダウン -->
+                <div id="statusDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                    <button onclick="setStatusFilter('all')" class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors">すべて</button>
+                    <button onclick="setStatusFilter('draft')" class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors">下書き</button>
+                    <button onclick="setStatusFilter('review')" class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors">レビュー中</button>
+                    <button onclick="setStatusFilter('approved')" class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors">承認済み</button>
+                    <button onclick="setStatusFilter('published')" class="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors rounded-b-lg">公開済み</button>
+                </div>
+            </div>
+            
+            <!-- エクスポート -->
+            <button 
+                onclick="exportDialogues()" 
+                class="p-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                title="エクスポート"
+            >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
             </button>
         </div>
+    </div>
+    
+    <!-- アクティブフィルター表示 -->
+    <div id="activeFilters" class="hidden mt-3 flex items-center gap-2 flex-wrap">
+        <span class="text-xs text-gray-500">検索中:</span>
+        <!-- フィルタータグがここに動的に追加される -->
     </div>
 </div>
 
@@ -529,22 +607,239 @@
         window.location.href = '/upload';
     }
     
-    // 検索機能
-    function searchDialogues(query) {
-        // 実際の実装では、サーバーサイドで検索を実行
-        console.log('Searching for:', query);
-        showNotification('検索中...', 'info');
+    let currentFilters = {
+        search: '',
+        investor: '',
+        dateFrom: '',
+        dateTo: '',
+        status: 'all'
+    };
+    
+    // 統合検索のハンドラ
+    function handleUnifiedSearch(event) {
+        const searchTerm = event.target.value;
+        currentFilters.search = searchTerm;
+        
+        // Enterキーで即座に検索
+        if (event.key === 'Enter') {
+            performSearch();
+        } else {
+            // リアルタイム検索（デバウンス処理を追加しても良い）
+            if (searchTerm.length >= 2 || searchTerm.length === 0) {
+                performSearch();
+            }
+        }
     }
     
-    // フィルター切り替え
-    function toggleFilter(element, filter) {
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.classList.remove('active');
-        });
-        element.classList.add('active');
+    // 詳細検索パネルの表示切り替え
+    function toggleAdvancedSearch() {
+        const panel = document.getElementById('advancedSearchPanel');
+        panel.classList.toggle('hidden');
         
-        // 実際の実装では、フィルターに基づいてリストを更新
-        showNotification(`フィルター: ${element.textContent}`, 'info');
+        if (!panel.classList.contains('hidden')) {
+            // パネルを開いたときに最初の入力欄にフォーカス
+            document.getElementById('searchInvestor').focus();
+        }
+    }
+    
+    // 詳細検索の適用
+    function applyAdvancedSearch() {
+        currentFilters.investor = document.getElementById('searchInvestor').value;
+        currentFilters.dateFrom = document.getElementById('searchDateFrom').value;
+        currentFilters.dateTo = document.getElementById('searchDateTo').value;
+        
+        performSearch();
+        updateActiveFilters();
+    }
+    
+    // ステータスフィルターの表示切り替え
+    function toggleStatusFilter() {
+        const dropdown = document.getElementById('statusDropdown');
+        dropdown.classList.toggle('hidden');
+        
+        // クリックアウトハンドラ
+        if (!dropdown.classList.contains('hidden')) {
+            setTimeout(() => {
+                document.addEventListener('click', closeStatusDropdown);
+            }, 100);
+        }
+    }
+    
+    function closeStatusDropdown(event) {
+        const dropdown = document.getElementById('statusDropdown');
+        if (!event.target.closest('#statusDropdown') && !event.target.closest('[onclick="toggleStatusFilter()"]')) {
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', closeStatusDropdown);
+        }
+    }
+    
+    // ステータスフィルターの設定
+    function setStatusFilter(status) {
+        currentFilters.status = status;
+        const label = document.getElementById('statusFilterLabel');
+        const statusLabels = {
+            'all': 'すべて',
+            'draft': '下書き',
+            'review': 'レビュー中',
+            'approved': '承認済み',
+            'published': '公開済み'
+        };
+        label.textContent = statusLabels[status];
+        
+        // ドロップダウンを閉じる
+        document.getElementById('statusDropdown').classList.add('hidden');
+        
+        performSearch();
+        updateActiveFilters();
+    }
+    
+    // 検索実行
+    function performSearch() {
+        console.log('Searching with filters:', currentFilters);
+        
+        // 検索中の表示
+        if (Object.values(currentFilters).some(v => v && v !== 'all')) {
+            showNotification('検索中...', 'info');
+        }
+        
+        // ここで実際の検索処理を実装
+        // filterDialogues(currentFilters);
+    }
+    
+    // アクティブフィルターの表示更新
+    function updateActiveFilters() {
+        const container = document.getElementById('activeFilters');
+        const filters = [];
+        
+        if (currentFilters.search) {
+            filters.push(createFilterTag('検索', currentFilters.search, () => {
+                document.getElementById('unifiedSearch').value = '';
+                currentFilters.search = '';
+                performSearch();
+            }));
+        }
+        
+        if (currentFilters.investor) {
+            filters.push(createFilterTag('投資家', currentFilters.investor, () => {
+                document.getElementById('searchInvestor').value = '';
+                currentFilters.investor = '';
+                applyAdvancedSearch();
+            }));
+        }
+        
+        if (currentFilters.dateFrom || currentFilters.dateTo) {
+            const dateStr = [];
+            if (currentFilters.dateFrom) dateStr.push(`${currentFilters.dateFrom}から`);
+            if (currentFilters.dateTo) dateStr.push(`${currentFilters.dateTo}まで`);
+            filters.push(createFilterTag('期間', dateStr.join(''), () => {
+                document.getElementById('searchDateFrom').value = '';
+                document.getElementById('searchDateTo').value = '';
+                currentFilters.dateFrom = '';
+                currentFilters.dateTo = '';
+                applyAdvancedSearch();
+            }));
+        }
+        
+        if (currentFilters.status !== 'all') {
+            const statusLabels = {
+                'draft': '下書き',
+                'review': 'レビュー中',
+                'approved': '承認済み',
+                'published': '公開済み'
+            };
+            filters.push(createFilterTag('ステータス', statusLabels[currentFilters.status], () => {
+                setStatusFilter('all');
+            }));
+        }
+        
+        if (filters.length > 0) {
+            container.classList.remove('hidden');
+            container.innerHTML = '<span class="text-xs text-gray-500">検索中:</span>' + filters.join('');
+        } else {
+            container.classList.add('hidden');
+        }
+    }
+    
+    // フィルタータグの作成
+    function createFilterTag(label, value, onRemove) {
+        const tag = document.createElement('span');
+        tag.className = 'inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-sm rounded-full';
+        tag.innerHTML = `
+            <span class="text-gray-600">${label}:</span>
+            <span class="font-medium">${value}</span>
+            <button onclick="${onRemove.toString()}();updateActiveFilters()" class="ml-1 text-gray-400 hover:text-gray-600">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        `;
+        return tag.outerHTML;
+    }
+    
+    // 検索クリア
+    function clearSearch() {
+        document.getElementById('unifiedSearch').value = '';
+        document.getElementById('searchInvestor').value = '';
+        document.getElementById('searchDateFrom').value = '';
+        document.getElementById('searchDateTo').value = '';
+        currentFilters = {
+            search: '',
+            investor: '',
+            dateFrom: '',
+            dateTo: '',
+            status: 'all'
+        };
+        setStatusFilter('all');
+        performSearch();
+        updateActiveFilters();
+    }
+    
+    // 日付範囲のショートカット
+    function setDateRange(range) {
+        const today = new Date();
+        const dateFrom = document.getElementById('searchDateFrom');
+        const dateTo = document.getElementById('searchDateTo');
+        
+        let startDate = new Date();
+        let endDate = new Date();
+        
+        switch(range) {
+            case 'today':
+                startDate = today;
+                endDate = today;
+                break;
+            case 'week':
+                startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                endDate = today;
+                break;
+            case 'month':
+                startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                break;
+            case 'quarter':
+                const quarter = Math.floor(today.getMonth() / 3);
+                startDate = new Date(today.getFullYear(), quarter * 3, 1);
+                endDate = new Date(today.getFullYear(), quarter * 3 + 3, 0);
+                break;
+            case 'year':
+                startDate = new Date(today.getFullYear(), 0, 1);
+                endDate = new Date(today.getFullYear(), 11, 31);
+                break;
+        }
+        
+        dateFrom.value = formatDate(startDate);
+        dateTo.value = formatDate(endDate);
+        currentFilters.dateFrom = dateFrom.value;
+        currentFilters.dateTo = dateTo.value;
+        applyAdvancedSearch();
+    }
+    
+    // 日付をYYYY-MM-DD形式にフォーマット
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
     
     // 詳細検索
