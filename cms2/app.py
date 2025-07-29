@@ -45,7 +45,115 @@ MOCK_DATA = {
                 "time": "2024-01-22 08:45",
                 "status": "pending"
             }
-        ]
+        ],
+    "analytics": {
+        "kpis": {
+            "active_investors": {
+                "value": 418,
+                "trend": 12.5,
+                "trend_positive": True
+            },
+            "investor_satisfaction": {
+                "value": 94.5,
+                "trend": 2.3,
+                "trend_positive": True
+            },
+            "inquiries": {
+                "value": 1256,
+                "trend": -8.4,
+                "trend_positive": False
+            },
+            "ai_accuracy": {
+                "value": 96.8,
+                "trend": 1.2,
+                "trend_positive": True
+            }
+        },
+        "top_topics": [
+            {"name": "財務・業績", "percentage": 85},
+            {"name": "経営戦略", "percentage": 72},
+            {"name": "ESG", "percentage": 68},
+            {"name": "株主還元", "percentage": 45}
+        ],
+        "investor_types": [
+            {
+                "type": "機関投資家",
+                "count": 68,
+                "avg_activity": "月12.5回",
+                "satisfaction": 96
+            },
+            {
+                "type": "個人投資家",
+                "count": 256,
+                "avg_activity": "月3.2回",
+                "satisfaction": 94
+            },
+            {
+                "type": "海外投資家",
+                "count": 24,
+                "avg_activity": "月8.7回",
+                "satisfaction": 92
+            }
+        ],
+        "ai_insights": {
+            "key_finding": "過去30日間で「中期経営計画」に関する問い合わせが45%増加しています。特に海外投資家からの関心が高まっており、英語版資料の充実が推奨されます。",
+            "recommendation": "中期経営計画の進捗レポートを月次で公開することで、投資家の情報ニーズに応えられます。",
+            "warning": "ESG関連の問い合わせが前四半期比で20%減少。情報開示の強化を検討してください。",
+            "success_story": "AI-FAQ導入により、基本的な問い合わせが60%減少。IR担当者の業務効率が大幅に改善しました。"
+        }
+    },
+    "audit_logs": [
+        {
+            "id": 1,
+            "timestamp": "2024-01-22 15:30:45",
+            "event_type": "login",
+            "event_name": "ログイン",
+            "user_name": "山田 太郎",
+            "ip_address": "192.168.1.100",
+            "details": "管理者アカウントでログインしました",
+            "severity": "info"
+        },
+        {
+            "id": 2,
+            "timestamp": "2024-01-22 15:25:12",
+            "event_type": "data",
+            "event_name": "ドキュメント更新",
+            "user_name": "佐藤 花子",
+            "ip_address": "192.168.1.101",
+            "details": "ドキュメント「2024年第3四半期決算説明資料」を更新しました",
+            "severity": "info"
+        },
+        {
+            "id": 3,
+            "timestamp": "2024-01-22 14:50:33",
+            "event_type": "security",
+            "event_name": "ログイン失敗",
+            "user_name": "unknown",
+            "ip_address": "203.0.113.42",
+            "details": "不正なパスワードで3回連続でログインに失敗しました",
+            "severity": "warning"
+        },
+        {
+            "id": 4,
+            "timestamp": "2024-01-22 14:15:20",
+            "event_type": "system",
+            "event_name": "システムエラー",
+            "user_name": "SYSTEM",
+            "ip_address": "127.0.0.1",
+            "details": "メール送信サービスへの接続がタイムアウトしました",
+            "severity": "critical"
+        },
+        {
+            "id": 5,
+            "timestamp": "2024-01-22 13:45:55",
+            "event_type": "data",
+            "event_name": "FAQ追加",
+            "user_name": "鈴木 一郎",
+            "ip_address": "192.168.1.102",
+            "details": "新規FAQ「配当政策について」を追加しました",
+            "severity": "info"
+        }
+    ]
     },
     "investors": [
         {
@@ -159,6 +267,148 @@ MOCK_DATA = {
             "created_at": "2024-01-20",
             "views": 67
         }
+    ],
+    "users": [
+        {
+            "id": 1,
+            "name": "山田 太郎",
+            "email": "yamada@example.com",
+            "department": "IR部",
+            "role": "admin",
+            "role_display": "管理者",
+            "status": "active",
+            "last_login": "2024-01-22 15:30"
+        },
+        {
+            "id": 2,
+            "name": "佐藤 花子",
+            "email": "sato@example.com",
+            "department": "経理部",
+            "role": "editor",
+            "role_display": "編集者",
+            "status": "active",
+            "last_login": "2024-01-22 14:15"
+        },
+        {
+            "id": 3,
+            "name": "鈴木 一郎",
+            "email": "suzuki@example.com",
+            "department": "広報部",
+            "role": "viewer",
+            "role_display": "閲覧者",
+            "status": "active",
+            "last_login": "2024-01-22 09:45"
+        },
+        {
+            "id": 4,
+            "name": "田中 美咲",
+            "email": "tanaka@example.com",
+            "department": "IR部",
+            "role": "editor",
+            "role_display": "編集者",
+            "status": "inactive",
+            "last_login": "2024-01-15 16:20"
+        }
+    ],
+    "news": [
+        {
+            "id": 1,
+            "title": "2024年第3四半期決算発表のお知らせ",
+            "content": "2024年第3四半期の決算を発表いたします。売上高は前年同期比15%増の1,250億円、営業利益は同20%増の180億円となりました。",
+            "category": "ir",
+            "category_display": "IR情報",
+            "status": "published",
+            "publish_date": "2024-01-22",
+            "author": "IR部",
+            "view_count": 1250,
+            "is_important": True
+        },
+        {
+            "id": 2,
+            "title": "新製品発表会のご案内",
+            "content": "2024年2月15日に新製品発表会を開催いたします。最新のAI技術を活用した革新的な製品をご紹介します。",
+            "category": "event",
+            "category_display": "イベント",
+            "status": "scheduled",
+            "publish_date": "2024-02-01",
+            "author": "広報部",
+            "view_count": 0,
+            "is_important": False
+        },
+        {
+            "id": 3,
+            "title": "ESGレポート2023を公開しました",
+            "content": "当社の環境・社会・ガバナンスへの取り組みをまとめたESGレポート2023を公開しました。",
+            "category": "notice",
+            "category_display": "お知らせ",
+            "status": "published",
+            "publish_date": "2024-01-20",
+            "author": "ESG推進室",
+            "view_count": 856,
+            "is_important": False
+        },
+        {
+            "id": 4,
+            "title": "【ドラフト】中期経営計画の進捗について",
+            "content": "2024-2026年中期経営計画の初年度進捗状況についてお知らせします。",
+            "category": "press",
+            "category_display": "プレスリリース",
+            "status": "draft",
+            "publish_date": "2024-01-25",
+            "author": "経営企画部",
+            "view_count": 0,
+            "is_important": False
+        }
+    ],
+    "schedule": [
+        {
+            "id": 1,
+            "title": "2024年第3四半期決算発表",
+            "type": "earnings",
+            "type_display": "決算発表",
+            "date": "2024-01-15",
+            "time": "15:00",
+            "location": "本社会議室",
+            "status": "scheduled",
+            "assignee": "IR部門責任者",
+            "description": "第3四半期の決算内容を発表します"
+        },
+        {
+            "id": 2,
+            "title": "決算説明会",
+            "type": "briefing",
+            "type_display": "説明会",
+            "date": "2024-01-16",
+            "time": "10:00",
+            "location": "オンライン",
+            "status": "preparing",
+            "assignee": "広報担当者A",
+            "description": "アナリスト向け決算説明会"
+        },
+        {
+            "id": 3,
+            "title": "個別投資家面談",
+            "type": "meeting",
+            "type_display": "株主総会",
+            "date": "2024-01-22",
+            "time": "14:00",
+            "location": "本社応接室",
+            "status": "scheduled",
+            "assignee": "IR部門責任者",
+            "description": "大手機関投資家との面談"
+        },
+        {
+            "id": 4,
+            "title": "ESG説明会",
+            "type": "other",
+            "type_display": "その他",
+            "date": "2024-01-10",
+            "time": "13:00",
+            "location": "オンライン",
+            "status": "completed",
+            "assignee": "ESG推進室",
+            "description": "ESGへの取り組みについて説明"
+        }
     ]
 }
 
@@ -170,6 +420,89 @@ async def dashboard(request: Request):
     return templates.TemplateResponse("pages/dashboard.html", {
         "request": request,
         "data": MOCK_DATA["dashboard"],
+        "base_url": "/cms2"
+    })
+
+@app.get("/audit-logs", response_class=HTMLResponse)
+async def audit_logs(request: Request):
+    """監査ログページ"""
+    logs_data = MOCK_DATA["audit_logs"]
+    
+    # 統計情報を計算
+    today_events = len([log for log in logs_data if log["timestamp"].startswith("2024-01-22")])
+    security_alerts = len([log for log in logs_data if log["event_type"] == "security"])
+    system_errors = len([log for log in logs_data if log["severity"] == "critical"])
+    active_users = len(set([log["user_name"] for log in logs_data if log["user_name"] not in ["SYSTEM", "unknown"]]))
+    
+    return templates.TemplateResponse("pages/audit-logs.html", {
+        "request": request,
+        "logs": logs_data,
+        "total_logs": len(logs_data) * 100,  # モック：実際は全件数
+        "today_events": today_events,
+        "security_alerts": security_alerts,
+        "system_errors": system_errors,
+        "active_users": active_users,
+        "base_url": "/cms2"
+    })
+
+@app.get("/analytics", response_class=HTMLResponse)
+async def analytics(request: Request):
+    """アナリティクスページ"""
+    analytics_data = MOCK_DATA["analytics"]
+    
+    return templates.TemplateResponse("pages/analytics.html", {
+        "request": request,
+        "kpis": analytics_data["kpis"],
+        "top_topics": analytics_data["top_topics"],
+        "investor_types": analytics_data["investor_types"],
+        "ai_insights": analytics_data["ai_insights"],
+        "last_updated": "2024-01-22 15:30",
+        "base_url": "/cms2"
+    })
+
+@app.get("/schedule", response_class=HTMLResponse)
+async def schedule(request: Request):
+    """スケジュール管理ページ"""
+    schedule_data = MOCK_DATA["schedule"]
+    
+    # 統計情報を計算
+    from datetime import datetime
+    today = datetime.now().date()
+    
+    upcoming_events = len([e for e in schedule_data if datetime.strptime(e["date"], "%Y-%m-%d").date() >= today])
+    this_month_events = len([e for e in schedule_data if e["date"].startswith("2024-01")])
+    pending_tasks = len([e for e in schedule_data if e["status"] in ["scheduled", "preparing"]])
+    completed_events = len([e for e in schedule_data if e["status"] == "completed"])
+    
+    return templates.TemplateResponse("pages/schedule.html", {
+        "request": request,
+        "events": schedule_data,
+        "upcoming_events": upcoming_events,
+        "this_month_events": this_month_events,
+        "pending_tasks": pending_tasks,
+        "completed_events": completed_events,
+        "current_month": "2024年1月",
+        "base_url": "/cms2"
+    })
+
+@app.get("/news", response_class=HTMLResponse)
+async def news(request: Request):
+    """ニュース管理ページ"""
+    news_data = MOCK_DATA["news"]
+    
+    # 統計情報を計算
+    published_count = len([n for n in news_data if n["status"] == "published"])
+    draft_count = len([n for n in news_data if n["status"] == "draft"])
+    scheduled_count = len([n for n in news_data if n["status"] == "scheduled"])
+    monthly_count = len([n for n in news_data if n["publish_date"].startswith("2024-01")])  # 今月の記事
+    
+    return templates.TemplateResponse("pages/news.html", {
+        "request": request,
+        "articles": news_data,
+        "published_count": published_count,
+        "draft_count": draft_count,
+        "scheduled_count": scheduled_count,
+        "monthly_count": monthly_count,
         "base_url": "/cms2"
     })
 
@@ -209,6 +542,124 @@ async def faq(request: Request):
         "base_url": "/cms2"
     })
 
+@app.get("/users", response_class=HTMLResponse)
+async def users(request: Request):
+    """ユーザー管理ページ"""
+    users_data = MOCK_DATA["users"]
+    
+    # 統計情報を計算
+    total_users = len(users_data)
+    active_users = len([u for u in users_data if u["status"] == "active"])
+    admin_users = len([u for u in users_data if u["role"] == "admin"])
+    inactive_users = len([u for u in users_data if u["status"] == "inactive"])
+    
+    return templates.TemplateResponse("pages/users.html", {
+        "request": request,
+        "users": users_data,
+        "total_users": total_users,
+        "active_users": active_users,
+        "admin_users": admin_users,
+        "inactive_users": inactive_users,
+        "base_url": "/cms2"
+    })
+
+@app.get("/permissions", response_class=HTMLResponse)
+async def permissions(request: Request):
+    """権限管理ページ"""
+    return templates.TemplateResponse("pages/permissions.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/settings", response_class=HTMLResponse)
+async def settings(request: Request):
+    """設定ページ"""
+    return templates.TemplateResponse("pages/settings.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    """ログインページ"""
+    return templates.TemplateResponse("pages/login.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/executive-dashboard", response_class=HTMLResponse)
+async def executive_dashboard(request: Request):
+    """経営陣ダッシュボードページ"""
+    return templates.TemplateResponse("pages/executive-dashboard.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/director-dashboard", response_class=HTMLResponse)
+async def director_dashboard(request: Request):
+    """社外取締役ダッシュボードページ"""
+    return templates.TemplateResponse("pages/director-dashboard.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/dialogue", response_class=HTMLResponse)
+async def dialogue(request: Request):
+    """議事録管理ページ"""
+    return templates.TemplateResponse("pages/dialogue.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/dialogue/{dialogue_id}/edit", response_class=HTMLResponse)
+async def dialogue_edit(request: Request, dialogue_id: str):
+    """議事録編集ページ"""
+    return templates.TemplateResponse("pages/dialogue-edit.html", {
+        "request": request,
+        "dialogue_id": dialogue_id,
+        "base_url": "/cms2"
+    })
+
+@app.get("/ir-calendar", response_class=HTMLResponse)
+async def ir_calendar(request: Request):
+    """IRカレンダーページ"""
+    return templates.TemplateResponse("pages/ir-calendar.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/content-center", response_class=HTMLResponse)
+async def content_center(request: Request):
+    """コンテンツセンターページ"""
+    return templates.TemplateResponse("pages/content-center.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/email-campaigns", response_class=HTMLResponse)
+async def email_campaigns(request: Request):
+    """メール配信ページ"""
+    return templates.TemplateResponse("pages/email-campaigns.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/strategy", response_class=HTMLResponse)
+async def strategy(request: Request):
+    """IR戦略ページ"""
+    return templates.TemplateResponse("pages/strategy.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/upload", response_class=HTMLResponse)
+async def upload(request: Request):
+    """音声アップロードページ"""
+    return templates.TemplateResponse("pages/upload.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
 # ===== API エンドポイント =====
 
 @app.get("/api/dashboard")
@@ -235,6 +686,21 @@ async def get_meetings():
 async def get_faqs():
     """FAQ一覧取得API"""
     return MOCK_DATA["faqs"]
+
+@app.get("/api/users")
+async def get_users():
+    """ユーザー一覧取得API"""
+    return MOCK_DATA["users"]
+
+@app.get("/api/news")
+async def get_news():
+    """ニュース一覧取得API"""
+    return MOCK_DATA["news"]
+
+@app.get("/api/schedule")
+async def get_schedule():
+    """スケジュール一覧取得API"""
+    return MOCK_DATA["schedule"]
 
 # ===== ヘルスチェック =====
 

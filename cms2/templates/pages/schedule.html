@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}スケジュール管理 - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- ページヘッダー -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div>
+                <h1 class="page-title">スケジュール管理</h1>
+                <p class="page-description">IR関連イベントの計画とスケジュール管理</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="btn btn-primary" onclick="ScheduleManager.openCreateModal()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    イベント追加
+                </button>
+                <button class="btn btn-secondary" onclick="ScheduleManager.toggleView()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span id="viewToggleText">カレンダー表示</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計カード -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">今後のイベント</p>
+                    <p class="stat-value">{{ upcoming_events }}</p>
+                </div>
+                <div class="stat-icon bg-blue-100">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">今月のイベント</p>
+                    <p class="stat-value text-green-600">{{ this_month_events }}</p>
+                </div>
+                <div class="stat-icon bg-green-100">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">未完了タスク</p>
+                    <p class="stat-value text-orange-600">{{ pending_tasks }}</p>
+                </div>
+                <div class="stat-icon bg-orange-100">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">完了イベント</p>
+                    <p class="stat-value text-gray-600">{{ completed_events }}</p>
+                </div>
+                <div class="stat-icon bg-gray-100">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フィルターパネル -->
+    <div class="filter-panel">
+        <div class="filter-controls">
+            <div class="search-box">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" 
+                       id="scheduleSearchInput"
+                       placeholder="イベントを検索..." 
+                       class="search-input">
+            </div>
+            <select class="filter-select" id="typeFilter">
+                <option value="">すべての種類</option>
+                <option value="earnings">決算発表</option>
+                <option value="briefing">説明会</option>
+                <option value="meeting">株主総会</option>
+                <option value="other">その他</option>
+            </select>
+            <select class="filter-select" id="statusFilter">
+                <option value="">すべてのステータス</option>
+                <option value="scheduled">予定</option>
+                <option value="preparing">準備中</option>
+                <option value="completed">完了</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- カレンダービュー -->
+    <div id="calendarView" class="card mb-6" style="display: none;">
+        <div class="card-header">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold">{{ current_month }} のスケジュール</h3>
+                <div class="flex gap-2">
+                    <button class="btn-icon" onclick="ScheduleManager.previousMonth()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="ScheduleManager.nextMonth()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="calendar-grid">
+                <div class="calendar-header">
+                    <div class="calendar-day-header">日</div>
+                    <div class="calendar-day-header">月</div>
+                    <div class="calendar-day-header">火</div>
+                    <div class="calendar-day-header">水</div>
+                    <div class="calendar-day-header">木</div>
+                    <div class="calendar-day-header">金</div>
+                    <div class="calendar-day-header">土</div>
+                </div>
+                <div class="calendar-body" id="calendarBody">
+                    <!-- カレンダーの日付はJavaScriptで動的に生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- リストビュー -->
+    <div id="listView" class="card">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">イベント一覧</h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="table-header">日時</th>
+                            <th class="table-header">イベント名</th>
+                            <th class="table-header">種類</th>
+                            <th class="table-header">場所</th>
+                            <th class="table-header">ステータス</th>
+                            <th class="table-header">担当者</th>
+                            <th class="table-header text-right">アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTableBody">
+                        {% for event in events %}
+                        <tr class="table-row">
+                            <td class="table-cell">
+                                <div class="font-medium">{{ event.date }}</div>
+                                <div class="text-sm text-gray-500">{{ event.time }}</div>
+                            </td>
+                            <td class="table-cell">
+                                <div class="font-medium">{{ event.title }}</div>
+                                {% if event.description %}
+                                <div class="text-sm text-gray-500">{{ event.description }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="table-cell">
+                                <span class="badge {% if event.type == 'earnings' %}badge-primary{% elif event.type == 'briefing' %}badge-info{% elif event.type == 'meeting' %}badge-purple{% else %}badge-gray{% endif %}">
+                                    {{ event.type_display }}
+                                </span>
+                            </td>
+                            <td class="table-cell">{{ event.location }}</td>
+                            <td class="table-cell">
+                                <span class="badge {% if event.status == 'scheduled' %}badge-warning{% elif event.status == 'preparing' %}badge-info{% elif event.status == 'completed' %}badge-success{% endif %}">
+                                    {% if event.status == 'scheduled' %}予定
+                                    {% elif event.status == 'preparing' %}準備中
+                                    {% elif event.status == 'completed' %}完了
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="table-cell">{{ event.assignee }}</td>
+                            <td class="table-cell">
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="ScheduleManager.editEvent({{ event.id }})" title="編集">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="btn-icon text-red-600" onclick="ScheduleManager.deleteEvent({{ event.id }})" title="削除">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- イベント作成/編集モーダル -->
+<div id="eventModal" class="modal-overlay hidden">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="modalTitle" class="modal-title">新規イベント登録</h3>
+            <button onclick="ScheduleManager.closeModal()" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="eventForm" class="modal-body">
+            <div class="form-group">
+                <label class="form-label">イベント名 <span class="required">*</span></label>
+                <input type="text" id="eventTitle" class="form-input" placeholder="例：2024年度第3四半期決算発表" required>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">種類 <span class="required">*</span></label>
+                    <select id="eventType" class="form-select" required>
+                        <option value="">選択してください</option>
+                        <option value="earnings">決算発表</option>
+                        <option value="briefing">説明会</option>
+                        <option value="meeting">株主総会</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">ステータス</label>
+                    <select id="eventStatus" class="form-select">
+                        <option value="scheduled">予定</option>
+                        <option value="preparing">準備中</option>
+                        <option value="completed">完了</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">日付 <span class="required">*</span></label>
+                    <input type="date" id="eventDate" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">時間</label>
+                    <input type="time" id="eventTime" class="form-input">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">場所</label>
+                <input type="text" id="eventLocation" class="form-input" placeholder="例：本社会議室、オンライン">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">詳細</label>
+                <textarea id="eventDescription" class="form-textarea" rows="3" placeholder="イベントの詳細情報を入力"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">担当者</label>
+                <select id="eventAssignee" class="form-select">
+                    <option value="">選択してください</option>
+                    <option value="IR部門責任者">IR部門責任者</option>
+                    <option value="広報担当者A">広報担当者A</option>
+                    <option value="経理部門">経理部門</option>
+                </select>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" onclick="ScheduleManager.closeModal()" class="btn btn-secondary">
+                    キャンセル
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <span id="submitBtnText">登録</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* カレンダースタイル */
+.calendar-grid {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.calendar-day-header {
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+    min-height: 100px;
+    padding: 0.5rem;
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+    background: white;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: #f9fafb;
+}
+
+.calendar-day:nth-child(7n) {
+    border-right: none;
+}
+
+.calendar-day-number {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.calendar-day.other-month .calendar-day-number {
+    color: #d1d5db;
+}
+
+.calendar-day.today {
+    background-color: #fef3c7;
+}
+
+.calendar-day.today .calendar-day-number {
+    color: #d97706;
+    font-weight: 700;
+}
+
+.calendar-event {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    margin: 0.125rem 0;
+    border-radius: 0.25rem;
+    background-color: #3b82f6;
+    color: white;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calendar-event:hover {
+    background-color: #2563eb;
+}
+
+.calendar-event.type-earnings {
+    background-color: #3b82f6;
+}
+
+.calendar-event.type-briefing {
+    background-color: #06b6d4;
+}
+
+.calendar-event.type-meeting {
+    background-color: #8b5cf6;
+}
+
+.calendar-event.type-other {
+    background-color: #6b7280;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', path='/js/pages/schedule.js') }}"></script>
+{% endblock %}

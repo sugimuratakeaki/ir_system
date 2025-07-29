@@ -1,0 +1,700 @@
+{% extends "base.html" %}
+
+{% block title %}音声アップロード{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* アップロード画面専用スタイル */
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .upload-step {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 32px;
+        margin-bottom: 24px;
+    }
+    
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background: #e5e7eb;
+        color: #6b7280;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.125rem;
+    }
+    
+    .step-number.active {
+        background: #14b8a6;
+        color: white;
+    }
+    
+    .step-number.completed {
+        background: #10b981;
+        color: white;
+    }
+    
+    .step-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .upload-zone {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 48px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+    
+    .upload-zone:hover {
+        border-color: #14b8a6;
+        background: #f0fdfa;
+    }
+    
+    .upload-zone.dragging {
+        border-color: #3b82f6;
+        background: #dbeafe;
+    }
+    
+    .upload-zone.has-file {
+        border-style: solid;
+        border-color: #10b981;
+        background: #f0fdf4;
+        cursor: default;
+    }
+    
+    .upload-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        color: #9ca3af;
+    }
+    
+    .upload-zone.has-file .upload-icon {
+        color: #10b981;
+    }
+    
+    .file-info {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 16px;
+    }
+    
+    .file-icon {
+        width: 48px;
+        height: 48px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .file-details {
+        flex: 1;
+        text-align: left;
+    }
+    
+    .file-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .file-meta {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #14b8a6;
+        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+    }
+    
+    .form-textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .transcription-progress {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        text-align: center;
+    }
+    
+    .progress-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 24px;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.6; transform: scale(0.95); }
+        50% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0.6; transform: scale(0.95); }
+    }
+    
+    .progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 24px 0;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #14b8a6, #0891b2);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .progress-bar-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+    }
+    
+    .progress-step {
+        text-align: center;
+        flex: 1;
+    }
+    
+    .progress-step-icon {
+        width: 40px;
+        height: 40px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 8px;
+        font-size: 20px;
+    }
+    
+    .progress-step.active .progress-step-icon {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+    
+    .progress-step.completed .progress-step-icon {
+        background: #d1fae5;
+        color: #10b981;
+    }
+    
+    .progress-step-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+    
+    .transcription-options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-top: 24px;
+    }
+    
+    .option-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .option-card:hover {
+        border-color: #14b8a6;
+        background: #f0fdfa;
+    }
+    
+    .option-card.selected {
+        border-color: #14b8a6;
+        background: #f0fdfa;
+        border-width: 2px;
+    }
+    
+    .option-card-title {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .option-card-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <!-- ヘッダー -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">音声ファイルアップロード</h1>
+        <p class="text-gray-600">投資家との面談音声をアップロードして、AIで文字起こしを行います</p>
+    </div>
+    
+    <!-- ステップ1: ファイルアップロード -->
+    <div class="upload-step" id="step1">
+        <div class="step-header">
+            <div class="step-number active">1</div>
+            <h2 class="step-title">音声ファイルを選択</h2>
+        </div>
+        
+        <div class="upload-zone" id="uploadZone" onclick="selectFile()">
+            <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">クリックまたはドラッグ＆ドロップ</h3>
+            <p class="text-sm text-gray-600 mb-4">MP3, WAV, M4A, MP4形式に対応（最大2GB）</p>
+            <button class="px-6 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors">
+                ファイルを選択
+            </button>
+            <input type="file" id="fileInput" class="hidden" accept=".mp3,.wav,.m4a,.mp4" onchange="handleFileSelect(event)">
+        </div>
+        
+        <div class="file-info" id="fileInfo" style="display: none;">
+            <div class="file-icon">🎵</div>
+            <div class="file-details">
+                <div class="file-name" id="fileName">meeting_recording.mp3</div>
+                <div class="file-meta" id="fileMeta">45.2MB • 45分30秒</div>
+            </div>
+            <button onclick="removeFile()" class="p-2 text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- ステップ2: 基本情報入力 -->
+    <div class="upload-step" id="step2">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h2 class="step-title">面談情報を入力</h2>
+        </div>
+        
+        <form>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label class="form-label">投資家名 <span class="text-red-500">*</span></label>
+                    <input type="text" class="form-input" placeholder="例: 野村アセットマネジメント">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">面談日時 <span class="text-red-500">*</span></label>
+                    <input type="datetime-local" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">参加者（投資家側）</label>
+                    <input type="text" class="form-input" placeholder="例: 山田太郎（ファンドマネージャー）">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">参加者（自社側）</label>
+                    <input type="text" class="form-input" placeholder="例: CEO、CFO、IR部長">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">ミーティングタイプ</label>
+                    <select class="form-input">
+                        <option>1on1面談</option>
+                        <option>グループミーティング</option>
+                        <option>カンファレンス</option>
+                        <option>決算説明会</option>
+                        <option>ロードショー</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">言語</label>
+                    <select class="form-input">
+                        <option>日本語</option>
+                        <option>英語</option>
+                        <option>日本語・英語混在</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">議題・アジェンダ</label>
+                <textarea class="form-textarea" placeholder="主な議題や話し合った内容を簡単に記載してください"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">タグ</label>
+                <input type="text" class="form-input" placeholder="例: 決算, DX戦略, ESG（カンマ区切り）">
+            </div>
+        </form>
+    </div>
+    
+    <!-- ステップ3: 文字起こし設定 -->
+    <div class="upload-step" id="step3">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h2 class="step-title">文字起こし設定</h2>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">文字起こしモデル</label>
+            <div class="transcription-options">
+                <div class="option-card selected" onclick="selectOption(this, 'model')">
+                    <div class="option-card-title">高精度モデル（推奨）</div>
+                    <div class="option-card-description">最高品質の文字起こし。専門用語も高精度で認識</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'model')">
+                    <div class="option-card-title">高速モデル</div>
+                    <div class="option-card-description">処理速度重視。通常の3倍速で処理</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">オプション機能</label>
+            <div class="space-y-3">
+                <label class="flex items-center">
+                    <input type="checkbox" checked class="mr-3">
+                    <div>
+                        <div class="font-medium">話者分離</div>
+                        <div class="text-sm text-gray-600">複数の話者を自動で識別・分離します</div>
+                    </div>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" checked class="mr-3">
+                    <div>
+                        <div class="font-medium">タイムスタンプ付与</div>
+                        <div class="text-sm text-gray-600">発言ごとにタイムスタンプを記録します</div>
+                    </div>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" checked class="mr-3">
+                    <div>
+                        <div class="font-medium">自動要約生成</div>
+                        <div class="text-sm text-gray-600">議事録の要約とキーポイントを自動生成します</div>
+                    </div>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" class="mr-3">
+                    <div>
+                        <div class="font-medium">FAQ自動生成</div>
+                        <div class="text-sm text-gray-600">よくある質問と回答を自動で抽出します</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">専門用語辞書</label>
+            <select class="form-input">
+                <option>標準辞書 + 金融・IR用語</option>
+                <option>標準辞書のみ</option>
+                <option>カスタム辞書を使用</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- アクションボタン -->
+    <div class="action-buttons">
+        <button onclick="window.history.back()" class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            キャンセル
+        </button>
+        <div class="flex gap-3">
+            <button onclick="saveDraft()" class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                下書き保存
+            </button>
+            <button onclick="startTranscription()" class="px-6 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors">
+                文字起こしを開始
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 文字起こし中のモーダル -->
+<div id="transcriptionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="transcription-progress">
+        <div class="progress-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-kagami-blue">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+        </div>
+        
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">AIが音声を文字起こし中...</h3>
+        <p class="text-gray-600 mb-6">45分の音声ファイルを処理しています</p>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: 35%"></div>
+        </div>
+        
+        <p class="text-sm text-gray-500 mt-2">予想残り時間: 約8分</p>
+        
+        <div class="progress-steps">
+            <div class="progress-step completed">
+                <div class="progress-step-icon">✓</div>
+                <div class="progress-step-label">音声解析</div>
+            </div>
+            <div class="progress-step active">
+                <div class="progress-step-icon">⚡</div>
+                <div class="progress-step-label">文字起こし</div>
+            </div>
+            <div class="progress-step">
+                <div class="progress-step-icon">🔍</div>
+                <div class="progress-step-label">話者分離</div>
+            </div>
+            <div class="progress-step">
+                <div class="progress-step-icon">📝</div>
+                <div class="progress-step-label">要約生成</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ドラッグ＆ドロップ機能
+    const uploadZone = document.getElementById('uploadZone');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight(e) {
+        uploadZone.classList.add('dragging');
+    }
+    
+    function unhighlight(e) {
+        uploadZone.classList.remove('dragging');
+    }
+    
+    uploadZone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    }
+    
+    // ファイル選択
+    function selectFile() {
+        document.getElementById('fileInput').click();
+    }
+    
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            handleFile(file);
+        }
+    }
+    
+    function handleFile(file) {
+        // ファイル情報を表示
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileMeta').textContent = `${formatFileSize(file.size)} • 推定時間: ${estimateDuration(file.size)}`;
+        document.getElementById('fileInfo').style.display = 'flex';
+        uploadZone.classList.add('has-file');
+        
+        // ステップ1を完了状態に
+        document.querySelector('#step1 .step-number').classList.remove('active');
+        document.querySelector('#step1 .step-number').classList.add('completed');
+        document.querySelector('#step1 .step-number').innerHTML = '✓';
+        
+        // ステップ2をアクティブに
+        document.querySelector('#step2 .step-number').classList.add('active');
+    }
+    
+    function removeFile() {
+        document.getElementById('fileInfo').style.display = 'none';
+        uploadZone.classList.remove('has-file');
+        document.getElementById('fileInput').value = '';
+        
+        // ステップ1を再度アクティブに
+        document.querySelector('#step1 .step-number').classList.add('active');
+        document.querySelector('#step1 .step-number').classList.remove('completed');
+        document.querySelector('#step1 .step-number').innerHTML = '1';
+        
+        // ステップ2を非アクティブに
+        document.querySelector('#step2 .step-number').classList.remove('active');
+    }
+    
+    // ファイルサイズのフォーマット
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // 推定時間の計算（ダミー）
+    function estimateDuration(fileSize) {
+        const minutes = Math.floor(fileSize / (1024 * 1024) * 0.5);
+        return `${minutes}分${Math.floor(Math.random() * 60)}秒`;
+    }
+    
+    // オプション選択
+    function selectOption(element, type) {
+        const options = element.parentElement.querySelectorAll('.option-card');
+        options.forEach(opt => opt.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+    
+    // 下書き保存
+    function saveDraft() {
+        showNotification('下書きを保存しました', 'success');
+    }
+    
+    // 文字起こし開始
+    function startTranscription() {
+        // 入力検証
+        const requiredFields = document.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        
+        // モーダル表示
+        document.getElementById('transcriptionModal').classList.remove('hidden');
+        
+        // プログレスバーのアニメーション
+        let progress = 0;
+        const progressBar = document.querySelector('.progress-bar-fill');
+        const progressSteps = document.querySelectorAll('.progress-step');
+        
+        const interval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress > 100) progress = 100;
+            
+            progressBar.style.width = progress + '%';
+            
+            // ステップの更新
+            if (progress > 25) {
+                progressSteps[1].classList.remove('active');
+                progressSteps[1].classList.add('completed');
+                progressSteps[1].querySelector('.progress-step-icon').innerHTML = '✓';
+                progressSteps[2].classList.add('active');
+            }
+            if (progress > 50) {
+                progressSteps[2].classList.remove('active');
+                progressSteps[2].classList.add('completed');
+                progressSteps[2].querySelector('.progress-step-icon').innerHTML = '✓';
+                progressSteps[3].classList.add('active');
+            }
+            if (progress > 75) {
+                progressSteps[3].classList.remove('active');
+                progressSteps[3].classList.add('completed');
+                progressSteps[3].querySelector('.progress-step-icon').innerHTML = '✓';
+            }
+            
+            if (progress === 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    document.getElementById('transcriptionModal').classList.add('hidden');
+                    showNotification('文字起こしが完了しました', 'success');
+                    window.location.href = '/dialogue/DLG-2024-004/edit';
+                }, 1000);
+            }
+        }, 500);
+    }
+</script>
+{% endblock %}

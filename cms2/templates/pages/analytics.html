@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}アナリティクス - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- ページヘッダー -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div>
+                <h1 class="page-title">アナリティクス</h1>
+                <p class="page-description">IR活動の分析とインサイト</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="btn btn-secondary" onclick="AnalyticsManager.refresh()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    更新
+                </button>
+                <button class="btn btn-primary" onclick="AnalyticsManager.exportReport()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    レポート出力
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 期間選択 -->
+    <div class="card mb-6">
+        <div class="card-body">
+            <div class="flex justify-between items-center">
+                <div class="flex gap-4 items-center">
+                    <label class="text-sm font-medium text-gray-700">分析期間:</label>
+                    <select class="form-select" id="periodSelect" style="width: 200px;">
+                        <option value="30">過去30日間</option>
+                        <option value="90">過去90日間</option>
+                        <option value="365">今年度</option>
+                        <option value="prev-year">前年度</option>
+                        <option value="custom">カスタム期間</option>
+                    </select>
+                </div>
+                <div class="text-sm text-gray-500">
+                    最終更新: {{ last_updated }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIサマリー -->
+    <div class="stats-grid mb-6">
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">アクティブ投資家数</p>
+                    <p class="stat-value">{{ kpis.active_investors.value }}</p>
+                </div>
+                <div class="stat-trend {% if kpis.active_investors.trend_positive %}trend-up{% else %}trend-down{% endif %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if kpis.active_investors.trend_positive %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        {% else %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                        {% endif %}
+                    </svg>
+                    <span>{{ kpis.active_investors.trend }}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">投資家満足度</p>
+                    <p class="stat-value">{{ kpis.investor_satisfaction.value }}%</p>
+                </div>
+                <div class="stat-trend {% if kpis.investor_satisfaction.trend_positive %}trend-up{% else %}trend-down{% endif %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if kpis.investor_satisfaction.trend_positive %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        {% else %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                        {% endif %}
+                    </svg>
+                    <span>{{ kpis.investor_satisfaction.trend }}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">問い合わせ件数</p>
+                    <p class="stat-value">{{ kpis.inquiries.value }}</p>
+                </div>
+                <div class="stat-trend {% if kpis.inquiries.trend_positive %}trend-up{% else %}trend-down{% endif %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if kpis.inquiries.trend_positive %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        {% else %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                        {% endif %}
+                    </svg>
+                    <span>{{ kpis.inquiries.trend }}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">AI応答精度</p>
+                    <p class="stat-value">{{ kpis.ai_accuracy.value }}%</p>
+                </div>
+                <div class="stat-trend {% if kpis.ai_accuracy.trend_positive %}trend-up{% else %}trend-down{% endif %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if kpis.ai_accuracy.trend_positive %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        {% else %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                        {% endif %}
+                    </svg>
+                    <span>{{ kpis.ai_accuracy.trend }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- グラフエリア -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- 投資家エンゲージメント推移 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">投資家エンゲージメント推移</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAQ利用状況 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-lg font-semibold">FAQ利用状況</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="faqChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 詳細分析 -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">投資家行動分析</h3>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- 関心の高いトピック -->
+                <div>
+                    <h4 class="font-semibold mb-4">最も関心の高いトピック</h4>
+                    <div class="space-y-3">
+                        {% for topic in top_topics %}
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">{{ topic.name }}</span>
+                            <div class="flex items-center gap-3">
+                                <div class="w-48 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ topic.percentage }}%"></div>
+                                </div>
+                                <span class="text-sm font-medium">{{ topic.percentage }}%</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- 投資家タイプ別活動 -->
+                <div>
+                    <h4 class="font-semibold mb-4">投資家タイプ別活動</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-2 text-sm font-medium text-gray-700">タイプ</th>
+                                    <th class="text-right py-2 text-sm font-medium text-gray-700">人数</th>
+                                    <th class="text-right py-2 text-sm font-medium text-gray-700">平均活動</th>
+                                    <th class="text-right py-2 text-sm font-medium text-gray-700">満足度</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for investor_type in investor_types %}
+                                <tr class="border-b">
+                                    <td class="py-2 text-sm">{{ investor_type.type }}</td>
+                                    <td class="py-2 text-sm text-right">{{ investor_type.count }}</td>
+                                    <td class="py-2 text-sm text-right">{{ investor_type.avg_activity }}</td>
+                                    <td class="py-2 text-sm text-right">
+                                        <span class="{% if investor_type.satisfaction >= 95 %}text-green-600{% elif investor_type.satisfaction >= 90 %}text-yellow-600{% else %}text-red-600{% endif %} font-medium">
+                                            {{ investor_type.satisfaction }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AIインサイト -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-lg font-semibold">
+                <span class="mr-2">🤖</span>AIによるインサイト
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <h4 class="font-semibold text-blue-900 mb-1">重要な発見</h4>
+                        <p class="text-sm text-blue-800">{{ ai_insights.key_finding }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <span class="badge badge-primary mr-3">推奨アクション</span>
+                    <p class="text-sm text-gray-700">{{ ai_insights.recommendation }}</p>
+                </div>
+                
+                <div class="flex items-start">
+                    <span class="badge badge-warning mr-3">注意事項</span>
+                    <p class="text-sm text-gray-700">{{ ai_insights.warning }}</p>
+                </div>
+                
+                <div class="flex items-start">
+                    <span class="badge badge-success mr-3">成功事例</span>
+                    <p class="text-sm text-gray-700">{{ ai_insights.success_story }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.trend-up {
+    color: #10b981;
+}
+
+.trend-down {
+    color: #ef4444;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', path='/js/pages/analytics.js') }}"></script>
+{% endblock %}

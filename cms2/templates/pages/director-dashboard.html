@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block title %}社外取締役ダッシュボード{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 社外取締役ダッシュボード専用スタイル */
+    .director-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 24px;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .director-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .governance-score {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0 auto;
+    }
+    
+    .score-excellent {
+        background: linear-gradient(135deg, #10b981, #14b8a6);
+        color: white;
+    }
+    
+    .score-good {
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        color: white;
+    }
+    
+    .score-warning {
+        background: linear-gradient(135deg, #f59e0b, #f97316);
+        color: white;
+    }
+    
+    .compliance-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .compliance-status {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+    
+    .status-ok {
+        background: #10b981;
+    }
+    
+    .status-warning {
+        background: #f59e0b;
+    }
+    
+    .status-alert {
+        background: #ef4444;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 32px;
+        padding-bottom: 24px;
+        border-left: 2px solid #e5e7eb;
+    }
+    
+    .timeline-item:last-child {
+        border-left: none;
+        padding-bottom: 0;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        left: -5px;
+        top: 0;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6b7280;
+        border: 2px solid white;
+    }
+    
+    .risk-matrix {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .risk-cell {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-weight: 600;
+        color: white;
+        font-size: 0.875rem;
+    }
+    
+    .risk-low {
+        background: #86efac;
+        color: #166534;
+    }
+    
+    .risk-medium {
+        background: #fde047;
+        color: #713f12;
+    }
+    
+    .risk-high {
+        background: #fca5a5;
+        color: #991b1b;
+    }
+    
+    .risk-critical {
+        background: #ef4444;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">社外取締役ダッシュボード</h1>
+            <p class="text-gray-600">ガバナンス状況とコンプライアンスの監視</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex gap-3">
+            <button onclick="downloadGovernanceReport()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                📑 ガバナンス報告書
+            </button>
+            <button onclick="scheduleReview()" class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors">
+                📅 レビュー会議設定
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ガバナンススコアサマリー -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- 総合ガバナンススコア -->
+    <div class="director-card text-center">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">総合ガバナンススコア</h3>
+        <div class="governance-score score-good mb-4">88</div>
+        <p class="text-sm text-gray-600 mb-2">前期比 +5ポイント</p>
+        <div class="text-xs text-gray-500">
+            東証プライム市場平均: 82
+        </div>
+    </div>
+    
+    <!-- コンプライアンス状況 -->
+    <div class="director-card">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">コンプライアンス状況</h3>
+        <div class="space-y-2">
+            <div class="compliance-item">
+                <div class="compliance-status status-ok"></div>
+                <div class="flex-1">
+                    <div class="font-medium text-gray-900">法令遵守</div>
+                    <div class="text-xs text-gray-500">違反事項なし</div>
+                </div>
+                <span class="text-sm text-green-600">正常</span>
+            </div>
+            <div class="compliance-item">
+                <div class="compliance-status status-ok"></div>
+                <div class="flex-1">
+                    <div class="font-medium text-gray-900">内部統制</div>
+                    <div class="text-xs text-gray-500">J-SOX対応完了</div>
+                </div>
+                <span class="text-sm text-green-600">正常</span>
+            </div>
+            <div class="compliance-item">
+                <div class="compliance-status status-warning"></div>
+                <div class="flex-1">
+                    <div class="font-medium text-gray-900">情報管理</div>
+                    <div class="text-xs text-gray-500">改善勧告1件</div>
+                </div>
+                <span class="text-sm text-yellow-600">要注意</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- リスクマトリクス -->
+    <div class="director-card">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">リスクマトリクス</h3>
+        <div class="risk-matrix mb-4">
+            <div class="risk-cell risk-low">低</div>
+            <div class="risk-cell risk-medium">中</div>
+            <div class="risk-cell risk-high">2</div>
+            <div class="risk-cell risk-low">1</div>
+            <div class="risk-cell risk-medium">3</div>
+            <div class="risk-cell risk-high">高</div>
+            <div class="risk-cell risk-medium">2</div>
+            <div class="risk-cell risk-high">1</div>
+            <div class="risk-cell risk-critical">重大</div>
+        </div>
+        <div class="text-center">
+            <p class="text-xs text-gray-500 mb-1">影響度 →</p>
+            <p class="text-xs text-gray-500">↑ 発生可能性</p>
+        </div>
+    </div>
+</div>
+
+<!-- 監視項目 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- 取締役会の実効性 -->
+    <div class="director-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="mr-2">🏛️</span>
+            取締役会の実効性
+        </h2>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                <div>
+                    <h4 class="font-medium text-gray-900">開催回数（年間）</h4>
+                    <p class="text-sm text-gray-500">法定基準: 12回以上</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-kagami-blue">14回</div>
+                    <div class="text-sm text-green-600">✓ 基準達成</div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                <div>
+                    <h4 class="font-medium text-gray-900">平均出席率</h4>
+                    <p class="text-sm text-gray-500">目標: 95%以上</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-kagami-blue">97.2%</div>
+                    <div class="text-sm text-green-600">✓ 目標達成</div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between py-3">
+                <div>
+                    <h4 class="font-medium text-gray-900">議題の多様性</h4>
+                    <p class="text-sm text-gray-500">戦略議題の割合</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-kagami-blue">42%</div>
+                    <div class="text-sm text-yellow-600">改善余地あり</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 重要な審議事項 -->
+    <div class="director-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="mr-2">📋</span>
+            直近の重要審議事項
+        </h2>
+        <div class="space-y-3">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="text-sm text-gray-500 mb-1">2024年1月15日</div>
+                <h4 class="font-medium text-gray-900 mb-1">M&A案件の審議</h4>
+                <p class="text-sm text-gray-600">
+                    海外子会社買収案について審議。デューデリジェンス結果を踏まえ条件付き承認。
+                </p>
+                <div class="mt-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        承認（条件付き）
+                    </span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="text-sm text-gray-500 mb-1">2024年1月8日</div>
+                <h4 class="font-medium text-gray-900 mb-1">役員報酬制度の見直し</h4>
+                <p class="text-sm text-gray-600">
+                    長期インセンティブ制度の導入について議論。報酬委員会での継続審議を決定。
+                </p>
+                <div class="mt-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        継続審議
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="/board-minutes" class="text-sm text-accent-teal hover:text-accent-teal/80">
+                議事録一覧へ →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 株主との対話状況 -->
+<div class="director-card mb-8">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+        <span class="flex items-center">
+            <span class="mr-2">💬</span>
+            株主との対話状況
+        </span>
+        <a href="/shareholder-dialogue" class="text-sm text-accent-teal hover:text-accent-teal/80 font-normal">詳細を見る →</a>
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 議決権行使結果 -->
+        <div>
+            <h3 class="font-medium text-gray-900 mb-3">直近の株主総会議決権行使結果</h3>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-sm font-medium">取締役選任議案</span>
+                    <div class="flex items-center">
+                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 94.5%"></div>
+                        </div>
+                        <span class="text-sm font-semibold">94.5%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-sm font-medium">役員報酬議案</span>
+                    <div class="flex items-center">
+                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 88.2%"></div>
+                        </div>
+                        <span class="text-sm font-semibold">88.2%</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-sm font-medium">定款変更議案</span>
+                    <div class="flex items-center">
+                        <div class="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 76.8%"></div>
+                        </div>
+                        <span class="text-sm font-semibold">76.8%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主要株主からの意見 -->
+        <div>
+            <h3 class="font-medium text-gray-900 mb-3">主要株主からの最新意見</h3>
+            <div class="space-y-3">
+                <div class="p-3 bg-blue-50 rounded-lg">
+                    <div class="flex items-start justify-between mb-1">
+                        <h4 class="text-sm font-medium text-gray-900">議決権行使助言会社A</h4>
+                        <span class="text-xs text-gray-500">1週間前</span>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        独立社外取締役の比率向上を評価。スキルマトリクスの開示も良好。
+                    </p>
+                </div>
+                <div class="p-3 bg-yellow-50 rounded-lg">
+                    <div class="flex items-start justify-between mb-1">
+                        <h4 class="text-sm font-medium text-gray-900">大手機関投資家B</h4>
+                        <span class="text-xs text-gray-500">2週間前</span>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        サクセッションプランの詳細開示を要望。後継者育成の取り組みを注視。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- アクションアイテム -->
+<div class="director-card">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <span class="mr-2">✅</span>
+        社外取締役向けアクションアイテム
+    </h2>
+    <div class="space-y-3">
+        <div class="flex items-start p-4 bg-red-50 rounded-lg border border-red-200">
+            <input type="checkbox" class="mt-1 mr-3">
+            <div class="flex-1">
+                <h4 class="font-medium text-gray-900 mb-1">情報管理体制の改善勧告への対応確認</h4>
+                <p class="text-sm text-gray-600 mb-2">
+                    内部監査で指摘された情報管理体制の改善状況をレビュー
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <span>期限: 2024/01/31</span>
+                    <span class="text-red-600 font-medium">優先度: 高</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-start p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <input type="checkbox" class="mt-1 mr-3">
+            <div class="flex-1">
+                <h4 class="font-medium text-gray-900 mb-1">ESG委員会への出席</h4>
+                <p class="text-sm text-gray-600 mb-2">
+                    四半期ESG委員会での気候変動対応戦略のレビュー
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <span>日時: 2024/02/05 14:00</span>
+                    <span class="text-blue-600 font-medium">定例会議</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ガバナンス報告書ダウンロード
+    function downloadGovernanceReport() {
+        showNotification('ガバナンス報告書を生成中です...', 'info');
+        setTimeout(() => {
+            showNotification('ガバナンス報告書をダウンロードしました', 'success');
+        }, 2000);
+    }
+    
+    // レビュー会議設定
+    function scheduleReview() {
+        showModal({
+            title: 'ガバナンスレビュー会議の設定',
+            content: `
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">会議タイプ</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>定例ガバナンスレビュー</option>
+                            <option>臨時リスク評価会議</option>
+                            <option>コンプライアンス確認会議</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">希望日時</label>
+                        <input type="datetime-local" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">参加者</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2"> 監査委員会メンバー
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2"> 内部監査部門
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> 外部監査人
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">アジェンダ（任意）</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="3"
+                            placeholder="議題を入力してください..."></textarea>
+                    </div>
+                </form>
+            `,
+            confirmText: '会議を設定',
+            onConfirm: () => {
+                showNotification('ガバナンスレビュー会議を設定しました', 'success');
+            }
+        });
+    }
+    
+    // リスクマトリクスのインタラクティブ機能
+    document.querySelectorAll('.risk-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            const riskLevel = this.textContent;
+            if (riskLevel.match(/\d+/)) {
+                showModal({
+                    title: 'リスク詳細',
+                    content: `
+                        <div class="space-y-4">
+                            <p class="text-sm text-gray-600">
+                                このセルには${riskLevel}件のリスク項目が含まれています。
+                            </p>
+                            <div class="space-y-2">
+                                <div class="p-3 bg-gray-50 rounded">
+                                    <h4 class="font-medium text-gray-900">サイバーセキュリティリスク</h4>
+                                    <p class="text-sm text-gray-600 mt-1">
+                                        重要システムへの不正アクセスリスク
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded">
+                                    <h4 class="font-medium text-gray-900">コンプライアンスリスク</h4>
+                                    <p class="text-sm text-gray-600 mt-1">
+                                        新規制への対応遅延リスク
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    confirmText: '詳細レポートを見る',
+                    cancelText: '閉じる'
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

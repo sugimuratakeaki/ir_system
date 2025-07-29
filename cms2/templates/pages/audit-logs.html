@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}監査ログ - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- ページヘッダー -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div>
+                <h1 class="page-title">監査ログ</h1>
+                <p class="page-description">システムの全ての操作履歴とセキュリティイベントを記録</p>
+            </div>
+            <button class="btn btn-gray" onclick="AuditLogManager.exportLogs()">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                エクスポート
+            </button>
+        </div>
+    </div>
+
+    <!-- 統計カード -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">本日のイベント</p>
+                    <p class="stat-value">{{ today_events }}</p>
+                </div>
+                <div class="stat-icon bg-blue-100">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">セキュリティアラート</p>
+                    <p class="stat-value text-red-600">{{ security_alerts }}</p>
+                </div>
+                <div class="stat-icon bg-red-100">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">システムエラー</p>
+                    <p class="stat-value text-yellow-600">{{ system_errors }}</p>
+                </div>
+                <div class="stat-icon bg-yellow-100">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-label">アクティブユーザー</p>
+                    <p class="stat-value text-green-600">{{ active_users }}</p>
+                </div>
+                <div class="stat-icon bg-green-100">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- フィルターパネル -->
+    <div class="card mb-6">
+        <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="form-group">
+                    <label class="form-label">日付範囲</label>
+                    <select id="dateRange" class="form-select">
+                        <option value="today">今日</option>
+                        <option value="week" selected>過去7日間</option>
+                        <option value="month">過去30日間</option>
+                        <option value="custom">カスタム</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">イベントタイプ</label>
+                    <select id="eventType" class="form-select">
+                        <option value="">全て</option>
+                        <option value="login">ログイン</option>
+                        <option value="data">データ操作</option>
+                        <option value="system">システム</option>
+                        <option value="security">セキュリティ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">重要度</label>
+                    <select id="severity" class="form-select">
+                        <option value="">全て</option>
+                        <option value="critical">重大</option>
+                        <option value="warning">警告</option>
+                        <option value="info">情報</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ユーザー</label>
+                    <input type="text" 
+                           id="userFilter"
+                           placeholder="ユーザー名で検索" 
+                           class="form-input">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="AuditLogManager.applyFilters()" class="btn btn-primary w-full">
+                        フィルター適用
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ログテーブル -->
+    <div class="data-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="table-header">時刻</th>
+                    <th class="table-header">イベント</th>
+                    <th class="table-header">ユーザー</th>
+                    <th class="table-header">IPアドレス</th>
+                    <th class="table-header">詳細</th>
+                    <th class="table-header">重要度</th>
+                    <th class="table-header text-right">操作</th>
+                </tr>
+            </thead>
+            <tbody id="logsTableBody">
+                {% for log in logs %}
+                <tr class="table-row log-row" data-type="{{ log.event_type }}" data-severity="{{ log.severity }}">
+                    <td class="table-cell">
+                        <span class="text-sm text-gray-600">{{ log.timestamp }}</span>
+                    </td>
+                    <td class="table-cell">
+                        <div class="flex items-center">
+                            {% if log.event_type == 'login' %}
+                            <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            {% elif log.event_type == 'data' %}
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                            </svg>
+                            {% elif log.event_type == 'security' %}
+                            <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            {% else %}
+                            <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {% endif %}
+                            <span class="text-sm font-medium text-gray-900">{{ log.event_name }}</span>
+                        </div>
+                    </td>
+                    <td class="table-cell">{{ log.user_name }}</td>
+                    <td class="table-cell">
+                        <span class="text-sm font-mono text-gray-600">{{ log.ip_address }}</span>
+                    </td>
+                    <td class="table-cell">
+                        <div class="max-w-xs truncate text-sm text-gray-600" title="{{ log.details }}">
+                            {{ log.details }}
+                        </div>
+                    </td>
+                    <td class="table-cell">
+                        <span class="badge {% if log.severity == 'critical' %}badge-danger{% elif log.severity == 'warning' %}badge-warning{% else %}badge-success{% endif %}">
+                            {% if log.severity == 'critical' %}重大
+                            {% elif log.severity == 'warning' %}警告
+                            {% else %}情報
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td class="table-cell">
+                        <button class="btn-icon" onclick="AuditLogManager.showDetails({{ log.id }})" title="詳細表示">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- ページネーション -->
+        <div class="table-pagination">
+            <div class="pagination-info">
+                全 <span class="font-medium">{{ total_logs }}</span> 件中
+                <span class="font-medium">1</span> から
+                <span class="font-medium">20</span> 件を表示
+            </div>
+            <nav class="pagination-nav">
+                <button class="pagination-btn" disabled>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <span class="pagination-ellipsis">...</span>
+                <button class="pagination-btn">10</button>
+                <button class="pagination-btn">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- ログ詳細モーダル -->
+<div id="logDetailModal" class="modal-overlay hidden">
+    <div class="modal-container modal-lg">
+        <div class="modal-header">
+            <h3 class="modal-title">ログ詳細</h3>
+            <button onclick="AuditLogManager.closeDetailModal()" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body" id="logDetailContent">
+            <!-- 詳細内容はJavaScriptで動的に挿入 -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.log-row {
+    transition: all 0.2s ease;
+}
+
+.table-pagination {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.pagination-nav {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.pagination-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f9fafb;
+    color: #374151;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.pagination-ellipsis {
+    padding: 0.5rem;
+    color: #6b7280;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', path='/js/pages/audit-logs.js') }}"></script>
+{% endblock %}

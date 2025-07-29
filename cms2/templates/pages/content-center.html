@@ -1,0 +1,897 @@
+{% extends "base.html" %}
+
+{% block title %}コンテンツセンター{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* コンテンツセンター専用スタイル */
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .content-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .content-thumbnail {
+        height: 200px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: #d1d5db;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .content-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .content-type-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 4px 12px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border-radius: 20px;
+        text-transform: uppercase;
+    }
+    
+    .content-info {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .content-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .content-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 12px;
+    }
+    
+    .content-description {
+        font-size: 0.875rem;
+        color: #4b5563;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+    }
+    
+    .content-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .folder-card {
+        background: white;
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 32px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .folder-card:hover {
+        border-color: #14b8a6;
+        background: #f0fdfa;
+    }
+    
+    .folder-icon {
+        font-size: 3rem;
+        margin-bottom: 12px;
+    }
+    
+    .upload-zone {
+        background: #f9fafb;
+        border: 2px dashed #14b8a6;
+        border-radius: 12px;
+        padding: 48px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-zone:hover {
+        background: #f0fdfa;
+        border-color: #0891b2;
+    }
+    
+    .upload-zone.dragging {
+        background: #dbeafe;
+        border-color: #3b82f6;
+    }
+    
+    /* フィルターサイドバー */
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    
+    .filter-title {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 12px;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .filter-option {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+    
+    .filter-option:hover {
+        color: #14b8a6;
+    }
+    
+    .filter-option input[type="checkbox"] {
+        margin-right: 8px;
+    }
+    
+    .filter-count {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+    
+    /* グリッド/リスト表示切り替え */
+    .view-toggle {
+        display: flex;
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 4px;
+    }
+    
+    .view-toggle button {
+        flex: 1;
+        padding: 8px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        color: #6b7280;
+    }
+    
+    .view-toggle button.active {
+        background: white;
+        color: #111827;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* リスト表示スタイル */
+    .content-list-item {
+        background: white;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.2s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .content-list-item:hover {
+        background: #f9fafb;
+        border-color: #14b8a6;
+    }
+    
+    .content-list-icon {
+        width: 48px;
+        height: 48px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .content-list-info {
+        flex: 1;
+    }
+    
+    .content-list-title {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .content-list-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    /* タグスタイル */
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+    }
+    
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        background: #e5e7eb;
+        color: #374151;
+        font-size: 0.75rem;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    
+    .tag:hover {
+        background: #14b8a6;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">コンテンツセンター</h1>
+            <p class="text-gray-600">IR関連資料の一元管理</p>
+        </div>
+        <div class="mt-4 lg:mt-0 flex flex-wrap gap-3">
+            <button onclick="showUploadModal()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                アップロード
+            </button>
+            <button onclick="createFolder()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+                新規フォルダ
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 検索バー -->
+<div class="mb-6">
+    <div class="relative">
+        <input 
+            type="text" 
+            placeholder="ファイル名、タグ、作成者で検索..."
+            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-teal focus:border-transparent"
+        >
+        <svg class="absolute left-4 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- サイドバー -->
+    <div class="lg:col-span-1">
+        <!-- カテゴリフィルター -->
+        <div class="filter-section">
+            <h3 class="filter-title">カテゴリ</h3>
+            <div class="space-y-2">
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-earnings" checked>
+                    <label for="cat-earnings">決算資料</label>
+                    <span class="filter-count">24</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-presentation" checked>
+                    <label for="cat-presentation">説明会資料</label>
+                    <span class="filter-count">18</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-annual" checked>
+                    <label for="cat-annual">年次報告書</label>
+                    <span class="filter-count">5</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-esg" checked>
+                    <label for="cat-esg">ESG/サステナビリティ</label>
+                    <span class="filter-count">12</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-governance" checked>
+                    <label for="cat-governance">ガバナンス</label>
+                    <span class="filter-count">8</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-other" checked>
+                    <label for="cat-other">その他</label>
+                    <span class="filter-count">15</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ファイルタイプフィルター -->
+        <div class="filter-section">
+            <h3 class="filter-title">ファイルタイプ</h3>
+            <div class="space-y-2">
+                <div class="filter-option">
+                    <input type="checkbox" id="type-pdf" checked>
+                    <label for="type-pdf">PDF</label>
+                    <span class="filter-count">45</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="type-pptx" checked>
+                    <label for="type-pptx">PowerPoint</label>
+                    <span class="filter-count">23</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="type-xlsx" checked>
+                    <label for="type-xlsx">Excel</label>
+                    <span class="filter-count">12</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="type-video" checked>
+                    <label for="type-video">動画</label>
+                    <span class="filter-count">6</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 更新日フィルター -->
+        <div class="filter-section">
+            <h3 class="filter-title">更新日</h3>
+            <div class="space-y-2">
+                <div class="filter-option">
+                    <input type="radio" name="date" id="date-all" checked>
+                    <label for="date-all">すべて</label>
+                </div>
+                <div class="filter-option">
+                    <input type="radio" name="date" id="date-week">
+                    <label for="date-week">過去1週間</label>
+                </div>
+                <div class="filter-option">
+                    <input type="radio" name="date" id="date-month">
+                    <label for="date-month">過去1ヶ月</label>
+                </div>
+                <div class="filter-option">
+                    <input type="radio" name="date" id="date-quarter">
+                    <label for="date-quarter">過去3ヶ月</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- メインコンテンツ -->
+    <div class="lg:col-span-3">
+        <!-- ツールバー -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="text-sm text-gray-600">
+                82件のコンテンツ
+            </div>
+            <div class="flex items-center gap-4">
+                <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <option>更新日順（新しい順）</option>
+                    <option>更新日順（古い順）</option>
+                    <option>名前順</option>
+                    <option>サイズ順</option>
+                    <option>人気順</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="active" onclick="setViewMode('grid')" title="グリッド表示">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                    </button>
+                    <button onclick="setViewMode('list')" title="リスト表示">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- アップロードゾーン -->
+        <div class="upload-zone mb-6" id="uploadZone">
+            <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p class="text-gray-600 mb-2">ファイルをドラッグ＆ドロップ</p>
+            <p class="text-sm text-gray-500">または<button class="text-accent-teal hover:text-accent-teal/80">ファイルを選択</button></p>
+        </div>
+        
+        <!-- コンテンツグリッド -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="contentGrid">
+            <!-- コンテンツカード1 -->
+            <div class="content-card">
+                <div class="content-thumbnail">
+                    <span>📊</span>
+                    <span class="content-type-badge">PDF</span>
+                </div>
+                <div class="content-info">
+                    <h3 class="content-title">2024年第3四半期決算説明資料</h3>
+                    <div class="content-meta">
+                        <span>45ページ</span>
+                        <span>•</span>
+                        <span>2.8MB</span>
+                    </div>
+                    <p class="content-description">
+                        2024年第3四半期の業績概要、セグメント別実績、通期業績見通しの修正について
+                    </p>
+                    <div class="tag-list">
+                        <span class="tag">決算</span>
+                        <span class="tag">Q3</span>
+                        <span class="tag">2024年</span>
+                    </div>
+                    <div class="content-actions">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            3日前
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="プレビュー">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="ダウンロード">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- コンテンツカード2 -->
+            <div class="content-card">
+                <div class="content-thumbnail">
+                    <span>🎯</span>
+                    <span class="content-type-badge">PPTX</span>
+                </div>
+                <div class="content-info">
+                    <h3 class="content-title">中期経営計画2024-2026</h3>
+                    <div class="content-meta">
+                        <span>68スライド</span>
+                        <span>•</span>
+                        <span>15.2MB</span>
+                    </div>
+                    <p class="content-description">
+                        新中期経営計画の概要、成長戦略、財務目標、株主還元方針について詳細に説明
+                    </p>
+                    <div class="tag-list">
+                        <span class="tag">中計</span>
+                        <span class="tag">戦略</span>
+                        <span class="tag">重要</span>
+                    </div>
+                    <div class="content-actions">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            1週間前
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="プレビュー">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="ダウンロード">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- コンテンツカード3 -->
+            <div class="content-card">
+                <div class="content-thumbnail">
+                    <span>🌱</span>
+                    <span class="content-type-badge">PDF</span>
+                </div>
+                <div class="content-info">
+                    <h3 class="content-title">統合報告書2023</h3>
+                    <div class="content-meta">
+                        <span>124ページ</span>
+                        <span>•</span>
+                        <span>28.5MB</span>
+                    </div>
+                    <p class="content-description">
+                        財務・非財務情報を統合し、持続的な企業価値創造のストーリーを説明
+                    </p>
+                    <div class="tag-list">
+                        <span class="tag">統合報告</span>
+                        <span class="tag">ESG</span>
+                        <span class="tag">2023年</span>
+                    </div>
+                    <div class="content-actions">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            2週間前
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="プレビュー">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="ダウンロード">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- フォルダーカード -->
+            <div class="folder-card" onclick="openFolder('archive-2023')">
+                <div class="folder-icon">📁</div>
+                <h3 class="font-semibold text-gray-900 mb-1">2023年度アーカイブ</h3>
+                <p class="text-sm text-gray-600">24ファイル</p>
+            </div>
+            
+            <!-- コンテンツカード4 -->
+            <div class="content-card">
+                <div class="content-thumbnail">
+                    <img src="/static/images/video-thumbnail.jpg" alt="決算説明会動画">
+                    <span class="content-type-badge">VIDEO</span>
+                </div>
+                <div class="content-info">
+                    <h3 class="content-title">Q3決算説明会 録画配信</h3>
+                    <div class="content-meta">
+                        <span>45:32</span>
+                        <span>•</span>
+                        <span>856MB</span>
+                    </div>
+                    <p class="content-description">
+                        2024年第3四半期決算説明会の録画。CEO・CFOによる業績説明とQ&Aセッション
+                    </p>
+                    <div class="tag-list">
+                        <span class="tag">動画</span>
+                        <span class="tag">決算説明会</span>
+                        <span class="tag">Q3</span>
+                    </div>
+                    <div class="content-actions">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            視聴回数: 234
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="再生">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="共有">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-5.882 1.973m0 0a9.001 9.001 0 01-5.882-1.973" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- コンテンツカード5 -->
+            <div class="content-card">
+                <div class="content-thumbnail">
+                    <span>📈</span>
+                    <span class="content-type-badge">XLSX</span>
+                </div>
+                <div class="content-info">
+                    <h3 class="content-title">財務データ集（10年分）</h3>
+                    <div class="content-meta">
+                        <span>15シート</span>
+                        <span>•</span>
+                        <span>4.2MB</span>
+                    </div>
+                    <p class="content-description">
+                        過去10年間の財務データ、セグメント別実績、主要KPIの推移をまとめたExcelファイル
+                    </p>
+                    <div class="tag-list">
+                        <span class="tag">財務データ</span>
+                        <span class="tag">時系列</span>
+                        <span class="tag">Excel</span>
+                    </div>
+                    <div class="content-actions">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            1ヶ月前
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="プレビュー">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" title="ダウンロード">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- リスト表示（非表示） -->
+        <div class="hidden" id="contentList">
+            <!-- リストアイテムのサンプル -->
+            <div class="content-list-item">
+                <div class="content-list-icon">📊</div>
+                <div class="content-list-info">
+                    <h3 class="content-list-title">2024年第3四半期決算説明資料</h3>
+                    <div class="content-list-meta">
+                        <span>PDF</span>
+                        <span>•</span>
+                        <span>45ページ</span>
+                        <span>•</span>
+                        <span>2.8MB</span>
+                        <span>•</span>
+                        <span>3日前更新</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ページネーション -->
+        <div class="flex items-center justify-center mt-8">
+            <nav class="flex items-center gap-2">
+                <button class="p-2 text-gray-400 cursor-not-allowed" disabled>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button class="px-3 py-1 bg-kagami-blue text-white rounded">1</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded">2</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded">3</button>
+                <button class="p-2 text-gray-600 hover:bg-gray-100 rounded">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ドラッグ＆ドロップ機能
+    const uploadZone = document.getElementById('uploadZone');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight(e) {
+        uploadZone.classList.add('dragging');
+    }
+    
+    function unhighlight(e) {
+        uploadZone.classList.remove('dragging');
+    }
+    
+    uploadZone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        handleFiles(files);
+    }
+    
+    function handleFiles(files) {
+        ([...files]).forEach(uploadFile);
+    }
+    
+    function uploadFile(file) {
+        showNotification(`"${file.name}" をアップロード中...`, 'info');
+        
+        // 実際のアップロード処理
+        setTimeout(() => {
+            showNotification(`"${file.name}" のアップロードが完了しました`, 'success');
+        }, 2000);
+    }
+    
+    // アップロードモーダル
+    function showUploadModal() {
+        showModal({
+            title: 'ファイルアップロード',
+            content: `
+                <div class="space-y-4">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                        <input type="file" id="fileInput" multiple class="hidden">
+                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p class="text-gray-600 mb-2">ファイルを選択またはドラッグ＆ドロップ</p>
+                        <button onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors">
+                            ファイルを選択
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">カテゴリ</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>決算資料</option>
+                            <option>説明会資料</option>
+                            <option>年次報告書</option>
+                            <option>ESG/サステナビリティ</option>
+                            <option>ガバナンス</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">タグ（カンマ区切り）</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                            placeholder="例: 2024年, Q3, 決算">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">説明（任意）</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="3"
+                            placeholder="ファイルの内容について"></textarea>
+                    </div>
+                </div>
+            `,
+            confirmText: 'アップロード',
+            onConfirm: () => {
+                showNotification('アップロードを開始しました', 'info');
+            }
+        });
+    }
+    
+    // フォルダ作成
+    function createFolder() {
+        showModal({
+            title: '新規フォルダ作成',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">フォルダ名</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                            placeholder="例: 2024年決算資料">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">説明（任意）</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="2"
+                            placeholder="フォルダの説明"></textarea>
+                    </div>
+                </div>
+            `,
+            confirmText: '作成',
+            onConfirm: () => {
+                showNotification('フォルダを作成しました', 'success');
+            }
+        });
+    }
+    
+    // 表示モード切り替え
+    function setViewMode(mode) {
+        const gridView = document.getElementById('contentGrid');
+        const listView = document.getElementById('contentList');
+        const buttons = document.querySelectorAll('.view-toggle button');
+        
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        if (mode === 'grid') {
+            gridView.classList.remove('hidden');
+            listView.classList.add('hidden');
+            buttons[0].classList.add('active');
+        } else {
+            gridView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            buttons[1].classList.add('active');
+        }
+    }
+    
+    // フォルダを開く
+    function openFolder(folderId) {
+        window.location.href = `/content-center/folder/${folderId}`;
+    }
+    
+    // フィルター処理
+    document.querySelectorAll('.filter-option input').forEach(input => {
+        input.addEventListener('change', function() {
+            // 実際の実装では、選択されたフィルターに基づいてコンテンツを絞り込む
+            showNotification('フィルターを適用しました', 'info');
+        });
+    });
+</script>
+{% endblock %}

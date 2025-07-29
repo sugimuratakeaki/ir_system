@@ -1,0 +1,924 @@
+{% extends "base.html" %}
+
+{% block title %}メール配信{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* メール配信専用スタイル */
+    .campaign-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 24px;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+    
+    .campaign-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        border-color: #14b8a6;
+    }
+    
+    .campaign-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .status-draft {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    
+    .status-scheduled {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-sending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-sent {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-failed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a365d;
+        margin-bottom: 4px;
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .template-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .template-card:hover {
+        background: white;
+        border-color: #14b8a6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    
+    .template-card.selected {
+        background: #f0fdfa;
+        border-color: #14b8a6;
+        border-width: 2px;
+    }
+    
+    .recipient-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        background: #e5e7eb;
+        color: #374151;
+        font-size: 0.875rem;
+        border-radius: 20px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .recipient-tag button {
+        margin-left: 8px;
+        color: #6b7280;
+        transition: color 0.2s ease;
+    }
+    
+    .recipient-tag button:hover {
+        color: #ef4444;
+    }
+    
+    .email-preview {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    
+    .email-preview-header {
+        background: #f3f4f6;
+        padding: 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .email-preview-body {
+        padding: 24px;
+        min-height: 400px;
+    }
+    
+    .timeline-step {
+        display: flex;
+        align-items: start;
+        position: relative;
+        padding-bottom: 32px;
+    }
+    
+    .timeline-step:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-step::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 44px;
+        bottom: 0;
+        width: 2px;
+        background: #e5e7eb;
+    }
+    
+    .timeline-step:last-child::before {
+        display: none;
+    }
+    
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-right: 16px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .timeline-icon.completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .timeline-icon.active {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .timeline-content {
+        flex: 1;
+    }
+    
+    .analytics-chart {
+        height: 300px;
+        position: relative;
+    }
+    
+    /* エディタツールバー */
+    .editor-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+    
+    .editor-button {
+        padding: 6px 10px;
+        border-radius: 4px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .editor-button:hover {
+        background: #f3f4f6;
+    }
+    
+    .editor-button.active {
+        background: #1a365d;
+        color: white;
+    }
+    
+    .editor-separator {
+        width: 1px;
+        height: 24px;
+        background: #e5e7eb;
+        margin: 0 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">メール配信</h1>
+            <p class="text-gray-600">投資家向けメールキャンペーンの作成・管理</p>
+        </div>
+        <div class="mt-4 lg:mt-0 flex flex-wrap gap-3">
+            <button onclick="showTemplates()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+                テンプレート
+            </button>
+            <button onclick="importContacts()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                連絡先インポート
+            </button>
+            <button onclick="createCampaign()" class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                新規キャンペーン
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 統計サマリー -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="metric-card">
+        <div class="metric-value">85.2%</div>
+        <div class="metric-label">平均開封率</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-value">32.5%</div>
+        <div class="metric-label">平均クリック率</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-value">1,234</div>
+        <div class="metric-label">総配信先数</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-value">8</div>
+        <div class="metric-label">今月の配信数</div>
+    </div>
+</div>
+
+<!-- タブナビゲーション -->
+<div class="border-b border-gray-200 mb-6">
+    <nav class="flex gap-8">
+        <button class="pb-4 text-sm font-medium text-kagami-blue border-b-2 border-kagami-blue" onclick="showTab('campaigns')">
+            キャンペーン一覧
+        </button>
+        <button class="pb-4 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="showTab('create')">
+            新規作成
+        </button>
+        <button class="pb-4 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="showTab('analytics')">
+            分析レポート
+        </button>
+        <button class="pb-4 text-sm font-medium text-gray-500 hover:text-gray-700" onclick="showTab('settings')">
+            設定
+        </button>
+    </nav>
+</div>
+
+<!-- キャンペーン一覧 -->
+<div id="campaignsTab">
+    <div class="space-y-4">
+        <!-- キャンペーンカード1 -->
+        <div class="campaign-card" onclick="openCampaign('CAMP-001')">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Q4決算発表のお知らせ</h3>
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            856名
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            予定: 2024/01/24 15:00
+                        </span>
+                    </div>
+                </div>
+                <span class="campaign-status status-scheduled">予約済み</span>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <div class="text-sm text-gray-600">開封率</div>
+                    <div class="font-semibold">-</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">クリック率</div>
+                    <div class="font-semibold">-</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">配信成功</div>
+                    <div class="font-semibold">-</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">エラー</div>
+                    <div class="font-semibold">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- キャンペーンカード2 -->
+        <div class="campaign-card" onclick="openCampaign('CAMP-002')">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">統合報告書2023 公開のお知らせ</h3>
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            1,234名
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            配信: 2024/01/15 10:00
+                        </span>
+                    </div>
+                </div>
+                <span class="campaign-status status-sent">配信完了</span>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <div class="text-sm text-gray-600">開封率</div>
+                    <div class="font-semibold text-green-600">89.3%</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">クリック率</div>
+                    <div class="font-semibold text-green-600">45.2%</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">配信成功</div>
+                    <div class="font-semibold">1,232</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">エラー</div>
+                    <div class="font-semibold text-red-600">2</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- キャンペーンカード3 -->
+        <div class="campaign-card" onclick="openCampaign('CAMP-003')">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">個人投資家向け説明会のご案内</h3>
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            -
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            作成中
+                        </span>
+                    </div>
+                </div>
+                <span class="campaign-status status-draft">下書き</span>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <div class="text-sm text-gray-600">開封率</div>
+                    <div class="font-semibold text-gray-400">-</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">クリック率</div>
+                    <div class="font-semibold text-gray-400">-</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">配信成功</div>
+                    <div class="font-semibold text-gray-400">-</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-600">エラー</div>
+                    <div class="font-semibold text-gray-400">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新規作成タブ（非表示） -->
+<div id="createTab" class="hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 左側：作成フォーム -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- ステップインジケーター -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div class="timeline-step">
+                        <div class="timeline-icon completed">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div class="timeline-content">
+                            <h4 class="font-medium text-gray-900">基本情報</h4>
+                            <p class="text-sm text-gray-500">件名・送信者設定</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-icon active">2</div>
+                        <div class="timeline-content">
+                            <h4 class="font-medium text-gray-900">配信先選択</h4>
+                            <p class="text-sm text-gray-500">投資家リスト設定</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-icon">3</div>
+                        <div class="timeline-content">
+                            <h4 class="font-medium text-gray-900">内容作成</h4>
+                            <p class="text-sm text-gray-500">メール本文編集</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-icon">4</div>
+                        <div class="timeline-content">
+                            <h4 class="font-medium text-gray-900">確認・送信</h4>
+                            <p class="text-sm text-gray-500">最終確認</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 基本情報 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">基本情報</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">キャンペーン名</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                            placeholder="例: Q4決算発表のお知らせ">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">件名</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                            placeholder="例: 【重要】2024年第4四半期決算発表について">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">送信者名</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                                value="KAGAMI株式会社 IR部">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">送信元メールアドレス</label>
+                            <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                                value="ir@kagami.co.jp">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 配信先選択 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">配信先選択</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">配信リスト</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>全投資家リスト (1,234名)</option>
+                            <option>機関投資家リスト (856名)</option>
+                            <option>個人投資家リスト (378名)</option>
+                            <option>海外投資家リスト (432名)</option>
+                            <option>カスタムリスト...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">タグでフィルター</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                                + 大株主
+                            </button>
+                            <button class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                                + ESG重視
+                            </button>
+                            <button class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                                + 長期保有
+                            </button>
+                            <button class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                                + アクティブ
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">選択済み配信先</label>
+                        <div class="flex flex-wrap">
+                            <span class="recipient-tag">
+                                機関投資家リスト (856名)
+                                <button>×</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- メール内容 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="editor-toolbar">
+                    <button class="editor-button" title="太字">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" />
+                        </svg>
+                    </button>
+                    <button class="editor-button" title="斜体">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 4h4M8 20h4m3-16L9 20" />
+                        </svg>
+                    </button>
+                    <button class="editor-button" title="下線">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v8a5 5 0 0010 0V4M5 20h14" />
+                        </svg>
+                    </button>
+                    <div class="editor-separator"></div>
+                    <button class="editor-button" title="リンク">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                    </button>
+                    <button class="editor-button" title="画像">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </button>
+                    <div class="editor-separator"></div>
+                    <button class="editor-button" title="変数挿入">
+                        {変数}
+                    </button>
+                    <button class="editor-button" title="テンプレート">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <textarea class="w-full h-96 px-4 py-3 border border-gray-300 rounded-lg resize-none" 
+                        placeholder="メール本文を入力してください...">
+{投資家名} 様
+
+いつもお世話になっております。
+KAGAMI株式会社 IR部です。
+
+この度、2024年第4四半期決算を発表させていただきますので、
+下記の通りご案内申し上げます。
+
+【決算発表概要】
+日時：2024年1月24日（水）15:00～16:30
+場所：東京証券取引所ホール および オンライン配信
+内容：
+- 2024年第4四半期業績概要
+- 通期業績見通し
+- 中期経営計画の進捗
+- 質疑応答
+
+【オンライン視聴について】
+以下のURLよりご視聴いただけます。
+https://ir.kagami.co.jp/events/q4-2024
+
+【決算資料について】
+決算短信および説明資料は、発表同時刻に当社IRサイトに掲載いたします。
+https://ir.kagami.co.jp/library/
+
+ご不明な点がございましたら、下記までお問い合わせください。
+
+今後とも変わらぬご支援を賜りますよう、よろしくお願い申し上げます。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KAGAMI株式会社 IR部
+Email: ir@kagami.co.jp
+Tel: 03-1234-5678
+https://ir.kagami.co.jp/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右側：プレビュー -->
+        <div class="lg:col-span-1">
+            <div class="sticky top-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">プレビュー</h3>
+                <div class="email-preview">
+                    <div class="email-preview-header">
+                        <div class="text-sm text-gray-600 mb-1">送信者: KAGAMI株式会社 IR部 &lt;ir@kagami.co.jp&gt;</div>
+                        <div class="text-sm text-gray-600 mb-1">宛先: 山田 太郎 &lt;yamada@example.com&gt;</div>
+                        <div class="font-semibold">件名: 【重要】2024年第4四半期決算発表について</div>
+                    </div>
+                    <div class="email-preview-body">
+                        <div class="whitespace-pre-wrap text-sm">山田 太郎 様
+
+いつもお世話になっております。
+KAGAMI株式会社 IR部です。
+
+この度、2024年第4四半期決算を発表させていただきますので、
+下記の通りご案内申し上げます。
+
+【決算発表概要】
+日時：2024年1月24日（水）15:00～16:30
+場所：東京証券取引所ホール および オンライン配信
+内容：
+- 2024年第4四半期業績概要
+- 通期業績見通し
+- 中期経営計画の進捗
+- 質疑応答
+
+【オンライン視聴について】
+以下のURLよりご視聴いただけます。
+<a href="#" class="text-blue-600 hover:underline">https://ir.kagami.co.jp/events/q4-2024</a>
+
+【決算資料について】
+決算短信および説明資料は、発表同時刻に当社IRサイトに掲載いたします。
+<a href="#" class="text-blue-600 hover:underline">https://ir.kagami.co.jp/library/</a>
+
+ご不明な点がございましたら、下記までお問い合わせください。
+
+今後とも変わらぬご支援を賜りますよう、よろしくお願い申し上げます。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KAGAMI株式会社 IR部
+Email: ir@kagami.co.jp
+Tel: 03-1234-5678
+<a href="#" class="text-blue-600 hover:underline">https://ir.kagami.co.jp/</a>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 space-y-3">
+                    <button class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        テスト送信
+                    </button>
+                    <button class="w-full px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors">
+                        下書き保存
+                    </button>
+                    <button class="w-full px-4 py-2 bg-accent-teal text-white rounded-lg hover:bg-accent-teal/90 transition-colors">
+                        送信予約
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 分析レポートタブ（非表示） -->
+<div id="analyticsTab" class="hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">開封率の推移</h3>
+            <div class="analytics-chart">
+                <canvas id="openRateChart"></canvas>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">クリック率の推移</h3>
+            <div class="analytics-chart">
+                <canvas id="clickRateChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // タブ切り替え
+    function showTab(tabName) {
+        // すべてのタブコンテンツを非表示
+        document.querySelectorAll('[id$="Tab"]').forEach(tab => {
+            tab.classList.add('hidden');
+        });
+        
+        // 選択されたタブを表示
+        document.getElementById(tabName + 'Tab').classList.remove('hidden');
+        
+        // タブボタンのスタイル更新
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.className = 'pb-4 text-sm font-medium text-gray-500 hover:text-gray-700';
+        });
+        event.target.className = 'pb-4 text-sm font-medium text-kagami-blue border-b-2 border-kagami-blue';
+        
+        // 分析タブの場合はチャートを初期化
+        if (tabName === 'analytics') {
+            initializeCharts();
+        }
+    }
+    
+    // キャンペーン作成
+    function createCampaign() {
+        showTab('create');
+    }
+    
+    // キャンペーンを開く
+    function openCampaign(campaignId) {
+        window.location.href = `/email-campaigns/${campaignId}`;
+    }
+    
+    // テンプレート表示
+    function showTemplates() {
+        showModal({
+            title: 'メールテンプレート',
+            content: `
+                <div class="space-y-4">
+                    <div class="template-card">
+                        <h4 class="font-medium text-gray-900 mb-2">決算発表お知らせテンプレート</h4>
+                        <p class="text-sm text-gray-600 mb-3">
+                            四半期・通期決算発表時の標準的なお知らせメール
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">使用回数: 24回</span>
+                            <button class="text-sm text-accent-teal hover:text-accent-teal/80">使用する</button>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card">
+                        <h4 class="font-medium text-gray-900 mb-2">IR資料公開テンプレート</h4>
+                        <p class="text-sm text-gray-600 mb-3">
+                            統合報告書、有価証券報告書などの公開お知らせ
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">使用回数: 18回</span>
+                            <button class="text-sm text-accent-teal hover:text-accent-teal/80">使用する</button>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card">
+                        <h4 class="font-medium text-gray-900 mb-2">イベント案内テンプレート</h4>
+                        <p class="text-sm text-gray-600 mb-3">
+                            説明会、カンファレンスなどのイベント案内
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">使用回数: 32回</span>
+                            <button class="text-sm text-accent-teal hover:text-accent-teal/80">使用する</button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: null,
+            cancelText: '閉じる'
+        });
+    }
+    
+    // 連絡先インポート
+    function importContacts() {
+        showModal({
+            title: '連絡先のインポート',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">インポート方法</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>CSVファイルから</option>
+                            <option>Excelファイルから</option>
+                            <option>既存のCRMから同期</option>
+                        </select>
+                    </div>
+                    
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                        <input type="file" id="contactFile" class="hidden" accept=".csv,.xlsx">
+                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p class="text-gray-600 mb-2">ファイルを選択またはドラッグ＆ドロップ</p>
+                        <button onclick="document.getElementById('contactFile').click()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                            ファイルを選択
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm text-gray-600">
+                            ※ CSVファイルには以下の列が必要です：<br>
+                            メールアドレス, 氏名, 会社名, 投資家タイプ
+                        </p>
+                    </div>
+                </div>
+            `,
+            confirmText: 'インポート開始',
+            onConfirm: () => {
+                showNotification('連絡先のインポートを開始しました', 'info');
+            }
+        });
+    }
+    
+    // チャート初期化
+    function initializeCharts() {
+        // 開封率チャート
+        const openRateCtx = document.getElementById('openRateChart').getContext('2d');
+        new Chart(openRateCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: '開封率',
+                    data: [78, 82, 85, 83, 87, 85],
+                    borderColor: '#14b8a6',
+                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // クリック率チャート
+        const clickRateCtx = document.getElementById('clickRateChart').getContext('2d');
+        new Chart(clickRateCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: 'クリック率',
+                    data: [28, 31, 35, 32, 38, 33],
+                    borderColor: '#1a365d',
+                    backgroundColor: 'rgba(26, 54, 93, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 50,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // エディタボタンの機能
+    document.querySelectorAll('.editor-button').forEach(button => {
+        button.addEventListener('click', function() {
+            // 実際の実装では、選択されたテキストに対して書式を適用
+            this.classList.toggle('active');
+        });
+    });
+</script>
+{% endblock %}

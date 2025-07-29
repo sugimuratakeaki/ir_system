@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+
+{% block title %}経営陣ダッシュボード{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 経営陣ダッシュボード専用スタイル */
+    .executive-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 24px;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .executive-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a365d;
+        line-height: 1;
+    }
+    
+    .metric-trend {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .trend-up {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .trend-down {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .priority-high {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .priority-medium {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .priority-low {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+    
+    .action-item {
+        display: flex;
+        align-items: start;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+    
+    .action-item:hover {
+        background: #f3f4f6;
+        transform: translateX(4px);
+    }
+    
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .metric-value {
+            font-size: 2rem;
+        }
+        
+        .chart-container {
+            height: 250px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">経営陣ダッシュボード</h1>
+            <p class="text-gray-600">IR活動の全体像と重要指標を一覧で確認</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex gap-3">
+            <button onclick="exportReport()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                📊 レポート出力
+            </button>
+            <button onclick="showSettings()" class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors">
+                ⚙️ カスタマイズ
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- KPIサマリー -->
+<div class="summary-grid mb-8">
+    <!-- 投資家満足度 -->
+    <div class="executive-card">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h3 class="text-sm font-medium text-gray-600 mb-2">投資家満足度</h3>
+                <div class="metric-value">4.2<span class="text-2xl text-gray-500">/5.0</span></div>
+            </div>
+            <div class="metric-trend trend-up">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                +0.3
+            </div>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">前四半期比</span>
+            <a href="/analytics" class="text-sm text-accent-teal hover:text-accent-teal/80">詳細を見る →</a>
+        </div>
+    </div>
+    
+    <!-- IR活動回数 -->
+    <div class="executive-card">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h3 class="text-sm font-medium text-gray-600 mb-2">IR活動回数（四半期）</h3>
+                <div class="metric-value">156<span class="text-xl text-gray-500">回</span></div>
+            </div>
+            <div class="metric-trend trend-up">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                +12%
+            </div>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">目標: 150回</span>
+            <a href="/meetings" class="text-sm text-accent-teal hover:text-accent-teal/80">詳細を見る →</a>
+        </div>
+    </div>
+    
+    <!-- 情報開示スコア -->
+    <div class="executive-card">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h3 class="text-sm font-medium text-gray-600 mb-2">情報開示スコア</h3>
+                <div class="metric-value">92<span class="text-xl text-gray-500">%</span></div>
+            </div>
+            <div class="metric-trend trend-up">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                +5%
+            </div>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">業界平均: 78%</span>
+            <a href="/strategy" class="text-sm text-accent-teal hover:text-accent-teal/80">詳細を見る →</a>
+        </div>
+    </div>
+    
+    <!-- 株主構成 -->
+    <div class="executive-card">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h3 class="text-sm font-medium text-gray-600 mb-2">機関投資家比率</h3>
+                <div class="metric-value">68.5<span class="text-xl text-gray-500">%</span></div>
+            </div>
+            <div class="metric-trend trend-down">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                </svg>
+                -1.2%
+            </div>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-500">外国人投資家: 42.3%</span>
+            <a href="/investors" class="text-sm text-accent-teal hover:text-accent-teal/80">詳細を見る →</a>
+        </div>
+    </div>
+</div>
+
+<!-- 重要アクションアイテム -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- 承認待ちタスク -->
+    <div class="executive-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="mr-2">⏳</span>
+            承認待ちタスク
+        </h2>
+        <div class="space-y-3">
+            <div class="action-item">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h4 class="font-medium text-gray-900">Q4決算説明資料の最終確認</h4>
+                        <span class="priority-badge priority-high">緊急</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">IR部門より最終稿が提出されました</p>
+                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                        <span>提出者: 田中IR部長</span>
+                        <span>期限: 2024/01/25</span>
+                    </div>
+                </div>
+                <button class="ml-4 px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors text-sm">
+                    確認する
+                </button>
+            </div>
+            
+            <div class="action-item">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h4 class="font-medium text-gray-900">ESG報告書のメッセージ文案</h4>
+                        <span class="priority-badge priority-medium">重要</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">社長メッセージの内容確認をお願いします</p>
+                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                        <span>提出者: ESG推進室</span>
+                        <span>期限: 2024/01/28</span>
+                    </div>
+                </div>
+                <button class="ml-4 px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors text-sm">
+                    確認する
+                </button>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="/tasks" class="text-sm text-accent-teal hover:text-accent-teal/80">すべてのタスクを表示 →</a>
+        </div>
+    </div>
+    
+    <!-- 重要イベント -->
+    <div class="executive-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="mr-2">📅</span>
+            今後の重要イベント
+        </h2>
+        <div class="space-y-3">
+            <div class="action-item">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h4 class="font-medium text-gray-900">Q4決算発表</h4>
+                        <span class="text-sm text-gray-500">2日後</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">14:00より東証ホールにて実施</p>
+                    <div class="flex items-center gap-4 text-sm">
+                        <span class="text-green-600">✓ 資料準備完了</span>
+                        <span class="text-orange-600">⚠ 参加者リスト確認中</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-item">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h4 class="font-medium text-gray-900">海外投資家向けカンファレンス</h4>
+                        <span class="text-sm text-gray-500">来週</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">ロンドン・NYでのロードショー</p>
+                    <div class="flex items-center gap-4 text-sm">
+                        <span class="text-green-600">✓ スケジュール確定</span>
+                        <span class="text-blue-600">📋 面談: 12社予定</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="/schedule" class="text-sm text-accent-teal hover:text-accent-teal/80">IRカレンダーを表示 →</a>
+        </div>
+    </div>
+</div>
+
+<!-- 分析チャート -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- 投資家エンゲージメント推移 -->
+    <div class="executive-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">投資家エンゲージメント推移</h2>
+        <div class="chart-container">
+            <canvas id="engagementChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- 地域別投資家分布 -->
+    <div class="executive-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">地域別投資家分布</h2>
+        <div class="chart-container">
+            <canvas id="regionalChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- 最新のフィードバック -->
+<div class="executive-card">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+        <span class="flex items-center">
+            <span class="mr-2">💬</span>
+            最新の投資家フィードバック
+        </span>
+        <a href="/feedback" class="text-sm text-accent-teal hover:text-accent-teal/80 font-normal">すべて表示 →</a>
+    </h2>
+    <div class="space-y-4">
+        <div class="border-l-4 border-green-500 pl-4 py-2">
+            <div class="flex items-start justify-between mb-1">
+                <h4 class="font-medium text-gray-900">野村アセットマネジメント</h4>
+                <span class="text-sm text-gray-500">2024/01/22</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">
+                「今回の中期経営計画は非常に明確で、特にDX戦略の具体性が評価できる。実行フェーズでの進捗開示に期待。」
+            </p>
+            <div class="flex items-center gap-4 text-sm">
+                <span class="text-green-600">ポジティブ</span>
+                <span class="text-gray-500">面談: CFO対応</span>
+            </div>
+        </div>
+        
+        <div class="border-l-4 border-yellow-500 pl-4 py-2">
+            <div class="flex items-start justify-between mb-1">
+                <h4 class="font-medium text-gray-900">BlackRock</h4>
+                <span class="text-sm text-gray-500">2024/01/20</span>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">
+                「ESG関連の定量目標をより明確にしてほしい。特にScope3の削減計画について詳細な説明が必要。」
+            </p>
+            <div class="flex items-center gap-4 text-sm">
+                <span class="text-yellow-600">要改善</span>
+                <span class="text-gray-500">電話会議: IR部対応</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // チャート初期化
+    document.addEventListener('DOMContentLoaded', function() {
+        // エンゲージメントチャート
+        const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+        new Chart(engagementCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                datasets: [{
+                    label: '面談数',
+                    data: [45, 52, 48, 58, 62, 55, 68, 72, 65, 78, 82, 86],
+                    borderColor: '#14b8a6',
+                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'イベント参加者数',
+                    data: [120, 135, 125, 145, 155, 140, 165, 175, 160, 185, 195, 210],
+                    borderColor: '#1a365d',
+                    backgroundColor: 'rgba(26, 54, 93, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // 地域別投資家分布チャート
+        const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+        new Chart(regionalCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['日本', '北米', '欧州', 'アジア（日本除く）', 'その他'],
+                datasets: [{
+                    data: [45, 25, 18, 8, 4],
+                    backgroundColor: [
+                        '#1a365d',
+                        '#14b8a6',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#e5e7eb'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    });
+    
+    // レポート出力
+    function exportReport() {
+        showNotification('レポートを生成中です...', 'info');
+        setTimeout(() => {
+            showNotification('経営陣向けレポートをダウンロードしました', 'success');
+        }, 2000);
+    }
+    
+    // 設定画面
+    function showSettings() {
+        showModal({
+            title: 'ダッシュボードのカスタマイズ',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">表示する指標</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2"> 投資家満足度
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2"> IR活動回数
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2"> 情報開示スコア
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2"> 機関投資家比率
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">更新頻度</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>リアルタイム</option>
+                            <option>1時間ごと</option>
+                            <option>日次</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            confirmText: '保存',
+            onConfirm: () => {
+                showNotification('設定を保存しました', 'success');
+            }
+        });
+    }
+</script>
+{% endblock %}

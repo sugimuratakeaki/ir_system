@@ -1,0 +1,909 @@
+{% extends "base.html" %}
+
+{% block title %}IR戦略・開示{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* IR戦略専用スタイル */
+    .strategy-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 24px;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .strategy-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .objective-item {
+        display: flex;
+        align-items: start;
+        gap: 16px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+    
+    .objective-item:hover {
+        background: #f3f4f6;
+        transform: translateX(4px);
+    }
+    
+    .objective-number {
+        width: 32px;
+        height: 32px;
+        background: #1a365d;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: #14b8a6;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+    
+    .disclosure-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .disclosure-item:hover {
+        border-color: #14b8a6;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .disclosure-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-in-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-planned {
+        background: #f3f4f6;
+        color: #374151;
+    }
+    
+    .status-overdue {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .timeline-chart {
+        position: relative;
+        padding: 20px 0;
+        overflow-x: auto;
+    }
+    
+    .timeline-months {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 20px;
+        padding-left: 120px;
+    }
+    
+    .timeline-month {
+        flex-shrink: 0;
+        width: 80px;
+        text-align: center;
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .timeline-rows {
+        position: relative;
+    }
+    
+    .timeline-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        position: relative;
+    }
+    
+    .timeline-label {
+        width: 120px;
+        flex-shrink: 0;
+        font-size: 0.875rem;
+        color: #374151;
+        padding-right: 16px;
+    }
+    
+    .timeline-bar-container {
+        flex: 1;
+        position: relative;
+        height: 32px;
+    }
+    
+    .timeline-bar {
+        position: absolute;
+        height: 100%;
+        background: #14b8a6;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 0.75rem;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .timeline-bar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+    }
+    
+    .timeline-bar.type-earnings {
+        background: #ef4444;
+    }
+    
+    .timeline-bar.type-report {
+        background: #3b82f6;
+    }
+    
+    .timeline-bar.type-event {
+        background: #9333ea;
+    }
+    
+    .timeline-bar.type-regulatory {
+        background: #f59e0b;
+    }
+    
+    .benchmark-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .benchmark-table th {
+        background: #f9fafb;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #374151;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .benchmark-table td {
+        padding: 12px;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.875rem;
+    }
+    
+    .benchmark-table tr:hover {
+        background: #f9fafb;
+    }
+    
+    .score-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 24px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .score-high {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .score-medium {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .score-low {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .ai-suggestion {
+        background: linear-gradient(135deg, #f0fdfa, #e0f2fe);
+        border: 1px solid #14b8a6;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ai-suggestion::before {
+        content: '✨';
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 24px;
+    }
+    
+    .ai-suggestion-title {
+        font-weight: 600;
+        color: #0f766e;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .ai-suggestion-content {
+        color: #134e4a;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">IR戦略・開示</h1>
+            <p class="text-gray-600">IR活動の戦略立案と開示計画の管理</p>
+        </div>
+        <div class="mt-4 lg:mt-0 flex flex-wrap gap-3">
+            <button onclick="showAIAssistant()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                AI戦略アシスタント
+            </button>
+            <button onclick="exportStrategy()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                戦略書出力
+            </button>
+            <button onclick="createNewObjective()" class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                新規目標設定
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- AI提案 -->
+<div class="ai-suggestion">
+    <h3 class="ai-suggestion-title">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        AIからの戦略提案
+    </h3>
+    <p class="ai-suggestion-content">
+        最近の投資家フィードバック分析の結果、ESG情報の開示頻度を高めることで投資家満足度の向上が期待できます。
+        特に、カーボンニュートラルへの取り組みとダイバーシティ推進の進捗について、四半期ごとの定期報告を検討することをお勧めします。
+    </p>
+    <button class="mt-3 text-sm text-teal-700 hover:text-teal-800 font-medium">詳細を見る →</button>
+</div>
+
+<!-- 戦略目標 -->
+<div class="strategy-card mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">2024年度 IR戦略目標</h2>
+        <span class="text-sm text-gray-500">進捗率: 68%</span>
+    </div>
+    
+    <div class="space-y-3">
+        <div class="objective-item">
+            <div class="objective-number">1</div>
+            <div class="flex-1">
+                <h4 class="font-medium text-gray-900 mb-1">機関投資家との対話機会の拡大</h4>
+                <p class="text-sm text-gray-600 mb-2">年間面談数を前年比20%増加（目標: 180件）</p>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-500">現在: 142件 / 180件</span>
+                    <span class="text-green-600 font-medium">79%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 79%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="objective-item">
+            <div class="objective-number">2</div>
+            <div class="flex-1">
+                <h4 class="font-medium text-gray-900 mb-1">ESG情報開示の充実</h4>
+                <p class="text-sm text-gray-600 mb-2">統合報告書の内容充実とTCFD対応の完全実施</p>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-500">4/5タスク完了</span>
+                    <span class="text-green-600 font-medium">80%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 80%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="objective-item">
+            <div class="objective-number">3</div>
+            <div class="flex-1">
+                <h4 class="font-medium text-gray-900 mb-1">海外投資家比率の向上</h4>
+                <p class="text-sm text-gray-600 mb-2">海外機関投資家保有比率を45%まで引き上げ（現在: 42.3%）</p>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-500">あと2.7ポイント</span>
+                    <span class="text-yellow-600 font-medium">47%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 47%; background: #f59e0b;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4 text-center">
+        <button onclick="showAllObjectives()" class="text-sm text-accent-teal hover:text-accent-teal/80">
+            すべての目標を見る →
+        </button>
+    </div>
+</div>
+
+<!-- 開示スケジュール -->
+<div class="strategy-card mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">開示スケジュール</h2>
+        <div class="flex items-center gap-2">
+            <button onclick="changeTimelineView('month')" class="px-3 py-1 text-sm bg-gray-100 rounded-lg">月次</button>
+            <button onclick="changeTimelineView('quarter')" class="px-3 py-1 text-sm bg-kagami-blue text-white rounded-lg">四半期</button>
+            <button onclick="changeTimelineView('year')" class="px-3 py-1 text-sm bg-gray-100 rounded-lg">年次</button>
+        </div>
+    </div>
+    
+    <div class="timeline-chart">
+        <div class="timeline-months">
+            <div class="timeline-month">1月</div>
+            <div class="timeline-month">2月</div>
+            <div class="timeline-month">3月</div>
+            <div class="timeline-month">4月</div>
+            <div class="timeline-month">5月</div>
+            <div class="timeline-month">6月</div>
+        </div>
+        
+        <div class="timeline-rows">
+            <div class="timeline-row">
+                <div class="timeline-label">決算発表</div>
+                <div class="timeline-bar-container">
+                    <div class="timeline-bar type-earnings" style="left: 20px; width: 60px;">
+                        Q3決算
+                    </div>
+                    <div class="timeline-bar type-earnings" style="left: 340px; width: 60px;">
+                        Q4決算
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-row">
+                <div class="timeline-label">報告書</div>
+                <div class="timeline-bar-container">
+                    <div class="timeline-bar type-report" style="left: 100px; width: 80px;">
+                        四半期報告
+                    </div>
+                    <div class="timeline-bar type-report" style="left: 260px; width: 100px;">
+                        有価証券報告
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-row">
+                <div class="timeline-label">IRイベント</div>
+                <div class="timeline-bar-container">
+                    <div class="timeline-bar type-event" style="left: 40px; width: 120px;">
+                        海外ロードショー
+                    </div>
+                    <div class="timeline-bar type-event" style="left: 300px; width: 80px;">
+                        個人向け説明会
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-row">
+                <div class="timeline-label">その他開示</div>
+                <div class="timeline-bar-container">
+                    <div class="timeline-bar type-regulatory" style="left: 180px; width: 100px;">
+                        統合報告書
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- 開示項目チェックリスト -->
+    <div class="strategy-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">今月の開示項目</h2>
+        
+        <div class="space-y-2">
+            <div class="disclosure-item" onclick="openDisclosureDetail('DISC-001')">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" checked onclick="event.stopPropagation()">
+                    <div>
+                        <h4 class="font-medium text-gray-900">Q4決算短信</h4>
+                        <p class="text-sm text-gray-500">期限: 2024/01/24</p>
+                    </div>
+                </div>
+                <span class="disclosure-status status-completed">完了</span>
+            </div>
+            
+            <div class="disclosure-item" onclick="openDisclosureDetail('DISC-002')">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" checked onclick="event.stopPropagation()">
+                    <div>
+                        <h4 class="font-medium text-gray-900">決算説明資料</h4>
+                        <p class="text-sm text-gray-500">期限: 2024/01/24</p>
+                    </div>
+                </div>
+                <span class="disclosure-status status-completed">完了</span>
+            </div>
+            
+            <div class="disclosure-item" onclick="openDisclosureDetail('DISC-003')">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" onclick="event.stopPropagation()">
+                    <div>
+                        <h4 class="font-medium text-gray-900">業績予想の修正</h4>
+                        <p class="text-sm text-gray-500">期限: 2024/01/24</p>
+                    </div>
+                </div>
+                <span class="disclosure-status status-in-progress">作成中</span>
+            </div>
+            
+            <div class="disclosure-item" onclick="openDisclosureDetail('DISC-004')">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" onclick="event.stopPropagation()">
+                    <div>
+                        <h4 class="font-medium text-gray-900">コーポレートガバナンス報告書更新</h4>
+                        <p class="text-sm text-gray-500">期限: 2024/01/31</p>
+                    </div>
+                </div>
+                <span class="disclosure-status status-planned">予定</span>
+            </div>
+            
+            <div class="disclosure-item" onclick="openDisclosureDetail('DISC-005')">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" onclick="event.stopPropagation()">
+                    <div>
+                        <h4 class="font-medium text-gray-900">株主通信（第3四半期）</h4>
+                        <p class="text-sm text-gray-500">期限: 2024/01/15</p>
+                    </div>
+                </div>
+                <span class="disclosure-status status-overdue">遅延</span>
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">完了率</span>
+                <span class="font-semibold">40% (2/5)</span>
+            </div>
+            <div class="progress-bar mt-2">
+                <div class="progress-fill" style="width: 40%"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 競合他社ベンチマーク -->
+    <div class="strategy-card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">競合他社ベンチマーク</h2>
+        
+        <table class="benchmark-table">
+            <thead>
+                <tr>
+                    <th>項目</th>
+                    <th>当社</th>
+                    <th>A社</th>
+                    <th>B社</th>
+                    <th>業界平均</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>年間IR活動回数</td>
+                    <td><span class="score-badge score-high">156</span></td>
+                    <td>142</td>
+                    <td>168</td>
+                    <td>145</td>
+                </tr>
+                <tr>
+                    <td>情報開示スコア</td>
+                    <td><span class="score-badge score-high">92</span></td>
+                    <td>88</td>
+                    <td>85</td>
+                    <td>78</td>
+                </tr>
+                <tr>
+                    <td>ESG評価</td>
+                    <td><span class="score-badge score-medium">B+</span></td>
+                    <td>A</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <td>ウェブサイト評価</td>
+                    <td><span class="score-badge score-high">4.5</span></td>
+                    <td>4.2</td>
+                    <td>4.6</td>
+                    <td>3.8</td>
+                </tr>
+                <tr>
+                    <td>適時開示対応</td>
+                    <td><span class="score-badge score-high">100%</span></td>
+                    <td>98%</td>
+                    <td>100%</td>
+                    <td>95%</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="mt-4 text-center">
+            <button onclick="showDetailedBenchmark()" class="text-sm text-accent-teal hover:text-accent-teal/80">
+                詳細分析レポートを見る →
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 推奨アクション -->
+<div class="strategy-card mt-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">推奨アクション</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div class="flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h4 class="font-medium text-blue-900">緊急</h4>
+            </div>
+            <p class="text-sm text-blue-700 mb-2">
+                株主通信の発行が遅延しています。至急対応が必要です。
+            </p>
+            <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                対応する →
+            </button>
+        </div>
+        
+        <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div class="flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h4 class="font-medium text-yellow-900">今週中</h4>
+            </div>
+            <p class="text-sm text-yellow-700 mb-2">
+                決算発表に向けたQ&A想定問答の最終確認をお願いします。
+            </p>
+            <button class="text-sm text-yellow-600 hover:text-yellow-700 font-medium">
+                確認する →
+            </button>
+        </div>
+        
+        <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+            <div class="flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h4 class="font-medium text-green-900">推奨</h4>
+            </div>
+            <p class="text-sm text-green-700 mb-2">
+                ESG評価向上のため、TCFD提言に基づく情報開示を強化しましょう。
+            </p>
+            <button class="text-sm text-green-600 hover:text-green-700 font-medium">
+                詳細を見る →
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // AI戦略アシスタント
+    function showAIAssistant() {
+        showModal({
+            title: 'AI戦略アシスタント',
+            content: `
+                <div class="space-y-4">
+                    <div class="p-4 bg-gradient-to-r from-teal-50 to-blue-50 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 mb-2">AIが分析した改善ポイント</h4>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600">•</span>
+                                海外投資家向けの英文開示資料の充実が効果的です
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600">•</span>
+                                ESG関連の定量データ開示を増やすことで評価向上が期待できます
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600">•</span>
+                                四半期ごとの進捗レポート発行により透明性が向上します
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            具体的な質問や相談事項
+                        </label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="4"
+                            placeholder="例：ESG評価を向上させるための具体的な施策について"></textarea>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark">
+                            AIに相談する
+                        </button>
+                        <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                            過去の提案を見る
+                        </button>
+                    </div>
+                </div>
+            `,
+            confirmText: null,
+            cancelText: '閉じる'
+        });
+    }
+    
+    // 戦略書出力
+    function exportStrategy() {
+        showModal({
+            title: 'IR戦略書の出力',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">出力形式</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>PDF（プレゼンテーション形式）</option>
+                            <option>Word（編集可能）</option>
+                            <option>PowerPoint（スライド形式）</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">含める内容</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">戦略目標と進捗状況</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">開示スケジュール</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">競合他社ベンチマーク</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">改善提案とアクションプラン</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">対象期間</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>2024年度（今年度）</option>
+                            <option>2024年度上期</option>
+                            <option>2024年第4四半期</option>
+                            <option>カスタム期間</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            confirmText: '出力',
+            onConfirm: () => {
+                showNotification('IR戦略書を生成中です...', 'info');
+                setTimeout(() => {
+                    showNotification('IR戦略書をダウンロードしました', 'success');
+                }, 2000);
+            }
+        });
+    }
+    
+    // 新規目標設定
+    function createNewObjective() {
+        showModal({
+            title: '新規戦略目標の設定',
+            content: `
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">目標タイトル</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="例：個人投資家向けIR活動の強化">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">カテゴリ</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>投資家エンゲージメント</option>
+                            <option>情報開示</option>
+                            <option>ESG/サステナビリティ</option>
+                            <option>デジタルIR</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">目標詳細</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="3"
+                            placeholder="具体的な目標内容と達成基準を記載"></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">目標値</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                placeholder="例：年間50回">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">期限</label>
+                            <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">担当者</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>IR部全体</option>
+                            <option>田中 太郎（IR部長）</option>
+                            <option>鈴木 花子（IRマネージャー）</option>
+                            <option>佐藤 次郎（IR担当）</option>
+                        </select>
+                    </div>
+                </form>
+            `,
+            confirmText: '目標を設定',
+            onConfirm: () => {
+                showNotification('新しい戦略目標を設定しました', 'success');
+            }
+        });
+    }
+    
+    // すべての目標を表示
+    function showAllObjectives() {
+        window.location.href = '/strategy/objectives';
+    }
+    
+    // タイムライン表示切替
+    function changeTimelineView(view) {
+        // 実際の実装では、表示期間を切り替える
+        showNotification(`${view === 'month' ? '月次' : view === 'quarter' ? '四半期' : '年次'}表示に切り替えました`, 'info');
+    }
+    
+    // 開示詳細
+    function openDisclosureDetail(disclosureId) {
+        showModal({
+            title: 'Q4決算短信',
+            content: `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-sm text-gray-600">ステータス</span>
+                            <p class="font-medium">完了</p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">期限</span>
+                            <p class="font-medium">2024年1月24日</p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">担当者</span>
+                            <p class="font-medium">経理部・IR部</p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">承認者</span>
+                            <p class="font-medium">CFO</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">進捗状況</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="text-sm">数値確定（1/20完了）</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="text-sm">監査法人レビュー（1/22完了）</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="text-sm">取締役会承認（1/23完了）</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">関連ドキュメント</h4>
+                        <div class="space-y-2">
+                            <a href="#" class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                決算短信_最終版.pdf
+                            </a>
+                            <a href="#" class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                監査報告書.pdf
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: null,
+            cancelText: '閉じる'
+        });
+    }
+    
+    // 詳細ベンチマーク
+    function showDetailedBenchmark() {
+        window.location.href = '/strategy/benchmark';
+    }
+    
+    // タイムラインバーのクリック
+    document.querySelectorAll('.timeline-bar').forEach(bar => {
+        bar.addEventListener('click', function() {
+            const title = this.textContent.trim();
+            showNotification(`"${title}"の詳細を表示`, 'info');
+        });
+    });
+</script>
+{% endblock %}

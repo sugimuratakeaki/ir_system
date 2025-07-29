@@ -1,0 +1,879 @@
+{% extends "base.html" %}
+
+{% block title %}IRカレンダー{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* IRカレンダー専用スタイル */
+    .calendar-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+    
+    .calendar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+    
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        border-left: 1px solid #e5e7eb;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .calendar-day-header {
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #374151;
+        background: #f9fafb;
+        border-right: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .calendar-day {
+        min-height: 120px;
+        padding: 8px;
+        border-right: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+        background: white;
+        position: relative;
+        transition: background-color 0.2s ease;
+    }
+    
+    .calendar-day:hover {
+        background: #f9fafb;
+    }
+    
+    .calendar-day.other-month {
+        background: #fafafa;
+        color: #9ca3af;
+    }
+    
+    .calendar-day.today {
+        background: #f0fdfa;
+    }
+    
+    .calendar-day-number {
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin-bottom: 4px;
+    }
+    
+    .today .calendar-day-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: #14b8a6;
+        color: white;
+        border-radius: 50%;
+    }
+    
+    .calendar-event {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        margin-bottom: 2px;
+        border-radius: 4px;
+        cursor: pointer;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+    
+    .calendar-event:hover {
+        transform: translateX(2px);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .event-earnings {
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 3px solid #ef4444;
+    }
+    
+    .event-meeting {
+        background: #dbeafe;
+        color: #1e40af;
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .event-conference {
+        background: #f3e8ff;
+        color: #6b21a8;
+        border-left: 3px solid #9333ea;
+    }
+    
+    .event-deadline {
+        background: #fef3c7;
+        color: #92400e;
+        border-left: 3px solid #f59e0b;
+    }
+    
+    .event-more {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-align: center;
+        padding: 2px;
+        cursor: pointer;
+    }
+    
+    .event-more:hover {
+        color: #374151;
+        text-decoration: underline;
+    }
+    
+    /* サイドバー */
+    .calendar-sidebar {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 24px;
+    }
+    
+    .event-type-filter {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    .event-type-filter:hover {
+        background: #f3f4f6;
+    }
+    
+    .event-type-filter.active {
+        background: #f3f4f6;
+    }
+    
+    .event-type-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        margin-right: 12px;
+    }
+    
+    /* イベント詳細モーダル */
+    .event-detail-header {
+        display: flex;
+        align-items: start;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .event-detail-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    
+    .event-detail-content {
+        flex: 1;
+    }
+    
+    .event-detail-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .event-detail-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    /* タイムライン表示 */
+    .timeline-view {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 24px;
+    }
+    
+    .timeline-item {
+        display: flex;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+    
+    .timeline-date {
+        flex-shrink: 0;
+        width: 120px;
+        text-align: right;
+    }
+    
+    .timeline-date-day {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a365d;
+    }
+    
+    .timeline-date-info {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .timeline-events {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">IRカレンダー</h1>
+            <p class="text-gray-600">IR活動スケジュールの一元管理</p>
+        </div>
+        <div class="mt-4 lg:mt-0 flex flex-wrap gap-3">
+            <button onclick="showViewOptions()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                表示切替
+            </button>
+            <button onclick="exportCalendar()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                エクスポート
+            </button>
+            <button onclick="createNewEvent()" class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                新規イベント
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- カレンダー本体 -->
+    <div class="lg:col-span-3">
+        <div class="calendar-container">
+            <!-- カレンダーヘッダー -->
+            <div class="calendar-header">
+                <button onclick="previousMonth()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <h2 class="text-xl font-semibold text-gray-900">2024年1月</h2>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="goToToday()" class="px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        今日
+                    </button>
+                    <button onclick="nextMonth()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- カレンダーグリッド -->
+            <div class="calendar-grid">
+                <!-- 曜日ヘッダー -->
+                <div class="calendar-day-header">日</div>
+                <div class="calendar-day-header">月</div>
+                <div class="calendar-day-header">火</div>
+                <div class="calendar-day-header">水</div>
+                <div class="calendar-day-header">木</div>
+                <div class="calendar-day-header">金</div>
+                <div class="calendar-day-header">土</div>
+                
+                <!-- カレンダー日付 -->
+                <!-- 前月の日付 -->
+                <div class="calendar-day other-month">
+                    <div class="calendar-day-number">31</div>
+                </div>
+                
+                <!-- 今月の日付 -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">1</div>
+                    <div class="calendar-event event-deadline" onclick="showEventDetail('EVT-001')">
+                        四半期報告書提出期限
+                    </div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="calendar-day-number">2</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="calendar-day-number">3</div>
+                    <div class="calendar-event event-meeting" onclick="showEventDetail('EVT-002')">
+                        野村AM面談
+                    </div>
+                    <div class="calendar-event event-meeting" onclick="showEventDetail('EVT-003')">
+                        三菱UFJ面談
+                    </div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="calendar-day-number">4</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="calendar-day-number">5</div>
+                    <div class="calendar-event event-conference" onclick="showEventDetail('EVT-004')">
+                        JPモルガンカンファレンス
+                    </div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="calendar-day-number">6</div>
+                </div>
+                
+                <!-- 中略... -->
+                
+                <div class="calendar-day today">
+                    <div class="calendar-day-number">22</div>
+                    <div class="calendar-event event-meeting" onclick="showEventDetail('EVT-005')">
+                        BlackRock面談
+                    </div>
+                    <div class="calendar-event event-deadline" onclick="showEventDetail('EVT-006')">
+                        ESG報告書〆切
+                    </div>
+                    <div class="event-more" onclick="showMoreEvents('2024-01-22')">
+                        他2件...
+                    </div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="calendar-day-number">23</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="calendar-day-number">24</div>
+                    <div class="calendar-event event-earnings" onclick="showEventDetail('EVT-007')">
+                        Q4決算発表
+                    </div>
+                </div>
+                
+                <!-- 残りの日付... -->
+            </div>
+        </div>
+        
+        <!-- タイムライン表示 -->
+        <div class="timeline-view">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">今後のイベント</h3>
+            
+            <div class="timeline-item">
+                <div class="timeline-date">
+                    <div class="timeline-date-day">22</div>
+                    <div class="timeline-date-info">月曜日</div>
+                </div>
+                <div class="timeline-events">
+                    <div class="calendar-event event-meeting" style="padding: 8px 12px;">
+                        <div class="font-medium">BlackRock面談</div>
+                        <div class="text-xs mt-1">14:00-15:00 | オンライン</div>
+                    </div>
+                    <div class="calendar-event event-deadline" style="padding: 8px 12px;">
+                        <div class="font-medium">ESG報告書提出期限</div>
+                        <div class="text-xs mt-1">17:00締切</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-date">
+                    <div class="timeline-date-day">24</div>
+                    <div class="timeline-date-info">水曜日</div>
+                </div>
+                <div class="timeline-events">
+                    <div class="calendar-event event-earnings" style="padding: 8px 12px;">
+                        <div class="font-medium">2024年第4四半期決算発表</div>
+                        <div class="text-xs mt-1">15:00-16:30 | 東証ホール + オンライン配信</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- サイドバー -->
+    <div class="lg:col-span-1 space-y-6">
+        <!-- イベントタイプフィルター -->
+        <div class="calendar-sidebar">
+            <h3 class="font-semibold text-gray-900 mb-4">イベントタイプ</h3>
+            
+            <div class="event-type-filter active">
+                <input type="checkbox" checked class="mr-3">
+                <div class="event-type-indicator" style="background: #ef4444;"></div>
+                <span class="text-sm">決算関連</span>
+                <span class="ml-auto text-sm text-gray-500">3</span>
+            </div>
+            
+            <div class="event-type-filter active">
+                <input type="checkbox" checked class="mr-3">
+                <div class="event-type-indicator" style="background: #3b82f6;"></div>
+                <span class="text-sm">投資家面談</span>
+                <span class="ml-auto text-sm text-gray-500">12</span>
+            </div>
+            
+            <div class="event-type-filter active">
+                <input type="checkbox" checked class="mr-3">
+                <div class="event-type-indicator" style="background: #9333ea;"></div>
+                <span class="text-sm">カンファレンス</span>
+                <span class="ml-auto text-sm text-gray-500">4</span>
+            </div>
+            
+            <div class="event-type-filter active">
+                <input type="checkbox" checked class="mr-3">
+                <div class="event-type-indicator" style="background: #f59e0b;"></div>
+                <span class="text-sm">提出期限</span>
+                <span class="ml-auto text-sm text-gray-500">6</span>
+            </div>
+        </div>
+        
+        <!-- 今月の統計 -->
+        <div class="calendar-sidebar">
+            <h3 class="font-semibold text-gray-900 mb-4">今月の活動サマリー</h3>
+            
+            <div class="space-y-3">
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-600">総イベント数</span>
+                    <span class="font-semibold">25件</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-600">投資家面談</span>
+                    <span class="font-semibold">12件</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-600">参加予定人数</span>
+                    <span class="font-semibold">156名</span>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span class="text-sm text-gray-600">準備完了率</span>
+                    <span class="font-semibold text-green-600">87%</span>
+                </div>
+            </div>
+            
+            <button onclick="showMonthlyReport()" class="w-full mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
+                月次レポートを見る
+            </button>
+        </div>
+        
+        <!-- クイックアクション -->
+        <div class="calendar-sidebar">
+            <h3 class="font-semibold text-gray-900 mb-4">クイックアクション</h3>
+            
+            <div class="space-y-2">
+                <button onclick="importFromOutlook()" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm text-left flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Outlookから取り込み
+                </button>
+                <button onclick="syncWithTeams()" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm text-left flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Teams会議と同期
+                </button>
+                <button onclick="notificationSettings()" class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm text-left flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    通知設定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // カレンダーナビゲーション
+    function previousMonth() {
+        showNotification('前月を表示', 'info');
+    }
+    
+    function nextMonth() {
+        showNotification('翌月を表示', 'info');
+    }
+    
+    function goToToday() {
+        showNotification('今日の日付に移動しました', 'info');
+    }
+    
+    // イベント作成
+    function createNewEvent() {
+        showModal({
+            title: '新規イベント作成',
+            content: `
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">イベント名</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                            placeholder="例：○○証券との面談">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">イベントタイプ</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>投資家面談</option>
+                            <option>決算発表</option>
+                            <option>カンファレンス</option>
+                            <option>ロードショー</option>
+                            <option>株主総会</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">開始日時</label>
+                            <input type="datetime-local" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">終了日時</label>
+                            <input type="datetime-local" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">場所</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                            placeholder="例：本社会議室A / オンライン">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">参加者</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg" 
+                            placeholder="参加者を追加...">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">詳細・メモ</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="3"
+                            placeholder="アジェンダ、準備事項など"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-2">
+                            <span class="text-sm text-gray-700">リマインダーを設定（1日前）</span>
+                        </label>
+                    </div>
+                </form>
+            `,
+            confirmText: '作成',
+            onConfirm: () => {
+                showNotification('イベントを作成しました', 'success');
+            }
+        });
+    }
+    
+    // イベント詳細表示
+    function showEventDetail(eventId) {
+        // モックデータ
+        const eventData = {
+            'EVT-007': {
+                title: '2024年第4四半期決算発表',
+                type: 'earnings',
+                date: '2024年1月24日（水）',
+                time: '15:00 - 16:30',
+                location: '東証ホール + オンライン配信',
+                description: '2024年第4四半期および通期の決算発表を行います。'
+            }
+        };
+        
+        const event = eventData[eventId] || eventData['EVT-007'];
+        
+        showModal({
+            title: event.title,
+            content: `
+                <div class="event-detail-header">
+                    <div class="event-detail-icon" style="background: #fee2e2;">
+                        📊
+                    </div>
+                    <div class="event-detail-content">
+                        <div class="text-gray-600 mb-2">${event.date} ${event.time}</div>
+                        <div class="text-gray-700">${event.location}</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">概要</h4>
+                        <p class="text-sm text-gray-600">${event.description}</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">準備状況</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">決算資料</span>
+                                <span class="text-sm text-green-600 font-medium">✓ 完了</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">プレゼンテーション</span>
+                                <span class="text-sm text-green-600 font-medium">✓ 完了</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Q&A想定問答</span>
+                                <span class="text-sm text-yellow-600 font-medium">準備中</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">配信テスト</span>
+                                <span class="text-sm text-gray-400">未着手</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">参加者（8名）</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">CEO</span>
+                            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">CFO</span>
+                            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">IR部長</span>
+                            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">経理部長</span>
+                            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">+4名</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="event-detail-meta">
+                    <div class="event-detail-meta-item">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        1時間30分
+                    </div>
+                    <div class="event-detail-meta-item">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        リマインダー設定済み
+                    </div>
+                </div>
+            `,
+            confirmText: '編集',
+            cancelText: '閉じる',
+            onConfirm: () => {
+                showNotification('編集画面を開きます', 'info');
+            }
+        });
+    }
+    
+    // その他のイベント表示
+    function showMoreEvents(date) {
+        showModal({
+            title: `${date}のイベント`,
+            content: `
+                <div class="space-y-3">
+                    <div class="p-3 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-medium">個人投資家向け説明会準備</h4>
+                            <span class="text-xs text-gray-500">10:00-11:00</span>
+                        </div>
+                        <p class="text-sm text-gray-600">資料最終確認、会場設営</p>
+                    </div>
+                    <div class="p-3 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-medium">IR部定例会議</h4>
+                            <span class="text-xs text-gray-500">16:00-17:00</span>
+                        </div>
+                        <p class="text-sm text-gray-600">決算発表準備状況の共有</p>
+                    </div>
+                </div>
+            `,
+            confirmText: null,
+            cancelText: '閉じる'
+        });
+    }
+    
+    // 表示オプション
+    function showViewOptions() {
+        showModal({
+            title: 'カレンダー表示設定',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">表示形式</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option selected>月表示</option>
+                            <option>週表示</option>
+                            <option>日表示</option>
+                            <option>リスト表示</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">週の開始日</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>日曜日</option>
+                            <option selected>月曜日</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">タイムゾーン</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option selected>東京 (GMT+9)</option>
+                            <option>ニューヨーク (GMT-5)</option>
+                            <option>ロンドン (GMT+0)</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            confirmText: '適用',
+            onConfirm: () => {
+                showNotification('表示設定を更新しました', 'success');
+            }
+        });
+    }
+    
+    // エクスポート
+    function exportCalendar() {
+        showModal({
+            title: 'カレンダーのエクスポート',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">期間</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>今月</option>
+                            <option>今四半期</option>
+                            <option>今年度</option>
+                            <option>カスタム期間</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">形式</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="format" checked class="mr-2">
+                                <span>iCalendar (.ics)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="format" class="mr-2">
+                                <span>Excel (.xlsx)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="format" class="mr-2">
+                                <span>PDF</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: 'エクスポート',
+            onConfirm: () => {
+                showNotification('カレンダーをエクスポートしました', 'success');
+            }
+        });
+    }
+    
+    // 月次レポート
+    function showMonthlyReport() {
+        window.location.href = '/analytics#monthly-report';
+    }
+    
+    // 外部連携
+    function importFromOutlook() {
+        showNotification('Outlook連携画面を開きます', 'info');
+    }
+    
+    function syncWithTeams() {
+        showNotification('Teams同期を開始しました', 'info');
+    }
+    
+    function notificationSettings() {
+        showModal({
+            title: '通知設定',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">リマインダー</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">イベント1日前</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">イベント1時間前</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">イベント15分前</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">通知方法</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">メール通知</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">ブラウザ通知</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">Slack通知</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: '保存',
+            onConfirm: () => {
+                showNotification('通知設定を保存しました', 'success');
+            }
+        });
+    }
+    
+    // イベントタイプフィルター
+    document.querySelectorAll('.event-type-filter').forEach(filter => {
+        filter.addEventListener('click', function() {
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            this.classList.toggle('active');
+            
+            // 実際の実装では、カレンダーの表示を更新
+            showNotification('フィルターを更新しました', 'info');
+        });
+    });
+</script>
+{% endblock %}

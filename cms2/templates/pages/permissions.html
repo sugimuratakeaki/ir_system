@@ -1,0 +1,878 @@
+{% extends "base.html" %}
+
+{% block title %}権限管理{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 権限管理専用スタイル */
+    .permission-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 24px;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .permission-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .role-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 24px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .role-header:hover {
+        background: #f3f4f6;
+    }
+    
+    .role-header.expanded {
+        background: #e5e7eb;
+    }
+    
+    .role-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .role-icon {
+        width: 48px;
+        height: 48px;
+        background: #e5e7eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .role-admin .role-icon {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .role-editor .role-icon {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .role-viewer .role-icon {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .role-custom .role-icon {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+    
+    .role-details {
+        flex: 1;
+    }
+    
+    .role-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .role-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .role-stats {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .role-body {
+        padding: 24px;
+        display: none;
+    }
+    
+    .role-header.expanded + .role-body {
+        display: block;
+    }
+    
+    .permission-section {
+        margin-bottom: 24px;
+    }
+    
+    .permission-section-title {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .permission-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+    }
+    
+    .permission-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .permission-item:hover {
+        background: #f3f4f6;
+    }
+    
+    .permission-checkbox {
+        margin-right: 12px;
+    }
+    
+    .permission-label {
+        flex: 1;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+    
+    .permission-icon {
+        color: #9ca3af;
+        margin-left: 8px;
+    }
+    
+    .user-permission-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .user-permission-table th {
+        background: #f9fafb;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #374151;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .user-permission-table td {
+        padding: 12px;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.875rem;
+    }
+    
+    .user-permission-table tr:hover {
+        background: #f9fafb;
+    }
+    
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        background: #e5e7eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: #6b7280;
+    }
+    
+    .permission-matrix {
+        overflow-x: auto;
+    }
+    
+    .matrix-table {
+        width: 100%;
+        min-width: 800px;
+        border-collapse: collapse;
+    }
+    
+    .matrix-table th {
+        background: #f9fafb;
+        padding: 8px 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    
+    .matrix-table td {
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #f3f4f6;
+    }
+    
+    .matrix-table tbody tr:hover {
+        background: #f9fafb;
+    }
+    
+    .matrix-table .resource-name {
+        text-align: left;
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .permission-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        margin: 0 auto;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .permission-full {
+        background: #10b981;
+    }
+    
+    .permission-read {
+        background: #3b82f6;
+    }
+    
+    .permission-none {
+        background: #e5e7eb;
+    }
+    
+    .permission-indicator:hover {
+        transform: scale(1.2);
+    }
+    
+    .audit-entry {
+        display: flex;
+        align-items: start;
+        gap: 12px;
+        padding: 12px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .audit-entry:last-child {
+        border-bottom: none;
+    }
+    
+    .audit-time {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        white-space: nowrap;
+    }
+    
+    .audit-content {
+        flex: 1;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+    
+    .audit-user {
+        font-weight: 500;
+        color: #111827;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">権限管理</h1>
+            <p class="text-gray-600">ユーザーロールとアクセス権限の設定</p>
+        </div>
+        <div class="mt-4 lg:mt-0 flex flex-wrap gap-3">
+            <button onclick="showMatrixView()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                権限マトリクス
+            </button>
+            <button onclick="showAuditLog()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                変更履歴
+            </button>
+            <button onclick="createRole()" class="px-4 py-2 bg-kagami-blue text-white rounded-lg hover:bg-kagami-blue-dark transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                新規ロール作成
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 統計サマリー -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-lg p-4 border border-gray-200">
+        <div class="text-sm text-gray-600 mb-1">総ユーザー数</div>
+        <div class="text-2xl font-bold text-gray-900">24</div>
+        <div class="text-xs text-gray-500 mt-1">アクティブ: 22</div>
+    </div>
+    <div class="bg-white rounded-lg p-4 border border-gray-200">
+        <div class="text-sm text-gray-600 mb-1">定義済みロール</div>
+        <div class="text-2xl font-bold text-gray-900">5</div>
+        <div class="text-xs text-gray-500 mt-1">カスタム: 2</div>
+    </div>
+    <div class="bg-white rounded-lg p-4 border border-gray-200">
+        <div class="text-sm text-gray-600 mb-1">権限グループ</div>
+        <div class="text-2xl font-bold text-gray-900">8</div>
+        <div class="text-xs text-gray-500 mt-1">全128項目</div>
+    </div>
+    <div class="bg-white rounded-lg p-4 border border-gray-200">
+        <div class="text-sm text-gray-600 mb-1">最終更新</div>
+        <div class="text-2xl font-bold text-gray-900">3日前</div>
+        <div class="text-xs text-gray-500 mt-1">管理者による</div>
+    </div>
+</div>
+
+<!-- ロール管理 -->
+<div class="space-y-4 mb-8">
+    <!-- 管理者ロール -->
+    <div class="permission-card">
+        <div class="role-header role-admin expanded" onclick="toggleRole(this)">
+            <div class="role-info">
+                <div class="role-icon">👑</div>
+                <div class="role-details">
+                    <div class="role-name">管理者</div>
+                    <div class="role-description">システムの全機能にアクセス可能</div>
+                </div>
+            </div>
+            <div class="role-stats">
+                <span>3名</span>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
+        <div class="role-body">
+            <!-- IR管理 -->
+            <div class="permission-section">
+                <h4 class="permission-section-title">IR管理</h4>
+                <div class="permission-grid">
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">投資家情報の閲覧・編集</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">議事録の作成・編集・削除</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">FAQ管理</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">メール配信</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- コンテンツ管理 -->
+            <div class="permission-section">
+                <h4 class="permission-section-title">コンテンツ管理</h4>
+                <div class="permission-grid">
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">ドキュメントのアップロード</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">ニュース・お知らせの公開</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">スケジュール管理</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- システム管理 -->
+            <div class="permission-section">
+                <h4 class="permission-section-title">システム管理</h4>
+                <div class="permission-grid">
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">ユーザー管理</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">権限管理</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">監査ログの閲覧</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" checked disabled class="permission-checkbox">
+                        <label class="permission-label">システム設定</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 割り当てユーザー -->
+            <div class="mt-6">
+                <h4 class="font-medium text-gray-900 mb-3">割り当てユーザー</h4>
+                <div class="flex flex-wrap gap-3">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                        <div class="user-avatar">山田</div>
+                        <span class="text-sm">山田 太郎</span>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                        <div class="user-avatar">鈴木</div>
+                        <span class="text-sm">鈴木 一郎</span>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                        <div class="user-avatar">高橋</div>
+                        <span class="text-sm">高橋 美咲</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 編集者ロール -->
+    <div class="permission-card">
+        <div class="role-header role-editor" onclick="toggleRole(this)">
+            <div class="role-info">
+                <div class="role-icon">✏️</div>
+                <div class="role-details">
+                    <div class="role-name">編集者</div>
+                    <div class="role-description">コンテンツの作成・編集が可能</div>
+                </div>
+            </div>
+            <div class="role-stats">
+                <span>12名</span>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
+        <div class="role-body">
+            <!-- 権限設定内容 -->
+        </div>
+    </div>
+    
+    <!-- 閲覧者ロール -->
+    <div class="permission-card">
+        <div class="role-header role-viewer" onclick="toggleRole(this)">
+            <div class="role-info">
+                <div class="role-icon">👁️</div>
+                <div class="role-details">
+                    <div class="role-name">閲覧者</div>
+                    <div class="role-description">情報の閲覧のみ可能</div>
+                </div>
+            </div>
+            <div class="role-stats">
+                <span>7名</span>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
+        <div class="role-body">
+            <!-- 権限設定内容 -->
+        </div>
+    </div>
+    
+    <!-- カスタムロール -->
+    <div class="permission-card">
+        <div class="role-header role-custom" onclick="toggleRole(this)">
+            <div class="role-info">
+                <div class="role-icon">⚡</div>
+                <div class="role-details">
+                    <div class="role-name">IR担当者</div>
+                    <div class="role-description">IR業務に特化した権限セット</div>
+                </div>
+            </div>
+            <div class="role-stats">
+                <span>5名</span>
+                <button onclick="event.stopPropagation(); editRole('custom1')" class="text-accent-teal hover:text-accent-teal/80">
+                    編集
+                </button>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
+        <div class="role-body">
+            <!-- 権限設定内容 -->
+        </div>
+    </div>
+</div>
+
+<!-- ユーザー別権限一覧 -->
+<div class="permission-card">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">ユーザー別権限一覧</h2>
+        <div class="flex items-center gap-2">
+            <input type="text" placeholder="ユーザー検索..." class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option>すべてのロール</option>
+                <option>管理者</option>
+                <option>編集者</option>
+                <option>閲覧者</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="user-permission-table">
+            <thead>
+                <tr>
+                    <th>ユーザー</th>
+                    <th>部署</th>
+                    <th>ロール</th>
+                    <th>最終ログイン</th>
+                    <th>ステータス</th>
+                    <th>アクション</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="user-avatar">山田</div>
+                            <div>
+                                <div class="font-medium">山田 太郎</div>
+                                <div class="text-xs text-gray-500">yamada@example.com</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>IR部</td>
+                    <td>
+                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                            管理者
+                        </span>
+                    </td>
+                    <td>10分前</td>
+                    <td>
+                        <span class="text-green-600 font-medium">有効</span>
+                    </td>
+                    <td>
+                        <button onclick="editUserPermission(1)" class="text-sm text-accent-teal hover:text-accent-teal/80">
+                            編集
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="user-avatar">佐藤</div>
+                            <div>
+                                <div class="font-medium">佐藤 花子</div>
+                                <div class="text-xs text-gray-500">sato@example.com</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>経理部</td>
+                    <td>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                            編集者
+                        </span>
+                    </td>
+                    <td>2時間前</td>
+                    <td>
+                        <span class="text-green-600 font-medium">有効</span>
+                    </td>
+                    <td>
+                        <button onclick="editUserPermission(2)" class="text-sm text-accent-teal hover:text-accent-teal/80">
+                            編集
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="user-avatar">鈴木</div>
+                            <div>
+                                <div class="font-medium">鈴木 一郎</div>
+                                <div class="text-xs text-gray-500">suzuki@example.com</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>広報部</td>
+                    <td>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                            閲覧者
+                        </span>
+                    </td>
+                    <td>1日前</td>
+                    <td>
+                        <span class="text-green-600 font-medium">有効</span>
+                    </td>
+                    <td>
+                        <button onclick="editUserPermission(3)" class="text-sm text-accent-teal hover:text-accent-teal/80">
+                            編集
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ロールの展開/折りたたみ
+    function toggleRole(header) {
+        header.classList.toggle('expanded');
+        const icon = header.querySelector('svg');
+        if (header.classList.contains('expanded')) {
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+    
+    // 新規ロール作成
+    function createRole() {
+        showModal({
+            title: '新規ロール作成',
+            content: `
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ロール名</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="例: 経営企画担当">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">説明</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg" rows="3"
+                            placeholder="このロールの用途や権限の概要"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ベースロール</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>権限を最初から設定</option>
+                            <option>閲覧者をベースに作成</option>
+                            <option>編集者をベースに作成</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">アイコン</label>
+                        <div class="flex gap-2">
+                            <button type="button" class="p-3 border border-gray-300 rounded-lg hover:bg-gray-50">🎯</button>
+                            <button type="button" class="p-3 border border-gray-300 rounded-lg hover:bg-gray-50">💼</button>
+                            <button type="button" class="p-3 border border-gray-300 rounded-lg hover:bg-gray-50">📊</button>
+                            <button type="button" class="p-3 border border-gray-300 rounded-lg hover:bg-gray-50">🔧</button>
+                            <button type="button" class="p-3 border border-gray-300 rounded-lg hover:bg-gray-50">🌟</button>
+                        </div>
+                    </div>
+                </form>
+            `,
+            confirmText: '作成',
+            onConfirm: () => {
+                showNotification('新しいロールを作成しました', 'success');
+            }
+        });
+    }
+    
+    // ロール編集
+    function editRole(roleId) {
+        showNotification('ロール編集画面を開きます', 'info');
+    }
+    
+    // ユーザー権限編集
+    function editUserPermission(userId) {
+        showModal({
+            title: 'ユーザー権限の編集',
+            content: `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="user-avatar">山田</div>
+                        <div>
+                            <div class="font-medium">山田 太郎</div>
+                            <div class="text-sm text-gray-500">yamada@example.com</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ロール</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option selected>管理者</option>
+                            <option>編集者</option>
+                            <option>閲覧者</option>
+                            <option>IR担当者（カスタム）</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">個別権限の追加</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">決算資料の早期アクセス</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">機密情報へのアクセス</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">他部署データの閲覧</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">アクセス制限</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">IP制限を有効化</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">二要素認証を必須化</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: '保存',
+            onConfirm: () => {
+                showNotification('権限設定を更新しました', 'success');
+            }
+        });
+    }
+    
+    // 権限マトリクス表示
+    function showMatrixView() {
+        showModal({
+            title: '権限マトリクス',
+            size: 'xl',
+            content: `
+                <div class="permission-matrix">
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th class="resource-name">リソース / ロール</th>
+                                <th>管理者</th>
+                                <th>編集者</th>
+                                <th>閲覧者</th>
+                                <th>IR担当者</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="resource-name">投資家情報</td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                                <td><div class="permission-indicator permission-read" title="読み取り専用"></div></td>
+                                <td><div class="permission-indicator permission-read" title="読み取り専用"></div></td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                            </tr>
+                            <tr>
+                                <td class="resource-name">議事録</td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                                <td><div class="permission-indicator permission-read" title="読み取り専用"></div></td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                            </tr>
+                            <tr>
+                                <td class="resource-name">財務データ</td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                                <td><div class="permission-indicator permission-read" title="読み取り専用"></div></td>
+                                <td><div class="permission-indicator permission-none" title="アクセス不可"></div></td>
+                                <td><div class="permission-indicator permission-read" title="読み取り専用"></div></td>
+                            </tr>
+                            <tr>
+                                <td class="resource-name">システム設定</td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                                <td><div class="permission-indicator permission-none" title="アクセス不可"></div></td>
+                                <td><div class="permission-indicator permission-none" title="アクセス不可"></div></td>
+                                <td><div class="permission-indicator permission-none" title="アクセス不可"></div></td>
+                            </tr>
+                            <tr>
+                                <td class="resource-name">メール配信</td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                                <td><div class="permission-indicator permission-none" title="アクセス不可"></div></td>
+                                <td><div class="permission-indicator permission-full" title="完全アクセス"></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 flex items-center justify-center gap-4 text-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="permission-indicator permission-full" style="width: 16px; height: 16px;"></div>
+                        <span>完全アクセス</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="permission-indicator permission-read" style="width: 16px; height: 16px;"></div>
+                        <span>読み取り専用</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="permission-indicator permission-none" style="width: 16px; height: 16px;"></div>
+                        <span>アクセス不可</span>
+                    </div>
+                </div>
+            `,
+            confirmText: null,
+            cancelText: '閉じる'
+        });
+    }
+    
+    // 変更履歴表示
+    function showAuditLog() {
+        showModal({
+            title: '権限変更履歴',
+            size: 'lg',
+            content: `
+                <div class="space-y-1">
+                    <div class="audit-entry">
+                        <div class="audit-time">2024/01/22 15:30</div>
+                        <div class="audit-content">
+                            <span class="audit-user">山田 太郎</span>が
+                            <span class="audit-user">佐藤 花子</span>のロールを
+                            「閲覧者」から「編集者」に変更しました
+                        </div>
+                    </div>
+                    <div class="audit-entry">
+                        <div class="audit-time">2024/01/20 10:15</div>
+                        <div class="audit-content">
+                            <span class="audit-user">鈴木 一郎</span>が
+                            新しいカスタムロール「IR担当者」を作成しました
+                        </div>
+                    </div>
+                    <div class="audit-entry">
+                        <div class="audit-time">2024/01/18 14:45</div>
+                        <div class="audit-content">
+                            <span class="audit-user">山田 太郎</span>が
+                            「編集者」ロールの権限を更新しました（メール配信権限を追加）
+                        </div>
+                    </div>
+                    <div class="audit-entry">
+                        <div class="audit-time">2024/01/15 09:30</div>
+                        <div class="audit-content">
+                            <span class="audit-user">高橋 美咲</span>が
+                            <span class="audit-user">田中 次郎</span>をシステムに追加し、
+                            「閲覧者」ロールを割り当てました
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: null,
+            cancelText: '閉じる'
+        });
+    }
+</script>
+{% endblock %}
