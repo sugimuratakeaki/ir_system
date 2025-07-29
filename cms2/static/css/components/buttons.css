@@ -1,0 +1,402 @@
+/* 
+ * KAGAMI CMS 2.0 - Button Styles
+ * 洗練されたボタンコンポーネント
+ */
+
+/* ===== ベースボタン ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-md);
+    font-weight: var(--font-medium);
+    font-size: var(--text-sm);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    border: 1px solid transparent;
+    transition: all var(--transition-fast) var(--easing-default);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ホバーエフェクト */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* フォーカススタイル */
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+/* ===== ボタンバリエーション ===== */
+
+/* プライマリボタン */
+.btn-primary {
+    background: var(--accent-teal);
+    color: white;
+    border-color: var(--accent-teal);
+}
+
+.btn-primary:hover {
+    background: var(--accent-teal-dark);
+    border-color: var(--accent-teal-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(20, 184, 166, 0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(20, 184, 166, 0.2);
+}
+
+/* セカンダリボタン */
+.btn-secondary {
+    background: white;
+    color: var(--gray-700);
+    border-color: var(--gray-300);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    color: var(--gray-900);
+}
+
+.btn-secondary:active {
+    background: var(--gray-100);
+}
+
+/* アウトラインボタン */
+.btn-outline {
+    background: transparent;
+    color: var(--gray-700);
+    border-color: var(--gray-300);
+}
+
+.btn-outline:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    color: var(--gray-900);
+}
+
+.btn-outline-primary {
+    color: var(--accent-teal);
+    border-color: var(--accent-teal);
+}
+
+.btn-outline-primary:hover {
+    background: rgba(20, 184, 166, 0.05);
+    border-color: var(--accent-teal-dark);
+    color: var(--accent-teal-dark);
+}
+
+/* ゴーストボタン */
+.btn-ghost {
+    background: transparent;
+    color: var(--gray-700);
+    border-color: transparent;
+}
+
+.btn-ghost:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+/* 危険ボタン */
+.btn-danger {
+    background: var(--error);
+    color: white;
+    border-color: var(--error);
+}
+
+.btn-danger:hover {
+    background: var(--error-dark);
+    border-color: var(--error-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+
+/* 成功ボタン */
+.btn-success {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.btn-success:hover {
+    background: var(--success-dark);
+    border-color: var(--success-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+}
+
+/* ===== ボタンサイズ ===== */
+.btn-xs {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--text-xs);
+    gap: 4px;
+}
+
+.btn-sm {
+    padding: 6px var(--space-sm);
+    font-size: var(--text-xs);
+}
+
+.btn-lg {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--text-base);
+}
+
+.btn-xl {
+    padding: var(--space-lg) var(--space-xl);
+    font-size: var(--text-lg);
+}
+
+/* ===== ボタン状態 ===== */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-loading {
+    color: transparent;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+    color: inherit;
+}
+
+/* ===== ボタン形状 ===== */
+.btn-rounded {
+    border-radius: var(--border-radius-full);
+}
+
+.btn-square {
+    border-radius: 0;
+}
+
+/* アイコンボタン */
+.btn-icon {
+    padding: var(--space-sm);
+    width: 40px;
+    height: 40px;
+}
+
+.btn-icon.btn-sm {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+}
+
+.btn-icon.btn-lg {
+    width: 48px;
+    height: 48px;
+    padding: var(--space-md);
+}
+
+/* ===== ボタングループ ===== */
+.btn-group {
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.btn-group > .btn {
+    position: relative;
+    flex: 0 1 auto;
+}
+
+.btn-group > .btn:hover {
+    z-index: 1;
+}
+
+.btn-group > .btn:not(:first-child) {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.btn-group > .btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* 垂直ボタングループ */
+.btn-group-vertical {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.btn-group-vertical > .btn {
+    width: 100%;
+}
+
+.btn-group-vertical > .btn:not(:first-child) {
+    margin-top: -1px;
+    margin-left: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.btn-group-vertical > .btn:not(:last-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ===== フローティングアクションボタン ===== */
+.fab {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    transition: all var(--transition-fast);
+    z-index: var(--z-fixed);
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-xl);
+}
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+/* ===== ブロックボタン ===== */
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* ===== ソーシャルボタン ===== */
+.btn-google {
+    background: white;
+    color: var(--gray-700);
+    border-color: var(--gray-300);
+}
+
+.btn-google:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+}
+
+.btn-github {
+    background: #24292e;
+    color: white;
+    border-color: #24292e;
+}
+
+.btn-github:hover {
+    background: #1a1e22;
+    border-color: #1a1e22;
+}
+
+.btn-twitter {
+    background: #1da1f2;
+    color: white;
+    border-color: #1da1f2;
+}
+
+.btn-twitter:hover {
+    background: #1a91da;
+    border-color: #1a91da;
+}
+
+/* ===== アニメーション ===== */
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* リップルエフェクト */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(0);
+    animation: ripple 0.6s ease-out;
+}
+
+/* ===== ダークモード対応 ===== */
+[data-theme="dark"] .btn-secondary {
+    background: var(--gray-700);
+    color: var(--gray-200);
+    border-color: var(--gray-600);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: var(--gray-600);
+    border-color: var(--gray-500);
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .btn-outline {
+    color: var(--gray-300);
+    border-color: var(--gray-600);
+}
+
+[data-theme="dark"] .btn-outline:hover {
+    background: var(--gray-700);
+    border-color: var(--gray-500);
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .btn-ghost {
+    color: var(--gray-300);
+}
+
+[data-theme="dark"] .btn-ghost:hover {
+    background: var(--gray-700);
+    color: var(--gray-100);
+}

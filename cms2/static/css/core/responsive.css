@@ -1,0 +1,554 @@
+/**
+ * KAGAMI CMS 2.0 - Responsive Design
+ * レスポンシブデザインとモバイル最適化
+ */
+
+/* ===== ブレークポイント定義 ===== */
+:root {
+    --breakpoint-xs: 480px;
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+}
+
+/* ===== レスポンシブユーティリティクラス ===== */
+/* 表示/非表示 */
+@media (max-width: 767px) {
+    .hide-mobile { display: none !important; }
+    .show-mobile { display: block !important; }
+}
+
+@media (min-width: 768px) {
+    .hide-desktop { display: none !important; }
+    .show-desktop { display: block !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .hide-tablet { display: none !important; }
+    .show-tablet { display: block !important; }
+}
+
+/* ===== レスポンシブグリッド ===== */
+.responsive-grid {
+    display: grid;
+    gap: var(--space-lg);
+}
+
+.responsive-grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.responsive-grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.responsive-grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* ===== メインレイアウトのレスポンシブ対応 ===== */
+/* タブレット（768px - 1023px） */
+@media (max-width: 1023px) {
+    /* サイドバー */
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        z-index: var(--z-sidebar);
+        transition: left var(--transition-normal);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .sidebar.mobile-open {
+        left: 0;
+    }
+    
+    /* サイドバーオーバーレイ */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: calc(var(--z-sidebar) - 1);
+    }
+    
+    body.sidebar-open .sidebar-overlay {
+        display: block;
+    }
+    
+    /* メインコンテンツ */
+    .main-wrapper {
+        margin-left: 0 !important;
+    }
+    
+    /* ページコンテンツ */
+    .page-content {
+        padding: var(--space-md);
+    }
+    
+    /* ヘッダー */
+    .header {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .header-search {
+        display: none;
+    }
+    
+    /* ブレッドクラム */
+    .breadcrumb {
+        display: none;
+    }
+}
+
+/* モバイル（767px以下） */
+@media (max-width: 767px) {
+    /* タイポグラフィ調整 */
+    h1 { font-size: var(--text-2xl); }
+    h2 { font-size: var(--text-xl); }
+    h3 { font-size: var(--text-lg); }
+    
+    /* ヘッダー */
+    .header {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+    
+    .header-left,
+    .header-right {
+        width: 100%;
+    }
+    
+    .page-title {
+        font-size: var(--text-lg);
+    }
+    
+    .page-title-icon {
+        display: none;
+    }
+    
+    /* ユーザーメニュー */
+    .user-menu-button {
+        padding: var(--space-xs);
+    }
+    
+    .user-info {
+        display: none;
+    }
+    
+    .user-avatar {
+        margin-right: 0;
+    }
+    
+    /* ボタンサイズ調整 */
+    .btn {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+    }
+    
+    /* カード */
+    .card {
+        padding: var(--space-md);
+    }
+    
+    /* テーブルのレスポンシブ対応 */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .data-table {
+        min-width: 600px;
+    }
+    
+    /* フォーム */
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-group {
+        margin-bottom: var(--space-md);
+    }
+    
+    /* モーダル */
+    .modal-content {
+        width: 95%;
+        margin: var(--space-sm);
+        max-height: 90vh;
+    }
+    
+    .modal-large {
+        width: 95%;
+    }
+    
+    /* 通知 */
+    .notification-container {
+        top: var(--space-sm);
+        right: var(--space-sm);
+        left: var(--space-sm);
+    }
+    
+    .notification {
+        width: 100%;
+        margin: 0;
+    }
+}
+
+/* ===== ダッシュボードのレスポンシブ ===== */
+@media (max-width: 1279px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dashboard-card.span-2 {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 767px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-card.span-2 {
+        grid-column: span 1;
+    }
+    
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pipeline-header {
+        overflow-x: auto;
+        display: flex;
+        gap: var(--space-md);
+        padding-bottom: var(--space-sm);
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .pipeline-stage {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}
+
+/* ===== ドキュメント管理のレスポンシブ ===== */
+@media (max-width: 1023px) {
+    .folder-tree-sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+        transition: left var(--transition-normal);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .folder-tree-sidebar.open {
+        left: 0;
+    }
+    
+    .document-main {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .document-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .document-toolbar {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .document-filters {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+}
+
+/* ===== ミーティング管理のレスポンシブ ===== */
+@media (max-width: 1023px) {
+    .meeting-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .kanban-board {
+        padding: var(--space-md);
+    }
+    
+    .kanban-column {
+        min-width: 280px;
+    }
+}
+
+@media (max-width: 767px) {
+    .meeting-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .view-controls {
+        flex-direction: column;
+        gap: var(--space-md);
+        align-items: stretch;
+    }
+    
+    .view-tabs {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .meeting-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .calendar-weekdays,
+    .calendar-days {
+        font-size: var(--text-xs);
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        padding: var(--space-xs);
+    }
+    
+    .calendar-meeting {
+        font-size: 10px;
+        padding: 1px 2px;
+    }
+}
+
+/* ===== 投資家管理のレスポンシブ ===== */
+@media (max-width: 1023px) {
+    .investor-dashboard {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .content-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-section {
+        order: 2;
+    }
+    
+    .action-section {
+        order: 1;
+        align-self: flex-end;
+        margin-bottom: var(--space-md);
+    }
+}
+
+@media (max-width: 767px) {
+    .investor-dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .investor-grid {
+        grid-template-columns: 1fr;
+        padding: var(--space-md);
+    }
+    
+    .filter-chips {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: var(--space-xs);
+    }
+    
+    .filter-chip {
+        flex-shrink: 0;
+    }
+    
+    .view-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .view-tab {
+        flex-shrink: 0;
+    }
+    
+    .action-section {
+        width: 100%;
+        display: flex;
+        gap: var(--space-sm);
+    }
+    
+    .action-section .btn {
+        flex: 1;
+    }
+}
+
+/* ===== タッチデバイス最適化 ===== */
+@media (hover: none) and (pointer: coarse) {
+    /* タッチターゲットのサイズを拡大 */
+    button,
+    a,
+    input[type="checkbox"],
+    input[type="radio"],
+    .clickable {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* ホバーエフェクトを無効化 */
+    .btn:hover,
+    .nav-item:hover,
+    .card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* タッチフィードバック */
+    .btn:active,
+    .nav-item:active,
+    .card:active {
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+    
+    /* スクロールの改善 */
+    .scrollable {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+}
+
+/* ===== 印刷対応 ===== */
+@media print {
+    /* 不要な要素を非表示 */
+    .sidebar,
+    .header,
+    .notification-container,
+    #modal-container,
+    .no-print,
+    .btn,
+    .action-bar,
+    .view-tabs,
+    .filter-section {
+        display: none !important;
+    }
+    
+    /* レイアウト調整 */
+    .main-wrapper {
+        margin-left: 0 !important;
+    }
+    
+    .page-content {
+        padding: 0 !important;
+    }
+    
+    /* 背景色を削除 */
+    * {
+        background: white !important;
+        color: black !important;
+    }
+    
+    /* リンクのURL表示 */
+    a[href]:after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        color: #666;
+    }
+    
+    /* ページブレーク */
+    .page-break {
+        page-break-before: always;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+    
+    table {
+        page-break-inside: avoid;
+    }
+}
+
+/* ===== アクセシビリティ向上 ===== */
+/* ハイコントラストモード */
+@media (prefers-contrast: high) {
+    :root {
+        --gray-100: #f0f0f0;
+        --gray-900: #000000;
+        --accent-teal: #008080;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .card {
+        border: 2px solid var(--gray-900);
+    }
+}
+
+/* モーション削減 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .loading-spinner {
+        display: none;
+    }
+    
+    .loading-overlay.active::after {
+        content: '読み込み中...';
+        display: block;
+        font-size: var(--text-lg);
+        color: var(--gray-700);
+    }
+}
+
+/* ===== オリエンテーション対応 ===== */
+@media (orientation: landscape) and (max-width: 896px) {
+    .header {
+        padding: var(--space-xs) var(--space-md);
+    }
+    
+    .page-content {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .modal-content {
+        max-height: 85vh;
+    }
+}
+
+/* ===== 高解像度ディスプレイ対応 ===== */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    /* 細い線の調整 */
+    .border-thin {
+        border-width: 0.5px;
+    }
+    
+    /* アイコンの鮮明化 */
+    .icon-svg {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+}

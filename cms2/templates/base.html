@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - KAGAMI CMS 2.0</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMxYTM2NWQiLz4KPHBhdGggZD0iTTEwIDEySDE0VjIwSDEwVjEyWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE4IDhIMjJWMjBIMThWOFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg==">
+    
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="/static/css/core/base.css">
+    <link rel="stylesheet" href="/static/css/core/utilities.css">
+    <link rel="stylesheet" href="/static/css/core/responsive.css">
+    
+    <!-- Component CSS -->
+    <link rel="stylesheet" href="/static/css/components/sidebar.css">
+    <link rel="stylesheet" href="/static/css/components/header.css">
+    <link rel="stylesheet" href="/static/css/components/cards.css">
+    <link rel="stylesheet" href="/static/css/components/modals.css">
+    <link rel="stylesheet" href="/static/css/components/notifications.css">
+    <link rel="stylesheet" href="/static/css/components/buttons.css">
+    <link rel="stylesheet" href="/static/css/components/forms.css">
+    <link rel="stylesheet" href="/static/css/components/tables.css">
+    
+    <!-- Tailwind CSS (フォールバック用) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kagami-blue': '#1a365d',
+                        'kagami-blue-dark': '#0f2544',
+                        'accent-teal': '#14b8a6',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Page Specific CSS -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-layout">
+        <!-- サイドバー -->
+        {% include 'components/sidebar.html' %}
+        
+        <!-- メインコンテンツエリア -->
+        <main class="main-wrapper">
+            <!-- ヘッダー -->
+            {% include 'components/header.html' %}
+            
+            <!-- ページコンテンツ -->
+            <div class="page-content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- 通知コンテナ -->
+    <div id="notification-container" class="notification-container"></div>
+    
+    <!-- モーダルコンテナ -->
+    <div id="modal-container"></div>
+    
+    <!-- Core JavaScript -->
+    <script src="/static/js/core/app.js"></script>
+    <script src="/static/js/core/utils.js"></script>
+    
+    <!-- Component JavaScript -->
+    <script src="/static/js/components/sidebar.js"></script>
+    <script src="/static/js/components/notifications.js"></script>
+    <script src="/static/js/components/modals.js"></script>
+    <script src="/static/js/components/tables.js"></script>
+    <script src="/static/js/components/forms.js"></script>
+    
+    <!-- Advanced Features -->
+    <script src="/static/js/core/advanced-features.js"></script>
+    <script src="/static/js/core/error-handling.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Page Specific JavaScript -->
+    {% block extra_js %}{% endblock %}
+    
+    <style>
+        /* レイアウトスタイル */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+            background: var(--gray-50);
+        }
+        
+        .main-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left var(--transition-normal) var(--easing-default);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .sidebar.collapsed + .main-wrapper {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+        
+        .page-content {
+            flex: 1;
+            padding: var(--space-lg);
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        /* 通知コンテナ */
+        .notification-container {
+            position: fixed;
+            top: var(--space-lg);
+            right: var(--space-lg);
+            z-index: var(--z-notification);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            pointer-events: none;
+        }
+        
+        .notification-container > * {
+            pointer-events: auto;
+        }
+        
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .main-wrapper {
+                margin-left: 0;
+            }
+            
+            .sidebar.collapsed + .main-wrapper {
+                margin-left: 0;
+            }
+            
+            .page-content {
+                padding: var(--space-md);
+            }
+            
+            .notification-container {
+                top: var(--space-md);
+                right: var(--space-md);
+                left: var(--space-md);
+            }
+        }
+        
+        /* ローディングオーバーレイ */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-overlay);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-normal), visibility var(--transition-normal);
+        }
+        
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--accent-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* プリント対応 */
+        @media print {
+            .sidebar,
+            .header,
+            .notification-container,
+            #modal-container,
+            .no-print {
+                display: none !important;
+            }
+            
+            .main-wrapper {
+                margin-left: 0 !important;
+            }
+            
+            .page-content {
+                padding: 0 !important;
+            }
+        }
+    </style>
+</body>
+</html>

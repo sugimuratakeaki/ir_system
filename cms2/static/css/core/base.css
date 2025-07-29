@@ -1,0 +1,258 @@
+/* 
+ * KAGAMI CMS 2.0 - Base Styles
+ * リセットとベーススタイル
+ */
+
+/* ===== CSS変数のインポート ===== */
+@import url('./variables.css');
+
+/* ===== ベースリセット ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-normal);
+  color: var(--gray-900);
+  background-color: var(--gray-50);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===== 見出し ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  color: var(--gray-900);
+}
+
+h1 { font-size: var(--text-4xl); margin-bottom: var(--space-lg); }
+h2 { font-size: var(--text-3xl); margin-bottom: var(--space-lg); }
+h3 { font-size: var(--text-2xl); margin-bottom: var(--space-md); }
+h4 { font-size: var(--text-xl); margin-bottom: var(--space-md); }
+h5 { font-size: var(--text-lg); margin-bottom: var(--space-sm); }
+h6 { font-size: var(--text-base); margin-bottom: var(--space-sm); }
+
+/* ===== リンク ===== */
+a {
+  color: var(--info);
+  text-decoration: none;
+  transition: color var(--transition-fast) var(--easing-default);
+  cursor: pointer;
+}
+
+a:hover {
+  color: var(--info-dark);
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* ===== パラグラフ ===== */
+p {
+  margin-bottom: var(--space-md);
+  line-height: var(--leading-relaxed);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== リスト ===== */
+ul, ol {
+  margin-bottom: var(--space-md);
+  padding-left: var(--space-lg);
+}
+
+li {
+  margin-bottom: var(--space-xs);
+  line-height: var(--leading-normal);
+}
+
+/* ===== テーブル ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-md);
+}
+
+th, td {
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-bottom: var(--border-width) solid var(--gray-200);
+}
+
+th {
+  font-weight: var(--font-semibold);
+  background-color: var(--gray-50);
+  color: var(--gray-700);
+}
+
+/* ===== フォーム要素 ===== */
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+button:focus {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 2px;
+}
+
+/* ===== 画像 ===== */
+img, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+svg {
+  fill: currentColor;
+}
+
+/* ===== コード ===== */
+code, pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+code {
+  background-color: var(--gray-100);
+  padding: 0.125rem 0.25rem;
+  border-radius: var(--border-radius-sm);
+}
+
+pre {
+  background-color: var(--gray-900);
+  color: var(--gray-100);
+  padding: var(--space-md);
+  border-radius: var(--border-radius-md);
+  overflow-x: auto;
+  margin-bottom: var(--space-md);
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* ===== 引用 ===== */
+blockquote {
+  border-left: 4px solid var(--accent-teal);
+  padding-left: var(--space-md);
+  margin-bottom: var(--space-md);
+  font-style: italic;
+  color: var(--gray-700);
+}
+
+/* ===== 区切り線 ===== */
+hr {
+  border: none;
+  border-top: var(--border-width) solid var(--gray-200);
+  margin: var(--space-xl) 0;
+}
+
+/* ===== スクロールバー（Webkit） ===== */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--gray-100);
+  border-radius: var(--border-radius-lg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--gray-400);
+  border-radius: var(--border-radius-lg);
+  border: 3px solid var(--gray-100);
+  transition: background-color var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--gray-500);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-400) var(--gray-100);
+}
+
+/* ===== 選択時のスタイル ===== */
+::selection {
+  background-color: var(--accent-teal);
+  color: white;
+}
+
+::-moz-selection {
+  background-color: var(--accent-teal);
+  color: white;
+}
+
+/* ===== フォーカススタイル ===== */
+:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* ===== アニメーション無効化（アクセシビリティ） ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== プリント時のスタイル ===== */
+@media print {
+  body {
+    background-color: white;
+    color: black;
+  }
+  
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}

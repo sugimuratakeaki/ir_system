@@ -1,0 +1,1012 @@
+{% extends 'base.html' %}
+
+{% block title %}投資家管理{% endblock %}
+{% block page_icon %}👥{% endblock %}
+{% block page_title %}投資家管理{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-item">
+    <a href="#" class="breadcrumb-link">IR業務統合</a>
+    <span class="breadcrumb-separator">›</span>
+</div>
+{% endblock %}
+{% block breadcrumb_current %}投資家管理{% endblock %}
+
+{% block content %}
+<!-- 投資家統計ダッシュボード -->
+<div class="investor-dashboard">
+    <div class="dashboard-card total-investors">
+        <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M21 10C23.2091 10 25 8.20914 25 6C25 3.79086 23.2091 2 21 2C18.7909 2 17 3.79086 17 6C17 8.20914 18.7909 10 21 10Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M11 10C13.2091 10 15 8.20914 15 6C15 3.79086 13.2091 2 11 2C8.79086 2 7 3.79086 7 6C7 8.20914 8.79086 10 11 10Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M21 22C25.4183 22 29 18.4183 29 14H13C13 18.4183 16.5817 22 21 22Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M11 22C15.4183 22 19 18.4183 19 14H3C3 18.4183 6.58172 22 11 22Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </div>
+        <div class="card-content">
+            <div class="card-value">1,248</div>
+            <div class="card-label">総投資家数</div>
+            <div class="card-trend positive">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 12V4M8 4L4 8M8 4L12 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>8.5%</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-card institutional">
+        <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M4 29H28M6 11H10M14 11H18M22 11H26M6 7H10M14 7H18M22 7H26M6 15H10M14 15H18M22 15H26M6 19H10M14 19H18M22 19H26M6 23H10M14 23H18M22 23H26M4 29V5C4 3.89543 4.89543 3 6 3H26C27.1046 3 28 3.89543 28 5V29" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="card-content">
+            <div class="card-value">456</div>
+            <div class="card-label">機関投資家</div>
+            <div class="card-detail">36.5% of total</div>
+        </div>
+    </div>
+    
+    <div class="dashboard-card overseas">
+        <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+                <path d="M2 16H30M16 2C16 2 10 8 10 16C10 24 16 30 16 30C16 30 22 24 22 16C22 8 16 2 16 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="card-content">
+            <div class="card-value">312</div>
+            <div class="card-label">海外投資家</div>
+            <div class="card-detail">25.0% of total</div>
+        </div>
+    </div>
+    
+    <div class="dashboard-card engagement">
+        <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M11 3L4 9V23C4 23.5304 4.21071 24.0391 4.58579 24.4142C4.96086 24.7893 5.46957 25 6 25H26C26.5304 25 27.0391 24.7893 27.4142 24.4142C27.7893 24.0391 28 23.5304 28 23V9L21 3H11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 9H28M21 13L16 18L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="card-content">
+            <div class="card-value">89%</div>
+            <div class="card-label">エンゲージメント率</div>
+            <div class="card-detail">メール開封率</div>
+        </div>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="investor-main-content">
+    <!-- フィルターとアクション -->
+    <div class="content-header">
+        <div class="filter-section">
+            <div class="search-box">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M17.5 17.5L13.875 13.875M15.8333 9.16667C15.8333 12.8486 12.8486 15.8333 9.16667 15.8333C5.48477 15.8333 2.5 12.8486 2.5 9.16667C2.5 5.48477 5.48477 2.5 9.16667 2.5C12.8486 2.5 15.8333 5.48477 15.8333 9.16667Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="search" class="search-input" placeholder="投資家名、会社名で検索..." id="investorSearch">
+            </div>
+            
+            <div class="filter-chips">
+                <button class="filter-chip active" data-filter="all">
+                    すべて
+                    <span class="chip-count">1,248</span>
+                </button>
+                <button class="filter-chip" data-filter="institutional">
+                    機関投資家
+                    <span class="chip-count">456</span>
+                </button>
+                <button class="filter-chip" data-filter="overseas">
+                    海外投資家
+                    <span class="chip-count">312</span>
+                </button>
+                <button class="filter-chip" data-filter="individual">
+                    個人投資家
+                    <span class="chip-count">380</span>
+                </button>
+                <button class="filter-chip" data-filter="analyst">
+                    アナリスト
+                    <span class="chip-count">100</span>
+                </button>
+            </div>
+            
+            <button class="btn btn-secondary" id="advancedFilterBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 4H14M4 8H12M6 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                詳細フィルター
+            </button>
+        </div>
+        
+        <div class="action-section">
+            <button class="btn btn-secondary" id="exportBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M11.3333 5.33333L8 2M8 2L4.66667 5.33333M8 2V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                エクスポート
+            </button>
+            
+            <button class="btn btn-primary" id="addInvestorBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 3.33333V12.6667M3.33333 8H12.6667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                新規投資家登録
+            </button>
+        </div>
+    </div>
+    
+    <!-- ビュー切り替えタブ -->
+    <div class="view-tabs">
+        <button class="view-tab active" data-view="grid">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="3" y="3" width="6" height="6" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="11" y="3" width="6" height="6" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="3" y="11" width="6" height="6" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="11" y="11" width="6" height="6" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            グリッドビュー
+        </button>
+        <button class="view-tab" data-view="list">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M7 5H17M7 10H17M7 15H17M3 5H3.01M3 10H3.01M3 15H3.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            リストビュー
+        </button>
+        <button class="view-tab" data-view="map">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M1 6V16L6.5 13L13.5 17L19 14V4L13.5 7L6.5 3L1 6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            マップビュー
+        </button>
+    </div>
+    
+    <!-- コンテンツエリア -->
+    <div class="view-content">
+        <!-- グリッドビュー -->
+        <div id="gridView" class="investor-grid">
+            <!-- 投資家カード -->
+            <div class="investor-card" data-investor-id="1">
+                <div class="investor-card-header">
+                    <div class="investor-type institutional">機関投資家</div>
+                    <button class="card-menu-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 12.6667C8.36819 12.6667 8.66667 12.3682 8.66667 12C8.66667 11.6318 8.36819 11.3333 8 11.3333C7.63181 11.3333 7.33333 11.6318 7.33333 12C7.33333 12.3682 7.63181 12.6667 8 12.6667Z" fill="currentColor"/>
+                            <path d="M8 8.66667C8.36819 8.66667 8.66667 8.36819 8.66667 8C8.66667 7.63181 8.36819 7.33333 8 7.33333C7.63181 7.33333 7.33333 7.63181 7.33333 8C7.33333 8.36819 7.63181 8.66667 8 8.66667Z" fill="currentColor"/>
+                            <path d="M8 4.66667C8.36819 4.66667 8.66667 4.36819 8.66667 4C8.66667 3.63181 8.36819 3.33333 8 3.33333C7.63181 3.33333 7.33333 3.63181 7.33333 4C7.33333 4.36819 7.63181 4.66667 8 4.66667Z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="investor-info">
+                    <div class="investor-avatar">野村</div>
+                    <h3 class="investor-name">野村アセットマネジメント株式会社</h3>
+                    <p class="investor-position">チーフファンドマネージャー</p>
+                    <p class="investor-contact">山田 太郎</p>
+                </div>
+                
+                <div class="investor-stats">
+                    <div class="stat">
+                        <span class="stat-label">保有株数</span>
+                        <span class="stat-value">1,234,567株</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">保有比率</span>
+                        <span class="stat-value">3.45%</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">最終面談</span>
+                        <span class="stat-value">2024/03/15</span>
+                    </div>
+                </div>
+                
+                <div class="investor-tags">
+                    <span class="tag">長期保有</span>
+                    <span class="tag">ESG重視</span>
+                    <span class="tag">アクティブ</span>
+                </div>
+                
+                <div class="investor-actions">
+                    <button class="btn btn-sm btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M2 5.33333C2 4.97971 2.14048 4.64057 2.39052 4.39052C2.64057 4.14048 2.97971 4 3.33333 4H12.6667C13.0203 4 13.3594 4.14048 13.6095 4.39052C13.8595 4.64057 14 4.97971 14 5.33333V10.6667C14 11.0203 13.8595 11.3594 13.6095 11.6095C13.3594 11.8595 13.0203 12 12.6667 12H3.33333C2.97971 12 2.64057 11.8595 2.39052 11.6095C2.14048 11.3594 2 11.0203 2 10.6667V5.33333Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 5.33333L8 8.66667L2 5.33333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        メール
+                    </button>
+                    <button class="btn btn-sm btn-primary">詳細</button>
+                </div>
+            </div>
+            
+            <!-- 他の投資家カード -->
+            <div class="investor-card" data-investor-id="2">
+                <div class="investor-card-header">
+                    <div class="investor-type overseas">海外投資家</div>
+                    <button class="card-menu-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 12.6667C8.36819 12.6667 8.66667 12.3682 8.66667 12C8.66667 11.6318 8.36819 11.3333 8 11.3333C7.63181 11.3333 7.33333 11.6318 7.33333 12C7.33333 12.3682 7.63181 12.6667 8 12.6667Z" fill="currentColor"/>
+                            <path d="M8 8.66667C8.36819 8.66667 8.66667 8.36819 8.66667 8C8.66667 7.63181 8.36819 7.33333 8 7.33333C7.63181 7.33333 7.33333 7.63181 7.33333 8C7.33333 8.36819 7.63181 8.66667 8 8.66667Z" fill="currentColor"/>
+                            <path d="M8 4.66667C8.36819 4.66667 8.66667 4.36819 8.66667 4C8.66667 3.63181 8.36819 3.33333 8 3.33333C7.63181 3.33333 7.33333 3.63181 7.33333 4C7.33333 4.36819 7.63181 4.66667 8 4.66667Z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="investor-info">
+                    <div class="investor-avatar">BR</div>
+                    <h3 class="investor-name">BlackRock Inc.</h3>
+                    <p class="investor-position">Portfolio Manager</p>
+                    <p class="investor-contact">John Smith</p>
+                </div>
+                
+                <div class="investor-stats">
+                    <div class="stat">
+                        <span class="stat-label">保有株数</span>
+                        <span class="stat-value">2,456,789株</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">保有比率</span>
+                        <span class="stat-value">6.87%</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">最終面談</span>
+                        <span class="stat-value">2024/03/10</span>
+                    </div>
+                </div>
+                
+                <div class="investor-tags">
+                    <span class="tag">インデックス</span>
+                    <span class="tag">パッシブ</span>
+                    <span class="tag">グローバル</span>
+                </div>
+                
+                <div class="investor-actions">
+                    <button class="btn btn-sm btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M2 5.33333C2 4.97971 2.14048 4.64057 2.39052 4.39052C2.64057 4.14048 2.97971 4 3.33333 4H12.6667C13.0203 4 13.3594 4.14048 13.6095 4.39052C13.8595 4.64057 14 4.97971 14 5.33333V10.6667C14 11.0203 13.8595 11.3594 13.6095 11.6095C13.3594 11.8595 13.0203 12 12.6667 12H3.33333C2.97971 12 2.64057 11.8595 2.39052 11.6095C2.14048 11.3594 2 11.0203 2 10.6667V5.33333Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 5.33333L8 8.66667L2 5.33333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        メール
+                    </button>
+                    <button class="btn btn-sm btn-primary">詳細</button>
+                </div>
+            </div>
+            
+            <!-- さらに多くの投資家カード... -->
+        </div>
+        
+        <!-- リストビュー（非表示） -->
+        <div id="listView" class="investor-list" style="display: none;">
+            <!-- DataTableで表示 -->
+        </div>
+        
+        <!-- マップビュー（非表示） -->
+        <div id="mapView" class="investor-map" style="display: none;">
+            <div id="worldMap" style="height: 600px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 詳細フィルターモーダル -->
+<div class="modal" id="advancedFilterModal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>詳細フィルター</h2>
+            <button class="modal-close" onclick="closeAdvancedFilter()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="filter-group">
+                <label class="filter-label">保有株数</label>
+                <div class="range-inputs">
+                    <input type="number" class="form-input" placeholder="最小" id="minShares">
+                    <span>〜</span>
+                    <input type="number" class="form-input" placeholder="最大" id="maxShares">
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">保有比率</label>
+                <div class="range-inputs">
+                    <input type="number" class="form-input" placeholder="最小 %" step="0.01" id="minRatio">
+                    <span>〜</span>
+                    <input type="number" class="form-input" placeholder="最大 %" step="0.01" id="maxRatio">
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">投資スタイル</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="active"> アクティブ
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="passive"> パッシブ
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="index"> インデックス
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="quant"> クオンツ
+                    </label>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">重視項目</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="esg"> ESG
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="growth"> 成長性
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="value"> バリュー
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="dividend"> 配当
+                    </label>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">最終コンタクト</label>
+                <select class="form-select" id="lastContact">
+                    <option value="">すべて</option>
+                    <option value="week">1週間以内</option>
+                    <option value="month">1ヶ月以内</option>
+                    <option value="quarter">3ヶ月以内</option>
+                    <option value="half">6ヶ月以内</option>
+                    <option value="year">1年以内</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="resetFilters()">リセット</button>
+            <button class="btn btn-primary" onclick="applyFilters()">適用</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 投資家管理ページ専用スタイル */
+.investor-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    gap: var(--space-md);
+    transition: all var(--transition-normal);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dashboard-card.total-investors .card-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+.dashboard-card.institutional .card-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.dashboard-card.overseas .card-icon {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8B5CF6;
+}
+
+.dashboard-card.engagement .card-icon {
+    background: rgba(251, 146, 60, 0.1);
+    color: #FB923C;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-value {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+}
+
+.card-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-xs);
+}
+
+.card-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+.card-trend.positive {
+    color: var(--success);
+}
+
+.card-trend.negative {
+    color: var(--error);
+}
+
+.card-detail {
+    font-size: var(--text-xs);
+    color: var(--gray-500);
+}
+
+/* メインコンテンツ */
+.investor-main-content {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.content-header {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.filter-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.search-box {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    padding-left: 40px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--text-sm);
+}
+
+.search-icon {
+    position: absolute;
+    left: var(--space-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+}
+
+.filter-chips {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-chip:hover {
+    background: var(--gray-200);
+}
+
+.filter-chip.active {
+    background: var(--accent-teal);
+    color: white;
+    border-color: var(--accent-teal);
+}
+
+.chip-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.action-section {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* ビュータブ */
+.view-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.view-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.view-tab:hover {
+    color: var(--gray-900);
+    background: var(--gray-100);
+}
+
+.view-tab.active {
+    color: var(--accent-teal);
+    border-bottom-color: var(--accent-teal);
+}
+
+/* 投資家グリッド */
+.investor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+}
+
+.investor-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+}
+
+.investor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.investor-card-header {
+    padding: var(--space-md);
+    background: var(--gray-50);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.investor-type {
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    padding: 4px 12px;
+    border-radius: var(--border-radius-full);
+}
+
+.investor-type.institutional {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.investor-type.overseas {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8B5CF6;
+}
+
+.investor-type.individual {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+.investor-type.analyst {
+    background: rgba(251, 146, 60, 0.1);
+    color: #FB923C;
+}
+
+.card-menu-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.card-menu-btn:hover {
+    background: var(--gray-200);
+}
+
+.investor-info {
+    padding: var(--space-lg);
+    text-align: center;
+}
+
+.investor-avatar {
+    width: 64px;
+    height: 64px;
+    background: var(--gray-300);
+    color: var(--gray-700);
+    border-radius: var(--border-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    margin: 0 auto var(--space-md);
+}
+
+.investor-name {
+    font-size: var(--text-md);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+}
+
+.investor-position {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-xs);
+}
+
+.investor-contact {
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+}
+
+.investor-stats {
+    padding: 0 var(--space-lg);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+}
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-xs) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.stat:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.stat-value {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+}
+
+.investor-tags {
+    padding: 0 var(--space-lg) var(--space-md);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-size: var(--text-xs);
+    border-radius: var(--border-radius-sm);
+}
+
+.investor-actions {
+    padding: var(--space-md);
+    background: var(--gray-50);
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.investor-actions .btn {
+    flex: 1;
+}
+
+/* フィルターモーダル */
+.filter-group {
+    margin-bottom: var(--space-lg);
+}
+
+.filter-label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+    margin-bottom: var(--space-sm);
+}
+
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-sm);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* レスポンシブ */
+@media (max-width: 1024px) {
+    .content-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-section {
+        order: 2;
+    }
+    
+    .action-section {
+        order: 1;
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .investor-dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .investor-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-chips {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .view-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ビュー切り替え
+    const viewTabs = document.querySelectorAll('.view-tab');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const mapView = document.getElementById('mapView');
+    
+    viewTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            viewTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const view = tab.dataset.view;
+            gridView.style.display = view === 'grid' ? 'grid' : 'none';
+            listView.style.display = view === 'list' ? 'block' : 'none';
+            mapView.style.display = view === 'map' ? 'block' : 'none';
+            
+            if (view === 'list') {
+                initializeInvestorTable();
+            } else if (view === 'map') {
+                initializeMap();
+            }
+        });
+    });
+    
+    // フィルターチップ
+    const filterChips = document.querySelectorAll('.filter-chip');
+    filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            filterChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            applyFilter(chip.dataset.filter);
+        });
+    });
+    
+    // 詳細フィルター
+    document.getElementById('advancedFilterBtn').addEventListener('click', () => {
+        document.getElementById('advancedFilterModal').style.display = 'flex';
+    });
+    
+    // 新規投資家登録
+    document.getElementById('addInvestorBtn').addEventListener('click', () => {
+        // モーダル表示または新規登録ページへ遷移
+        showNotification('新規投資家登録画面を開きます', 'info');
+    });
+    
+    // エクスポート
+    document.getElementById('exportBtn').addEventListener('click', () => {
+        showNotification('投資家データをエクスポート中...', 'info');
+    });
+    
+    // 検索機能
+    const searchInput = document.getElementById('investorSearch');
+    let searchTimer;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            performSearch(e.target.value);
+        }, 300);
+    });
+    
+    // DataTable初期化
+    function initializeInvestorTable() {
+        if (!window.investorTableInstance) {
+            window.investorTableInstance = new DataTable('#listView', {
+                columns: [
+                    {
+                        key: 'name',
+                        label: '投資家名',
+                        render: (value, row) => {
+                            return `
+                                <div class="investor-name-cell">
+                                    <div class="investor-avatar-small">${row.avatar}</div>
+                                    <div>
+                                        <div class="name">${value}</div>
+                                        <div class="company">${row.company}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    },
+                    {
+                        key: 'type',
+                        label: 'タイプ',
+                        render: (value) => {
+                            const typeMap = {
+                                institutional: '機関投資家',
+                                overseas: '海外投資家',
+                                individual: '個人投資家',
+                                analyst: 'アナリスト'
+                            };
+                            return `<span class="investor-type ${value}">${typeMap[value]}</span>`;
+                        }
+                    },
+                    { key: 'shares', label: '保有株数', render: (value) => formatNumber(value) + '株' },
+                    { key: 'ratio', label: '保有比率', render: (value) => value + '%' },
+                    { key: 'lastContact', label: '最終コンタクト' },
+                    {
+                        key: 'actions',
+                        label: 'アクション',
+                        render: () => `
+                            <div class="table-actions">
+                                <button class="btn btn-sm btn-secondary">メール</button>
+                                <button class="btn btn-sm btn-primary">詳細</button>
+                            </div>
+                        `
+                    }
+                ],
+                data: generateMockInvestors(),
+                pageSize: 20
+            });
+        }
+    }
+    
+    // マップ初期化
+    function initializeMap() {
+        // 実際の実装ではLeafletやMapboxなどを使用
+        console.log('Map initialization would happen here');
+    }
+    
+    // フィルター適用
+    function applyFilter(filterType) {
+        console.log('Applying filter:', filterType);
+        // フィルタリングロジックの実装
+    }
+    
+    // 検索実行
+    function performSearch(query) {
+        console.log('Searching:', query);
+        // 検索ロジックの実装
+    }
+    
+    // モックデータ生成
+    function generateMockInvestors() {
+        const investors = [];
+        const types = ['institutional', 'overseas', 'individual', 'analyst'];
+        const companies = [
+            '野村アセットマネジメント', '三菱UFJ信託銀行', 'BlackRock', 
+            'ゴールドマン・サックス', 'フィデリティ投信'
+        ];
+        
+        for (let i = 1; i <= 100; i++) {
+            investors.push({
+                id: i,
+                name: `投資家 ${i}`,
+                avatar: companies[i % companies.length].substring(0, 2),
+                company: companies[i % companies.length],
+                type: types[Math.floor(Math.random() * types.length)],
+                shares: Math.floor(Math.random() * 5000000),
+                ratio: (Math.random() * 10).toFixed(2),
+                lastContact: '2024/03/15'
+            });
+        }
+        
+        return investors;
+    }
+    
+    function formatNumber(num) {
+        return new Intl.NumberFormat('ja-JP').format(num);
+    }
+});
+
+// モーダル関数
+function closeAdvancedFilter() {
+    document.getElementById('advancedFilterModal').style.display = 'none';
+}
+
+function resetFilters() {
+    document.querySelectorAll('#advancedFilterModal input').forEach(input => {
+        if (input.type === 'checkbox') {
+            input.checked = false;
+        } else {
+            input.value = '';
+        }
+    });
+    document.getElementById('lastContact').value = '';
+}
+
+function applyFilters() {
+    // フィルター適用ロジック
+    showNotification('フィルターを適用しました', 'success');
+    closeAdvancedFilter();
+}
+</script>
+{% endblock %}

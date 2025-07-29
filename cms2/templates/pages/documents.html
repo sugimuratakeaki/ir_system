@@ -1,0 +1,893 @@
+{% extends 'base.html' %}
+
+{% block title %}ドキュメント管理{% endblock %}
+{% block page_icon %}📄{% endblock %}
+{% block page_title %}ドキュメント管理{% endblock %}
+
+{% block breadcrumb %}
+<div class="breadcrumb-item">
+    <a href="#" class="breadcrumb-link">コンテンツ管理</a>
+    <span class="breadcrumb-separator">›</span>
+</div>
+{% endblock %}
+{% block breadcrumb_current %}ドキュメント管理{% endblock %}
+
+{% block content %}
+<!-- ドキュメント統計 -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon document">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">1,248</div>
+            <div class="stat-label">総ドキュメント数</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon upload">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">45</div>
+            <div class="stat-label">今月のアップロード</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon storage">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M22 12H2M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">68.4 GB</div>
+            <div class="stat-label">使用容量</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon views">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">12,847</div>
+            <div class="stat-label">今月の閲覧数</div>
+        </div>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="document-content">
+    <!-- アクションバー -->
+    <div class="action-bar">
+        <div class="action-bar-left">
+            <button class="btn btn-primary" id="uploadButton">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M11.3333 5.33333L8 2M8 2L4.66667 5.33333M8 2V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                アップロード
+            </button>
+            
+            <button class="btn btn-secondary" id="createFolderButton">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M14 6.66667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6L8 5.33333H12.6667C13.0203 5.33333 13.3594 5.47381 13.6095 5.72386C13.8595 5.97391 14 6.31305 14 6.66667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 9.33333V12M6.66667 10.6667H9.33333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                新規フォルダ
+            </button>
+        </div>
+        
+        <div class="action-bar-right">
+            <div class="view-toggle">
+                <button class="view-toggle-btn active" data-view="grid">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <rect x="2" y="2" width="5" height="5" stroke="currentColor" stroke-width="1.5"/>
+                        <rect x="9" y="2" width="5" height="5" stroke="currentColor" stroke-width="1.5"/>
+                        <rect x="2" y="9" width="5" height="5" stroke="currentColor" stroke-width="1.5"/>
+                        <rect x="9" y="9" width="5" height="5" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </button>
+                <button class="view-toggle-btn" data-view="list">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M5.33333 4H14M5.33333 8H14M5.33333 12H14M2 4H2.00667M2 8H2.00667M2 12H2.00667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- フォルダツリーとコンテンツエリア -->
+    <div class="document-layout">
+        <!-- サイドバー（フォルダツリー） -->
+        <aside class="folder-tree-sidebar">
+            <div class="folder-tree-header">
+                <h3>フォルダ</h3>
+                <button class="folder-tree-collapse" title="フォルダツリーを折りたたむ">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="folder-tree">
+                <div class="folder-item root expanded">
+                    <div class="folder-item-content">
+                        <svg class="folder-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M14 6.66667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6L8 5.33333H12.6667C13.0203 5.33333 13.3594 5.47381 13.6095 5.72386C13.8595 5.97391 14 6.31305 14 6.66667Z" fill="currentColor"/>
+                        </svg>
+                        <span>ルートフォルダ</span>
+                    </div>
+                    
+                    <div class="folder-children">
+                        <div class="folder-item">
+                            <div class="folder-item-content">
+                                <svg class="folder-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M14 6.66667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6L8 5.33333H12.6667C13.0203 5.33333 13.3594 5.47381 13.6095 5.72386C13.8595 5.97391 14 6.31305 14 6.66667Z" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>決算資料</span>
+                                <span class="folder-count">124</span>
+                            </div>
+                        </div>
+                        
+                        <div class="folder-item">
+                            <div class="folder-item-content">
+                                <svg class="folder-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M14 6.66667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6L8 5.33333H12.6667C13.0203 5.33333 13.3594 5.47381 13.6095 5.72386C13.8595 5.97391 14 6.31305 14 6.66667Z" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>プレゼンテーション</span>
+                                <span class="folder-count">89</span>
+                            </div>
+                        </div>
+                        
+                        <div class="folder-item">
+                            <div class="folder-item-content">
+                                <svg class="folder-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M14 6.66667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6L8 5.33333H12.6667C13.0203 5.33333 13.3594 5.47381 13.6095 5.72386C13.8595 5.97391 14 6.31305 14 6.66667Z" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>議事録</span>
+                                <span class="folder-count">256</span>
+                            </div>
+                        </div>
+                        
+                        <div class="folder-item">
+                            <div class="folder-item-content">
+                                <svg class="folder-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M14 6.66667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6L8 5.33333H12.6667C13.0203 5.33333 13.3594 5.47381 13.6095 5.72386C13.8595 5.97391 14 6.31305 14 6.66667Z" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>レポート</span>
+                                <span class="folder-count">178</span>
+                            </div>
+                        </div>
+                        
+                        <div class="folder-item">
+                            <div class="folder-item-content">
+                                <svg class="folder-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M14 6.66667V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V4C2 3.64638 2.14048 3.30724 2.39052 3.05719C2.64057 2.80714 2.97971 2.66667 3.33333 2.66667H6L8 5.33333H12.6667C13.0203 5.33333 13.3594 5.47381 13.6095 5.72386C13.8595 5.97391 14 6.31305 14 6.66667Z" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>規程・ポリシー</span>
+                                <span class="folder-count">45</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- メインコンテンツエリア -->
+        <main class="document-main">
+            <!-- 検索・フィルター -->
+            <div class="document-toolbar">
+                <div class="document-search">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M17.5 17.5L13.875 13.875M15.8333 9.16667C15.8333 12.8486 12.8486 15.8333 9.16667 15.8333C5.48477 15.8333 2.5 12.8486 2.5 9.16667C2.5 5.48477 5.48477 2.5 9.16667 2.5C12.8486 2.5 15.8333 5.48477 15.8333 9.16667Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="search" class="document-search-input" placeholder="ドキュメントを検索...">
+                </div>
+                
+                <div class="document-filters">
+                    <select class="filter-select">
+                        <option value="">すべての種類</option>
+                        <option value="pdf">PDF</option>
+                        <option value="doc">Word文書</option>
+                        <option value="xls">Excel</option>
+                        <option value="ppt">PowerPoint</option>
+                        <option value="img">画像</option>
+                    </select>
+                    
+                    <select class="filter-select">
+                        <option value="">更新日順</option>
+                        <option value="name">名前順</option>
+                        <option value="size">サイズ順</option>
+                        <option value="type">種類順</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- ドキュメントグリッド -->
+            <div class="document-grid" id="documentGrid">
+                <!-- ドキュメントカード -->
+                <div class="document-card" data-id="doc1">
+                    <div class="document-preview">
+                        <svg class="file-icon pdf" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <path d="M28 4H12C10.9391 4 9.92172 4.42143 9.17157 5.17157C8.42143 5.92172 8 6.93913 8 8V40C8 41.0609 8.42143 42.0783 9.17157 42.8284C9.92172 43.5786 10.9391 44 12 44H36C37.0609 44 38.0783 43.5786 38.8284 42.8284C39.5786 42.0783 40 41.0609 40 40V16L28 4Z" fill="#DC2626"/>
+                            <path d="M28 4V16H40" fill="#991B1B"/>
+                            <text x="24" y="32" text-anchor="middle" fill="white" font-size="10" font-weight="bold">PDF</text>
+                        </svg>
+                    </div>
+                    <div class="document-info">
+                        <h4 class="document-title">2024年第3四半期決算説明資料</h4>
+                        <div class="document-meta">
+                            <span>2.4 MB</span>
+                            <span>•</span>
+                            <span>2024/03/15</span>
+                        </div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="document-action-btn" title="ダウンロード">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="document-action-btn" title="その他">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 12.6667C8.36819 12.6667 8.66667 12.3682 8.66667 12C8.66667 11.6318 8.36819 11.3333 8 11.3333C7.63181 11.3333 7.33333 11.6318 7.33333 12C7.33333 12.3682 7.63181 12.6667 8 12.6667Z" fill="currentColor"/>
+                                <path d="M8 8.66667C8.36819 8.66667 8.66667 8.36819 8.66667 8C8.66667 7.63181 8.36819 7.33333 8 7.33333C7.63181 7.33333 7.33333 7.63181 7.33333 8C7.33333 8.36819 7.63181 8.66667 8 8.66667Z" fill="currentColor"/>
+                                <path d="M8 4.66667C8.36819 4.66667 8.66667 4.36819 8.66667 4C8.66667 3.63181 8.36819 3.33333 8 3.33333C7.63181 3.33333 7.33333 3.63181 7.33333 4C7.33333 4.36819 7.63181 4.66667 8 4.66667Z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 他のドキュメントカードもここに配置 -->
+            </div>
+            
+            <!-- ドキュメントテーブル（リストビュー） -->
+            <div class="document-table-container" id="documentTable" style="display: none;">
+                <!-- DataTableコンポーネントで描画 -->
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- アップロードモーダル -->
+<div class="upload-modal" id="uploadModal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>ファイルアップロード</h2>
+            <button class="modal-close" onclick="closeUploadModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="upload-area" id="uploadArea">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" class="upload-icon">
+                    <path d="M42.6667 42.6667L32 32M32 32L21.3333 42.6667M32 32V56M53.3333 44.9067C55.9689 43.1982 57.8594 40.6035 58.639 37.6046C59.4186 34.6057 59.0329 31.4079 57.5535 28.6625C56.0741 25.9171 53.6021 23.8121 50.6262 22.7472C47.6503 21.6823 44.3797 21.7286 41.4347 22.8773C40.6365 19.2637 38.6663 16.0295 35.8315 13.6636C32.9968 11.2978 29.4535 9.93405 25.7461 9.79082C22.0387 9.6476 18.3823 10.7328 15.3724 12.8662C12.3626 14.9997 10.1676 18.0601 9.13067 21.5573C6.45808 22.1134 4.03476 23.5468 2.24555 25.6378C0.456331 27.7289 -0.598765 30.3612 -0.765096 33.1124C-0.931427 35.8636 0.299711 38.5755 2.31906 40.6964C4.33841 42.8174 7.03604 44.2191 9.91467 44.672" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <p class="upload-text">ファイルをドラッグ＆ドロップ</p>
+                <p class="upload-subtext">または</p>
+                <button class="btn btn-primary">ファイルを選択</button>
+                <input type="file" id="fileInput" multiple style="display: none;">
+            </div>
+            <div class="upload-list" id="uploadList"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 統計グリッド */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    transition: all var(--transition-normal);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-icon.document {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+.stat-icon.upload {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.stat-icon.storage {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8B5CF6;
+}
+
+.stat-icon.views {
+    background: rgba(251, 146, 60, 0.1);
+    color: #FB923C;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--gray-900);
+    line-height: 1;
+    margin-bottom: var(--space-xs);
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* ドキュメントレイアウト */
+.document-content {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.action-bar {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.action-bar-left,
+.action-bar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.view-toggle {
+    display: flex;
+    background: var(--gray-100);
+    border-radius: var(--border-radius-md);
+    padding: 2px;
+}
+
+.view-toggle-btn {
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-fast);
+    color: var(--gray-600);
+}
+
+.view-toggle-btn:hover {
+    color: var(--gray-900);
+}
+
+.view-toggle-btn.active {
+    background: white;
+    color: var(--gray-900);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ドキュメントレイアウト */
+.document-layout {
+    display: flex;
+    height: calc(100vh - 300px);
+}
+
+/* フォルダツリー */
+.folder-tree-sidebar {
+    width: 280px;
+    border-right: 1px solid var(--gray-200);
+    background: var(--gray-50);
+    display: flex;
+    flex-direction: column;
+}
+
+.folder-tree-header {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.folder-tree-header h3 {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.folder-tree-collapse {
+    padding: var(--space-xs);
+    color: var(--gray-600);
+    transition: all var(--transition-fast);
+}
+
+.folder-tree-collapse:hover {
+    color: var(--gray-900);
+}
+
+.folder-tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-sm);
+}
+
+.folder-item {
+    user-select: none;
+}
+
+.folder-item-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.folder-item-content:hover {
+    background: var(--gray-100);
+}
+
+.folder-item.selected .folder-item-content {
+    background: var(--accent-teal);
+    color: white;
+}
+
+.folder-icon {
+    flex-shrink: 0;
+}
+
+.folder-count {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    background: var(--gray-200);
+    color: var(--gray-600);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-full);
+}
+
+.folder-children {
+    margin-left: var(--space-lg);
+}
+
+/* メインコンテンツ */
+.document-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.document-toolbar {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    gap: var(--space-md);
+}
+
+.document-search {
+    flex: 1;
+    position: relative;
+}
+
+.document-search-input {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    padding-left: 40px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+}
+
+.document-search-input:focus {
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.document-search .search-icon {
+    position: absolute;
+    left: var(--space-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+}
+
+.document-filters {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.filter-select {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--text-sm);
+    background: white;
+    cursor: pointer;
+}
+
+/* ドキュメントグリッド */
+.document-grid {
+    flex: 1;
+    padding: var(--space-lg);
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
+}
+
+.document-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+}
+
+.document-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.document-preview {
+    height: 160px;
+    background: var(--gray-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.file-icon {
+    opacity: 0.8;
+}
+
+.document-info {
+    padding: var(--space-md);
+}
+
+.document-title {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.document-meta {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.document-actions {
+    padding: var(--space-sm) var(--space-md);
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+}
+
+.document-action-btn {
+    padding: var(--space-xs);
+    color: var(--gray-600);
+    transition: all var(--transition-fast);
+    border-radius: var(--border-radius-sm);
+}
+
+.document-action-btn:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+/* アップロードモーダル */
+.upload-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    margin: 0;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--gray-400);
+    transition: all var(--transition-fast);
+    border-radius: var(--border-radius-md);
+}
+
+.modal-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+.modal-body {
+    flex: 1;
+    padding: var(--space-lg);
+    overflow-y: auto;
+}
+
+.upload-area {
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+
+.upload-area.drag-over {
+    border-color: var(--accent-teal);
+    background: rgba(20, 184, 166, 0.05);
+}
+
+.upload-icon {
+    color: var(--gray-400);
+    margin-bottom: var(--space-md);
+}
+
+.upload-text {
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+    margin-bottom: var(--space-sm);
+}
+
+.upload-subtext {
+    color: var(--gray-600);
+    margin-bottom: var(--space-md);
+}
+
+.upload-list {
+    margin-top: var(--space-lg);
+}
+
+/* レスポンシブ */
+@media (max-width: 1024px) {
+    .folder-tree-sidebar {
+        position: absolute;
+        left: -280px;
+        height: 100%;
+        z-index: 10;
+        transition: left var(--transition-normal);
+    }
+    
+    .folder-tree-sidebar.open {
+        left: 0;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .document-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .action-bar-left,
+    .action-bar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .document-toolbar {
+        flex-direction: column;
+    }
+    
+    .document-filters {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ビュー切り替え
+    const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
+    const documentGrid = document.getElementById('documentGrid');
+    const documentTable = document.getElementById('documentTable');
+    
+    viewToggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            viewToggleBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const view = btn.dataset.view;
+            if (view === 'grid') {
+                documentGrid.style.display = 'grid';
+                documentTable.style.display = 'none';
+            } else {
+                documentGrid.style.display = 'none';
+                documentTable.style.display = 'block';
+                initializeDataTable();
+            }
+        });
+    });
+    
+    // アップロードモーダル
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadModal = document.getElementById('uploadModal');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    
+    uploadButton.addEventListener('click', () => {
+        uploadModal.style.display = 'flex';
+    });
+    
+    // ドラッグ＆ドロップ
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('drag-over');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        handleFiles(e.dataTransfer.files);
+    });
+    
+    // ファイル選択
+    uploadArea.querySelector('.btn').addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+    
+    // データテーブル初期化
+    function initializeDataTable() {
+        if (!window.dataTableInstance) {
+            window.dataTableInstance = new DataTable('#documentTable', {
+                columns: [
+                    { key: 'name', label: 'ファイル名' },
+                    { key: 'type', label: '種類' },
+                    { key: 'size', label: 'サイズ' },
+                    { key: 'modified', label: '更新日' },
+                    { key: 'owner', label: '所有者' },
+                    {
+                        key: 'actions',
+                        label: 'アクション',
+                        render: () => `
+                            <div class="table-actions">
+                                <button class="btn btn-sm btn-secondary">ダウンロード</button>
+                                <button class="btn btn-sm btn-secondary">詳細</button>
+                            </div>
+                        `
+                    }
+                ],
+                data: generateMockDocuments(),
+                pageSize: 20
+            });
+        }
+    }
+    
+    // モックデータ生成
+    function generateMockDocuments() {
+        const documents = [];
+        const types = ['PDF', 'Word', 'Excel', 'PowerPoint'];
+        
+        for (let i = 1; i <= 50; i++) {
+            documents.push({
+                id: `doc${i}`,
+                name: `ドキュメント_${i}.pdf`,
+                type: types[Math.floor(Math.random() * types.length)],
+                size: `${(Math.random() * 10).toFixed(1)} MB`,
+                modified: '2024/03/15',
+                owner: '山田太郎'
+            });
+        }
+        
+        return documents;
+    }
+    
+    // ファイル処理
+    function handleFiles(files) {
+        // ファイルアップロード処理
+        console.log('Uploading files:', files);
+    }
+});
+
+// モーダルを閉じる
+function closeUploadModal() {
+    document.getElementById('uploadModal').style.display = 'none';
+}
+</script>
+{% endblock %}

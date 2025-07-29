@@ -1,0 +1,907 @@
+{% extends 'base.html' %}
+
+{% block title %}AI-FAQ管理{% endblock %}
+{% block page_icon %}🤖{% endblock %}
+{% block page_title %}AI-FAQ管理{% endblock %}
+{% block breadcrumb_current %}AI-FAQ管理{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="page-header">
+    <div class="page-header-content">
+        <p class="page-description">AIによる自動FAQ生成と管理システム</p>
+    </div>
+    <div class="page-header-actions">
+        <button class="btn btn-secondary" onclick="KAGAMI.faq.trainModel()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 8V13.3333C4 13.6869 4.14048 14.0261 4.39052 14.2761C4.64057 14.5262 4.97971 14.6667 5.33333 14.6667H10.6667C11.0203 14.6667 11.3594 14.5262 11.6095 14.2761C11.8595 14.0261 12 13.6869 12 13.3333V8M10 4L8 2M8 2L6 4M8 2V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            AIモデル更新
+        </button>
+        <button class="btn btn-primary" onclick="KAGAMI.faq.showAddModal()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 3.33334V12.6667M3.33333 8H12.6667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            FAQ追加
+        </button>
+    </div>
+</div>
+
+<!-- AI統計ダッシュボード -->
+<div class="ai-stats-grid">
+    <div class="ai-stat-card">
+        <div class="ai-stat-header">
+            <span class="ai-stat-icon">🧠</span>
+            <span class="ai-stat-label">AI生成FAQ数</span>
+        </div>
+        <div class="ai-stat-value">1,234</div>
+        <div class="ai-stat-chart">
+            <canvas id="aiGeneratedChart" width="100" height="40"></canvas>
+        </div>
+    </div>
+    
+    <div class="ai-stat-card">
+        <div class="ai-stat-header">
+            <span class="ai-stat-icon">✅</span>
+            <span class="ai-stat-label">回答精度</span>
+        </div>
+        <div class="ai-stat-value">94.7%</div>
+        <div class="ai-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 94.7%"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ai-stat-card">
+        <div class="ai-stat-header">
+            <span class="ai-stat-icon">👍</span>
+            <span class="ai-stat-label">満足度スコア</span>
+        </div>
+        <div class="ai-stat-value">4.8<span class="ai-stat-unit">/5</span></div>
+        <div class="ai-rating">
+            <span class="star filled">★</span>
+            <span class="star filled">★</span>
+            <span class="star filled">★</span>
+            <span class="star filled">★</span>
+            <span class="star partial">★</span>
+        </div>
+    </div>
+    
+    <div class="ai-stat-card">
+        <div class="ai-stat-header">
+            <span class="ai-stat-icon">⚡</span>
+            <span class="ai-stat-label">平均応答時間</span>
+        </div>
+        <div class="ai-stat-value">0.8<span class="ai-stat-unit">秒</span></div>
+        <div class="ai-stat-comparison">
+            <span class="comparison-label">前月比</span>
+            <span class="comparison-value positive">-0.2秒</span>
+        </div>
+    </div>
+</div>
+
+<!-- FAQカテゴリータブ -->
+<div class="faq-tabs">
+    <button class="faq-tab active" data-category="all">
+        すべて
+        <span class="tab-count">2,456</span>
+    </button>
+    <button class="faq-tab" data-category="financial">
+        財務・業績
+        <span class="tab-count">823</span>
+    </button>
+    <button class="faq-tab" data-category="strategy">
+        経営戦略
+        <span class="tab-count">456</span>
+    </button>
+    <button class="faq-tab" data-category="esg">
+        ESG・サステナビリティ
+        <span class="tab-count">387</span>
+    </button>
+    <button class="faq-tab" data-category="governance">
+        ガバナンス
+        <span class="tab-count">290</span>
+    </button>
+    <button class="faq-tab" data-category="other">
+        その他
+        <span class="tab-count">500</span>
+    </button>
+</div>
+
+<!-- フィルターとアクション -->
+<div class="faq-controls">
+    <div class="faq-filters">
+        <div class="search-box">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.5 17.5L13.875 13.875M15.8333 9.16667C15.8333 12.8486 12.8486 15.8333 9.16667 15.8333C5.48477 15.8333 2.5 12.8486 2.5 9.16667C2.5 5.48477 5.48477 2.5 9.16667 2.5C12.8486 2.5 15.8333 5.48477 15.8333 9.16667Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <input type="search" class="search-input" placeholder="FAQを検索..." id="faqSearch">
+        </div>
+        
+        <select class="filter-select" id="statusFilter">
+            <option value="">すべてのステータス</option>
+            <option value="published">公開中</option>
+            <option value="draft">下書き</option>
+            <option value="review">レビュー中</option>
+            <option value="archived">アーカイブ</option>
+        </select>
+        
+        <select class="filter-select" id="sourceFilter">
+            <option value="">すべてのソース</option>
+            <option value="ai">AI生成</option>
+            <option value="manual">手動作成</option>
+            <option value="meeting">議事録から生成</option>
+        </select>
+    </div>
+    
+    <div class="bulk-actions">
+        <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.bulkPublish()">
+            一括公開
+        </button>
+        <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.bulkArchive()">
+            一括アーカイブ
+        </button>
+    </div>
+</div>
+
+<!-- FAQ一覧 -->
+<div class="faq-list">
+    <!-- FAQアイテム -->
+    <div class="faq-item">
+        <div class="faq-item-header">
+            <div class="faq-item-info">
+                <h3 class="faq-question">2024年度の営業利益率の目標はどの程度ですか？</h3>
+                <div class="faq-meta">
+                    <span class="faq-category">財務・業績</span>
+                    <span class="faq-source ai">AI生成</span>
+                    <span class="faq-date">2024/03/15 14:30</span>
+                    <span class="faq-views">閲覧数: 1,234</span>
+                </div>
+            </div>
+            <div class="faq-item-actions">
+                <span class="faq-status published">公開中</span>
+                <button class="action-btn" onclick="KAGAMI.faq.toggleExpand(this)">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="faq-item-content" style="display: none;">
+            <div class="faq-answer">
+                <p>2024年度の営業利益率目標は15%以上を設定しています。これは前年度実績の13.8%から約1.2ポイントの改善を目指すもので、主に以下の施策により達成を見込んでいます：</p>
+                <ul>
+                    <li>生産効率の向上による原価率の改善（0.5ポイント）</li>
+                    <li>高付加価値製品へのシフト（0.4ポイント）</li>
+                    <li>販管費の最適化（0.3ポイント）</li>
+                </ul>
+            </div>
+            
+            <div class="faq-ai-info">
+                <div class="ai-confidence">
+                    <span class="confidence-label">AI信頼度:</span>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 92%"></div>
+                    </div>
+                    <span class="confidence-value">92%</span>
+                </div>
+                <div class="ai-sources">
+                    <span class="sources-label">参照元:</span>
+                    <a href="#" class="source-link">2024年3月期決算説明会資料 P.12</a>
+                    <a href="#" class="source-link">中期経営計画 P.8</a>
+                </div>
+            </div>
+            
+            <div class="faq-actions">
+                <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.edit(1)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.3333 2C11.5084 1.82491 11.7163 1.68601 11.9451 1.59125C12.1739 1.49649 12.4191 1.44772 12.6667 1.44772C12.9142 1.44772 13.1594 1.49649 13.3882 1.59125C13.617 1.68601 13.8249 1.82491 14 2C14.1751 2.1751 14.314 2.38297 14.4088 2.61178C14.5035 2.84059 14.5523 3.08582 14.5523 3.33333C14.5523 3.58085 14.5035 3.82608 14.4088 4.05489C14.314 4.2837 14.1751 4.49157 14 4.66667L5 13.6667L2 14.6667L3 11.6667L11.3333 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    編集
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.improve(1)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 2L9.73205 6.47109L14.596 6.87336L11.0359 10.0289L12.1353 14.7933L8 12.3L3.86474 14.7933L4.96415 10.0289L1.40402 6.87336L6.26795 6.47109L8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    AI改善
+                </button>
+                <button class="btn btn-sm btn-outline danger" onclick="KAGAMI.faq.archive(1)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 5.33333H14M2 5.33333V13.3333C2 13.6869 2.14048 14.0261 2.39052 14.2761C2.64057 14.5262 2.97971 14.6667 3.33333 14.6667H12.6667C13.0203 14.6667 13.3594 14.5262 13.6095 14.2761C13.8595 14.0261 14 13.6869 14 13.3333V5.33333M4.66667 5.33333V3.33333C4.66667 2.97971 4.80714 2.64057 5.05719 2.39052C5.30724 2.14048 5.64638 2 6 2H10C10.3536 2 10.6928 2.14048 10.9428 2.39052C11.1929 2.64057 11.3333 2.97971 11.3333 3.33333V5.33333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    アーカイブ
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 追加のFAQアイテム -->
+    <div class="faq-item">
+        <div class="faq-item-header">
+            <div class="faq-item-info">
+                <h3 class="faq-question">ESG投資に対する取り組みについて教えてください</h3>
+                <div class="faq-meta">
+                    <span class="faq-category">ESG・サステナビリティ</span>
+                    <span class="faq-source meeting">議事録から生成</span>
+                    <span class="faq-date">2024/03/14 10:15</span>
+                    <span class="faq-views">閲覧数: 892</span>
+                </div>
+            </div>
+            <div class="faq-item-actions">
+                <span class="faq-status review">レビュー中</span>
+                <button class="action-btn" onclick="KAGAMI.faq.toggleExpand(this)">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="faq-item">
+        <div class="faq-item-header">
+            <div class="faq-item-info">
+                <h3 class="faq-question">配当政策と株主還元の方針について</h3>
+                <div class="faq-meta">
+                    <span class="faq-category">財務・業績</span>
+                    <span class="faq-source manual">手動作成</span>
+                    <span class="faq-date">2024/03/10 16:45</span>
+                    <span class="faq-views">閲覧数: 2,341</span>
+                </div>
+            </div>
+            <div class="faq-item-actions">
+                <span class="faq-status published">公開中</span>
+                <button class="action-btn" onclick="KAGAMI.faq.toggleExpand(this)">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI提案セクション -->
+<div class="ai-suggestions">
+    <h2 class="suggestions-title">
+        <span class="suggestions-icon">💡</span>
+        AIからの提案
+    </h2>
+    <div class="suggestions-list">
+        <div class="suggestion-item">
+            <div class="suggestion-content">
+                <p class="suggestion-text">最近の投資家面談で「DX戦略」に関する質問が増えています。FAQの追加を推奨します。</p>
+                <div class="suggestion-meta">
+                    <span class="suggestion-frequency">過去7日間で12回言及</span>
+                    <span class="suggestion-confidence">推奨度: 高</span>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="KAGAMI.faq.createFromSuggestion(1)">
+                FAQ作成
+            </button>
+        </div>
+        
+        <div class="suggestion-item">
+            <div class="suggestion-content">
+                <p class="suggestion-text">「2025年度の設備投資計画」のFAQが古くなっています。最新情報での更新を推奨します。</p>
+                <div class="suggestion-meta">
+                    <span class="suggestion-frequency">FAQ ID: #234</span>
+                    <span class="suggestion-confidence">推奨度: 中</span>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="KAGAMI.faq.updateSuggestion(234)">
+                更新する
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ページヘッダー */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+}
+
+.page-description {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+}
+
+.page-header-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* AI統計グリッド */
+.ai-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.ai-stat-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    border: 1px solid var(--gray-200);
+    transition: all var(--transition-fast);
+}
+
+.ai-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.ai-stat-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.ai-stat-icon {
+    font-size: 1.5rem;
+}
+
+.ai-stat-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    font-weight: var(--font-medium);
+}
+
+.ai-stat-value {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-md);
+}
+
+.ai-stat-unit {
+    font-size: var(--text-lg);
+    font-weight: var(--font-normal);
+    color: var(--gray-600);
+}
+
+.ai-stat-chart {
+    height: 40px;
+    position: relative;
+}
+
+.ai-progress {
+    margin-top: var(--space-sm);
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-teal), var(--info));
+    transition: width var(--transition-normal);
+}
+
+.ai-rating {
+    display: flex;
+    gap: 2px;
+    font-size: 1.25rem;
+}
+
+.star {
+    color: var(--gray-300);
+}
+
+.star.filled {
+    color: #fbbf24;
+}
+
+.star.partial {
+    background: linear-gradient(90deg, #fbbf24 80%, var(--gray-300) 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.ai-stat-comparison {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-sm);
+}
+
+.comparison-label {
+    color: var(--gray-600);
+}
+
+.comparison-value {
+    font-weight: var(--font-medium);
+}
+
+.comparison-value.positive {
+    color: var(--success);
+}
+
+.comparison-value.negative {
+    color: var(--error);
+}
+
+/* FAQタブ */
+.faq-tabs {
+    display: flex;
+    gap: var(--space-xs);
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: var(--space-lg);
+    overflow-x: auto;
+}
+
+.faq-tab {
+    padding: var(--space-sm) var(--space-md);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    white-space: nowrap;
+}
+
+.faq-tab:hover {
+    color: var(--gray-900);
+    background: var(--gray-50);
+}
+
+.faq-tab.active {
+    color: var(--accent-teal);
+    border-bottom-color: var(--accent-teal);
+}
+
+.tab-count {
+    padding: 2px 8px;
+    background: var(--gray-100);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+}
+
+.faq-tab.active .tab-count {
+    background: rgba(20, 184, 166, 0.1);
+    color: var(--accent-teal);
+}
+
+/* FAQコントロール */
+.faq-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.faq-filters {
+    display: flex;
+    gap: var(--space-md);
+    flex: 1;
+}
+
+.bulk-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* FAQ一覧 */
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.faq-item {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all var(--transition-fast);
+}
+
+.faq-item:hover {
+    border-color: var(--gray-300);
+    box-shadow: var(--shadow-sm);
+}
+
+.faq-item-header {
+    padding: var(--space-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+}
+
+.faq-item-info {
+    flex: 1;
+}
+
+.faq-question {
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-sm);
+}
+
+.faq-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.faq-category {
+    padding: 2px 8px;
+    background: var(--gray-100);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-xs);
+}
+
+.faq-source {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.faq-source::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gray-400);
+}
+
+.faq-source.ai::before {
+    background: var(--info);
+}
+
+.faq-source.meeting::before {
+    background: var(--accent-teal);
+}
+
+.faq-source.manual::before {
+    background: var(--warning);
+}
+
+.faq-item-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.faq-status {
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.faq-status.published {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.faq-status.draft {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--gray-600);
+}
+
+.faq-status.review {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius-md);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.action-btn:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.faq-item-content {
+    padding: 0 var(--space-lg) var(--space-lg);
+    border-top: 1px solid var(--gray-200);
+}
+
+.faq-answer {
+    padding: var(--space-lg) 0;
+    color: var(--gray-700);
+    line-height: var(--leading-relaxed);
+}
+
+.faq-answer ul {
+    margin-top: var(--space-sm);
+    padding-left: var(--space-lg);
+}
+
+.faq-ai-info {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-md);
+    background: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-md);
+}
+
+.ai-confidence {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.confidence-label,
+.sources-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    font-weight: var(--font-medium);
+}
+
+.confidence-bar {
+    width: 100px;
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-teal), var(--info));
+}
+
+.confidence-value {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+}
+
+.ai-sources {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.source-link {
+    font-size: var(--text-sm);
+    color: var(--info);
+    text-decoration: none;
+}
+
+.source-link:hover {
+    text-decoration: underline;
+}
+
+.faq-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.btn.danger {
+    color: var(--error);
+    border-color: var(--error);
+}
+
+.btn.danger:hover {
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* AI提案セクション */
+.ai-suggestions {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border-radius: var(--border-radius-xl);
+    padding: var(--space-xl);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+.suggestions-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-lg);
+}
+
+.suggestions-icon {
+    font-size: 1.5rem;
+}
+
+.suggestions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.suggestion-item {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-md);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.suggestion-content {
+    flex: 1;
+}
+
+.suggestion-text {
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    margin-bottom: var(--space-sm);
+}
+
+.suggestion-meta {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+/* レスポンシブ */
+@media (max-width: 1024px) {
+    .faq-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .faq-filters {
+        flex-wrap: wrap;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+    
+    .ai-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .faq-tabs {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .faq-item-header {
+        flex-direction: column;
+    }
+    
+    .faq-ai-info {
+        flex-direction: column;
+    }
+    
+    .suggestion-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+
+<script>
+// FAQ管理ページ用JavaScript
+KAGAMI.faq = {
+    // FAQの展開/折りたたみ
+    toggleExpand: function(button) {
+        const item = button.closest('.faq-item');
+        const content = item.querySelector('.faq-item-content');
+        const isExpanded = content.style.display !== 'none';
+        
+        content.style.display = isExpanded ? 'none' : 'block';
+        button.style.transform = isExpanded ? '' : 'rotate(180deg)';
+    },
+    
+    // AIモデルの更新
+    trainModel: function() {
+        KAGAMI.notification.show('AIモデルの更新を開始しました', 'info');
+        // 実際の更新処理
+    },
+    
+    // FAQ追加モーダル
+    showAddModal: function() {
+        KAGAMI.notification.show('FAQ追加モーダルを表示', 'info');
+    },
+    
+    // その他のメソッド
+    edit: function(id) {
+        console.log('Edit FAQ:', id);
+    },
+    
+    improve: function(id) {
+        console.log('Improve FAQ:', id);
+    },
+    
+    archive: function(id) {
+        console.log('Archive FAQ:', id);
+    },
+    
+    bulkPublish: function() {
+        console.log('Bulk publish');
+    },
+    
+    bulkArchive: function() {
+        console.log('Bulk archive');
+    },
+    
+    createFromSuggestion: function(id) {
+        console.log('Create from suggestion:', id);
+    },
+    
+    updateSuggestion: function(id) {
+        console.log('Update suggestion:', id);
+    }
+};
+
+// ミニチャートの描画（サンプル）
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('aiGeneratedChart');
+    if (canvas && typeof Chart !== 'undefined') {
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['', '', '', '', '', '', ''],
+                datasets: [{
+                    data: [65, 72, 78, 85, 92, 98, 105],
+                    borderColor: '#14b8a6',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

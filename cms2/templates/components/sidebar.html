@@ -1,0 +1,132 @@
+<!-- サイドバーコンポーネント -->
+<aside class="sidebar" id="sidebar">
+    <!-- サイドバーヘッダー -->
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-logo">
+            <div class="logo-icon">🔮</div>
+            <span class="logo-text">KAGAMI CMS</span>
+        </a>
+        <button class="sidebar-toggle" id="sidebarToggle" title="サイドバーを閉じる">
+            <svg class="toggle-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 6L8 10L12 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- ナビゲーション -->
+    <nav class="sidebar-nav">
+        <!-- メインナビゲーション -->
+        <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}" data-tooltip="ダッシュボード">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">ダッシュボード</span>
+        </a>
+        
+        <a href="/executive-dashboard" class="nav-item {% if request.path == '/executive-dashboard' %}active{% endif %}" data-tooltip="経営陣ダッシュボード">
+            <span class="nav-icon">👔</span>
+            <span class="nav-text">経営陣ダッシュボード</span>
+        </a>
+        
+        <a href="/director-dashboard" class="nav-item {% if request.path == '/director-dashboard' %}active{% endif %}" data-tooltip="社外取締役ダッシュボード">
+            <span class="nav-icon">🎭</span>
+            <span class="nav-text">社外取締役ダッシュボード</span>
+        </a>
+        
+        <!-- コンテンツ管理セクション -->
+        <div class="nav-section">
+            <div class="nav-section-title">コンテンツ管理</div>
+            
+            <a href="/faq" class="nav-item {% if request.path == '/faq' %}active{% endif %}" data-tooltip="AI-FAQ管理">
+                <span class="nav-icon">🤖</span>
+                <span class="nav-text">AI-FAQ管理</span>
+            </a>
+            
+            <a href="/documents" class="nav-item {% if request.path == '/documents' %}active{% endif %}" data-tooltip="ドキュメント">
+                <span class="nav-icon">📄</span>
+                <span class="nav-text">ドキュメント</span>
+            </a>
+            
+            <a href="/news" class="nav-item {% if request.path == '/news' %}active{% endif %}" data-tooltip="ニュース・お知らせ">
+                <span class="nav-icon">📰</span>
+                <span class="nav-text">ニュース・お知らせ</span>
+            </a>
+        </div>
+        
+        <!-- IR業務統合セクション -->
+        <div class="nav-section">
+            <div class="nav-section-title">IR業務統合</div>
+            
+            <a href="/ir-calendar" class="nav-item {% if request.path == '/ir-calendar' %}active{% endif %}" data-tooltip="IRカレンダー">
+                <span class="nav-icon">📅</span>
+                <span class="nav-text">IRカレンダー</span>
+            </a>
+            
+            <a href="/meetings" class="nav-item {% if request.path == '/meetings' %}active{% endif %}" data-tooltip="面談管理">
+                <span class="nav-icon">🤝</span>
+                <span class="nav-text">面談管理</span>
+            </a>
+            
+            <a href="/dialogue" class="nav-item {% if request.path == '/dialogue' %}active{% endif %}" data-tooltip="議事録管理">
+                <span class="nav-icon">💬</span>
+                <span class="nav-text">議事録管理</span>
+            </a>
+            
+            <a href="/content-center" class="nav-item {% if request.path == '/content-center' %}active{% endif %}" data-tooltip="コンテンツセンター">
+                <span class="nav-icon">📚</span>
+                <span class="nav-text">コンテンツセンター</span>
+            </a>
+            
+            <a href="/investors" class="nav-item {% if request.path == '/investors' %}active{% endif %}" data-tooltip="投資家管理">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">投資家管理</span>
+            </a>
+            
+            <a href="/strategy" class="nav-item {% if request.path == '/strategy' %}active{% endif %}" data-tooltip="戦略・開示">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-text">戦略・開示</span>
+            </a>
+            
+            <a href="/email-campaigns" class="nav-item {% if request.path == '/email-campaigns' %}active{% endif %}" data-tooltip="メール配信">
+                <span class="nav-icon">✉️</span>
+                <span class="nav-text">メール配信</span>
+            </a>
+            
+            <a href="/analytics" class="nav-item {% if request.path == '/analytics' %}active{% endif %}" data-tooltip="分析">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">分析</span>
+            </a>
+        </div>
+        
+        <!-- システム管理セクション -->
+        <div class="nav-section">
+            <div class="nav-section-title">システム管理</div>
+            
+            <a href="/users" class="nav-item {% if request.path == '/users' %}active{% endif %}" data-tooltip="ユーザー管理">
+                <span class="nav-icon">👤</span>
+                <span class="nav-text">ユーザー管理</span>
+            </a>
+            
+            <a href="/permissions" class="nav-item {% if request.path == '/permissions' %}active{% endif %}" data-tooltip="権限管理">
+                <span class="nav-icon">🔐</span>
+                <span class="nav-text">権限管理</span>
+            </a>
+            
+            <a href="/audit-logs" class="nav-item {% if request.path == '/audit-logs' %}active{% endif %}" data-tooltip="監査ログ">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-text">監査ログ</span>
+            </a>
+            
+            <a href="/settings" class="nav-item {% if request.path == '/settings' %}active{% endif %}" data-tooltip="設定">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">設定</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- フッター -->
+    <div class="sidebar-footer">
+        <div class="sidebar-footer-content">
+            <span class="sidebar-footer-icon">©</span>
+            <span class="sidebar-footer-text">2024 KAGAMI</span>
+        </div>
+    </div>
+</aside>

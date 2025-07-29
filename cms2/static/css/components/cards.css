@@ -1,0 +1,474 @@
+/* 
+ * KAGAMI CMS 2.0 - Card Styles
+ * 洗練されたカードコンポーネント
+ */
+
+/* ===== ベースカード ===== */
+.card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all var(--transition-fast);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* ===== カードヘッダー ===== */
+.card-header {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.card-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.card-subtitle {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-top: var(--space-xs);
+}
+
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* ===== カードボディ ===== */
+.card-body {
+    padding: var(--space-lg);
+}
+
+.card-body.no-padding {
+    padding: 0;
+}
+
+/* ===== カードフッター ===== */
+.card-footer {
+    padding: var(--space-md) var(--space-lg);
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+/* ===== カードバリエーション ===== */
+
+/* インタラクティブカード */
+.card-interactive {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-interactive::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.card-interactive:hover::before {
+    left: 100%;
+}
+
+/* ハイライトカード */
+.card-highlighted {
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.card-highlighted .card-header {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+/* グラデーションカード */
+.card-gradient {
+    background: linear-gradient(135deg, var(--kagami-blue-dark) 0%, var(--kagami-blue) 100%);
+    color: white;
+    border: none;
+}
+
+.card-gradient .card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-gradient .card-title,
+.card-gradient .card-subtitle {
+    color: white;
+}
+
+.card-gradient .card-footer {
+    background: rgba(0, 0, 0, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== 統計カード ===== */
+.stat-card {
+    padding: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gray-200);
+}
+
+.stat-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-card-content {
+    flex: 1;
+}
+
+.stat-card-value {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--gray-900);
+    line-height: 1;
+}
+
+.stat-card-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-top: var(--space-xs);
+}
+
+.stat-card-trend {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+/* 統計カードのカラーバリエーション */
+.stat-card.stat-success::after {
+    background: var(--success);
+}
+
+.stat-card.stat-success .stat-card-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.stat-card.stat-warning::after {
+    background: var(--warning);
+}
+
+.stat-card.stat-warning .stat-card-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.stat-card.stat-error::after {
+    background: var(--error);
+}
+
+.stat-card.stat-error .stat-card-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.stat-card.stat-info::after {
+    background: var(--info);
+}
+
+.stat-card.stat-info .stat-card-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+/* ===== プロファイルカード ===== */
+.profile-card {
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--border-radius-full);
+    margin: 0 auto var(--space-md);
+    background: linear-gradient(135deg, var(--accent-teal), var(--info));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius-full);
+}
+
+.profile-name {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+}
+
+.profile-role {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-md);
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--gray-200);
+}
+
+.profile-stat {
+    text-align: center;
+}
+
+.profile-stat-value {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+}
+
+.profile-stat-label {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ===== タイムラインカード ===== */
+.timeline-card {
+    padding: 0;
+}
+
+.timeline-item {
+    padding: var(--space-lg);
+    position: relative;
+    border-left: 2px solid var(--gray-200);
+    margin-left: var(--space-lg);
+}
+
+.timeline-item:last-child {
+    border-left: none;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: var(--space-lg);
+    width: 12px;
+    height: 12px;
+    border-radius: var(--border-radius-full);
+    background: white;
+    border: 2px solid var(--gray-400);
+}
+
+.timeline-item.active::before {
+    background: var(--accent-teal);
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+}
+
+.timeline-time {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+    margin-bottom: var(--space-xs);
+}
+
+.timeline-content {
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+}
+
+/* ===== カードグリッド ===== */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+}
+
+.card-grid.grid-2 {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+.card-grid.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.card-grid.grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ===== カードローディング ===== */
+.card-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 1024px) {
+    .card-grid.grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .card-grid.grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .card-grid,
+    .card-grid.grid-2,
+    .card-grid.grid-3,
+    .card-grid.grid-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .card-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+    }
+    
+    .profile-stats {
+        gap: var(--space-md);
+    }
+}
+
+/* ===== ダークモード対応 ===== */
+[data-theme="dark"] .card {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+[data-theme="dark"] .card-header {
+    border-bottom-color: var(--gray-700);
+}
+
+[data-theme="dark"] .card-title {
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .card-subtitle {
+    color: var(--gray-400);
+}
+
+[data-theme="dark"] .card-footer {
+    background: var(--gray-900);
+    border-top-color: var(--gray-700);
+}
+
+[data-theme="dark"] .stat-card-value {
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .stat-card-label {
+    color: var(--gray-400);
+}
+
+[data-theme="dark"] .profile-name {
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .profile-role {
+    color: var(--gray-400);
+}
+
+[data-theme="dark"] .profile-stat-value {
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .profile-stat-label {
+    color: var(--gray-400);
+}
+
+[data-theme="dark"] .timeline-item {
+    border-left-color: var(--gray-700);
+}
+
+[data-theme="dark"] .timeline-item::before {
+    background: var(--gray-800);
+    border-color: var(--gray-600);
+}
+
+[data-theme="dark"] .timeline-content {
+    color: var(--gray-300);
+}

@@ -1,0 +1,454 @@
+/* 
+ * KAGAMI CMS 2.0 - Modal Styles
+ * 洗練されたモーダルコンポーネント
+ */
+
+/* ===== モーダルラッパー ===== */
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-normal), visibility var(--transition-normal);
+}
+
+.modal-wrapper.modal-show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-wrapper.modal-hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* ===== バックドロップ ===== */
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* ===== モーダル本体 ===== */
+.modal {
+    position: relative;
+    background: white;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-2xl);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.9) translateY(20px);
+    transition: transform var(--transition-normal) var(--easing-default);
+}
+
+.modal-show .modal {
+    transform: scale(1) translateY(0);
+}
+
+.modal-hide .modal {
+    transform: scale(0.9) translateY(20px);
+}
+
+/* サイズバリエーション */
+.modal-small {
+    width: 100%;
+    max-width: 400px;
+}
+
+.modal-medium {
+    width: 100%;
+    max-width: 600px;
+}
+
+.modal-large {
+    width: 100%;
+    max-width: 900px;
+}
+
+.modal-full {
+    width: 95vw;
+    height: 95vh;
+    max-width: 1400px;
+}
+
+/* ===== モーダルクローズボタン ===== */
+.modal-close {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-full);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    z-index: 1;
+}
+
+.modal-close:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-300);
+    color: var(--gray-900);
+    transform: rotate(90deg);
+}
+
+.modal-close:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+/* ===== モーダルヘッダー ===== */
+.modal-header {
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--gray-900);
+    margin: 0;
+    padding-right: var(--space-xl);
+}
+
+/* ===== モーダルボディ ===== */
+.modal-body {
+    padding: var(--space-xl);
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: var(--border-radius-lg);
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gray-400);
+    border-radius: var(--border-radius-lg);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-500);
+}
+
+/* ===== モーダルフッター ===== */
+.modal-footer {
+    padding: var(--space-lg) var(--space-xl) var(--space-xl);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* ===== モーダル内のフォーム ===== */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.form-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+}
+
+.form-label .required {
+    color: var(--error);
+    margin-left: 2px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    padding: var(--space-sm) var(--space-md);
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--text-sm);
+    color: var(--gray-900);
+    transition: all var(--transition-fast);
+    width: 100%;
+}
+
+.form-input:hover,
+.form-select:hover,
+.form-textarea:hover {
+    border-color: var(--gray-400);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+    background: var(--gray-100);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.form-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.form-help {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* ===== ローディングモーダル ===== */
+.modal-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--accent-teal);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.modal-loading p {
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    margin: 0;
+}
+
+/* ===== ボタンスタイル（モーダル用） ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--border-radius-md);
+    font-weight: var(--font-medium);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--accent-teal);
+    color: white;
+    border-color: var(--accent-teal);
+}
+
+.btn-primary:hover {
+    background: var(--accent-teal-dark);
+    border-color: var(--accent-teal-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--gray-700);
+    border-color: var(--gray-300);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+}
+
+.btn-danger {
+    background: var(--error);
+    color: white;
+    border-color: var(--error);
+}
+
+.btn-danger:hover {
+    background: var(--error-dark);
+    border-color: var(--error-dark);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* ===== アニメーション ===== */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+}
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 768px) {
+    .modal-wrapper {
+        padding: var(--space-md);
+    }
+    
+    .modal {
+        max-height: 95vh;
+    }
+    
+    .modal-small,
+    .modal-medium,
+    .modal-large {
+        max-width: 100%;
+    }
+    
+    .modal-header {
+        padding: var(--space-lg) var(--space-lg) var(--space-md);
+    }
+    
+    .modal-title {
+        font-size: var(--text-xl);
+    }
+    
+    .modal-body {
+        padding: var(--space-lg);
+    }
+    
+    .modal-footer {
+        padding: var(--space-md) var(--space-lg) var(--space-lg);
+        flex-direction: column-reverse;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+/* ===== ダークモード対応 ===== */
+[data-theme="dark"] .modal {
+    background: var(--gray-800);
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom-color: var(--gray-700);
+}
+
+[data-theme="dark"] .modal-title {
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top-color: var(--gray-700);
+}
+
+[data-theme="dark"] .modal-close {
+    background: var(--gray-700);
+    border-color: var(--gray-600);
+    color: var(--gray-300);
+}
+
+[data-theme="dark"] .modal-close:hover {
+    background: var(--gray-600);
+    border-color: var(--gray-500);
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea {
+    background: var(--gray-700);
+    border-color: var(--gray-600);
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .form-input:hover,
+[data-theme="dark"] .form-select:hover,
+[data-theme="dark"] .form-textarea:hover {
+    border-color: var(--gray-500);
+}
+
+[data-theme="dark"] .form-label {
+    color: var(--gray-300);
+}
+
+[data-theme="dark"] .form-help {
+    color: var(--gray-400);
+}
