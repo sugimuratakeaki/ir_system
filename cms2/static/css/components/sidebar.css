@@ -195,6 +195,12 @@
   justify-content: center;
 }
 
+.sidebar.collapsed .nav-item.has-submenu {
+  padding: var(--space-sm) !important;
+  margin: 0 var(--space-xs) !important;
+  justify-content: center !important;
+}
+
 /* ホバー効果 */
 .nav-item::before {
   content: '';
@@ -274,7 +280,7 @@
 }
 
 /* ツールチップ（折りたたみ時） */
-.sidebar.collapsed .nav-item:hover::after {
+.sidebar.collapsed .nav-item:not(.has-submenu):hover::after {
   content: attr(data-tooltip);
   position: absolute;
   left: calc(100% + var(--space-sm));
@@ -370,6 +376,162 @@
 
 .sidebar.collapsed .sidebar-footer-text {
   display: none;
+}
+
+/* ===== サブメニュー ===== */
+.nav-item-wrapper {
+  position: relative;
+}
+
+/* has-submenuでnav-itemのスタイルをオーバーライド */
+.nav-item.has-submenu {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  cursor: pointer;
+  padding: var(--space-sm) var(--space-lg) !important;
+  margin: 0 var(--space-sm) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-decoration: none !important;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+  position: relative !important;
+  gap: var(--space-md) !important;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  width: auto !important;
+}
+
+.nav-item.has-submenu:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.nav-item.has-submenu .nav-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.nav-item.has-submenu .nav-text {
+  flex: 1;
+  opacity: 1;
+  transform: translateX(0);
+  transition: all var(--transition-normal);
+}
+
+.nav-arrow {
+  font-size: 10px;
+  margin-left: auto;
+  transition: transform var(--transition-normal);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.nav-item.has-submenu.expanded .nav-arrow {
+  transform: rotate(-180deg);
+}
+
+.nav-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-normal);
+  background-color: rgba(0, 0, 0, 0.2);
+  margin: var(--space-xs) var(--space-sm) 0 var(--space-sm);
+  border-radius: var(--border-radius-md);
+}
+
+.nav-submenu.show {
+  max-height: 400px;
+  margin-bottom: var(--space-sm);
+}
+
+.submenu-item {
+  display: block;
+  padding: var(--space-sm) var(--space-md);
+  padding-left: calc(var(--space-lg) + 24px + var(--space-sm));
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  transition: all var(--transition-fast);
+  position: relative;
+  border-radius: var(--border-radius-sm);
+  margin: 2px var(--space-xs);
+}
+
+.submenu-item::before {
+  content: '•';
+  position: absolute;
+  left: calc(var(--space-lg) + 12px - 4px);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.submenu-item:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(2px);
+}
+
+.submenu-item.active {
+  color: var(--accent-teal);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.submenu-item.active::before {
+  color: var(--accent-teal);
+}
+
+/* 折りたたみ時のサブメニュー */
+.sidebar.collapsed .nav-submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: 200px;
+  background-color: var(--kagami-blue-dark);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--border-radius);
+  margin-left: var(--space-sm);
+  margin-top: 0;
+  border-left: none;
+  padding: var(--space-sm) 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.sidebar.collapsed .nav-item-wrapper:hover .nav-submenu.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.sidebar.collapsed .nav-arrow {
+  display: none;
+}
+
+/* アクティブ状態のサブメニュー項目 */
+.nav-item.has-submenu.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-weight: var(--font-medium);
+}
+
+/* has-submenuの::afterと::beforeを無効化 */
+.nav-item.has-submenu::after {
+  display: none !important;
+}
+
+.nav-item.has-submenu:hover::before {
+  display: none !important;
+}
+
+/* サブメニューのアクティブ表示用の左ボーダー */
+.nav-item.has-submenu.active {
+  box-shadow: inset 4px 0 0 0 var(--accent-teal);
 }
 
 /* ===== レスポンシブ ===== */

@@ -660,6 +660,30 @@ async def upload(request: Request):
         "base_url": "/cms2"
     })
 
+@app.get("/dialogue-analysis", response_class=HTMLResponse)
+async def dialogue_analysis(request: Request):
+    """対話分析ページ"""
+    return templates.TemplateResponse("pages/dialogue-analysis.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/upload-confirm", response_class=HTMLResponse)
+async def upload_confirm(request: Request):
+    """アップロード確認・メタ情報登録ページ"""
+    return templates.TemplateResponse("pages/upload-confirm.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/dialogue-publish", response_class=HTMLResponse)
+async def dialogue_publish(request: Request):
+    """対話記録の確認・公開設定ページ"""
+    return templates.TemplateResponse("pages/dialogue-publish.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
 # ===== API エンドポイント =====
 
 @app.get("/api/dashboard")

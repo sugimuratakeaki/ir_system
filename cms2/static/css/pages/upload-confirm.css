@@ -1,0 +1,1149 @@
+/* ====================
+   アップロード確認画面スタイル
+   ==================== */
+
+/* プログレスステップ（dialogue-analysisと共通） */
+.progress-header {
+    background-color: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: var(--gray-300);
+    z-index: -1;
+}
+
+.step.completed:not(:last-child)::after,
+.step.active:not(:last-child)::after {
+    background-color: var(--kagami-blue);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--gray-300);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-sm);
+    transition: all var(--transition-normal);
+}
+
+.step.completed .step-number {
+    background-color: var(--success-green);
+}
+
+.step.active .step-number {
+    background-color: var(--kagami-blue);
+    box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.2);
+}
+
+.step-label {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: var(--kagami-blue);
+    font-weight: var(--font-medium);
+}
+
+.step.clickable {
+    cursor: pointer;
+}
+
+.step.clickable:hover .step-number {
+    transform: scale(1.1);
+}
+
+/* コンテンツヘッダー */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    gap: var(--space-md);
+}
+
+.header-info {
+    flex: 1;
+}
+
+.page-description {
+    color: var(--gray-600);
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* アップロードファイル情報 */
+.upload-file-info {
+    margin-bottom: var(--space-lg);
+}
+
+.upload-file-info .card-header {
+    background-color: rgba(59, 130, 246, 0.05);
+    border-bottom: 2px solid var(--kagami-blue);
+}
+
+.file-details {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+}
+
+.file-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-sm);
+}
+
+.file-meta {
+    display: flex;
+    gap: var(--space-lg);
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+.file-meta span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.progress-container {
+    margin-top: var(--space-md);
+}
+
+.progress-status {
+    font-size: var(--text-sm);
+    color: var(--success-green);
+    margin-top: var(--space-xs);
+}
+
+/* フォームグリッド */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+/* フォーム要素 */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+.form-group {
+    margin-bottom: var(--space-md);
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-xs);
+    color: var(--gray-700);
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: var(--error-red);
+}
+
+.form-help {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+    margin-top: var(--space-xs);
+}
+
+/* 投資家選択 */
+.investor-select {
+    position: relative;
+}
+
+.investor-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    margin-top: var(--space-xs);
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: var(--space-sm) var(--space-md);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.suggestion-item:hover {
+    background-color: var(--gray-50);
+}
+
+/* 参加者リスト */
+.participant-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.checkbox-item:hover {
+    background-color: white;
+}
+
+/* 参加者タグ */
+.participant-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+/* タグ入力 */
+.tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    background-color: white;
+    min-height: 44px;
+    align-items: center;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--kagami-blue);
+    color: white;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+}
+
+.tag-input-field {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    font-size: var(--text-sm);
+    background: transparent;
+}
+
+/* 関連資料 */
+.related-docs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.doc-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    transition: all var(--transition-fast);
+}
+
+.doc-item:hover {
+    background-color: var(--gray-100);
+}
+
+.doc-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.doc-info {
+    flex: 1;
+}
+
+.doc-title {
+    font-weight: var(--font-medium);
+    color: var(--gray-900);
+}
+
+.doc-meta {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* AI分析プレビュー */
+.ai-analysis-preview {
+    margin-bottom: var(--space-lg);
+}
+
+.ai-header {
+    background: linear-gradient(135deg, var(--kagami-blue), var(--kagami-blue-dark));
+    color: white;
+}
+
+.ai-header .card-title {
+    color: white;
+}
+
+.ai-analysis-content {
+    background-color: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+}
+
+/* 分析進捗 */
+.analysis-progress {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.progress-item {
+    display: grid;
+    grid-template-columns: 150px 1fr 100px;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.progress-label {
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+}
+
+.progress-status {
+    text-align: right;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.progress-status.success {
+    color: var(--success-green);
+}
+
+/* 暫定サマリー */
+.summary-list {
+    margin: var(--space-sm) 0;
+    padding-left: var(--space-lg);
+}
+
+.summary-list li {
+    margin-bottom: var(--space-xs);
+}
+
+/* FAQ候補セクション */
+.faq-candidates-section {
+    background-color: white;
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    margin-top: var(--space-lg);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-lg);
+    gap: var(--space-md);
+}
+
+.section-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-xs);
+}
+
+.section-subtitle {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.section-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+}
+
+/* FAQ管理タブ */
+.faq-management-tabs {
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: var(--space-lg);
+}
+
+.tab-buttons {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.tab-btn {
+    padding: var(--space-sm) var(--space-md);
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--gray-600);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.tab-btn:hover {
+    color: var(--kagami-blue);
+}
+
+.tab-btn.active {
+    color: var(--kagami-blue);
+    border-bottom-color: var(--kagami-blue);
+}
+
+/* FAQ候補カード */
+.faq-preview-grid {
+    display: grid;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.faq-candidate-card {
+    background-color: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    transition: all var(--transition-fast);
+}
+
+.faq-candidate-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--kagami-blue);
+}
+
+.faq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.faq-header-left,
+.faq-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.faq-category {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--kagami-blue);
+    cursor: pointer;
+}
+
+/* バッジ */
+.badge-new {
+    background-color: var(--success-green);
+}
+
+.badge-update {
+    background-color: var(--warning-yellow);
+}
+
+/* 信頼度バッジ */
+.confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    border-radius: var(--border-radius-sm);
+}
+
+.confidence-badge.high {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success-green);
+}
+
+.confidence-badge.medium {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning-yellow);
+}
+
+.confidence-badge.low {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: var(--gray-600);
+}
+
+/* アイコンボタン */
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-fast);
+    color: var(--gray-600);
+}
+
+.btn-icon:hover {
+    background-color: var(--gray-100);
+    color: var(--gray-900);
+}
+
+/* FAQ内容 */
+.faq-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.similar-faq-notice {
+    background-color: rgba(245, 158, 11, 0.1);
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.similar-faq-notice a {
+    color: var(--kagami-blue);
+    text-decoration: underline;
+}
+
+.faq-question,
+.faq-answer {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+}
+
+.q-mark,
+.a-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-weight: var(--font-bold);
+    font-size: var(--text-sm);
+    flex-shrink: 0;
+}
+
+.q-mark {
+    background-color: var(--kagami-blue);
+    color: white;
+}
+
+.a-mark {
+    background-color: var(--success-green);
+    color: white;
+}
+
+.faq-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--gray-100);
+}
+
+.faq-info {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.faq-info span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.faq-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* ワークフロー図 */
+.workflow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-lg);
+    overflow-x: auto;
+}
+
+.workflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 100px;
+}
+
+.step-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-xs);
+}
+
+.workflow-step .step-label {
+    font-weight: var(--font-medium);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-xs);
+    color: var(--gray-900);
+}
+
+.step-desc {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.workflow-step.active .step-icon {
+    filter: none;
+}
+
+.workflow-step:not(.active):not(.current) .step-icon {
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+.workflow-step.current {
+    position: relative;
+}
+
+.workflow-step.current::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background-color: var(--kagami-blue);
+    border-radius: 50%;
+}
+
+.workflow-arrow {
+    font-size: 1.5rem;
+    color: var(--gray-400);
+    margin: 0 var(--space-md);
+}
+
+/* FAQ活用情報 */
+.faq-usage-info {
+    background-color: rgba(59, 130, 246, 0.05);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.usage-title {
+    font-size: var(--text-md);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* 懸念事項セクション */
+.concerns-section {
+    margin-top: var(--space-lg);
+}
+
+.concern-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.concern-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: white;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.concern-item.high {
+    border-color: var(--error-red);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.concern-item.medium {
+    border-color: var(--warning-yellow);
+    background-color: rgba(245, 158, 11, 0.05);
+}
+
+.concern-item.low {
+    border-color: var(--success-green);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+.concern-icon {
+    font-size: var(--text-sm);
+}
+
+/* アクションバー */
+.action-bar {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    border-top: 1px solid var(--gray-200);
+    padding: var(--space-lg);
+    margin: var(--space-lg) calc(-1 * var(--space-lg)) calc(-1 * var(--space-lg));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.action-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--space-md);
+}
+
+/* モーダル */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    position: relative;
+    background-color: white;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s var(--easing-default);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--border-radius-md);
+    color: var(--gray-600);
+    transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+    background-color: var(--gray-100);
+    color: var(--gray-900);
+}
+
+.modal-body {
+    flex: 1;
+    padding: var(--space-lg);
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-top: 1px solid var(--gray-200);
+    background-color: var(--gray-50);
+}
+
+/* ワークフロー設定 */
+.workflow-section {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.workflow-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.workflow-section h4 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.workflow-settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.setting-label {
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+}
+
+.approver-list,
+.integration-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+/* FAQ統合モーダル */
+.merge-comparison {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-lg);
+    background-color: var(--gray-50);
+    border-radius: var(--border-radius-lg);
+}
+
+.merge-item {
+    flex: 1;
+    background-color: white;
+    padding: var(--space-md);
+    border-radius: var(--border-radius-md);
+    border: 2px solid var(--gray-200);
+}
+
+.merge-item.current {
+    border-color: var(--kagami-blue);
+}
+
+.merge-item.existing {
+    border-color: var(--warning-yellow);
+}
+
+.merge-item h4 {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-sm);
+    color: var(--gray-700);
+}
+
+.merge-arrow {
+    font-size: 2rem;
+    color: var(--gray-400);
+}
+
+.faq-preview {
+    font-size: var(--text-sm);
+}
+
+.faq-preview .question,
+.faq-preview .answer {
+    margin-bottom: var(--space-sm);
+}
+
+.faq-preview .meta {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.merge-options {
+    background-color: white;
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.merge-options h4 {
+    font-size: var(--text-md);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-md);
+}
+
+.option-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.radio-item:hover {
+    background-color: var(--gray-50);
+}
+
+/* エラー状態 */
+.form-control.error {
+    border-color: var(--error-red);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1200px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-actions {
+        width: 100%;
+        margin-top: var(--space-md);
+    }
+    
+    .header-actions .btn {
+        flex: 1;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-steps {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .step::after {
+        display: none;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: var(--space-md);
+    }
+    
+    .merge-comparison {
+        flex-direction: column;
+    }
+    
+    .merge-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .workflow-diagram {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .workflow-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .action-bar {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .action-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 480px) {
+    .file-details {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .file-meta {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .section-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .section-actions .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .faq-meta {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+}
+
+/* プリント対応 */
+@media print {
+    .header-actions,
+    .action-bar,
+    .btn {
+        display: none;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid var(--gray-300);
+    }
+    
+    .modal {
+        display: none;
+    }
+}

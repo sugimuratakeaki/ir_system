@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}確認・公開設定{% endblock %}
+{% block page_icon %}🚀{% endblock %}
+{% block page_title %}確認・公開設定{% endblock %}
+{% block breadcrumb %}
+<div class="breadcrumb-item">
+    <a href="/dialogue" class="breadcrumb-link">対話管理</a>
+    <span class="breadcrumb-separator">›</span>
+</div>
+<div class="breadcrumb-item">
+    <a href="/dialogue-analysis" class="breadcrumb-link">AI分析</a>
+    <span class="breadcrumb-separator">›</span>
+</div>
+{% endblock %}
+{% block breadcrumb_current %}確認・公開{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/dialogue-publish.css">
+{% endblock %}
+
+{% block content %}
+<!-- プログレスバー -->
+<div class="progress-header">
+    <div class="progress-steps">
+        <div class="step completed clickable" onclick="navigateToStep(1)">
+            <div class="step-number">1</div>
+            <div class="step-label">ファイル選択</div>
+        </div>
+        <div class="step completed clickable" onclick="navigateToStep(2)">
+            <div class="step-number">2</div>
+            <div class="step-label">アップロード</div>
+        </div>
+        <div class="step completed clickable" onclick="navigateToStep(3)">
+            <div class="step-number">3</div>
+            <div class="step-label">メタ情報登録</div>
+        </div>
+        <div class="step completed clickable" onclick="navigateToStep(4)">
+            <div class="step-number">4</div>
+            <div class="step-label">AI分析</div>
+        </div>
+        <div class="step active">
+            <div class="step-number">5</div>
+            <div class="step-label">確認・公開</div>
+        </div>
+    </div>
+</div>
+
+<!-- ヘッダー -->
+<div class="content-header">
+    <div class="header-info">
+        <p class="page-description">野村アセットマネジメントとの個別面談（2025/07/15）</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-secondary" onclick="goBack()">
+            <i class="icon-arrow-left"></i>前へ戻る
+        </button>
+        <button class="btn btn-success" onclick="publishDialogue()">
+            <i class="icon-check"></i>公開する
+        </button>
+    </div>
+</div>
+
+<!-- 全体サマリー -->
+<div class="publish-summary">
+    <h3 class="summary-title"><i class="icon-bar-chart-2"></i>処理結果サマリー</h3>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="item-icon">📄</div>
+            <div class="item-content">
+                <div class="item-label">ファイル処理</div>
+                <div class="item-value success">完了</div>
+                <div class="item-detail">90分15秒 / 8,432文字</div>
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="item-icon">🧠</div>
+            <div class="item-content">
+                <div class="item-label">AI分析</div>
+                <div class="item-value success">完了</div>
+                <div class="item-detail">12項目抽出</div>
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="item-icon">❓</div>
+            <div class="item-content">
+                <div class="item-label">FAQ候補</div>
+                <div class="item-value warning">5件</div>
+                <div class="item-detail">承認待ち: 2件</div>
+            </div>
+        </div>
+        <div class="summary-item">
+            <div class="item-icon">✅</div>
+            <div class="item-content">
+                <div class="item-label">アクション</div>
+                <div class="item-value info">8件</div>
+                <div class="item-detail">高優先度: 3件</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="publish-container">
+    <!-- 左カラム：確認事項 -->
+    <div class="publish-main">
+        <!-- 対話記録情報 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="icon-clipboard"></i>対話記録情報</h3>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">会議タイトル</span>
+                        <span class="info-value">野村アセットマネジメントとの個別面談</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">開催日時</span>
+                        <span class="info-value">2025年7月15日 14:00-15:30</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">投資家</span>
+                        <span class="info-value">野村アセットマネジメント（主要株主）</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">参加者</span>
+                        <span class="info-value">CEO田中一郎、CFO佐藤二郎 他</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">重要度</span>
+                        <span class="info-value"><span class="badge badge-danger">高</span></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">機密度</span>
+                        <span class="info-value"><span class="badge badge-warning">社内限定</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ承認 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="icon-help-circle"></i>FAQ承認</h3>
+                <div class="header-actions">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="select-all-faqs" onchange="toggleAllFAQs()">
+                        <span>すべて選択</span>
+                    </label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="faq-approval-list">
+                    <!-- FAQ 1 -->
+                    <div class="faq-approval-item approved">
+                        <div class="faq-checkbox-wrapper">
+                            <input type="checkbox" class="faq-select" checked>
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-header">
+                                <span class="faq-category">AI事業</span>
+                                <span class="confidence-badge high">信頼度: 95%</span>
+                                <span class="status-badge approved">自動承認</span>
+                            </div>
+                            <div class="faq-text">
+                                <div class="question">Q: AI事業の成長率35%を達成した要因は？</div>
+                                <div class="answer">A: エンタープライズSaaSの好調、新製品の市場投入、既存顧客のアップセルが主な要因です。</div>
+                            </div>
+                            <div class="faq-settings">
+                                <select class="form-control-sm">
+                                    <option>一般公開</option>
+                                    <option>会員限定</option>
+                                    <option selected>社内限定</option>
+                                </select>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="faq-approval-item pending">
+                        <div class="faq-checkbox-wrapper">
+                            <input type="checkbox" class="faq-select">
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-header">
+                                <span class="faq-category">人材戦略</span>
+                                <span class="confidence-badge medium">信頼度: 88%</span>
+                                <span class="status-badge pending">承認待ち</span>
+                            </div>
+                            <div class="faq-text">
+                                <div class="question">Q: エンジニア採用の具体的な目標と進捗は？</div>
+                                <div class="answer">A: 2025年度末までに200名体制を目指し、現在150名まで増強しました。</div>
+                            </div>
+                            <div class="faq-settings">
+                                <select class="form-control-sm">
+                                    <option>一般公開</option>
+                                    <option>会員限定</option>
+                                    <option selected>社内限定</option>
+                                </select>
+                                <button class="btn btn-sm btn-primary">承認</button>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="faq-approval-item approved">
+                        <div class="faq-checkbox-wrapper">
+                            <input type="checkbox" class="faq-select" checked>
+                        </div>
+                        <div class="faq-content">
+                            <div class="faq-header">
+                                <span class="faq-category">競争戦略</span>
+                                <span class="confidence-badge high">信頼度: 92%</span>
+                                <span class="status-badge approved">自動承認</span>
+                            </div>
+                            <div class="faq-text">
+                                <div class="question">Q: 競合他社との差別化戦略について教えてください</div>
+                                <div class="answer">A: 業界特化型AIソリューションの開発力と、顧客企業との共創による製品開発が強みです。</div>
+                            </div>
+                            <div class="faq-settings">
+                                <select class="form-control-sm">
+                                    <option selected>一般公開</option>
+                                    <option>会員限定</option>
+                                    <option>社内限定</option>
+                                </select>
+                                <button class="btn btn-sm btn-secondary">編集</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-summary">
+                    <p>承認済み: 3件 / 承認待ち: 2件 / 合計: 5件</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- アクションアイテム確認 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="icon-check-square"></i>アクションアイテム</h3>
+            </div>
+            <div class="card-body">
+                <div class="action-review-list">
+                    <div class="action-review-item high-priority">
+                        <div class="action-priority">🔴</div>
+                        <div class="action-content">
+                            <div class="action-title">競合分析レポートの準備</div>
+                            <div class="action-meta">
+                                <span>担当: IR部</span>
+                                <span>期限: 2025/07/22</span>
+                            </div>
+                        </div>
+                        <div class="action-assignee">
+                            <select class="form-control-sm">
+                                <option>IR部 - 山本三郎</option>
+                                <option>IR部 - 鈴木五郎</option>
+                                <option>経営企画部 - 伊藤六郎</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="action-review-item high-priority">
+                        <div class="action-priority">🔴</div>
+                        <div class="action-content">
+                            <div class="action-title">AI事業の詳細KPI共有</div>
+                            <div class="action-meta">
+                                <span>担当: 経営企画部</span>
+                                <span>期限: 2025/07/20</span>
+                            </div>
+                        </div>
+                        <div class="action-assignee">
+                            <select class="form-control-sm">
+                                <option>経営企画部 - 高橋四郎</option>
+                                <option>経営企画部 - 伊藤六郎</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="action-review-item medium-priority">
+                        <div class="action-priority">🟡</div>
+                        <div class="action-content">
+                            <div class="action-title">人材採用進捗の月次アップデート</div>
+                            <div class="action-meta">
+                                <span>担当: 人事部</span>
+                                <span>期限: 月次</span>
+                            </div>
+                        </div>
+                        <div class="action-assignee">
+                            <select class="form-control-sm">
+                                <option>人事部 - 田中部長</option>
+                                <option>人事部 - 採用担当</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右カラム：公開設定 -->
+    <div class="publish-sidebar">
+        <!-- 公開設定 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="icon-globe"></i>公開設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="publish-settings">
+                    <div class="setting-group">
+                        <label class="setting-label">対話記録の公開範囲</label>
+                        <select class="form-control">
+                            <option>非公開（内部のみ）</option>
+                            <option selected>社内限定</option>
+                            <option>役員限定</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">FAQの自動公開</label>
+                        <label class="switch-wrapper">
+                            <input type="checkbox" class="toggle-switch" checked>
+                            <span class="switch-label">承認済みFAQを自動公開</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">連携システム</label>
+                        <div class="integration-checklist">
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>投資家向けWebサイト</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>AIチャットボット</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>メール自動応答</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>社内ナレッジベース</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知設定 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="icon-mail"></i>通知設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="notification-settings">
+                    <div class="setting-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked>
+                            <span>関係者に完了通知を送信</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">通知先</label>
+                        <div class="recipient-list">
+                            <div class="recipient-item">
+                                <span>CEO - 田中一郎</span>
+                                <button class="remove-btn" onclick="removeRecipient(this)">×</button>
+                            </div>
+                            <div class="recipient-item">
+                                <span>CFO - 佐藤二郎</span>
+                                <button class="remove-btn" onclick="removeRecipient(this)">×</button>
+                            </div>
+                            <div class="recipient-item">
+                                <span>IR部門責任者</span>
+                                <button class="remove-btn" onclick="removeRecipient(this)">×</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-secondary" onclick="addRecipient()">
+                            <i class="icon-plus"></i>通知先を追加
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- アーカイブ設定 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="icon-archive"></i>アーカイブ設定</h3>
+            </div>
+            <div class="card-body">
+                <div class="archive-settings">
+                    <div class="setting-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked>
+                            <span>対話記録をアーカイブ</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">保存期間</label>
+                        <select class="form-control">
+                            <option>1年間</option>
+                            <option>3年間</option>
+                            <option selected>5年間</option>
+                            <option>無期限</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">タグ</label>
+                        <div class="tag-input">
+                            <span class="tag">決算</span>
+                            <span class="tag">AI事業</span>
+                            <span class="tag">個別面談</span>
+                            <span class="tag">2025Q1</span>
+                            <input type="text" placeholder="タグを追加..." class="tag-input-field" onkeypress="handleTagInput(event)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 公開前チェックリスト -->
+<div class="pre-publish-checklist">
+    <h3 class="checklist-title"><i class="icon-list"></i>公開前チェックリスト</h3>
+    <div class="checklist-grid">
+        <label class="checklist-item completed">
+            <input type="checkbox" checked disabled>
+            <span>ファイルの文字起こし完了</span>
+        </label>
+        <label class="checklist-item completed">
+            <input type="checkbox" checked disabled>
+            <span>AI分析完了</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="legal-check" onchange="updatePublishReadiness()">
+            <span>法務チェック完了</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="approval-check" onchange="updatePublishReadiness()">
+            <span>責任者承認取得</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="faq-review" onchange="updatePublishReadiness()">
+            <span>FAQ内容確認完了</span>
+        </label>
+        <label class="checklist-item">
+            <input type="checkbox" id="action-assign" onchange="updatePublishReadiness()">
+            <span>アクション担当者割当完了</span>
+        </label>
+    </div>
+</div>
+
+<!-- アクションボタン -->
+<div class="action-bar">
+    <div class="action-hint">
+        <i class="icon-info"></i>ヒント：公開前にすべてのチェック項目を確認してください
+    </div>
+    <div class="action-buttons">
+        <button class="btn btn-secondary" onclick="saveDraft()">
+            <i class="icon-save"></i>下書き保存
+        </button>
+        <button class="btn btn-primary" onclick="validateAndPublish()">
+            <i class="icon-check"></i>確認して公開
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/pages/dialogue-publish.js"></script>
+{% endblock %}

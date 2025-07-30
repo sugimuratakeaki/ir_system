@@ -283,6 +283,34 @@ KAGAMI.sidebar = {
                 section.style.display = visibleItems.length > 0 ? '' : 'none';
             });
         }, 300));
+    },
+    
+    // サブメニューのトグル
+    toggleSubmenu(event, element) {
+        event.preventDefault();
+        
+        const submenu = element.nextElementSibling;
+        const isExpanded = element.classList.contains('expanded');
+        
+        // 他のサブメニューを閉じる
+        document.querySelectorAll('.nav-item.has-submenu').forEach(item => {
+            if (item !== element) {
+                item.classList.remove('expanded');
+                const otherSubmenu = item.nextElementSibling;
+                if (otherSubmenu) {
+                    otherSubmenu.classList.remove('show');
+                }
+            }
+        });
+        
+        // 現在のサブメニューをトグル
+        if (isExpanded) {
+            element.classList.remove('expanded');
+            submenu.classList.remove('show');
+        } else {
+            element.classList.add('expanded');
+            submenu.classList.add('show');
+        }
     }
 };
 
@@ -292,3 +320,8 @@ if (document.readyState === 'loading') {
 } else {
     KAGAMI.sidebar.init();
 }
+
+// グローバル関数として公開
+window.toggleSubmenu = function(event, element) {
+    KAGAMI.sidebar.toggleSubmenu(event, element);
+};

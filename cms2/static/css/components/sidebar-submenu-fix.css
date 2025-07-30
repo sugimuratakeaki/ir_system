@@ -1,0 +1,31 @@
+/* ====================
+   サブメニュー修正用追加スタイル
+   ==================== */
+
+/* サブメニューの微調整 */
+@media screen and (min-width: 0) {
+  /* アイコンとテキストの間隔調整 */
+  .nav-item.has-submenu .nav-icon {
+    margin-right: var(--space-md) !important;
+  }
+  
+  /* サブメニューの矢印位置 */
+  .nav-arrow {
+    margin-left: var(--space-sm) !important;
+  }
+  
+  /* サブメニューアイテムの行間 */
+  .submenu-item {
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  
+  /* アクティブ時のアニメーション */
+  .nav-item.has-submenu {
+    transition: all var(--transition-fast) !important;
+  }
+  
+  .nav-submenu {
+    transition: max-height var(--transition-normal) ease-in-out !important;
+  }
+}

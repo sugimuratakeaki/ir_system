@@ -1,0 +1,636 @@
+{% extends "base.html" %}
+
+{% block title %}AI詳細分析 - 対話インサイト{% endblock %}
+{% block page_icon %}🤖{% endblock %}
+{% block page_title %}AI詳細分析{% endblock %}
+{% block breadcrumb %}
+<div class="breadcrumb-item">
+    <a href="/dialogue" class="breadcrumb-link">対話管理</a>
+    <span class="breadcrumb-separator">›</span>
+</div>
+{% endblock %}
+{% block breadcrumb_current %}AI分析{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/dialogue-analysis.css">
+{% endblock %}
+
+{% block content %}
+<!-- プログレスバー -->
+<div class="progress-header">
+    <div class="progress-steps">
+        <div class="step completed clickable" onclick="navigateToStep(1)">
+            <div class="step-number">1</div>
+            <div class="step-label">ファイル選択</div>
+        </div>
+        <div class="step completed clickable" onclick="navigateToStep(2)">
+            <div class="step-number">2</div>
+            <div class="step-label">アップロード</div>
+        </div>
+        <div class="step completed clickable" onclick="navigateToStep(3)">
+            <div class="step-number">3</div>
+            <div class="step-label">メタ情報登録</div>
+        </div>
+        <div class="step active">
+            <div class="step-number">4</div>
+            <div class="step-label">AI分析</div>
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-label">確認・公開</div>
+        </div>
+    </div>
+</div>
+
+<!-- ヘッダー -->
+<div class="content-header">
+    <div class="header-info">
+        <h2 class="page-subtitle">野村アセットマネジメントとの個別面談（2025/07/15）</h2>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-secondary" onclick="goBack()">
+            <i class="icon-arrow-left"></i>前へ戻る
+        </button>
+        <button class="btn btn-secondary" onclick="exportAnalysis()">
+            <i class="icon-download"></i>エクスポート
+        </button>
+        <button class="btn btn-primary" onclick="proceedToPublish()">
+            次へ：確認・公開<i class="icon-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- 分析サマリーカード -->
+<div class="analysis-summary-cards">
+    <div class="summary-card positive">
+        <div class="card-icon">😊</div>
+        <div class="card-content">
+            <div class="card-value">85%</div>
+            <div class="card-label">ポジティブ</div>
+            <div class="card-detail">全体的に好意的</div>
+        </div>
+    </div>
+    <div class="summary-card info">
+        <div class="card-icon">🎯</div>
+        <div class="card-content">
+            <div class="card-value">12件</div>
+            <div class="card-label">重要ポイント</div>
+            <div class="card-detail">アクション必要</div>
+        </div>
+    </div>
+    <div class="summary-card warning">
+        <div class="card-icon">❓</div>
+        <div class="card-content">
+            <div class="card-value">8件</div>
+            <div class="card-label">懸念事項</div>
+            <div class="card-detail">フォロー推奨</div>
+        </div>
+    </div>
+    <div class="summary-card success">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+            <div class="card-value">95%</div>
+            <div class="card-label">関連性スコア</div>
+            <div class="card-detail">決算関連度</div>
+        </div>
+    </div>
+</div>
+
+<!-- メインコンテンツエリア -->
+<div class="analysis-container">
+    <!-- 左サイドバー：目次・ナビゲーション -->
+    <aside class="analysis-sidebar">
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">分析セクション</h3>
+            <nav class="analysis-nav">
+                <a href="#executive-summary" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>エグゼクティブサマリー</span>
+                </a>
+                <a href="#sentiment-analysis" class="nav-item">
+                    <span class="nav-icon">😊</span>
+                    <span>感情分析</span>
+                </a>
+                <a href="#key-topics" class="nav-item">
+                    <span class="nav-icon">🏷️</span>
+                    <span>トピック分析</span>
+                </a>
+                <a href="#timeline-view" class="nav-item">
+                    <span class="nav-icon">⏰</span>
+                    <span>タイムライン</span>
+                </a>
+                <a href="#speaker-analysis" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>発言者分析</span>
+                </a>
+                <a href="#action-items" class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>アクションアイテム</span>
+                </a>
+                <a href="#risk-analysis" class="nav-item">
+                    <span class="nav-icon">⚠️</span>
+                    <span>リスク分析</span>
+                </a>
+            </nav>
+        </div>
+        
+        <!-- クイックアクション -->
+        <div class="sidebar-section">
+            <h4 class="sidebar-subtitle">クイックアクション</h4>
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="generateReport()">
+                    <i class="icon-file-text"></i>レポート生成
+                </button>
+                <button class="quick-action-btn" onclick="shareInsights()">
+                    <i class="icon-share"></i>インサイト共有
+                </button>
+                <button class="quick-action-btn" onclick="scheduleFollowup()">
+                    <i class="icon-calendar"></i>フォローアップ
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="analysis-main">
+        <!-- エグゼクティブサマリー -->
+        <section id="executive-summary" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">📋 エグゼクティブサマリー</h3>
+                <button class="btn btn-sm btn-secondary" onclick="editSummary()">
+                    <i class="icon-edit"></i>編集
+                </button>
+            </div>
+            
+            <div class="executive-summary-content">
+                <div class="summary-highlight">
+                    <h4>会議の概要</h4>
+                    <p>野村アセットマネジメントとの個別面談では、2025年第1四半期の業績について詳細な説明を行いました。特にAI事業の成長率35%という好調な結果に対して高い評価を受け、今後の成長戦略について建設的な議論が展開されました。</p>
+                </div>
+                
+                <div class="key-discussion-points">
+                    <h4>主要な議論ポイント</h4>
+                    <div class="discussion-grid">
+                        <div class="discussion-item positive">
+                            <div class="item-icon">✅</div>
+                            <div class="item-content">
+                                <h5>AI事業の成長性</h5>
+                                <p>エンタープライズ向けSaaSの好調な推移と新製品投入による相乗効果を高く評価</p>
+                                <span class="sentiment-tag positive">非常にポジティブ</span>
+                            </div>
+                        </div>
+                        <div class="discussion-item positive">
+                            <div class="item-icon">✅</div>
+                            <div class="item-content">
+                                <h5>財務健全性</h5>
+                                <p>営業利益率の改善とキャッシュフローの強化を評価</p>
+                                <span class="sentiment-tag positive">ポジティブ</span>
+                            </div>
+                        </div>
+                        <div class="discussion-item neutral">
+                            <div class="item-icon">🤔</div>
+                            <div class="item-content">
+                                <h5>人材戦略</h5>
+                                <p>エンジニア採用目標の達成可能性について慎重な見方も</p>
+                                <span class="sentiment-tag neutral">中立的</span>
+                            </div>
+                        </div>
+                        <div class="discussion-item caution">
+                            <div class="item-icon">⚠️</div>
+                            <div class="item-content">
+                                <h5>競合環境</h5>
+                                <p>大手テック企業の参入による競争激化への対応策を質問</p>
+                                <span class="sentiment-tag caution">要注意</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="investor-stance">
+                    <h4>投資家のスタンス</h4>
+                    <div class="stance-meter">
+                        <div class="meter-labels">
+                            <span>ネガティブ</span>
+                            <span>中立</span>
+                            <span>ポジティブ</span>
+                        </div>
+                        <div class="meter-bar">
+                            <div class="meter-fill" style="width: 85%;"></div>
+                            <div class="meter-marker" style="left: 85%;">
+                                <span class="marker-value">85%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="stance-description">全体的に前向きな評価。特にAI事業の成長性と経営陣のビジョンを高く評価。追加投資を検討する可能性も示唆。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 感情分析 -->
+        <section id="sentiment-analysis" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">😊 感情分析</h3>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" onclick="toggleSentimentView('timeline')">
+                        タイムライン
+                    </button>
+                    <button class="toggle-btn" onclick="toggleSentimentView('speaker')">
+                        発言者別
+                    </button>
+                    <button class="toggle-btn" onclick="toggleSentimentView('topic')">
+                        トピック別
+                    </button>
+                </div>
+            </div>
+            
+            <div class="sentiment-content">
+                <!-- 感情推移チャート -->
+                <div class="sentiment-timeline-chart">
+                    <canvas id="sentimentChart" height="200"></canvas>
+                </div>
+                
+                <!-- 感情分布 -->
+                <div class="sentiment-distribution">
+                    <div class="distribution-item positive">
+                        <div class="distribution-bar" style="height: 65%;"></div>
+                        <div class="distribution-label">
+                            <span class="emoji">😊</span>
+                            <span class="percentage">65%</span>
+                            <span class="label">ポジティブ</span>
+                        </div>
+                    </div>
+                    <div class="distribution-item neutral">
+                        <div class="distribution-bar" style="height: 25%;"></div>
+                        <div class="distribution-label">
+                            <span class="emoji">😐</span>
+                            <span class="percentage">25%</span>
+                            <span class="label">中立</span>
+                        </div>
+                    </div>
+                    <div class="distribution-item negative">
+                        <div class="distribution-bar" style="height: 10%;"></div>
+                        <div class="distribution-label">
+                            <span class="emoji">😕</span>
+                            <span class="percentage">10%</span>
+                            <span class="label">ネガティブ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 感情的なハイライト -->
+                <div class="emotional-highlights">
+                    <h4>感情的なハイライト</h4>
+                    <div class="highlight-cards">
+                        <div class="highlight-card most-positive">
+                            <div class="highlight-header">
+                                <span class="highlight-icon">🎉</span>
+                                <span class="highlight-label">最もポジティブな瞬間</span>
+                            </div>
+                            <div class="highlight-content">
+                                <p class="quote">"AI事業の成長率35%は素晴らしい成果です。市場をリードする位置にいることは明確です。"</p>
+                                <p class="context">山田太郎氏 - 14:25</p>
+                            </div>
+                        </div>
+                        <div class="highlight-card concern">
+                            <div class="highlight-header">
+                                <span class="highlight-icon">🤔</span>
+                                <span class="highlight-label">懸念が示された瞬間</span>
+                            </div>
+                            <div class="highlight-content">
+                                <p class="quote">"競合他社の動向は気になります。特に大手テック企業の参入についてどうお考えですか？"</p>
+                                <p class="context">鈴木花子氏 - 35:40</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- トピック分析 -->
+        <section id="key-topics" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">🏷️ トピック分析</h3>
+                <button class="btn btn-sm btn-secondary" onclick="adjustTopics()">
+                    <i class="icon-settings"></i>トピック調整
+                </button>
+            </div>
+            
+            <div class="topic-cloud">
+                <div class="topic-bubble large" data-weight="0.35">
+                    <span class="topic-name">AI事業</span>
+                    <span class="topic-percentage">35%</span>
+                </div>
+                <div class="topic-bubble medium" data-weight="0.20">
+                    <span class="topic-name">人材戦略</span>
+                    <span class="topic-percentage">20%</span>
+                </div>
+                <div class="topic-bubble medium" data-weight="0.15">
+                    <span class="topic-name">財務状況</span>
+                    <span class="topic-percentage">15%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.10">
+                    <span class="topic-name">競合分析</span>
+                    <span class="topic-percentage">10%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.08">
+                    <span class="topic-name">ESG</span>
+                    <span class="topic-percentage">8%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.07">
+                    <span class="topic-name">海外展開</span>
+                    <span class="topic-percentage">7%</span>
+                </div>
+                <div class="topic-bubble small" data-weight="0.05">
+                    <span class="topic-name">技術革新</span>
+                    <span class="topic-percentage">5%</span>
+                </div>
+            </div>
+            
+            <!-- トピック詳細 -->
+            <div class="topic-details">
+                <h4>主要トピックの詳細分析</h4>
+                <div class="topic-detail-cards">
+                    <div class="topic-detail-card">
+                        <div class="topic-header">
+                            <h5>🤖 AI事業（35%）</h5>
+                            <span class="sentiment-indicator positive">+85%</span>
+                        </div>
+                        <div class="topic-keywords">
+                            <span class="keyword">成長率</span>
+                            <span class="keyword">SaaS</span>
+                            <span class="keyword">エンタープライズ</span>
+                            <span class="keyword">新製品</span>
+                        </div>
+                        <div class="topic-insights">
+                            <p>最も議論時間が長く、投資家の関心が最も高いトピック。特に持続的成長性と競争優位性に注目。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="topic-detail-card">
+                        <div class="topic-header">
+                            <h5>👥 人材戦略（20%）</h5>
+                            <span class="sentiment-indicator neutral">+45%</span>
+                        </div>
+                        <div class="topic-keywords">
+                            <span class="keyword">エンジニア採用</span>
+                            <span class="keyword">200名体制</span>
+                            <span class="keyword">人材確保</span>
+                            <span class="keyword">競争力</span>
+                        </div>
+                        <div class="topic-insights">
+                            <p>採用目標の実現可能性と人材の質に関する議論。市場での人材獲得競争への懸念も表明。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- タイムライン表示 -->
+        <section id="timeline-view" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">⏰ 対話タイムライン</h3>
+                <div class="timeline-controls">
+                    <button class="btn btn-sm btn-secondary active" onclick="filterTimeline('all')">
+                        すべて
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="filterTimeline('key-moments')">
+                        重要な瞬間
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="filterTimeline('questions')">
+                        質問のみ
+                    </button>
+                </div>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-item key-moment">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-time">14:00</span>
+                            <span class="timeline-speaker">田中CEO</span>
+                            <span class="moment-badge">🌟 キーモーメント</span>
+                        </div>
+                        <div class="timeline-text">
+                            <p>本日はお時間をいただきありがとうございます。第1四半期の業績についてご説明させていただきます。</p>
+                        </div>
+                        <div class="timeline-analysis">
+                            <span class="analysis-tag">オープニング</span>
+                            <span class="sentiment-tag positive">ポジティブ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item question">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-time">14:23</span>
+                            <span class="timeline-speaker">山田氏（投資家）</span>
+                            <span class="question-badge">❓ 質問</span>
+                        </div>
+                        <div class="timeline-text">
+                            <p>AI事業の成長率35%を達成した要因について、もう少し詳しく教えていただけますか？</p>
+                        </div>
+                        <div class="timeline-analysis">
+                            <span class="analysis-tag">成長要因</span>
+                            <span class="interest-level high">高関心</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item answer key-moment">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-time">14:25</span>
+                            <span class="timeline-speaker">田中CEO</span>
+                            <span class="moment-badge">🌟 キーモーメント</span>
+                        </div>
+                        <div class="timeline-text">
+                            <p>主に3つの要因があります。第一にエンタープライズSaaSの好調、第二に新製品の市場投入、第三に既存顧客のアップセルです。特に大手企業向けAIソリューションの採用が加速しています。</p>
+                        </div>
+                        <div class="timeline-analysis">
+                            <span class="analysis-tag">成長戦略</span>
+                            <span class="sentiment-tag very-positive">非常にポジティブ</span>
+                            <span class="impact-tag">インパクト大</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- タイムラインナビゲーション -->
+                <div class="timeline-navigation">
+                    <button class="timeline-nav-btn" onclick="jumpToTime('start')">
+                        <i class="icon-skip-back"></i>開始
+                    </button>
+                    <button class="timeline-nav-btn" onclick="jumpToTime('previous')">
+                        <i class="icon-chevron-left"></i>前へ
+                    </button>
+                    <button class="timeline-nav-btn" onclick="jumpToTime('next')">
+                        次へ<i class="icon-chevron-right"></i>
+                    </button>
+                    <button class="timeline-nav-btn" onclick="jumpToTime('end')">
+                        終了<i class="icon-skip-forward"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- アクションアイテム -->
+        <section id="action-items" class="analysis-section">
+            <div class="section-header">
+                <h3 class="section-title">✅ アクションアイテム</h3>
+                <button class="btn btn-sm btn-primary" onclick="addActionItem()">
+                    <i class="icon-plus"></i>アクション追加
+                </button>
+            </div>
+            
+            <div class="action-items-container">
+                <div class="action-priority-groups">
+                    <!-- 高優先度 -->
+                    <div class="priority-group high">
+                        <h4 class="priority-header">
+                            <span class="priority-icon">🔴</span>
+                            <span>高優先度</span>
+                            <span class="count">(3)</span>
+                        </h4>
+                        <div class="action-items-list">
+                            <div class="action-item">
+                                <input type="checkbox" id="action1" class="action-checkbox">
+                                <label for="action1" class="action-content">
+                                    <div class="action-title">競合分析レポートの準備</div>
+                                    <div class="action-details">
+                                        <span class="action-owner">担当: IR部</span>
+                                        <span class="action-due">期限: 2025/07/22</span>
+                                    </div>
+                                    <div class="action-context">
+                                        投資家から競合他社の動向について詳細な質問があったため、追加資料を準備
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="action-item">
+                                <input type="checkbox" id="action2" class="action-checkbox">
+                                <label for="action2" class="action-content">
+                                    <div class="action-title">AI事業の詳細KPI共有</div>
+                                    <div class="action-details">
+                                        <span class="action-owner">担当: 経営企画部</span>
+                                        <span class="action-due">期限: 2025/07/20</span>
+                                    </div>
+                                    <div class="action-context">
+                                        月次のARRやチャーンレートなど、より詳細なメトリクスの開示を検討
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 中優先度 -->
+                    <div class="priority-group medium">
+                        <h4 class="priority-header">
+                            <span class="priority-icon">🟡</span>
+                            <span>中優先度</span>
+                            <span class="count">(5)</span>
+                        </h4>
+                        <div class="action-items-list">
+                            <div class="action-item">
+                                <input type="checkbox" id="action3" class="action-checkbox">
+                                <label for="action3" class="action-content">
+                                    <div class="action-title">人材採用進捗の月次アップデート</div>
+                                    <div class="action-details">
+                                        <span class="action-owner">担当: 人事部</span>
+                                        <span class="action-due">期限: 月次</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- アクション統計 -->
+                <div class="action-statistics">
+                    <h4>アクション統計</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">総アクション数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">今週期限</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">75%</div>
+                            <div class="stat-label">完了率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 右サイドバー：AI推奨事項 -->
+    <aside class="analysis-right-sidebar">
+        <div class="ai-recommendations">
+            <h3 class="sidebar-title">🤖 AI推奨事項</h3>
+            
+            <div class="recommendation-card">
+                <div class="rec-header">
+                    <span class="rec-icon">📊</span>
+                    <span class="rec-title">フォローアップ推奨</span>
+                </div>
+                <div class="rec-content">
+                    <p>競合分析に関する追加情報を2週間以内に提供することで、投資家の信頼を強化できます。</p>
+                    <button class="btn btn-sm btn-primary">タスク作成</button>
+                </div>
+            </div>
+            
+            <div class="recommendation-card">
+                <div class="rec-header">
+                    <span class="rec-icon">💡</span>
+                    <span class="rec-title">コミュニケーション改善</span>
+                </div>
+                <div class="rec-content">
+                    <p>技術的な説明をより具体的な事例で補強すると、理解度が向上します。</p>
+                    <button class="btn btn-sm btn-secondary">詳細を見る</button>
+                </div>
+            </div>
+            
+            <div class="recommendation-card">
+                <div class="rec-header">
+                    <span class="rec-icon">🎯</span>
+                    <span class="rec-title">次回の重点トピック</span>
+                </div>
+                <div class="rec-content">
+                    <ul class="rec-list">
+                        <li>人材確保の具体的施策</li>
+                        <li>競合対策の詳細</li>
+                        <li>海外展開のロードマップ</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 関連情報 -->
+        <div class="related-info">
+            <h4 class="sidebar-subtitle">関連する過去の対話</h4>
+            <div class="related-items">
+                <a href="#" class="related-item">
+                    <span class="date">2025/04/15</span>
+                    <span class="title">野村AM 四半期定例</span>
+                    <span class="similarity">類似度: 85%</span>
+                </a>
+                <a href="#" class="related-item">
+                    <span class="date">2025/01/20</span>
+                    <span class="title">野村AM 決算説明会</span>
+                    <span class="similarity">類似度: 72%</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/pages/dialogue-analysis.js"></script>
+{% endblock %}
