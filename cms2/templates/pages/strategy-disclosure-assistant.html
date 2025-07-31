@@ -1,0 +1,684 @@
+{% extends "base.html" %}
+
+{% block title %}中長期計画開示支援ツール{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ステップインジケーター */
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding: 0 2rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: #e5e7eb;
+}
+
+.step.completed:not(:last-child)::after {
+    background-color: #10b981;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    z-index: 1;
+    transition: all 0.3s;
+}
+
+.step.active .step-circle {
+    background-color: #3b82f6;
+    color: white;
+    transform: scale(1.1);
+}
+
+.step.completed .step-circle {
+    background-color: #10b981;
+    color: white;
+}
+
+.step-label {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+/* アップロードエリア */
+.upload-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    background-color: #f8fafc;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.upload-area.dragover {
+    border-color: #3b82f6;
+    background-color: #dbeafe;
+}
+
+/* 質問カード */
+.question-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+
+.question-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.priority-high {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.priority-medium {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.priority-low {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-6xl">
+    <!-- ヘッダー -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">中長期計画開示支援ツール</h1>
+        <p class="text-gray-600">AIが投資家視点で質問を生成し、効果的な中長期計画の開示資料作成をサポートします</p>
+    </div>
+
+    <!-- ステップインジケーター -->
+    <div class="step-indicator mb-8">
+        <div class="step active" id="step1">
+            <div class="step-circle">1</div>
+            <div class="step-label">資料アップロード</div>
+        </div>
+        <div class="step" id="step2">
+            <div class="step-circle">2</div>
+            <div class="step-label">AI分析・質問生成</div>
+        </div>
+        <div class="step" id="step3">
+            <div class="step-circle">3</div>
+            <div class="step-label">質問への回答</div>
+        </div>
+        <div class="step" id="step4">
+            <div class="step-circle">4</div>
+            <div class="step-label">開示資料作成</div>
+        </div>
+    </div>
+
+    <!-- ステップ1: ファイルアップロード -->
+    <div id="step1-content" class="step-content">
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">
+                    <span class="text-blue-600">ステップ1:</span> 企業情報と決算資料
+                </h2>
+                
+                <!-- 企業プロファイル入力 -->
+                <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-medium text-gray-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        企業プロファイル（AIがより適切な質問を生成するための情報）
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">業種</label>
+                            <select id="industry" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">選択してください</option>
+                                <option value="manufacturing">製造業</option>
+                                <option value="it">情報通信業</option>
+                                <option value="retail">小売業</option>
+                                <option value="finance">金融業</option>
+                                <option value="realestate">不動産業</option>
+                                <option value="service">サービス業</option>
+                                <option value="healthcare">医療・ヘルスケア</option>
+                                <option value="energy">エネルギー</option>
+                                <option value="other">その他</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">上場市場</label>
+                            <select id="market" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">選択してください</option>
+                                <option value="prime">東証プライム</option>
+                                <option value="standard">東証スタンダード</option>
+                                <option value="growth">東証グロース</option>
+                                <option value="non-listed">非上場</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">主な競合他社（任意）</label>
+                            <input type="text" id="competitors" placeholder="例：A社、B社、C社" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">重点事業領域（任意）</label>
+                            <input type="text" id="focus-areas" placeholder="例：AI、DX、海外展開" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="upload-area" onclick="document.getElementById('fileInput').click();" 
+                     ondrop="handleDrop(event)" 
+                     ondragover="handleDragOver(event)" 
+                     ondragleave="handleDragLeave(event)">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="text-gray-600 font-medium">
+                        クリックまたはドラッグ＆ドロップでファイルをアップロード
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        対応形式: PDF, Excel, PowerPoint (最大50MB)
+                    </p>
+                    <input type="file" id="fileInput" class="hidden" accept=".pdf,.xlsx,.xls,.pptx,.ppt" onchange="handleFileSelect(event)">
+                </div>
+
+                <div id="fileList" class="mt-4 hidden">
+                    <h3 class="font-medium text-gray-900 mb-2">アップロードされたファイル:</h3>
+                    <div id="fileItems"></div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors" onclick="skipToManualQuestions()">
+                        資料なしで進む
+                    </button>
+                    <button id="analyzeBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2" 
+                            onclick="startAnalysis()" disabled>
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        AIで分析開始
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ステップ2: AI分析中 -->
+    <div id="step2-content" class="step-content hidden">
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">
+                    <span class="text-blue-600">ステップ2:</span> AI分析中...
+                </h2>
+                
+                <div class="text-center py-8">
+                    <div class="loading-spinner mb-4"></div>
+                    <p class="text-gray-600 mb-2">決算資料を分析しています...</p>
+                    <p class="text-sm text-gray-500">投資家視点での重要な質問を生成中</p>
+                    
+                    <div class="mt-6 bg-gray-50 rounded-lg p-4 max-w-md mx-auto">
+                        <p class="text-sm text-gray-700 font-medium mb-3">分析中の項目:</p>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li id="analysis-item-1">・財務パフォーマンスの分析</li>
+                            <li id="analysis-item-2">・事業戦略の評価</li>
+                            <li id="analysis-item-3">・ESG要素の確認</li>
+                            <li id="analysis-item-4">・投資家の関心事項の特定</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ステップ3: 質問への回答 -->
+    <div id="step3-content" class="step-content hidden">
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <span class="text-blue-600">ステップ3:</span> 投資家視点の質問に回答
+                </h2>
+                
+                <p class="text-gray-600 mb-6">
+                    AIが生成した質問に回答してください。これらは投資家が中長期計画について最も知りたい事項です。
+                </p>
+
+                <div id="questionsContainer">
+                    <!-- 質問カードがここに動的に追加されます -->
+                </div>
+
+                <!-- 追加質問生成セクション -->
+                <div class="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-medium text-gray-900 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            もっと詳細な質問が必要ですか？
+                        </h4>
+                        <span id="additionalQuestionsCount" class="text-sm text-purple-600">0件追加済み</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button class="px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center" onclick="generateSpecificQuestions('competitor')">
+                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            競合比較質問を追加
+                        </button>
+                        <button class="px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center" onclick="generateSpecificQuestions('industry')">
+                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            業界特有の質問を追加
+                        </button>
+                        <button class="px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center" onclick="generateSpecificQuestions('deep')">
+                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            より詳細な分析質問
+                        </button>
+                    </div>
+                    <div class="mt-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">または、特定のトピックについて質問を追加：</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="customTopic" placeholder="例：M&A戦略、研究開発投資、サプライチェーン" 
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors" onclick="generateCustomQuestions()">
+                                AIで質問生成
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between">
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors" onclick="previousStep()">
+                        戻る
+                    </button>
+                    <div class="flex gap-3">
+                        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors" onclick="saveProgress()">
+                            一時保存
+                        </button>
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onclick="generateDisclosure()">
+                            開示資料を生成
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ステップ4: 開示資料作成 -->
+    <div id="step4-content" class="step-content hidden">
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">
+                    <span class="text-blue-600">ステップ4:</span> 中長期計画開示資料
+                </h2>
+
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">生成された開示資料</h3>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors" onclick="editDocument()">
+                                編集
+                            </button>
+                            <button class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors" onclick="downloadDocument()">
+                                ダウンロード
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="disclosureContent" class="prose max-w-none">
+                        <!-- 生成された開示資料がここに表示されます -->
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-blue-50 rounded-lg p-4">
+                    <div class="flex">
+                        <svg class="h-5 w-5 text-blue-400 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="text-sm text-blue-700">
+                            <p class="font-medium mb-1">次のステップ:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>経営陣による内容確認と承認</li>
+                                <li>法務部門によるコンプライアンスチェック</li>
+                                <li>IRウェブサイトへの掲載</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ローディングオーバーレイ -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 text-center">
+        <div class="loading-spinner mb-4"></div>
+        <p class="text-gray-700 font-medium">処理中...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 中長期計画開示支援ツールのJavaScript
+let uploadedFiles = [];
+let questionsData = [];
+let currentStep = 1;
+
+// ファイル処理関連の関数
+function handleFileSelect(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+        displayFiles(files);
+        document.getElementById('analyzeBtn').disabled = false;
+    }
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    event.currentTarget.classList.remove('dragover');
+    
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        displayFiles(files);
+        document.getElementById('analyzeBtn').disabled = false;
+    }
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+    event.currentTarget.classList.add('dragover');
+}
+
+function handleDragLeave(event) {
+    event.currentTarget.classList.remove('dragover');
+}
+
+function displayFiles(files) {
+    uploadedFiles = Array.from(files);
+    const fileList = document.getElementById('fileList');
+    const fileItems = document.getElementById('fileItems');
+    
+    fileList.classList.remove('hidden');
+    fileItems.innerHTML = '';
+    
+    uploadedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg mb-2';
+        fileItem.innerHTML = `
+            <div class="flex items-center">
+                <svg class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span class="text-sm text-gray-700">${file.name}</span>
+                <span class="text-xs text-gray-500 ml-2">(${formatFileSize(file.size)})</span>
+            </div>
+            <button onclick="removeFile(${index})" class="p-1 text-red-500 hover:text-red-700">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        `;
+        fileItems.appendChild(fileItem);
+    });
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    if (uploadedFiles.length === 0) {
+        document.getElementById('fileList').classList.add('hidden');
+        document.getElementById('analyzeBtn').disabled = true;
+    } else {
+        displayFiles(uploadedFiles);
+    }
+}
+
+// 分析開始
+function startAnalysis() {
+    const industry = document.getElementById('industry').value;
+    const market = document.getElementById('market').value;
+    
+    if (!industry || !market) {
+        alert('企業情報（業種、上場市場）を入力してください。');
+        return;
+    }
+    
+    moveToStep(2);
+    
+    // 分析アニメーション
+    const analysisItems = document.querySelectorAll('[id^="analysis-item-"]');
+    analysisItems.forEach((item, index) => {
+        setTimeout(() => {
+            item.style.color = '#10b981';
+            item.style.fontWeight = '600';
+        }, (index + 1) * 1000);
+    });
+    
+    // モック: 5秒後に質問生成完了
+    setTimeout(() => {
+        generateQuestions();
+        moveToStep(3);
+    }, 5000);
+}
+
+// 質問生成
+function generateQuestions() {
+    questionsData = [
+        {
+            id: 1,
+            category: "財務戦略",
+            priority: "high",
+            question: "貴社の営業利益率は過去3年間で12.5%から10.2%に低下していますが、中期計画で掲げている15%という目標達成のための具体的な施策と、各施策の利益貢献度をお聞かせください。",
+            aiHint: "DX投資による業務効率化（+1.5%）、不採算事業の撤退（+0.8%）、高付加価値製品へのシフト（+1.5%）などの具体的数値を含めた説明が望まれます。"
+        },
+        {
+            id: 2,
+            category: "資本効率",
+            priority: "high",
+            question: "ROEが業界平均を下回っていますが、資本効率改善に向けた資本配分の最適化戦略について、特に成長投資と株主還元のバランスをどのように考えているか教えてください。",
+            aiHint: "投資判定基準（WACC+α）、配当性向の目標水準、自社株買いの実施条件などを明確にすることが重要です。"
+        },
+        {
+            id: 3,
+            category: "ESG",
+            priority: "medium",
+            question: "2050年カーボンニュートラル達成に向けた具体的なロードマップと、移行期間における財務影響をどのように見積もっているか説明してください。",
+            aiHint: "Scope1,2,3別の削減目標、必要投資額、炭素税等のリスク要因の定量化が求められています。"
+        }
+    ];
+    
+    displayQuestions();
+}
+
+// 質問表示
+function displayQuestions() {
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+    
+    questionsData.forEach((q, index) => {
+        const questionCard = document.createElement('div');
+        questionCard.className = 'question-card';
+        questionCard.innerHTML = `
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        q.priority === 'high' ? 'priority-high' : 
+                        q.priority === 'medium' ? 'priority-medium' : 'priority-low'
+                    }">
+                        ${q.priority === 'high' ? '重要' : q.priority === 'medium' ? '中' : '低'}
+                    </span>
+                    <span class="text-sm text-gray-500 ml-2">${q.category}</span>
+                </div>
+                <span class="text-sm text-gray-400">質問 ${index + 1}/${questionsData.length}</span>
+            </div>
+            
+            <p class="text-gray-800 mb-3">${q.question}</p>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                <div class="flex items-start gap-2">
+                    <svg class="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <span class="text-sm font-medium text-blue-900">AIからのヒント</span>
+                        <p class="text-sm text-blue-700 mt-1">${q.aiHint}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">回答を入力してください</label>
+                <textarea 
+                    id="answer-${q.id}" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    rows="4"
+                    placeholder="投資家への説明を記入..."
+                    onchange="saveAnswer(${q.id}, this.value)"
+                ></textarea>
+                <div class="mt-2 flex justify-end">
+                    <button class="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors" onclick="generateAISuggestion(${q.id})">
+                        AI回答案を生成
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(questionCard);
+    });
+}
+
+// ステップ管理
+function moveToStep(step) {
+    document.getElementById(`step${currentStep}-content`).classList.add('hidden');
+    
+    for (let i = 1; i <= 4; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        if (i < step) {
+            stepEl.classList.add('completed');
+            stepEl.classList.remove('active');
+        } else if (i === step) {
+            stepEl.classList.add('active');
+            stepEl.classList.remove('completed');
+        } else {
+            stepEl.classList.remove('active', 'completed');
+        }
+    }
+    
+    document.getElementById(`step${step}-content`).classList.remove('hidden');
+    currentStep = step;
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        moveToStep(currentStep - 1);
+    }
+}
+
+// その他の関数
+function saveAnswer(questionId, answer) {
+    const question = questionsData.find(q => q.id === questionId);
+    if (question) {
+        question.answer = answer;
+    }
+}
+
+function generateAISuggestion(questionId) {
+    // モック実装
+    console.log('AI回答案を生成:', questionId);
+}
+
+function generateDisclosure() {
+    moveToStep(4);
+    // モック実装
+    document.getElementById('disclosureContent').innerHTML = `
+        <h1 class="text-2xl font-bold mb-4">中期経営計画 2025-2027</h1>
+        <p>開示資料のプレビューがここに表示されます。</p>
+    `;
+}
+
+function skipToManualQuestions() {
+    moveToStep(3);
+    generateQuestions();
+}
+
+function saveProgress() {
+    console.log('進捗を保存');
+}
+
+function editDocument() {
+    console.log('ドキュメント編集');
+}
+
+function downloadDocument() {
+    console.log('ドキュメントダウンロード');
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('中長期計画開示支援ツール初期化完了');
+});
+</script>
+{% endblock %}

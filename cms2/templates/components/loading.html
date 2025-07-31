@@ -1,0 +1,114 @@
+<!-- ローディングコンポーネント -->
+<!-- 使用方法:
+1. インラインローディング:
+{% set loading_text = "読み込み中..." %}
+{% include 'components/loading.html' %}
+
+2. オーバーレイローディング:
+<div id="loadingOverlay" class="loading-overlay hidden">
+    {% include 'components/loading.html' %}
+</div>
+-->
+
+<!-- スピナーローディング -->
+<div class="loading-spinner">
+    <div class="spinner">
+        <div class="spinner-circle"></div>
+    </div>
+    {% if loading_text %}
+    <p class="loading-text">{{ loading_text|default('読み込み中...') }}</p>
+    {% endif %}
+</div>
+
+<!-- スケルトンローディングテンプレート -->
+<!-- テーブル用 -->
+<template id="tableSkeletonTemplate">
+    <div class="skeleton-table">
+        <div class="skeleton-row skeleton-header">
+            <div class="skeleton-cell w-32"></div>
+            <div class="skeleton-cell w-48"></div>
+            <div class="skeleton-cell w-64"></div>
+            <div class="skeleton-cell w-32"></div>
+            <div class="skeleton-cell w-24"></div>
+        </div>
+        {% for i in range(5) %}
+        <div class="skeleton-row">
+            <div class="skeleton-cell w-32"></div>
+            <div class="skeleton-cell w-48"></div>
+            <div class="skeleton-cell w-64"></div>
+            <div class="skeleton-cell w-32"></div>
+            <div class="skeleton-cell w-24"></div>
+        </div>
+        {% endfor %}
+    </div>
+</template>
+
+<!-- カード用 -->
+<template id="cardSkeletonTemplate">
+    <div class="skeleton-card">
+        <div class="skeleton-card-header">
+            <div class="skeleton-line w-48 h-6"></div>
+        </div>
+        <div class="skeleton-card-body">
+            <div class="skeleton-line w-full"></div>
+            <div class="skeleton-line w-3/4"></div>
+            <div class="skeleton-line w-5/6"></div>
+            <div class="mt-4">
+                <div class="skeleton-line w-32 h-8"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- 統計カード用 -->
+<template id="statSkeletonTemplate">
+    <div class="skeleton-stat-card">
+        <div class="skeleton-stat-content">
+            <div>
+                <div class="skeleton-line w-24 h-4 mb-2"></div>
+                <div class="skeleton-line w-32 h-8"></div>
+            </div>
+            <div class="skeleton-icon"></div>
+        </div>
+    </div>
+</template>
+
+<!-- プログレスバー -->
+<div class="progress-container" id="progressContainer" style="display: none;">
+    <div class="progress-header">
+        <span class="progress-label">処理中...</span>
+        <span class="progress-percentage">0%</span>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-bar-fill" style="width: 0%;"></div>
+    </div>
+    <div class="progress-status">
+        <span class="progress-message"></span>
+    </div>
+</div>
+
+<!-- ドットローディング -->
+<div class="loading-dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+</div>
+
+<!-- パルスローディング（プレースホルダー） -->
+<div class="loading-pulse">
+    <div class="pulse-item"></div>
+</div>
+
+<!-- 全画面ローディング -->
+<div id="fullscreenLoader" class="fullscreen-loader hidden">
+    <div class="loader-content">
+        <div class="loader-logo">
+            <span class="text-4xl">🔮</span>
+        </div>
+        <div class="loader-spinner">
+            <div class="spinner-large"></div>
+        </div>
+        <p class="loader-text">KAGAMI IR管理センター</p>
+        <p class="loader-subtext">データを読み込んでいます...</p>
+    </div>
+</div>

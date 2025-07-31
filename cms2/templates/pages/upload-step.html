@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}ファイルアップロード{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Upload専用画面スタイル */
+.upload-workspace {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+}
+
+/* コンパクトな進捗バー */
+.compact-progress {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.step-navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.nav-step {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-step.active {
+    background: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+/* メインアップロード画面 */
+.upload-main {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.drop-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #fafafa;
+}
+
+.drop-area:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.drop-area.drag-over {
+    border-color: #10b981;
+    background: #f0fdf4;
+    transform: scale(1.02);
+}
+
+.file-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.file-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.file-type-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.file-type-icon.video {
+    background: #3b82f6;
+    color: white;
+}
+
+.file-type-icon.audio {
+    background: #10b981;
+    color: white;
+}
+
+.file-type-icon.document {
+    background: #f59e0b;
+    color: white;
+}
+
+/* サイドパネル */
+.sidebar-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #111827;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-workspace">
+    <!-- コンパクト進捗バー -->
+    <div class="compact-progress">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold mb-1">投資家ミーティング 2024/01/22</h1>
+                <div class="text-sm opacity-90">
+                    野村アセットマネジメント • 2024年1月22日 • 個別面談
+                </div>
+            </div>
+            <div class="step-navigation">
+                <div class="nav-step active">📁 アップロード</div>
+                <div class="nav-step">📝 文字起こし</div>
+                <div class="nav-step">🤖 AI要約</div>
+                <div class="nav-step">❓ FAQ</div>
+                <div class="nav-step">✅ レビュー</div>
+                <div class="nav-step">🌐 公開</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインアップロード領域 -->
+    <div class="upload-main">
+        <div class="space-y-6">
+            <!-- ドロップエリア -->
+            <div class="drop-area" onclick="selectFiles()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <div class="text-6xl mb-4 opacity-60">📁</div>
+                <h2 class="text-2xl font-semibold text-gray-900 mb-2">ファイルアップロード</h2>
+                <p class="text-gray-600 mb-4">
+                    面談の音声・動画ファイルや関連資料をドラッグ&ドロップ<br>
+                    またはクリックしてファイルを選択してください
+                </p>
+                <div class="bg-blue-50 rounded-lg p-4 text-left max-w-md mx-auto">
+                    <p class="text-sm font-medium text-blue-900 mb-2">📋 対応形式・制限</p>
+                    <div class="text-sm text-blue-700 space-y-1">
+                        <p>🎥 動画: MP4, MOV, AVI (最大2GB)</p>
+                        <p>🎵 音声: MP3, WAV, M4A (最大500MB)</p>
+                        <p>📄 資料: PDF, PPT, DOCX (最大100MB)</p>
+                        <p>⏱️ 推奨時間: 3時間以内</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- アップロード済みファイル -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">📂 アップロード済みファイル (2件)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="file-card">
+                        <div class="flex items-start gap-3">
+                            <div class="file-type-icon audio">🎵</div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">meeting_20240122.mp3</h4>
+                                <p class="text-sm text-gray-500">45MB • 1:30:45</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button class="px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50">
+                                        👁️ プレビュー
+                                    </button>
+                                    <button class="px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50">
+                                        📥 DL
+                                    </button>
+                                    <button class="px-3 py-1 text-xs text-red-600 bg-white border border-red-300 rounded hover:bg-red-50">
+                                        🗑️ 削除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-card">
+                        <div class="flex items-start gap-3">
+                            <div class="file-type-icon document">📄</div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-900">決算説明資料_Q3.pdf</h4>
+                                <p class="text-sm text-gray-500">8.5MB</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button class="px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50">
+                                        👁️ プレビュー
+                                    </button>
+                                    <button class="px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50">
+                                        📥 DL
+                                    </button>
+                                    <button class="px-3 py-1 text-xs text-red-600 bg-white border border-red-300 rounded hover:bg-red-50">
+                                        🗑️ 削除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- サイドパネル -->
+        <div class="space-y-4">
+            <!-- 基本情報 -->
+            <div class="sidebar-card">
+                <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <span>📝</span> 基本情報
+                </h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">会議種別</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option selected>個別面談</option>
+                            <option>決算説明会</option>
+                            <option>スモールミーティング</option>
+                            <option>カンファレンス</option>
+                            <option>ロードショー</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">優先度</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option selected>🔥 高</option>
+                            <option>🟡 中</option>
+                            <option>🟢 低</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">参加者数</label>
+                        <input type="number" value="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ファイル統計 -->
+            <div class="sidebar-card">
+                <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <span>📊</span> アップロード状況
+                </h3>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="stat-box">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">ファイル数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">53.5</div>
+                        <div class="stat-label">MB</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg p-3">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm text-gray-600">進捗状況</span>
+                        <span class="text-sm font-semibold">85%</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded-full">
+                        <div class="w-5/6 h-2 bg-green-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- クイックアクション -->
+            <div class="sidebar-card">
+                <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <span>⚡</span> クイックアクション
+                </h3>
+                <div class="space-y-2">
+                    <button class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                        🎤 録音品質チェック
+                    </button>
+                    <button class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                        🧪 文字起こしテスト
+                    </button>
+                    <button class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                        🏷️ メタデータ追加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- アクションバー -->
+    <div class="bg-gray-50 rounded-b-lg px-6 py-4 -mt-6 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            最終保存: 2分前
+        </div>
+        <div class="flex gap-3">
+            <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                💾 下書き保存
+            </button>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                📝 文字起こしへ進む
+            </button>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="fileInput" multiple accept="video/*,audio/*,.pdf,.ppt,.pptx,.doc,.docx" style="display: none;">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ファイルアップロード機能
+function selectFiles() {
+    document.getElementById('fileInput').click();
+}
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    handleFiles(e.target.files);
+});
+
+function handleFiles(files) {
+    console.log('選択されたファイル:', files);
+    // 実際のアップロード処理
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    handleFiles(e.dataTransfer.files);
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('ファイルアップロード画面初期化完了');
+});
+</script>
+{% endblock %}

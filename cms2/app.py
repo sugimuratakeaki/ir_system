@@ -45,7 +45,8 @@ MOCK_DATA = {
                 "time": "2024-01-22 08:45",
                 "status": "pending"
             }
-        ],
+        ]
+    },
     "analytics": {
         "kpis": {
             "active_investors": {
@@ -153,8 +154,7 @@ MOCK_DATA = {
             "details": "新規FAQ「配当政策について」を追加しました",
             "severity": "info"
         }
-    ]
-    },
+    ],
     "investors": [
         {
             "id": "inv_001",
@@ -409,6 +409,72 @@ MOCK_DATA = {
             "assignee": "ESG推進室",
             "description": "ESGへの取り組みについて説明"
         }
+    ],
+    "todays_meetings": [
+        {
+            "time": "10:00-11:00",
+            "type": "conference",
+            "type_label": "決算説明会",
+            "title": "Q3決算説明会（オンライン）",
+            "detail": "参加予定: 120名"
+        },
+        {
+            "time": "14:00-15:00",
+            "type": "individual",
+            "type_label": "個別面談",
+            "title": "海外投資家B社 個別面談",
+            "detail": "CFO対応・英語"
+        }
+    ],
+    "meeting_slots": {
+        "CEO": {
+            "total": 5,
+            "used": 3,
+            "usage_percentage": 60,
+            "next_available": "1/8（水）15:00-16:00"
+        },
+        "Director": {
+            "total": 4,
+            "used": 1,
+            "usage_percentage": 25,
+            "next_available": "12/27（金）14:00-15:00"
+        },
+        "CFO": {
+            "total": 10,
+            "used": 8,
+            "usage_percentage": 80,
+            "next_available": "1/10（金）10:00-11:00"
+        }
+    },
+    "pending_meetings": [
+        {
+            "id": "req_001",
+            "investor_name": "新規海外投資家C社",
+            "meeting_type": "CEO",
+            "requested_date": "1/12（日）",
+            "requested_time": "10:00-11:00",
+            "format": "オンライン",
+            "investor_info": "北米大手年金基金、運用資産$50B",
+            "topics": "長期成長戦略、サステナビリティ方針"
+        }
+    ],
+    "recent_conferences": [
+        {
+            "title": "Q3決算説明会",
+            "date": "2024/12/25",
+            "attendees": 156,
+            "questions": 23,
+            "duration": 75,
+            "qa_list": [
+                {
+                    "id": "qa_001",
+                    "timestamp": "00:35:00",
+                    "question": "自己資本比率の目標水準と達成時期について、より具体的な計画を教えてください。",
+                    "responder": "CFO",
+                    "answer": "中期的には45%を目標としており、2026年度末までの達成を目指しています。具体的には、非コア資産の売却で約200億円、運転資本の効率化で100億円の改善を見込んでいます。"
+                }
+            ]
+        }
     ]
 }
 
@@ -524,14 +590,7 @@ async def documents(request: Request):
         "base_url": "/cms2"
     })
 
-@app.get("/meetings", response_class=HTMLResponse)
-async def meetings(request: Request):
-    """ミーティング管理ページ"""
-    return templates.TemplateResponse("pages/meetings.html", {
-        "request": request,
-        "meetings": MOCK_DATA["meetings"],
-        "base_url": "/cms2"
-    })
+
 
 @app.get("/faq", response_class=HTMLResponse)
 async def faq(request: Request):
@@ -628,6 +687,14 @@ async def ir_calendar(request: Request):
         "base_url": "/cms2"
     })
 
+@app.get("/ir-calendar-workspace", response_class=HTMLResponse)
+async def ir_calendar_workspace(request: Request):
+    """IRカレンダー・面談ワークスペースページ"""
+    return templates.TemplateResponse("pages/ir-calendar-workspace.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
 @app.get("/content-center", response_class=HTMLResponse)
 async def content_center(request: Request):
     """コンテンツセンターページ"""
@@ -682,6 +749,89 @@ async def dialogue_publish(request: Request):
     return templates.TemplateResponse("pages/dialogue-publish.html", {
         "request": request,
         "base_url": "/cms2"
+    })
+
+@app.get("/dialogue/faq", response_class=HTMLResponse)
+async def dialogue_faq(request: Request):
+    """対話FAQ編集ページ"""
+    return templates.TemplateResponse("pages/dialogue/faq.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/dialogue/center-workspace", response_class=HTMLResponse)
+async def dialogue_center_workspace(request: Request):
+    """対話センターワークスペースページ"""
+    return templates.TemplateResponse("pages/dialogue/center-workspace.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/dialogue/edit-unified", response_class=HTMLResponse)
+async def dialogue_edit_unified(request: Request):
+    """統合議事録編集ページ"""
+    return templates.TemplateResponse("pages/dialogue/edit-unified.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/dialogue/upload", response_class=HTMLResponse)
+async def dialogue_upload(request: Request):
+    """対話記録アップロードページ"""
+    return templates.TemplateResponse("pages/dialogue-upload.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/ir-feedback", response_class=HTMLResponse)
+async def ir_feedback(request: Request):
+    """投資家フィードバック管理ページ"""
+    return templates.TemplateResponse("pages/ir-feedback.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/strategy-disclosure-assistant", response_class=HTMLResponse)
+async def strategy_disclosure_assistant(request: Request):
+    """中長期計画開示支援ツールページ"""
+    return templates.TemplateResponse("pages/strategy-disclosure-assistant.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/transcription-step", response_class=HTMLResponse)
+async def transcription_step(request: Request):
+    """文字起こし・編集ページ"""
+    return templates.TemplateResponse("pages/transcription-step.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/upload-step", response_class=HTMLResponse)
+async def upload_step(request: Request):
+    """ファイルアップロードページ"""
+    return templates.TemplateResponse("pages/upload-step.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/meetings", response_class=HTMLResponse)
+async def meetings(request: Request):
+    """IRミーティング管理ページ"""
+    # モックデータの準備
+    today = datetime.now()
+    
+    return templates.TemplateResponse("pages/meetings.html", {
+        "request": request,
+        "base_url": "/cms2",
+        "current_month": today.strftime("%Y年%m月"),
+        "today": today.strftime("%m月%d日"),
+        "todays_meetings": MOCK_DATA.get("todays_meetings", []),
+        "ceo_slots": MOCK_DATA.get("meeting_slots", {}).get("CEO", {}),
+        "director_slots": MOCK_DATA.get("meeting_slots", {}).get("Director", {}),
+        "cfo_slots": MOCK_DATA.get("meeting_slots", {}).get("CFO", {}),
+        "pending_meetings": MOCK_DATA.get("pending_meetings", []),
+        "recent_conferences": MOCK_DATA.get("recent_conferences", [])
     })
 
 # ===== API エンドポイント =====

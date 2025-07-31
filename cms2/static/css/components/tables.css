@@ -3,6 +3,191 @@
  * 洗練されたテーブルコンポーネント
  */
 
+/* ===== データテーブルコンテナ ===== */
+.data-table-container {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    margin-bottom: var(--space-xl);
+}
+
+/* ===== データテーブル ===== */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: var(--space-md);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.data-table th {
+    background: var(--gray-50);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    border-bottom: 2px solid var(--gray-200);
+    white-space: nowrap;
+    position: relative;
+}
+
+.data-table td {
+    font-size: var(--text-sm);
+    color: var(--gray-900);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== データテーブルのホバー効果 ===== */
+.data-table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--gray-50);
+}
+
+/* ===== ユーザー情報 ===== */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius-full);
+    background: var(--accent-teal);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+    flex-shrink: 0;
+}
+
+.user-name {
+    font-weight: var(--font-medium);
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+}
+
+.user-email {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* ===== アクションボタン ===== */
+.action-buttons {
+    display: flex;
+    gap: var(--space-xs);
+    justify-content: flex-end;
+}
+
+/* ===== フィルターパネル ===== */
+.filter-panel {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.filter-controls {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-icon {
+    position: absolute;
+    left: var(--space-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--gray-400);
+}
+
+.search-input {
+    width: 100%;
+    padding: var(--space-sm) var(--space-sm) var(--space-sm) calc(var(--space-sm) + 20px);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--text-sm);
+    transition: border-color var(--transition-fast);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.filter-select {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--text-sm);
+    background: white;
+    min-width: 150px;
+    transition: border-color var(--transition-fast);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+/* ===== ページヘッダー ===== */
+.page-header {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.page-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+}
+
+.page-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.page-description {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-top: var(--space-xs);
+}
+
 /* ===== ベーステーブル ===== */
 .table {
     width: 100%;
@@ -329,6 +514,29 @@
         justify-content: center;
         padding: var(--space-md);
         border-top: 1px solid var(--gray-100);
+    }
+    
+    /* フィルターパネルのレスポンシブ */
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        min-width: auto;
+    }
+    
+    /* ページヘッダーのレスポンシブ */
+    .page-header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-md);
+    }
+    
+    /* 統計グリッドのレスポンシブ */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
     }
 }
 

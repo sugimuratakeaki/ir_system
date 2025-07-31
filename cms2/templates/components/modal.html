@@ -1,0 +1,112 @@
+<!-- モーダルコンポーネント -->
+<!-- 使用方法:
+{% set modal_id = "sampleModal" %}
+{% set modal_title = "タイトル" %}
+{% set modal_size = "modal-lg" %} <!-- modal-sm, modal-md(default), modal-lg, modal-xl -->
+{% set modal_content %}
+    <!-- モーダルの内容をここに記述 -->
+{% endset %}
+{% set modal_footer %}
+    <button class="btn btn-gray" onclick="closeModal('{{ modal_id }}')">キャンセル</button>
+    <button class="btn btn-primary">保存</button>
+{% endset %}
+{% include 'components/modal.html' %}
+-->
+
+<div id="{{ modal_id }}" class="modal-overlay hidden">
+    <div class="modal-container {{ modal_size|default('modal-md') }}">
+        <div class="modal-header">
+            <h3 class="modal-title">{{ modal_title }}</h3>
+            <button onclick="closeModal('{{ modal_id }}')" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            {{ modal_content|safe }}
+        </div>
+        
+        {% if modal_footer %}
+        <div class="modal-footer">
+            {{ modal_footer|safe }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 確認モーダルテンプレート -->
+<template id="confirmModalTemplate">
+    <div class="modal-overlay">
+        <div class="modal-container modal-sm">
+            <div class="modal-header">
+                <h3 class="modal-title">確認</h3>
+                <button class="modal-close" data-action="cancel">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center py-4">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                        <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900" data-content="title">確認</h3>
+                    <p class="mt-2 text-sm text-gray-500" data-content="message">本当に実行しますか？</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-gray" data-action="cancel">キャンセル</button>
+                <button class="btn btn-primary" data-action="confirm">確認</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- 成功モーダルテンプレート -->
+<template id="successModalTemplate">
+    <div class="modal-overlay">
+        <div class="modal-container modal-sm">
+            <div class="modal-body">
+                <div class="text-center py-6">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+                        <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900" data-content="title">成功</h3>
+                    <p class="mt-2 text-sm text-gray-500" data-content="message">操作が正常に完了しました</p>
+                    <div class="mt-6">
+                        <button class="btn btn-primary" data-action="close">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- エラーモーダルテンプレート -->
+<template id="errorModalTemplate">
+    <div class="modal-overlay">
+        <div class="modal-container modal-sm">
+            <div class="modal-body">
+                <div class="text-center py-6">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
+                        <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900" data-content="title">エラー</h3>
+                    <p class="mt-2 text-sm text-gray-500" data-content="message">エラーが発生しました</p>
+                    <div class="mt-6">
+                        <button class="btn btn-primary" data-action="close">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -113,18 +113,18 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th class="table-header">ユーザー</th>
-                    <th class="table-header">役割</th>
-                    <th class="table-header">部署</th>
-                    <th class="table-header">ステータス</th>
-                    <th class="table-header">最終ログイン</th>
-                    <th class="table-header text-right">操作</th>
+                    <th>ユーザー</th>
+                    <th>役割</th>
+                    <th>部署</th>
+                    <th>ステータス</th>
+                    <th>最終ログイン</th>
+                    <th class="text-right">操作</th>
                 </tr>
             </thead>
             <tbody id="usersTableBody">
                 {% for user in users %}
-                <tr class="table-row">
-                    <td class="table-cell">
+                <tr>
+                    <td>
                         <div class="user-info">
                             <div class="user-avatar">
                                 {{ user.name[:2] }}
@@ -135,19 +135,19 @@
                             </div>
                         </div>
                     </td>
-                    <td class="table-cell">
+                    <td>
                         <span class="badge {% if user.role == 'admin' %}badge-purple{% elif user.role == 'editor' %}badge-blue{% else %}badge-gray{% endif %}">
                             {{ user.role_display }}
                         </span>
                     </td>
-                    <td class="table-cell">{{ user.department }}</td>
-                    <td class="table-cell">
+                    <td>{{ user.department }}</td>
+                    <td>
                         <span class="badge {% if user.status == 'active' %}badge-success{% else %}badge-gray{% endif %}">
                             {% if user.status == 'active' %}アクティブ{% else %}無効{% endif %}
                         </span>
                     </td>
-                    <td class="table-cell">{{ user.last_login }}</td>
-                    <td class="table-cell">
+                    <td>{{ user.last_login }}</td>
+                    <td>
                         <div class="action-buttons">
                             <button class="btn-icon" onclick="UserManager.editUser({{ user.id }})" title="編集">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+
+{% block title %}IRカレンダー・面談ワークスペース{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ base_url }}/static/css/pages/ir-calendar-workspace.css">
+{% endblock %}
+
+{% block content %}
+<div class="page-header bg-gradient-to-r from-blue-900 to-blue-700 text-white p-8 rounded-lg mb-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold mb-2">IRカレンダー・面談ワークスペース</h1>
+            <p class="text-blue-100 text-lg">統合された面談管理で効率的なIR業務を実現</p>
+        </div>
+        <div class="flex items-center gap-8">
+            <div class="text-center">
+                <p class="text-blue-200 text-sm mb-1">今日の面談</p>
+                <p class="text-3xl font-bold">2</p>
+            </div>
+            <div class="text-center">
+                <p class="text-blue-200 text-sm mb-1">承認待ち</p>
+                <p class="text-3xl font-bold text-yellow-300">3</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ir-workspace">
+    <!-- 左サイドバー: 面談リスト -->
+    <div class="workspace-sidebar bg-white rounded-lg shadow-lg">
+        <!-- フィルターヘッダー -->
+        <div class="p-6 bg-gray-50 border-b">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-gray-900">
+                    <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    面談管理
+                </h3>
+            </div>
+            
+            <!-- クイックフィルター -->
+            <div class="flex gap-2">
+                <button class="filter-btn active" onclick="filterMeetings('all')">
+                    全て (24)
+                </button>
+                <button class="filter-btn" onclick="filterMeetings('pending')">
+                    承認待ち (3)
+                </button>
+                <button class="filter-btn" onclick="filterMeetings('today')">
+                    今日 (2)
+                </button>
+            </div>
+        </div>
+        
+        <!-- 面談タイムライン -->
+        <div class="meeting-timeline">
+            <!-- 緊急対応必要 -->
+            <div class="meeting-card urgent selected" onclick="selectMeeting('meeting-001')">
+                <div class="meeting-status-indicator"></div>
+                <div class="meeting-content">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="badge badge-danger">承認期限迫る</span>
+                        <span class="text-xs text-gray-500">2時間後</span>
+                    </div>
+                    <h4 class="font-bold text-lg text-gray-900 mb-1">北米年金基金C社</h4>
+                    <p class="text-sm text-gray-600 mb-3">CEO面談リクエスト</p>
+                    <div class="workflow-status">
+                        <div class="status-dot active"></div>
+                        <span class="text-sm">承認待ち</span>
+                        <span class="text-xs text-red-600 ml-auto font-medium">要対応</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 今日の面談 -->
+            <div class="meeting-card approved" onclick="selectMeeting('meeting-002')">
+                <div class="meeting-status-indicator"></div>
+                <div class="meeting-content">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="badge badge-primary">今日 14:00</span>
+                    </div>
+                    <h4 class="font-bold text-lg text-gray-900 mb-1">BlackRock</h4>
+                    <p class="text-sm text-gray-600 mb-3">ESG戦略個別面談</p>
+                    <div class="workflow-status">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                        <span class="text-sm">実施準備完了</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 準備中の面談 -->
+            <div class="meeting-card pending" onclick="selectMeeting('meeting-003')">
+                <div class="meeting-status-indicator"></div>
+                <div class="meeting-content">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="badge badge-warning">明日 10:00</span>
+                    </div>
+                    <h4 class="font-bold text-lg text-gray-900 mb-1">Vanguard</h4>
+                    <p class="text-sm text-gray-600 mb-3">決算説明フォローアップ</p>
+                    <div class="workflow-status">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 40%"></div>
+                        </div>
+                        <span class="text-sm">資料準備中</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 追加の面談 -->
+            <div class="meeting-card" onclick="selectMeeting('meeting-004')">
+                <div class="meeting-status-indicator"></div>
+                <div class="meeting-content">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="badge badge-secondary">1/3 15:00</span>
+                    </div>
+                    <h4 class="font-bold text-lg text-gray-900 mb-1">Fidelity</h4>
+                    <p class="text-sm text-gray-600 mb-3">中期戦略ディスカッション</p>
+                    <div class="workflow-status">
+                        <div class="status-dot completed"></div>
+                        <span class="text-sm">承認済み</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新規面談ボタン -->
+        <div class="p-6 border-t">
+            <button class="btn btn-primary w-full" onclick="createNewMeeting()">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                新規面談登録
+            </button>
+        </div>
+    </div>
+    
+    <!-- メインカレンダー -->
+    <div class="workspace-main bg-white rounded-lg shadow-lg">
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="flex items-center gap-4">
+                    <button class="btn-icon" onclick="previousMonth()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="text-xl font-bold">2024年12月</h2>
+                    <button class="btn-icon" onclick="nextMonth()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="view-toggle-btn active" onclick="setView('month')">月表示</button>
+                    <button class="view-toggle-btn" onclick="setView('week')">週表示</button>
+                    <button class="view-toggle-btn" onclick="setView('day')">日表示</button>
+                </div>
+            </div>
+            
+            <div class="calendar-grid">
+                <!-- 曜日ヘッダー -->
+                <div class="calendar-day-header">日</div>
+                <div class="calendar-day-header">月</div>
+                <div class="calendar-day-header">火</div>
+                <div class="calendar-day-header">水</div>
+                <div class="calendar-day-header">木</div>
+                <div class="calendar-day-header">金</div>
+                <div class="calendar-day-header">土</div>
+                
+                <!-- カレンダーの日付（サンプル） -->
+                <div class="calendar-day">
+                    <div class="calendar-day-number">26</div>
+                    <div class="calendar-day-content">
+                        <div class="calendar-event approved" onclick="selectMeeting('meeting-002')">
+                            <span class="event-time">14:00</span>
+                            <span class="event-title">BlackRock</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="calendar-day-number">27</div>
+                    <div class="calendar-day-content">
+                        <div class="calendar-event pending" onclick="selectMeeting('meeting-003')">
+                            <span class="event-time">10:00</span>
+                            <span class="event-title">Vanguard</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 他の日付は省略 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右サイドパネル: 詳細情報 -->
+    <div class="workspace-sidepanel bg-white rounded-lg shadow-lg">
+        <div class="detail-panel" id="meeting-detail">
+            <!-- 選択された面談の詳細情報 -->
+            <div class="meeting-detail-header">
+                <div class="investor-avatar">C</div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">北米年金基金C社</h3>
+                    <p class="text-gray-600">CEO面談リクエスト</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="badge badge-danger">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            承認期限: 2時間後
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ワークフロープログレス -->
+            <div class="workflow-progress">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">承認ワークフロー</h4>
+                <div class="progress-steps">
+                    <div class="progress-step active">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">申請受付</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">承認</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">準備</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">実施</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">5</div>
+                        <div class="step-label">完了</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 面談詳細 -->
+            <div class="detail-section">
+                <h4 class="detail-section-title">面談詳細</h4>
+                <div class="detail-item">
+                    <span class="detail-label">希望日時</span>
+                    <span class="detail-value">1/12（日）10:00-11:00</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">形式</span>
+                    <span class="detail-value">オンライン (Zoom)</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">参加希望者</span>
+                    <span class="detail-value">CEO必須</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">面談テーマ</span>
+                    <span class="detail-value">長期成長戦略</span>
+                </div>
+            </div>
+            
+            <!-- 投資家情報 -->
+            <div class="investor-info-card">
+                <h4 class="detail-section-title">投資家情報</h4>
+                <div class="investor-metrics">
+                    <div class="metric-item">
+                        <span class="metric-label">運用資産</span>
+                        <span class="metric-value">$50B</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">投資スタイル</span>
+                        <span class="metric-value">ESG重視</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">前回面談</span>
+                        <span class="metric-value">初回</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">重要度</span>
+                        <span class="metric-value text-orange-600">
+                            <svg class="w-5 h-5 inline" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <span class="ml-1">高優先度</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- アクションボタン -->
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="approveMeeting('meeting-001')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    承認
+                </button>
+                <button class="btn btn-warning" onclick="rescheduleMeeting('meeting-001')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    日程調整
+                </button>
+                <button class="btn btn-secondary" onclick="viewInvestorHistory('meeting-001')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    履歴
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- クイックアクションモーダル -->
+<div id="quickActionModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeQuickAction()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">面談承認</h3>
+            <button class="modal-close" onclick="closeQuickAction()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">参加者選択</label>
+                <div class="space-y-3">
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="form-checkbox" checked>
+                        <span>CEO - 田中一郎</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="form-checkbox">
+                        <span>CFO - 佐藤二郎</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="form-checkbox" checked>
+                        <span>IR部長 - 山本三郎</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">事前準備メモ</label>
+                <textarea class="form-textarea" rows="3" placeholder="準備すべき資料や確認事項を記入..."></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="confirmApproval()">
+                    承認して準備開始
+                </button>
+                <button class="btn btn-secondary" onclick="closeQuickAction()">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ base_url }}/static/js/pages/ir-calendar-workspace.js"></script>
+{% endblock %}

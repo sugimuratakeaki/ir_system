@@ -1,391 +1,334 @@
 /**
  * KAGAMI CMS 2.0 - Core Application
- * 世界一のWebエンジニアが設計したコアアプリケーション
+ * アプリケーション全体の初期化と管理
  */
 
-// グローバル名前空間
-window.KAGAMI = window.KAGAMI || {};
-
-// アプリケーション設定
-KAGAMI.config = {
-    version: '2.0.0',
-    debug: true,
-    api: {
-        baseUrl: '/api',
-        timeout: 30000,
-        retryAttempts: 3
-    },
-    theme: {
-        default: 'light',
-        storageKey: 'kagami-theme'
-    },
-    sidebar: {
-        storageKey: 'kagami-sidebar-state'
-    },
-    notifications: {
-        duration: 5000,
-        position: 'top-right'
+class KagamiApp {
+    constructor() {
+        this.version = '2.0.0';
+        this.debug = false;
+        this.config = {
+            apiBaseUrl: '/api',
+            refreshInterval: 30000,
+            theme: 'light',
+            locale: 'ja-JP'
+        };
+        this.modules = new Map();
+        this.init();
     }
-};
 
-// アプリケーション初期化
-KAGAMI.init = function() {
-    console.log('🔮 KAGAMI CMS 2.0 初期化中...');
-    
-    // イベントリスナーの設定
-    this.setupEventListeners();
-    
-    // テーマの初期化
-    this.initTheme();
-    
-    // サイドバーの初期化
-    this.initSidebar();
-    
-    // ヘッダーの初期化
-    this.initHeader();
-    
-    // グローバルショートカットの設定
-    this.setupKeyboardShortcuts();
-    
-    // ページ固有の初期化
-    this.initPageSpecific();
-    
-    console.log('✅ KAGAMI CMS 2.0 初期化完了');
-};
-
-// イベントリスナーの設定
-KAGAMI.setupEventListeners = function() {
-    // ページ読み込み完了時
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => this.onDOMReady());
-    } else {
-        this.onDOMReady();
-    }
-    
-    // ウィンドウサイズ変更時
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => this.onWindowResize(), 250);
-    });
-    
-    // スクロール時
-    let scrollTimer;
-    window.addEventListener('scroll', () => {
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => this.onWindowScroll(), 100);
-    }, { passive: true });
-};
-
-// DOM準備完了時の処理
-KAGAMI.onDOMReady = function() {
-    // フォームの自動保存
-    this.setupAutoSave();
-    
-    // ツールチップの初期化
-    this.initTooltips();
-    
-    // モーダルの初期化
-    this.initModals();
-    
-    // 遅延読み込みの設定
-    this.setupLazyLoading();
-};
-
-// ウィンドウリサイズ時の処理
-KAGAMI.onWindowResize = function() {
-    const isMobile = window.innerWidth < 768;
-    document.body.classList.toggle('is-mobile', isMobile);
-    
-    // モバイルの場合はサイドバーを閉じる
-    if (isMobile && KAGAMI.sidebar && !KAGAMI.sidebar.isCollapsed()) {
-        KAGAMI.sidebar.close();
-    }
-};
-
-// スクロール時の処理
-KAGAMI.onWindowScroll = function() {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const header = document.getElementById('header');
-    
-    if (header) {
-        header.classList.toggle('scrolled', scrollTop > 10);
-    }
-};
-
-// テーマの初期化
-KAGAMI.initTheme = function() {
-    const savedTheme = localStorage.getItem(this.config.theme.storageKey) || this.config.theme.default;
-    this.setTheme(savedTheme);
-    
-    // テーマ切り替えボタンのイベント
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            this.setTheme(newTheme);
-        });
-    }
-};
-
-// テーマの設定
-KAGAMI.setTheme = function(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(this.config.theme.storageKey, theme);
-    
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.classList.toggle('dark', theme === 'dark');
-    }
-    
-    // テーマ変更イベントを発火
-    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
-};
-
-// サイドバーの初期化
-KAGAMI.initSidebar = function() {
-    // sidebar.jsで詳細実装
-    if (typeof KAGAMI.sidebar !== 'undefined' && KAGAMI.sidebar.init) {
-        KAGAMI.sidebar.init();
-    }
-};
-
-// ヘッダーの初期化
-KAGAMI.initHeader = function() {
-    // ユーザーメニューの初期化
-    const userMenuButton = document.getElementById('userMenuButton');
-    const userMenu = document.getElementById('userMenu');
-    
-    if (userMenuButton && userMenu) {
-        userMenuButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            userMenu.classList.toggle('open');
-        });
-        
-        // 外側クリックで閉じる
-        document.addEventListener('click', (e) => {
-            if (!userMenu.contains(e.target)) {
-                userMenu.classList.remove('open');
-            }
-        });
-    }
-    
-    // モバイルメニューボタン
-    const mobileMenuButton = document.getElementById('mobileMenuButton');
-    if (mobileMenuButton) {
-        mobileMenuButton.addEventListener('click', () => {
-            if (KAGAMI.sidebar) {
-                KAGAMI.sidebar.toggle();
-            }
-        });
-    }
-};
-
-// キーボードショートカットの設定
-KAGAMI.setupKeyboardShortcuts = function() {
-    document.addEventListener('keydown', (e) => {
-        // Ctrl/Cmd + K で検索
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            const searchInput = document.getElementById('globalSearch');
-            if (searchInput) {
-                searchInput.focus();
-            }
-        }
-        
-        // Ctrl/Cmd + \ でサイドバー切り替え
-        if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
-            e.preventDefault();
-            if (KAGAMI.sidebar) {
-                KAGAMI.sidebar.toggle();
-            }
-        }
-        
-        // Escape でモーダルやドロップダウンを閉じる
-        if (e.key === 'Escape') {
-            // ユーザーメニューを閉じる
-            const userMenu = document.getElementById('userMenu');
-            if (userMenu) {
-                userMenu.classList.remove('open');
-            }
-            
-            // モーダルを閉じる
-            if (KAGAMI.modal) {
-                KAGAMI.modal.closeAll();
-            }
-        }
-    });
-};
-
-// フォームの自動保存設定
-KAGAMI.setupAutoSave = function() {
-    const forms = document.querySelectorAll('form[data-autosave]');
-    
-    forms.forEach(form => {
-        const formId = form.getAttribute('data-autosave');
-        const inputs = form.querySelectorAll('input, textarea, select');
-        
-        // 保存されたデータの復元
-        const savedData = localStorage.getItem(`autosave-${formId}`);
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                Object.keys(data).forEach(name => {
-                    const input = form.querySelector(`[name="${name}"]`);
-                    if (input) {
-                        input.value = data[name];
-                    }
-                });
-            } catch (e) {
-                console.error('自動保存データの復元に失敗しました:', e);
-            }
-        }
-        
-        // 入力時の自動保存
-        let saveTimer;
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                clearTimeout(saveTimer);
-                saveTimer = setTimeout(() => {
-                    const data = {};
-                    inputs.forEach(inp => {
-                        if (inp.name) {
-                            data[inp.name] = inp.value;
-                        }
-                    });
-                    localStorage.setItem(`autosave-${formId}`, JSON.stringify(data));
-                    
-                    // 保存通知
-                    if (KAGAMI.notification) {
-                        KAGAMI.notification.show('下書きを保存しました', 'success', 2000);
-                    }
-                }, 1000);
-            });
-        });
-        
-        // フォーム送信時に自動保存データをクリア
-        form.addEventListener('submit', () => {
-            localStorage.removeItem(`autosave-${formId}`);
-        });
-    });
-};
-
-// ツールチップの初期化
-KAGAMI.initTooltips = function() {
-    // CSSのみで実装されているため、特別な初期化は不要
-    // 必要に応じて拡張可能
-};
-
-// モーダルの初期化
-KAGAMI.initModals = function() {
-    // modals.jsで詳細実装
-    if (typeof KAGAMI.modal !== 'undefined' && KAGAMI.modal.init) {
-        KAGAMI.modal.init();
-    }
-};
-
-// 遅延読み込みの設定
-KAGAMI.setupLazyLoading = function() {
-    if ('IntersectionObserver' in window) {
-        const lazyImages = document.querySelectorAll('img[data-lazy]');
-        
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.lazy;
-                    img.removeAttribute('data-lazy');
-                    observer.unobserve(img);
-                }
-            });
-        });
-        
-        lazyImages.forEach(img => imageObserver.observe(img));
-    }
-};
-
-// ページ固有の初期化
-KAGAMI.initPageSpecific = function() {
-    const pageInit = document.body.getAttribute('data-page-init');
-    if (pageInit && typeof window[pageInit] === 'function') {
-        window[pageInit]();
-    }
-};
-
-// APIヘルパー関数
-KAGAMI.api = {
-    // GETリクエスト
-    get: async function(endpoint, params = {}) {
-        const url = new URL(KAGAMI.config.api.baseUrl + endpoint, window.location.origin);
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-        
-        return this.request(url, {
-            method: 'GET'
-        });
-    },
-    
-    // POSTリクエスト
-    post: async function(endpoint, data = {}) {
-        return this.request(KAGAMI.config.api.baseUrl + endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-    },
-    
-    // PUTリクエスト
-    put: async function(endpoint, data = {}) {
-        return this.request(KAGAMI.config.api.baseUrl + endpoint, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-    },
-    
-    // DELETEリクエスト
-    delete: async function(endpoint) {
-        return this.request(KAGAMI.config.api.baseUrl + endpoint, {
-            method: 'DELETE'
-        });
-    },
-    
-    // 基本的なリクエスト処理
-    request: async function(url, options = {}) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), KAGAMI.config.api.timeout);
-        
+    async init() {
         try {
-            const response = await fetch(url, {
-                ...options,
-                signal: controller.signal,
-                credentials: 'same-origin'
-            });
+            // 基本設定の読み込み
+            await this.loadConfig();
             
-            clearTimeout(timeoutId);
+            // テーマの初期化
+            this.initTheme();
+            
+            // グローバルイベントの設定
+            this.setupGlobalEvents();
+            
+            // セキュリティ設定
+            this.setupSecurity();
+            
+            // 各モジュールの初期化
+            await this.initModules();
+            
+            // ショートカットキーの設定
+            this.setupKeyboardShortcuts();
+            
+            // WebSocketの初期化（リアルタイム通信用）
+            // this.initWebSocket();
+            
+            console.log(`KAGAMI CMS ${this.version} initialized`);
+            
+        } catch (error) {
+            console.error('Application initialization error:', error);
+            this.handleInitError(error);
+        }
+    }
+
+    async loadConfig() {
+        // ローカルストレージから設定を読み込み
+        const savedConfig = localStorage.getItem('kagami_config');
+        if (savedConfig) {
+            Object.assign(this.config, JSON.parse(savedConfig));
+        }
+    }
+
+    saveConfig() {
+        localStorage.setItem('kagami_config', JSON.stringify(this.config));
+    }
+
+    initTheme() {
+        const savedTheme = localStorage.getItem('kagami_theme') || this.config.theme;
+        this.setTheme(savedTheme);
+    }
+
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        this.config.theme = theme;
+        localStorage.setItem('kagami_theme', theme);
+        
+        // テーマ切り替えボタンの更新
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const lightIcon = themeToggle.querySelector('.theme-icon-light');
+            const darkIcon = themeToggle.querySelector('.theme-icon-dark');
+            
+            if (theme === 'dark') {
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+            } else {
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
+            }
+        }
+    }
+
+    setupGlobalEvents() {
+        // テーマ切り替え
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const newTheme = this.config.theme === 'light' ? 'dark' : 'light';
+                this.setTheme(newTheme);
+            });
+        }
+
+        // グローバル検索
+        const globalSearch = document.getElementById('globalSearch');
+        if (globalSearch) {
+            globalSearch.addEventListener('input', debounce((e) => {
+                this.performGlobalSearch(e.target.value);
+            }, 300));
+        }
+
+        // ネットワークステータス監視
+        window.addEventListener('online', () => {
+            showSuccess('接続回復', 'インターネット接続が回復しました');
+        });
+
+        window.addEventListener('offline', () => {
+            showError('接続エラー', 'インターネット接続が失われました');
+        });
+
+        // ページ離脱前の確認
+        window.addEventListener('beforeunload', (e) => {
+            if (this.hasUnsavedChanges()) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // エラーハンドリング
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            if (this.debug) {
+                showError('エラー', 'システムエラーが発生しました');
+            }
+        });
+    }
+
+    setupSecurity() {
+        // CSRF対策
+        const token = document.querySelector('meta[name="csrf-token"]');
+        if (token) {
+            axios.defaults.headers.common['X-CSRF-Token'] = token.content;
+        }
+
+        // XSS対策: 動的に追加されるコンテンツのサニタイズ
+        this.sanitizeHTML = (html) => {
+            const temp = document.createElement('div');
+            temp.textContent = html;
+            return temp.innerHTML;
+        };
+    }
+
+    async initModules() {
+        // ページ固有のモジュールを初期化
+        const pageModule = document.body.dataset.page;
+        if (pageModule) {
+            try {
+                const module = await this.loadModule(pageModule);
+                if (module && module.init) {
+                    await module.init();
+                }
+            } catch (error) {
+                console.error(`Module initialization error: ${pageModule}`, error);
+            }
+        }
+    }
+
+    async loadModule(moduleName) {
+        if (this.modules.has(moduleName)) {
+            return this.modules.get(moduleName);
+        }
+
+        // 動的インポート（必要に応じて）
+        // const module = await import(`./modules/${moduleName}.js`);
+        // this.modules.set(moduleName, module);
+        // return module;
+    }
+
+    setupKeyboardShortcuts() {
+        const shortcuts = {
+            'ctrl+k': () => document.getElementById('globalSearch')?.focus(),
+            'ctrl+/': () => this.toggleHelp(),
+            'ctrl+,': () => window.location.href = '/settings',
+            'ctrl+shift+d': () => this.toggleDebugMode(),
+            'esc': () => this.closeActiveModal()
+        };
+
+        document.addEventListener('keydown', (e) => {
+            const key = this.getShortcutKey(e);
+            if (shortcuts[key]) {
+                e.preventDefault();
+                shortcuts[key]();
+            }
+        });
+    }
+
+    getShortcutKey(e) {
+        const keys = [];
+        if (e.ctrlKey || e.metaKey) keys.push('ctrl');
+        if (e.shiftKey) keys.push('shift');
+        if (e.altKey) keys.push('alt');
+        if (e.key) keys.push(e.key.toLowerCase());
+        return keys.join('+');
+    }
+
+    async performGlobalSearch(query) {
+        if (!query || query.length < 2) return;
+
+        try {
+            const response = await fetch(`${this.config.apiBaseUrl}/search?q=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            this.displaySearchResults(results);
+        } catch (error) {
+            console.error('Search error:', error);
+        }
+    }
+
+    displaySearchResults(results) {
+        // 検索結果の表示処理
+        console.log('Search results:', results);
+    }
+
+    hasUnsavedChanges() {
+        // フォームの変更チェック
+        const forms = document.querySelectorAll('form[data-unsaved]');
+        return forms.length > 0;
+    }
+
+    toggleDebugMode() {
+        this.debug = !this.debug;
+        console.log(`Debug mode: ${this.debug ? 'ON' : 'OFF'}`);
+        if (this.debug) {
+            document.body.classList.add('debug-mode');
+        } else {
+            document.body.classList.remove('debug-mode');
+        }
+    }
+
+    toggleHelp() {
+        // ヘルプパネルの表示/非表示
+        console.log('Toggle help');
+    }
+
+    closeActiveModal() {
+        // アクティブなモーダルを閉じる
+        if (window.ModalManager && window.ModalManager.activeModals.length > 0) {
+            const topModal = window.ModalManager.activeModals[window.ModalManager.activeModals.length - 1];
+            window.ModalManager.close(topModal.id);
+        }
+    }
+
+    handleInitError(error) {
+        // 初期化エラーの処理
+        const errorContainer = document.createElement('div');
+        errorContainer.className = 'init-error';
+        errorContainer.innerHTML = `
+            <div class="error-content">
+                <h2>システムエラー</h2>
+                <p>アプリケーションの初期化中にエラーが発生しました。</p>
+                <p class="error-detail">${error.message}</p>
+                <button onclick="location.reload()" class="btn btn-primary">再読み込み</button>
+            </div>
+        `;
+        document.body.appendChild(errorContainer);
+    }
+
+    // API通信のラッパー
+    async api(endpoint, options = {}) {
+        const url = `${this.config.apiBaseUrl}${endpoint}`;
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        };
+
+        try {
+            const response = await fetch(url, { ...defaultOptions, ...options });
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`API Error: ${response.status}`);
             }
-            
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return await response.json();
-            }
-            
-            return await response.text();
+
+            return await response.json();
         } catch (error) {
-            if (error.name === 'AbortError') {
-                throw new Error('リクエストがタイムアウトしました');
-            }
+            console.error('API Request Error:', error);
             throw error;
         }
     }
-};
 
-// アプリケーション起動
-KAGAMI.init();
+    // ユーティリティメソッド
+    formatDate(date, format = 'YYYY-MM-DD') {
+        // 日付フォーマット処理
+        return new Date(date).toLocaleDateString(this.config.locale);
+    }
+
+    formatNumber(num) {
+        // 数値フォーマット処理
+        return new Intl.NumberFormat(this.config.locale).format(num);
+    }
+
+    formatCurrency(amount, currency = 'JPY') {
+        // 通貨フォーマット処理
+        return new Intl.NumberFormat(this.config.locale, {
+            style: 'currency',
+            currency: currency
+        }).format(amount);
+    }
+}
+
+// グローバルユーティリティ関数
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+// アプリケーションの初期化
+document.addEventListener('DOMContentLoaded', () => {
+    window.KagamiApp = new KagamiApp();
+});

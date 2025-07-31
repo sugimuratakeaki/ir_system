@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block title %}対話記録アップロード{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ base_url }}/static/css/pages/dialogue-upload.css">
+{% endblock %}
+
+{% block content %}
+<div class="page-header bg-gradient-to-r from-purple-900 to-purple-700 text-white p-8 rounded-lg mb-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold mb-2">対話記録アップロード</h1>
+            <p class="text-purple-100 text-lg">音声・動画ファイルから議事録を自動生成</p>
+        </div>
+        <div class="flex items-center gap-8">
+            <div class="text-center">
+                <p class="text-purple-200 text-sm mb-1">今月の処理済み</p>
+                <p class="text-3xl font-bold">24</p>
+            </div>
+            <div class="text-center">
+                <p class="text-purple-200 text-sm mb-1">処理中</p>
+                <p class="text-3xl font-bold text-yellow-300">3</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="upload-workspace">
+    <!-- メインアップロードエリア -->
+    <div class="upload-main bg-white rounded-lg shadow-lg">
+        <!-- アップロードゾーン -->
+        <div id="dropZone" class="upload-zone">
+            <div class="upload-zone-content">
+                <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">ファイルをドラッグ＆ドロップ</h3>
+                <p class="text-gray-600 mb-4">または</p>
+                <label for="fileInput" class="btn btn-primary cursor-pointer">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                    </svg>
+                    ファイルを選択
+                </label>
+                <input type="file" id="fileInput" class="hidden" accept="audio/*,video/*" multiple>
+                <p class="text-sm text-gray-500 mt-4">対応形式: MP3, MP4, WAV, M4A, MOV (最大500MB)</p>
+            </div>
+        </div>
+        
+        <!-- バッチアップロードオプション -->
+        <div class="batch-upload-section">
+            <h3 class="section-title">バッチアップロード設定</h3>
+            <div class="batch-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="form-checkbox" id="autoProcess">
+                    <span>アップロード後に自動で文字起こしを開始</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" class="form-checkbox" id="aiAnalysis">
+                    <span>AI分析を自動実行（要約・FAQ生成）</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" class="form-checkbox" id="notifyComplete">
+                    <span>処理完了時に通知を送信</span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- アップロードキュー -->
+        <div class="upload-queue-section">
+            <h3 class="section-title">アップロードキュー</h3>
+            <div id="uploadQueue" class="upload-queue">
+                <!-- アップロードアイテムが動的に追加される -->
+                <div class="empty-state">
+                    <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                    </svg>
+                    <p class="text-gray-500">アップロードするファイルを選択してください</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- サイドパネル: 処理状況 -->
+    <div class="processing-panel bg-white rounded-lg shadow-lg">
+        <div class="panel-header">
+            <h3 class="text-lg font-semibold">処理状況</h3>
+            <button class="btn-icon" onclick="refreshProcessingStatus()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="processing-list">
+            <!-- 処理中のアイテム -->
+            <div class="processing-item processing">
+                <div class="processing-header">
+                    <div class="processing-info">
+                        <h4 class="font-medium">決算説明会_2024Q3.mp4</h4>
+                        <p class="text-sm text-gray-600">文字起こし中...</p>
+                    </div>
+                    <div class="processing-progress-circle">
+                        <svg class="progress-ring" width="40" height="40">
+                            <circle class="progress-ring-bg" cx="20" cy="20" r="18"/>
+                            <circle class="progress-ring-fill" cx="20" cy="20" r="18" style="stroke-dashoffset: 45"/>
+                        </svg>
+                        <span class="progress-text">65%</span>
+                    </div>
+                </div>
+                <div class="processing-details">
+                    <div class="detail-item">
+                        <span class="detail-label">開始時刻</span>
+                        <span class="detail-value">14:32</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">推定残り時間</span>
+                        <span class="detail-value">約5分</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 完了したアイテム -->
+            <div class="processing-item completed">
+                <div class="processing-header">
+                    <div class="processing-info">
+                        <h4 class="font-medium">投資家面談_BlackRock.mp3</h4>
+                        <p class="text-sm text-green-600">処理完了</p>
+                    </div>
+                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="processing-actions">
+                    <button class="btn btn-sm btn-primary" onclick="viewTranscript('transcript-001')">
+                        議事録を確認
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="downloadResults('transcript-001')">
+                        ダウンロード
+                    </button>
+                </div>
+            </div>
+            
+            <!-- エラーが発生したアイテム -->
+            <div class="processing-item error">
+                <div class="processing-header">
+                    <div class="processing-info">
+                        <h4 class="font-medium">取締役会_録音.wav</h4>
+                        <p class="text-sm text-red-600">エラーが発生しました</p>
+                    </div>
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="error-message">
+                    <p class="text-sm text-red-700">音声品質が低いため処理できませんでした</p>
+                </div>
+                <div class="processing-actions">
+                    <button class="btn btn-sm btn-warning" onclick="retryProcessing('process-003')">
+                        再試行
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="reportIssue('process-003')">
+                        問題を報告
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 統計情報 -->
+        <div class="processing-stats">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">本日の処理統計</h4>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value">12</span>
+                    <span class="stat-label">完了</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">3</span>
+                    <span class="stat-label">処理中</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">1</span>
+                    <span class="stat-label">エラー</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">95%</span>
+                    <span class="stat-label">成功率</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- メタ情報入力モーダル -->
+<div id="metaInfoModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeMetaInfoModal()"></div>
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3 class="modal-title">メタ情報の入力</h3>
+            <button class="modal-close" onclick="closeMetaInfoModal()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="metaInfoForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label required">会議タイトル</label>
+                        <input type="text" class="form-input" name="title" required placeholder="例: 2024年第3四半期決算説明会">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required">会議日時</label>
+                        <input type="datetime-local" class="form-input" name="meetingDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required">会議種別</label>
+                        <select class="form-select" name="meetingType" required>
+                            <option value="">選択してください</option>
+                            <option value="earnings">決算説明会</option>
+                            <option value="investor">投資家面談</option>
+                            <option value="board">取締役会</option>
+                            <option value="shareholder">株主総会</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">参加者</label>
+                        <input type="text" class="form-input" name="participants" placeholder="例: CEO、CFO、機関投資家">
+                    </div>
+                    
+                    <div class="form-group col-span-2">
+                        <label class="form-label">メモ</label>
+                        <textarea class="form-textarea" name="notes" rows="3" placeholder="重要な議題や特記事項があれば記入"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">タグ</label>
+                    <div class="tag-input-container">
+                        <input type="text" class="tag-input" placeholder="Enterキーでタグを追加">
+                        <div class="tag-list" id="tagList">
+                            <!-- タグが動的に追加される -->
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeMetaInfoModal()">キャンセル</button>
+            <button class="btn btn-primary" onclick="submitMetaInfo()">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                アップロード開始
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ base_url }}/static/js/pages/dialogue-upload.js"></script>
+{% endblock %}

@@ -1,0 +1,119 @@
+<!-- 通知（トースト）コンポーネント -->
+<!-- 使用方法:
+JavaScript から NotificationManager.show() を使用
+NotificationManager.show('success', 'タイトル', 'メッセージ');
+-->
+
+<!-- 通知コンテナ -->
+<div id="notificationContainer" class="notification-container">
+    <!-- 通知はJavaScriptで動的に追加される -->
+</div>
+
+<!-- 通知テンプレート -->
+<template id="notificationTemplate">
+    <div class="notification-toast" data-type="">
+        <div class="notification-toast-content">
+            <div class="notification-toast-icon">
+                <!-- アイコンはタイプに応じてJavaScriptで設定 -->
+            </div>
+            <div class="notification-toast-body">
+                <h4 class="notification-toast-title"></h4>
+                <p class="notification-toast-message"></p>
+            </div>
+            <button class="notification-toast-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="notification-toast-progress">
+            <div class="notification-toast-progress-bar"></div>
+        </div>
+    </div>
+</template>
+
+<!-- インライン通知コンポーネント -->
+<!-- 使用方法:
+{% set alert_type = "info" %} <!-- success, info, warning, error -->
+{% set alert_title = "お知らせ" %}
+{% set alert_message = "メッセージ内容" %}
+{% set alert_dismissible = true %}
+{% include 'components/notification.html' %}
+-->
+
+{% if alert_type %}
+<div class="alert alert-{{ alert_type }} {% if alert_dismissible %}alert-dismissible{% endif %}">
+    <div class="alert-icon">
+        {% if alert_type == 'success' %}
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {% elif alert_type == 'info' %}
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {% elif alert_type == 'warning' %}
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        {% elif alert_type == 'error' %}
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {% endif %}
+    </div>
+    <div class="alert-content">
+        {% if alert_title %}
+        <h3 class="alert-title">{{ alert_title }}</h3>
+        {% endif %}
+        <p class="alert-message">{{ alert_message }}</p>
+        {% if alert_actions %}
+        <div class="alert-actions">
+            {{ alert_actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% if alert_dismissible %}
+    <button class="alert-dismiss" onclick="this.parentElement.remove()">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- バナー通知コンポーネント -->
+<!-- ページトップに表示される全幅の通知 -->
+{% if banner_type %}
+<div class="banner banner-{{ banner_type }}">
+    <div class="banner-content">
+        <div class="banner-icon">
+            {% if banner_type == 'info' %}
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {% elif banner_type == 'warning' %}
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            {% elif banner_type == 'success' %}
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {% endif %}
+        </div>
+        <p class="banner-message">{{ banner_message }}</p>
+        {% if banner_action %}
+        <a href="{{ banner_action_url }}" class="banner-action">{{ banner_action }}</a>
+        {% endif %}
+    </div>
+    {% if banner_dismissible %}
+    <button class="banner-dismiss" onclick="this.parentElement.remove()">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+    {% endif %}
+</div>
+{% endif %}

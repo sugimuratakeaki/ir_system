@@ -1,0 +1,181 @@
+<!-- データテーブルコンポーネント -->
+<!-- 使用方法:
+{% set table_id = "dataTable1" %}
+{% set table_columns = [
+    {"key": "name", "label": "名前", "sortable": true},
+    {"key": "email", "label": "メール", "sortable": true},
+    {"key": "role", "label": "役割", "sortable": false},
+    {"key": "status", "label": "ステータス", "sortable": true},
+    {"key": "actions", "label": "操作", "align": "right"}
+] %}
+{% set table_data = data_items %}
+{% set table_searchable = true %}
+{% set table_filters = true %}
+{% include 'components/data-table.html' %}
+-->
+
+<div class="data-table-wrapper" id="{{ table_id }}_wrapper">
+    <!-- テーブルヘッダー（検索・フィルター） -->
+    <div class="table-header">
+        <div class="table-header-left">
+            {% if table_searchable %}
+            <div class="table-search">
+                <svg class="search-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" 
+                       placeholder="検索..." 
+                       class="table-search-input"
+                       id="{{ table_id }}_search">
+            </div>
+            {% endif %}
+            
+            {% if table_bulk_actions %}
+            <div class="bulk-actions hidden" id="{{ table_id }}_bulkActions">
+                <span class="text-sm text-gray-700">
+                    <span id="{{ table_id }}_selectedCount">0</span>件選択中
+                </span>
+                {{ table_bulk_actions|safe }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="table-header-right">
+            {% if table_filters %}
+            <button class="btn btn-gray btn-sm" onclick="toggleTableFilters('{{ table_id }}')">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                フィルター
+            </button>
+            {% endif %}
+            
+            {% if table_export %}
+            <div class="dropdown">
+                <button class="btn btn-gray btn-sm dropdown-toggle">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    エクスポート
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a href="#" class="dropdown-item" onclick="exportTable('{{ table_id }}', 'csv')">CSV</a>
+                    <a href="#" class="dropdown-item" onclick="exportTable('{{ table_id }}', 'excel')">Excel</a>
+                    <a href="#" class="dropdown-item" onclick="exportTable('{{ table_id }}', 'pdf')">PDF</a>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if table_actions %}
+            {{ table_actions|safe }}
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- フィルターパネル -->
+    {% if table_filters %}
+    <div class="table-filters hidden" id="{{ table_id }}_filters">
+        <div class="filter-content">
+            {{ table_filter_content|safe }}
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-sm btn-gray" onclick="resetTableFilters('{{ table_id }}')">リセット</button>
+            <button class="btn btn-sm btn-primary" onclick="applyTableFilters('{{ table_id }}')">適用</button>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- テーブル本体 -->
+    <div class="table-container">
+        <table class="data-table" id="{{ table_id }}">
+            <thead>
+                <tr>
+                    {% if table_selectable %}
+                    <th class="table-checkbox">
+                        <input type="checkbox" 
+                               class="form-checkbox" 
+                               id="{{ table_id }}_selectAll"
+                               onchange="toggleAllRows('{{ table_id }}')">
+                    </th>
+                    {% endif %}
+                    
+                    {% for column in table_columns %}
+                    <th class="table-header {% if column.align %}text-{{ column.align }}{% endif %}"
+                        {% if column.sortable %}
+                        data-sortable="true"
+                        data-sort-key="{{ column.key }}"
+                        onclick="sortTable('{{ table_id }}', '{{ column.key }}')"
+                        {% endif %}>
+                        <div class="table-header-content">
+                            <span>{{ column.label }}</span>
+                            {% if column.sortable %}
+                            <svg class="sort-icon w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                            </svg>
+                            {% endif %}
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody id="{{ table_id }}_body">
+                <!-- データ行はJavaScriptまたはサーバーサイドで生成 -->
+                {% if table_loading %}
+                <tr>
+                    <td colspan="{{ table_columns|length + (1 if table_selectable else 0) }}" class="text-center py-8">
+                        <div class="loading-spinner">
+                            <div class="spinner">
+                                <div class="spinner-circle"></div>
+                            </div>
+                            <p class="loading-text">データを読み込み中...</p>
+                        </div>
+                    </td>
+                </tr>
+                {% elif table_empty %}
+                <tr>
+                    <td colspan="{{ table_columns|length + (1 if table_selectable else 0) }}" class="text-center py-8">
+                        <div class="empty-state">
+                            <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-500">データがありません</p>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <!-- 実際のデータ行 -->
+                {{ table_rows|safe }}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- ページネーション -->
+    <div class="table-pagination">
+        <div class="pagination-info">
+            全 <span class="font-medium" id="{{ table_id }}_totalCount">0</span> 件中
+            <span class="font-medium" id="{{ table_id }}_startCount">0</span> から
+            <span class="font-medium" id="{{ table_id }}_endCount">0</span> 件を表示
+        </div>
+        
+        <div class="pagination-controls">
+            <select class="form-select form-select-sm" 
+                    id="{{ table_id }}_pageSize"
+                    onchange="changePageSize('{{ table_id }}')">
+                <option value="10">10件</option>
+                <option value="25">25件</option>
+                <option value="50">50件</option>
+                <option value="100">100件</option>
+            </select>
+            
+            <nav class="pagination-nav" id="{{ table_id }}_pagination">
+                <!-- ページネーションボタンはJavaScriptで生成 -->
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- コンテキストメニュー -->
+<div id="{{ table_id }}_contextMenu" class="context-menu hidden">
+    {{ table_context_menu|safe }}
+</div>

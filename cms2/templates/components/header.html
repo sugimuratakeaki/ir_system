@@ -1,0 +1,140 @@
+<!-- ヘッダーコンポーネント -->
+<header class="main-header">
+    <div class="header-container">
+        <!-- 左側：ロゴとブランド -->
+        <div class="header-left">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            <div class="brand">
+                <span class="brand-icon">🔮</span>
+                <span class="brand-text">KAGAMI IR管理センター</span>
+            </div>
+        </div>
+
+        <!-- 中央：検索バー -->
+        <div class="header-center">
+            <div class="global-search">
+                <svg class="search-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" 
+                       placeholder="投資家、ドキュメント、イベントを検索..." 
+                       class="search-input"
+                       id="globalSearch">
+                <kbd class="search-shortcut">⌘K</kbd>
+            </div>
+        </div>
+
+        <!-- 右側：アクションとユーザー -->
+        <div class="header-right">
+            <!-- 通知 -->
+            <button class="header-icon-btn" onclick="toggleNotifications()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span class="notification-badge">3</span>
+            </button>
+
+            <!-- ヘルプ -->
+            <button class="header-icon-btn" onclick="openHelp()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </button>
+
+            <!-- ユーザーメニュー -->
+            <div class="user-menu">
+                <button class="user-menu-trigger" onclick="toggleUserMenu()">
+                    <img src="/static/images/avatar-placeholder.jpg" 
+                         alt="ユーザーアバター" 
+                         class="user-avatar">
+                    <span class="user-name">田中 太郎</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                
+                <!-- ドロップダウンメニュー -->
+                <div class="user-dropdown hidden" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="text-sm font-medium">田中 太郎</div>
+                        <div class="text-xs text-gray-500">IR部 マネージャー</div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="/settings" class="dropdown-item">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        設定
+                    </a>
+                    <a href="/help" class="dropdown-item">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        ヘルプ
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/logout" class="dropdown-item text-red-600">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        ログアウト
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- 通知パネル -->
+<div class="notification-panel hidden" id="notificationPanel">
+    <div class="notification-header">
+        <h3 class="text-lg font-semibold">通知</h3>
+        <button class="text-sm text-blue-600 hover:text-blue-700">すべて既読にする</button>
+    </div>
+    <div class="notification-list">
+        <!-- 通知アイテム -->
+        <div class="notification-item unread">
+            <div class="notification-icon bg-blue-100">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <p class="notification-title">野村AMとの面談が明日予定されています</p>
+                <p class="notification-time">5分前</p>
+            </div>
+        </div>
+        
+        <div class="notification-item">
+            <div class="notification-icon bg-green-100">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <p class="notification-title">決算資料のアップロードが完了しました</p>
+                <p class="notification-time">1時間前</p>
+            </div>
+        </div>
+        
+        <div class="notification-item">
+            <div class="notification-icon bg-yellow-100">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <p class="notification-title">FAQ生成タスクが保留中です</p>
+                <p class="notification-time">3時間前</p>
+            </div>
+        </div>
+    </div>
+    <div class="notification-footer">
+        <a href="/notifications" class="text-sm text-blue-600 hover:text-blue-700">すべての通知を見る</a>
+    </div>
+</div>

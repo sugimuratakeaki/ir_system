@@ -1,0 +1,531 @@
+{% extends "base.html" %}
+
+{% block title %}対話センターワークスペース{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 対話センターワークスペース専用スタイル */
+.activity-stream {
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+}
+
+.activity-card {
+    position: relative;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.activity-card:hover {
+    transform: translateX(4px);
+}
+
+.activity-card.selected {
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
+}
+
+.activity-card.urgent {
+    border-left: 4px solid #ef4444;
+    background-color: #fef2f2;
+}
+
+.activity-card.processing {
+    border-left: 4px solid #f59e0b;
+    background-color: #fffbeb;
+}
+
+.activity-card.completed {
+    border-left: 4px solid #10b981;
+    background-color: #f0fdfa;
+}
+
+.progress-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+}
+
+.progress-dot.completed {
+    background-color: #10b981;
+}
+
+.progress-dot.active {
+    background-color: #3b82f6;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.pipeline-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.stage-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+}
+
+.stage-circle.completed {
+    background: #10b981;
+    color: white;
+}
+
+.stage-circle.active {
+    background: #3b82f6;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.stage-circle.processing {
+    background: #f59e0b;
+    color: white;
+}
+
+.kanban-board {
+    display: flex;
+    gap: 1.5rem;
+    min-height: 600px;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.kanban-column {
+    min-width: 320px;
+    background: #f8fafc;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex h-[calc(100vh-4rem)] -mx-6 -my-6">
+    <!-- 左サイドバー：対話記録ストリーム -->
+    <div class="w-80 bg-gray-50 border-r overflow-y-auto">
+        <div class="p-4 bg-white border-b">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">対話記録ストリーム</h2>
+                <span class="text-sm text-gray-600">156件</span>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+                <button class="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">全て</button>
+                <button class="px-3 py-1 text-xs font-medium bg-white text-gray-600 border border-gray-300 rounded-full hover:bg-gray-50">緊急 (3)</button>
+                <button class="px-3 py-1 text-xs font-medium bg-white text-gray-600 border border-gray-300 rounded-full hover:bg-gray-50">処理中 (12)</button>
+                <button class="px-3 py-1 text-xs font-medium bg-white text-gray-600 border border-gray-300 rounded-full hover:bg-gray-50">今日 (5)</button>
+            </div>
+        </div>
+        
+        <div class="activity-stream p-4 space-y-3">
+            <!-- 緊急対応が必要な記録 -->
+            <div class="activity-card urgent selected bg-white rounded-lg p-4 shadow-sm" onclick="selectActivity('activity-001')">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-semibold text-gray-900">野村AM決算説明会</h3>
+                    <span class="text-xs text-gray-500">2時間前</span>
+                </div>
+                <div class="flex items-center gap-2 mb-3 text-sm">
+                    <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">機関投資家</span>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-gray-600">90分</span>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-red-600 font-medium">処理停滞</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="progress-dots">
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot active"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                    <span class="text-xs text-gray-600">AI要約中</span>
+                </div>
+            </div>
+
+            <!-- 処理中の記録 -->
+            <div class="activity-card processing bg-white rounded-lg p-4 shadow-sm" onclick="selectActivity('activity-002')">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-semibold text-gray-900">BlackRock個別面談</h3>
+                    <span class="text-xs text-gray-500">5時間前</span>
+                </div>
+                <div class="flex items-center gap-2 mb-3 text-sm">
+                    <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">海外投資家</span>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-gray-600">45分</span>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-yellow-600 font-medium">FAQ作成中</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="progress-dots">
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot active"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                    <span class="text-xs text-gray-600">FAQ生成中</span>
+                </div>
+            </div>
+
+            <!-- 完了済みの記録 -->
+            <div class="activity-card completed bg-white rounded-lg p-4 shadow-sm" onclick="selectActivity('activity-003')">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-semibold text-gray-900">個人投資家説明会</h3>
+                    <span class="text-xs text-gray-500">1日前</span>
+                </div>
+                <div class="flex items-center gap-2 mb-3 text-sm">
+                    <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">個人投資家</span>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-gray-600">2時間</span>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-green-600 font-medium">公開済み</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="progress-dots">
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                        <div class="progress-dot completed"></div>
+                    </div>
+                    <span class="text-xs text-gray-600">完了</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="flex-1 flex flex-col">
+        <!-- ヘッダー -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold">外部MTG議事録</h1>
+                    <p class="text-blue-100 text-sm mt-1">統合されたアクティビティストリーム管理</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-sm text-blue-200">処理中</p>
+                        <p class="text-2xl font-bold">12件</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-blue-200">緊急対応</p>
+                        <p class="text-2xl font-bold text-yellow-300">3件</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-blue-200">今日完了</p>
+                        <p class="text-2xl font-bold text-green-300">8件</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ツールバー -->
+        <div class="bg-white border-b px-6 py-3">
+            <div class="flex items-center gap-4">
+                <button class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    一括処理
+                </button>
+                <button class="inline-flex items-center px-3 py-1.5 bg-white text-gray-700 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                    エクスポート
+                </button>
+                
+                <div class="h-6 w-px bg-gray-300 mx-2"></div>
+                
+                <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
+                    <button class="px-3 py-1.5 bg-white text-gray-700 text-sm font-medium rounded shadow-sm">
+                        📊 ストリーム
+                    </button>
+                    <button class="px-3 py-1.5 text-gray-600 text-sm font-medium rounded hover:bg-gray-200">
+                        📋 かんばん
+                    </button>
+                    <button class="px-3 py-1.5 text-gray-600 text-sm font-medium rounded hover:bg-gray-200">
+                        📑 テーブル
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- メインワークスペース -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <!-- 処理パイプライン -->
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 mb-6">
+                <h3 class="font-semibold text-gray-800 mb-4">処理パイプライン - 野村AM決算説明会</h3>
+                <div class="flex justify-between items-center relative mb-6">
+                    <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-300 -translate-y-1/2"></div>
+                    
+                    <div class="pipeline-stage">
+                        <div class="stage-circle completed">✓</div>
+                        <span class="text-xs text-gray-600">アップロード</span>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle completed">✓</div>
+                        <span class="text-xs text-gray-600">文字起こし</span>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle processing">⏳</div>
+                        <span class="text-xs text-gray-600">AI要約</span>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle">4</div>
+                        <span class="text-xs text-gray-600">FAQ作成</span>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle">5</div>
+                        <span class="text-xs text-gray-600">レビュー</span>
+                    </div>
+                    <div class="pipeline-stage">
+                        <div class="stage-circle">6</div>
+                        <span class="text-xs text-gray-600">公開</span>
+                    </div>
+                </div>
+
+                <div class="bg-blue-100 rounded-lg p-4">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-blue-800 font-medium">AI要約処理中...</span>
+                        <span class="text-sm text-blue-600">推定残り時間: 3分</span>
+                    </div>
+                    <div class="w-full bg-blue-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full animate-pulse" style="width: 65%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 詳細情報 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h4 class="font-semibold text-gray-800 mb-4">📋 基本情報</h4>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">投資家</dt>
+                            <dd class="font-medium text-gray-900">野村アセットマネジメント</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">種別</dt>
+                            <dd class="font-medium text-gray-900">決算説明会</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">日時</dt>
+                            <dd class="font-medium text-gray-900">2024/01/22 15:00</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">時間</dt>
+                            <dd class="font-medium text-gray-900">90分</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">参加者</dt>
+                            <dd class="font-medium text-gray-900">CEO, CFO, IR部長</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h4 class="font-semibold text-gray-800 mb-4">📊 処理統計</h4>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">文字数</dt>
+                            <dd class="font-medium text-gray-900">15,680文字</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">文字起こし精度</dt>
+                            <dd class="font-medium text-green-600">96%</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">処理開始</dt>
+                            <dd class="font-medium text-gray-900">2時間前</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">進捗</dt>
+                            <dd class="font-medium text-blue-600">65%</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-gray-600">担当者</dt>
+                            <dd class="font-medium text-gray-900">IR担当者A</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- 次のアクション -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-2xl">⚡</span>
+                    <h4 class="font-semibold text-yellow-800">次のアクション</h4>
+                </div>
+                <p class="text-sm text-yellow-700 mb-4">AI要約が完了次第、FAQ生成に進みます。手動で介入する場合は下記ボタンをクリックしてください。</p>
+                <div class="flex gap-3">
+                    <button class="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-medium hover:bg-yellow-600">
+                        強制的に次へ進む
+                    </button>
+                    <button class="px-4 py-2 bg-white text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium hover:bg-yellow-50">
+                        処理を中断
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右サイドバー：インテリジェンス -->
+    <div class="w-80 bg-gray-50 border-l overflow-y-auto">
+        <div class="p-4 bg-white border-b">
+            <h2 class="text-lg font-semibold text-gray-900">🧠 インテリジェンス</h2>
+        </div>
+        
+        <div class="p-4 space-y-4">
+            <!-- 今日の統計 -->
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <h4 class="font-semibold text-gray-800 mb-3">📊 今日の統計</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">8</div>
+                        <div class="text-xs text-gray-600">処理完了</div>
+                        <div class="text-xs text-green-600">+3</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">12</div>
+                        <div class="text-xs text-gray-600">処理中</div>
+                        <div class="text-xs text-green-600">-2</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">96%</div>
+                        <div class="text-xs text-gray-600">AI精度</div>
+                        <div class="text-xs text-green-600">+1%</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900">2.3h</div>
+                        <div class="text-xs text-gray-600">平均時間</div>
+                        <div class="text-xs text-green-600">-0.5h</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI洞察 -->
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xl">🤖</span>
+                    <h4 class="font-semibold text-gray-800">AI洞察</h4>
+                </div>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-start gap-2">
+                        <span>💡</span>
+                        <span class="text-gray-700">今日の処理効率が20%向上しています</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span>⚠️</span>
+                        <span class="text-gray-700">3件の記録で処理遅延が発生中</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span>📈</span>
+                        <span class="text-gray-700">ESG関連の質問が急増しています</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 要対応アクション -->
+            <div class="bg-yellow-50 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-semibold text-yellow-800">🎯 要対応アクション</h4>
+                    <span class="px-2 py-0.5 bg-yellow-500 text-white text-xs font-medium rounded-full">5</span>
+                </div>
+                <ul class="space-y-2">
+                    <li class="flex items-center gap-2 text-sm">
+                        <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900">BlackRockへの回答</div>
+                            <div class="text-xs text-gray-500">期限: 今日</div>
+                        </div>
+                    </li>
+                    <li class="flex items-center gap-2 text-sm">
+                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900">FAQ承認</div>
+                            <div class="text-xs text-gray-500">期限: 明日</div>
+                        </div>
+                    </li>
+                    <li class="flex items-center gap-2 text-sm">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900">レポート作成</div>
+                            <div class="text-xs text-gray-500">期限: 来週</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 対話センターワークスペースのJavaScript
+let selectedActivityId = 'activity-001';
+
+function selectActivity(activityId) {
+    // 前の選択を解除
+    document.querySelectorAll('.activity-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // 新しい選択を設定
+    event.currentTarget.classList.add('selected');
+    selectedActivityId = activityId;
+    
+    console.log('選択された活動:', activityId);
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('対話センターワークスペース初期化完了');
+});
+</script>
+{% endblock %}

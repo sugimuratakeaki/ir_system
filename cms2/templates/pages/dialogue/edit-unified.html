@@ -1,0 +1,529 @@
+{% extends "base.html" %}
+
+{% block title %}議事録編集 - 統合編集システム{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 統合議事録編集システム専用スタイル */
+.unified-editor-container {
+    display: flex;
+    height: calc(100vh - 4rem);
+    margin: -1.5rem;
+}
+
+/* パイプライン進捗バー */
+.pipeline-progress {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.pipeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.meeting-info h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.meeting-meta {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.stages-container {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.stage-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    min-width: 110px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.stage-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.stage-item.active {
+    background: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.5);
+}
+
+.stage-item.completed {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.stage-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.stage-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* 左サイドバー */
+.left-sidebar {
+    width: 320px;
+    background: #f9fafb;
+    border-right: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.investor-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.investor-avatar {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.investor-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* メインコンテンツ */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.work-area {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background: white;
+}
+
+.work-area-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+/* 右サイドバー */
+.right-sidebar {
+    width: 320px;
+    background: #f9fafb;
+    border-left: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+/* アップロードエリア */
+.upload-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    background: #f8fafc;
+    transition: all 0.3s;
+}
+
+.upload-area:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.upload-area.drag-over {
+    border-color: #3b82f6;
+    background: #dbeafe;
+}
+
+/* 文字起こしエディター */
+.transcription-editor {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.editor-toolbar {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transcript-text {
+    padding: 1.5rem;
+    min-height: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+#transcriptEditor {
+    outline: none;
+    line-height: 1.8;
+}
+
+#transcriptEditor p {
+    margin-bottom: 1rem;
+}
+
+.uncertain {
+    background: #fef3c7;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+}
+
+/* AI提案 */
+.ai-suggestion {
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.suggestion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.confidence-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(14, 165, 233, 0.1);
+    color: #0c4a6e;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="unified-editor-container">
+    <!-- 左サイドバー：投資家情報 -->
+    <div class="left-sidebar">
+        <div class="investor-profile">
+            <div class="investor-avatar">野</div>
+            <div>
+                <h4 class="font-semibold text-gray-900">野村アセットマネジメント</h4>
+                <p class="text-sm text-gray-600">機関投資家</p>
+            </div>
+        </div>
+
+        <div class="investor-stats">
+            <div class="stat-item">
+                <div class="stat-value">12</div>
+                <div class="stat-label">総面談回数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">8.5</div>
+                <div class="stat-label">満足度</div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="font-semibold text-gray-900 mb-3">📋 過去面談履歴</h3>
+            <div class="space-y-2">
+                <div class="p-3 bg-white rounded-lg cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="text-xs text-gray-500 mb-1">2023-10-15</div>
+                    <div class="text-sm font-medium text-gray-900">Q2決算説明、ESG戦略</div>
+                    <div class="text-xs text-green-600">満足度: 8.2</div>
+                </div>
+                <div class="p-3 bg-white rounded-lg cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="text-xs text-gray-500 mb-1">2023-07-15</div>
+                    <div class="text-sm font-medium text-gray-900">中期経営計画、M&A戦略</div>
+                    <div class="text-xs text-green-600">満足度: 7.8</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="font-semibold text-gray-900 mb-3">📄 関連資料</h3>
+            <div class="space-y-2">
+                <div class="flex items-center gap-2 p-3 bg-white rounded-lg cursor-pointer hover:shadow-md transition-shadow">
+                    <span class="text-xl">📊</span>
+                    <span class="text-sm font-medium text-gray-900">Q3決算資料</span>
+                </div>
+                <div class="flex items-center gap-2 p-3 bg-white rounded-lg cursor-pointer hover:shadow-md transition-shadow">
+                    <span class="text-xl">📈</span>
+                    <span class="text-sm font-medium text-gray-900">中期経営計画</span>
+                </div>
+                <div class="flex items-center gap-2 p-3 bg-white rounded-lg cursor-pointer hover:shadow-md transition-shadow">
+                    <span class="text-xl">🌱</span>
+                    <span class="text-sm font-medium text-gray-900">ESGレポート</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="main-content">
+        <!-- パイプライン進捗バー -->
+        <div class="pipeline-progress">
+            <div class="pipeline-header">
+                <div class="meeting-info">
+                    <h1>投資家ミーティング 2024/01/22</h1>
+                    <div class="meeting-meta">
+                        <span>野村アセットマネジメント</span>
+                        <span>•</span>
+                        <span>2024年1月22日</span>
+                        <span>•</span>
+                        <span>決算説明会</span>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors">
+                        📤 書き出し
+                    </button>
+                </div>
+            </div>
+
+            <!-- 段階インジケーター -->
+            <div class="stages-container">
+                <div class="stage-item completed" onclick="switchStage('upload')">
+                    <div class="stage-icon">📹</div>
+                    <div class="stage-label">アップロード</div>
+                </div>
+                <div class="stage-item completed" onclick="switchStage('transcription')">
+                    <div class="stage-icon">📝</div>
+                    <div class="stage-label">文字起こし</div>
+                </div>
+                <div class="stage-item active" onclick="switchStage('ai_summary')">
+                    <div class="stage-icon">🤖</div>
+                    <div class="stage-label">AI要約</div>
+                </div>
+                <div class="stage-item" onclick="switchStage('faq')">
+                    <div class="stage-icon">❓</div>
+                    <div class="stage-label">FAQ作成</div>
+                </div>
+                <div class="stage-item" onclick="switchStage('review')">
+                    <div class="stage-icon">✅</div>
+                    <div class="stage-label">レビュー</div>
+                </div>
+                <div class="stage-item" onclick="switchStage('publish')">
+                    <div class="stage-icon">🌐</div>
+                    <div class="stage-label">公開</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ワークエリア -->
+        <div class="work-area">
+            <div class="work-area-header">
+                <div class="flex items-center gap-4">
+                    <div class="text-3xl">🤖</div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">AI要約・分析</h3>
+                        <p class="text-sm text-gray-600">議事録の要約と重要ポイントの抽出を行います</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        🤖 要約生成
+                    </button>
+                    <button class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        🎨 調整
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI要約コンテンツ -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h4 class="font-semibold text-gray-900 mb-4">📋 会議要約</h4>
+                    <div contenteditable="true" class="prose prose-sm max-w-none">
+                        <p><strong>主要議題:</strong> AI事業の競争優位性、ESG戦略の進捗、今後の投資計画</p>
+                        
+                        <p><strong>キーポイント:</strong></p>
+                        <ul>
+                            <li>AI事業では業界特化型データセットで競合優位を確立</li>
+                            <li>製造業向けソリューションで市場シェア25%を達成</li>
+                            <li>ESG投資を今期20%増額、カーボンニュートラル目標を2030年に前倒し</li>
+                            <li>新規設備投資により生産効率を15%向上予定</li>
+                        </ul>
+                        
+                        <p><strong>投資家の関心事項:</strong></p>
+                        <ul>
+                            <li>AI事業の収益性と成長持続性</li>
+                            <li>大手テック企業との競争戦略</li>
+                            <li>ESG投資のROI測定方法</li>
+                            <li>技術者採用計画と人材定着率</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h4 class="font-semibold text-gray-900 mb-4">🎯 アクションアイテム</h4>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium text-gray-900">追加資料の準備</span>
+                                <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded">優先度: 高</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-1">AI事業の詳細なロードマップ資料を次回面談までに準備</p>
+                            <p class="text-xs text-gray-500">期限: 2024-01-25</p>
+                        </div>
+
+                        <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium text-gray-900">ESG指標の詳細説明</span>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded">優先度: 中</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-1">カーボンニュートラル達成のための具体的施策とタイムライン</p>
+                            <p class="text-xs text-gray-500">期限: 2024-01-30</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右サイドバー：AIアシスタント -->
+    <div class="right-sidebar">
+        <h3 class="font-semibold text-gray-900 mb-4">🤖 AIアシスタント</h3>
+
+        <!-- AI提案 -->
+        <div class="ai-suggestion">
+            <div class="suggestion-header">
+                <span class="font-medium text-blue-900">📝 要約改善提案</span>
+                <span class="confidence-badge">信頼度: 94%</span>
+            </div>
+            <p class="text-sm text-gray-700 mb-3">
+                競合他社との比較情報を追加することで、投資家の理解がより深まります。
+            </p>
+            <div class="flex gap-2">
+                <button class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                    適用する
+                </button>
+                <button class="px-3 py-1.5 bg-white text-gray-600 border border-gray-300 text-sm rounded-lg hover:bg-gray-50">
+                    スキップ
+                </button>
+            </div>
+        </div>
+
+        <!-- 分析設定 -->
+        <div class="bg-white rounded-lg p-4 mb-4">
+            <h4 class="font-medium text-gray-900 mb-3">🎯 分析フォーカス</h4>
+            <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked class="rounded text-blue-600">
+                    <span>競合優位性分析</span>
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked class="rounded text-blue-600">
+                    <span>投資家関心度分析</span>
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" class="rounded text-blue-600">
+                    <span>リスク要因分析</span>
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" class="rounded text-blue-600">
+                    <span>ESG要素分析</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 分析結果 -->
+        <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 mb-3">📊 分析結果</h4>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">感情分析</span>
+                    <span class="font-medium text-green-600">ポジティブ 78%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">重要度</span>
+                    <span class="font-medium text-blue-600">高 (8.2/10)</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">信頼度</span>
+                    <span class="font-medium text-green-600">95%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 統合議事録編集システムのJavaScript
+let currentStage = 'ai_summary';
+
+function switchStage(stage) {
+    console.log('ステージ切り替え:', stage);
+    // 実際にはサーバーサイドでページを再読み込み
+    window.location.href = `{{ base_url }}/dialogue/edit-unified?stage=${stage}`;
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('統合議事録編集システム初期化完了');
+});
+</script>
+{% endblock %}

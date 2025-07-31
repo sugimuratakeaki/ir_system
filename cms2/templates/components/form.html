@@ -1,0 +1,240 @@
+<!-- フォームコンポーネント -->
+<!-- 各種フォーム要素のテンプレート -->
+
+<!-- テキスト入力 -->
+<!-- 使用方法:
+{% set input_id = "username" %}
+{% set input_label = "ユーザー名" %}
+{% set input_type = "text" %}
+{% set input_required = true %}
+{% set input_placeholder = "ユーザー名を入力" %}
+{% set input_help = "半角英数字で入力してください" %}
+{% include 'components/form-input.html' %}
+-->
+{% macro form_input(id, label, type='text', required=false, placeholder='', help='', error='', value='', disabled=false) %}
+<div class="form-group">
+    <label for="{{ id }}" class="form-label {% if required %}required{% endif %}">
+        {{ label }}
+    </label>
+    <input type="{{ type }}" 
+           id="{{ id }}"
+           name="{{ id }}"
+           class="form-input {% if error %}error{% endif %}"
+           {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+           {% if value %}value="{{ value }}"{% endif %}
+           {% if required %}required{% endif %}
+           {% if disabled %}disabled{% endif %}>
+    {% if help and not error %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- セレクトボックス -->
+{% macro form_select(id, label, options, required=false, help='', error='', value='', disabled=false, multiple=false) %}
+<div class="form-group">
+    <label for="{{ id }}" class="form-label {% if required %}required{% endif %}">
+        {{ label }}
+    </label>
+    <select id="{{ id }}"
+            name="{{ id }}"
+            class="form-select {% if error %}error{% endif %}"
+            {% if required %}required{% endif %}
+            {% if disabled %}disabled{% endif %}
+            {% if multiple %}multiple{% endif %}>
+        {% for option in options %}
+        <option value="{{ option.value }}" 
+                {% if option.value == value %}selected{% endif %}
+                {% if option.disabled %}disabled{% endif %}>
+            {{ option.label }}
+        </option>
+        {% endfor %}
+    </select>
+    {% if help and not error %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- テキストエリア -->
+{% macro form_textarea(id, label, required=false, placeholder='', help='', error='', value='', rows=4, disabled=false) %}
+<div class="form-group">
+    <label for="{{ id }}" class="form-label {% if required %}required{% endif %}">
+        {{ label }}
+    </label>
+    <textarea id="{{ id }}"
+              name="{{ id }}"
+              class="form-textarea {% if error %}error{% endif %}"
+              rows="{{ rows }}"
+              {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+              {% if required %}required{% endif %}
+              {% if disabled %}disabled{% endif %}>{{ value }}</textarea>
+    {% if help and not error %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- チェックボックス -->
+{% macro form_checkbox(id, label, checked=false, help='', disabled=false) %}
+<div class="form-check">
+    <input type="checkbox" 
+           id="{{ id }}"
+           name="{{ id }}"
+           class="form-checkbox"
+           {% if checked %}checked{% endif %}
+           {% if disabled %}disabled{% endif %}>
+    <label for="{{ id }}" class="form-check-label">
+        {{ label }}
+    </label>
+    {% if help %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- ラジオボタングループ -->
+{% macro form_radio_group(name, label, options, value='', required=false, help='', error='') %}
+<div class="form-group">
+    <label class="form-label {% if required %}required{% endif %}">
+        {{ label }}
+    </label>
+    <div class="form-radio-group">
+        {% for option in options %}
+        <div class="form-check">
+            <input type="radio" 
+                   id="{{ name }}_{{ loop.index }}"
+                   name="{{ name }}"
+                   value="{{ option.value }}"
+                   class="form-radio"
+                   {% if option.value == value %}checked{% endif %}
+                   {% if option.disabled %}disabled{% endif %}>
+            <label for="{{ name }}_{{ loop.index }}" class="form-check-label">
+                {{ option.label }}
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+    {% if help and not error %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- スイッチ（トグル） -->
+{% macro form_switch(id, label, checked=false, help='', disabled=false) %}
+<div class="form-switch-group">
+    <label for="{{ id }}" class="form-switch-label">
+        <span>{{ label }}</span>
+        <div class="form-switch">
+            <input type="checkbox" 
+                   id="{{ id }}"
+                   name="{{ id }}"
+                   class="form-switch-input"
+                   {% if checked %}checked{% endif %}
+                   {% if disabled %}disabled{% endif %}>
+            <span class="form-switch-slider"></span>
+        </div>
+    </label>
+    {% if help %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- ファイルアップロード -->
+{% macro form_file(id, label, accept='', multiple=false, required=false, help='', error='') %}
+<div class="form-group">
+    <label for="{{ id }}" class="form-label {% if required %}required{% endif %}">
+        {{ label }}
+    </label>
+    <div class="form-file-upload">
+        <input type="file" 
+               id="{{ id }}"
+               name="{{ id }}"
+               class="form-file-input"
+               {% if accept %}accept="{{ accept }}"{% endif %}
+               {% if multiple %}multiple{% endif %}
+               {% if required %}required{% endif %}>
+        <label for="{{ id }}" class="form-file-label">
+            <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <span class="form-file-text">クリックしてファイルを選択</span>
+            <span class="form-file-dragtext">またはここにドラッグ＆ドロップ</span>
+        </label>
+        <div class="form-file-list" id="{{ id }}_list"></div>
+    </div>
+    {% if help and not error %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- 日付・時刻入力 -->
+{% macro form_datetime(id, label, type='date', required=false, help='', error='', value='', min='', max='') %}
+<div class="form-group">
+    <label for="{{ id }}" class="form-label {% if required %}required{% endif %}">
+        {{ label }}
+    </label>
+    <div class="form-datetime">
+        <input type="{{ type }}" 
+               id="{{ id }}"
+               name="{{ id }}"
+               class="form-input {% if error %}error{% endif %}"
+               {% if value %}value="{{ value }}"{% endif %}
+               {% if min %}min="{{ min }}"{% endif %}
+               {% if max %}max="{{ max }}"{% endif %}
+               {% if required %}required{% endif %}>
+        <span class="form-datetime-icon">
+            {% if type == 'date' %}
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            {% else %}
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {% endif %}
+        </span>
+    </div>
+    {% if help and not error %}
+    <p class="form-help">{{ help }}</p>
+    {% endif %}
+    {% if error %}
+    <p class="form-error">{{ error }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<!-- フォームアクション -->
+{% macro form_actions(submit_label='保存', cancel_url='#', show_cancel=true, additional_actions='') %}
+<div class="form-actions">
+    <div class="form-actions-left">
+        {{ additional_actions|safe }}
+    </div>
+    <div class="form-actions-right">
+        {% if show_cancel %}
+        <a href="{{ cancel_url }}" class="btn btn-gray">キャンセル</a>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">
+            {{ submit_label }}
+        </button>
+    </div>
+</div>
+{% endmacro %}

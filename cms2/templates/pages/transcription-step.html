@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+
+{% block title %}文字起こし・編集{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 文字起こし専用画面スタイル */
+.transcription-workspace {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content 1fr;
+    height: calc(100vh - 140px);
+    gap: 1rem;
+}
+
+/* コンパクト進捗バー */
+.compact-progress {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.step-navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.nav-step {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-step.active {
+    background: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+/* メイン作業エリア */
+.transcription-main {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 0;
+    overflow: hidden;
+}
+
+/* 音声プレイヤー */
+.audio-player {
+    background: #f8fafc;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.play-button {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.2s;
+}
+
+.play-button:hover {
+    background: #2563eb;
+    transform: scale(1.05);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1e40af);
+    border-radius: 6px;
+    width: 25%;
+    transition: width 0.1s;
+}
+
+/* エディターエリア */
+.editor-toolbar {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.toolbar-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toolbar-btn:hover {
+    background: #f3f4f6;
+}
+
+.toolbar-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+/* 文字起こしコンテンツ */
+.transcript-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.transcript-segment {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fafafa;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.transcript-segment:hover {
+    background: #f8fafc;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.transcript-segment.current {
+    background: #fef3c7;
+    border-color: #fbbf24;
+}
+
+.transcript-segment.highlighted {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.speaker-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.segment-text {
+    width: 100%;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #1f2937;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.segment-text:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* サイドパネル */
+.transcription-sidebar {
+    background: #f8fafc;
+    border-left: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: white;
+}
+
+.sidebar-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #111827;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.speaker-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.5rem;
+}
+
+.speaker-item:hover {
+    background: #f3f4f6;
+}
+
+.speaker-item.active {
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="transcription-workspace">
+    <!-- コンパクト進捗バー -->
+    <div class="compact-progress">
+        <div class="compact-header">
+            <div>
+                <h1 class="text-xl font-bold mb-1">投資家ミーティング 2024/01/22</h1>
+                <div class="text-sm opacity-90">
+                    野村アセットマネジメント • 2024年1月22日 • 文字起こし・編集
+                </div>
+            </div>
+            <div class="step-navigation">
+                <div class="nav-step">📁 アップロード</div>
+                <div class="nav-step active">📝 文字起こし</div>
+                <div class="nav-step">🤖 AI要約</div>
+                <div class="nav-step">❓ FAQ</div>
+                <div class="nav-step">✅ レビュー</div>
+                <div class="nav-step">🌐 公開</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メイン作業エリア -->
+    <div class="transcription-main">
+        <!-- エディターエリア -->
+        <div class="transcript-editor-area flex flex-col h-full">
+            <!-- 音声プレイヤー -->
+            <div class="audio-player">
+                <div class="flex items-center gap-6 mb-4">
+                    <button class="play-button" onclick="togglePlayback()">
+                        <span id="play-icon">▶️</span>
+                    </button>
+                    <div class="flex-1">
+                        <div class="progress-bar" onclick="seekAudio(event)">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="font-mono text-sm text-gray-600" id="current-time">12:34</span>
+                            <span class="font-mono text-sm text-gray-600">1:30:45</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">再生速度:</span>
+                        <button class="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50">0.75x</button>
+                        <button class="px-2 py-1 text-xs border border-gray-300 rounded bg-blue-600 text-white">1.0x</button>
+                        <button class="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50">1.25x</button>
+                        <button class="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50">1.5x</button>
+                    </div>
+                    <span class="text-sm text-gray-600">
+                        🎤 認識精度: <span class="font-medium text-green-600">96%</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- エディターツールバー -->
+            <div class="editor-toolbar">
+                <div class="flex gap-2">
+                    <button class="toolbar-btn">
+                        🖍️ ハイライト
+                    </button>
+                    <button class="toolbar-btn">
+                        ⭐ 重要
+                    </button>
+                    <button class="toolbar-btn">
+                        👤 話者分離
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <button class="toolbar-btn">
+                        ↶ 元に戻す
+                    </button>
+                    <button class="toolbar-btn">
+                        ↷ やり直し
+                    </button>
+                </div>
+                <input type="text" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" placeholder="🔍 文字起こし内を検索...">
+                <div class="ml-auto text-sm text-gray-600">
+                    総文字数: 15,680文字 | 読了時間: 約12分
+                </div>
+            </div>
+
+            <!-- 文字起こしコンテンツ -->
+            <div class="transcript-content">
+                <!-- セグメント1 -->
+                <div class="transcript-segment current" data-timestamp="00:12:34">
+                    <div class="segment-header">
+                        <div class="flex items-center gap-3">
+                            <div class="speaker-avatar">T</div>
+                            <div>
+                                <div class="font-semibold text-gray-900">田中（CEO）</div>
+                                <div class="text-xs text-gray-500">12:34</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-mono cursor-pointer hover:text-blue-600">12:34</span>
+                            <span>•</span>
+                            <span>320文字</span>
+                        </div>
+                    </div>
+                    <textarea class="segment-text">本日は貴重なお時間をいただきありがとうございます。第3四半期の業績と今後の展望について説明させていただきます。まず、売上高は前年同期比15%増の3,250億円となり、計画を上回る進捗となっています。特に新規事業分野での成長が顕著で、DX関連サービスが大きく貢献しています。</textarea>
+                    <div class="flex gap-2 mt-3 opacity-0 hover:opacity-100 transition-opacity">
+                        <button class="toolbar-btn text-xs">🖍️ ハイライト</button>
+                        <button class="toolbar-btn text-xs">⭐ 重要</button>
+                        <button class="toolbar-btn text-xs">📝 メモ</button>
+                        <button class="toolbar-btn text-xs">✂️ 分割</button>
+                    </div>
+                </div>
+
+                <!-- セグメント2 -->
+                <div class="transcript-segment highlighted" data-timestamp="00:13:15">
+                    <div class="segment-header">
+                        <div class="flex items-center gap-3">
+                            <div class="speaker-avatar" style="background: #10b981;">I</div>
+                            <div>
+                                <div class="font-semibold text-gray-900">野村アセットマネジメント</div>
+                                <div class="text-xs text-gray-500">13:15</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-mono cursor-pointer hover:text-blue-600">13:15</span>
+                            <span>•</span>
+                            <span>280文字</span>
+                        </div>
+                    </div>
+                    <textarea class="segment-text">ありがとうございます。DX関連の成長は非常に印象的ですが、今後の競争環境をどのように見ていらっしゃいますか？特に大手IT企業の参入による影響と、御社の差別化戦略についてお聞かせください。</textarea>
+                </div>
+
+                <!-- セグメント3 -->
+                <div class="transcript-segment" data-timestamp="00:13:45">
+                    <div class="segment-header">
+                        <div class="flex items-center gap-3">
+                            <div class="speaker-avatar" style="background: #f59e0b;">S</div>
+                            <div>
+                                <div class="font-semibold text-gray-900">佐藤（CFO）</div>
+                                <div class="text-xs text-gray-500">13:45</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-mono cursor-pointer hover:text-blue-600">13:45</span>
+                            <span>•</span>
+                            <span>420文字</span>
+                        </div>
+                    </div>
+                    <textarea class="segment-text">財務面から補足させていただきます。DX事業の営業利益率は現在18%と高水準を維持しており、全社の収益性向上に大きく寄与しています。競争激化は確かにリスク要因ですが、当社は業界特化型のソリューションで差別化を図っており、既存顧客との強固な関係性が参入障壁となっています。今後3年間で、この分野に200億円の追加投資を計画しています。</textarea>
+                </div>
+            </div>
+
+            <!-- フッターアクションバー -->
+            <div class="bg-gray-50 border-t px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>最終保存: 2分前</span>
+                </div>
+                <div class="flex gap-3">
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        📤 書き出し
+                    </button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        💾 保存
+                    </button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        🤖 AI要約へ進む
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- サイドパネル -->
+        <div class="transcription-sidebar">
+            <div class="sidebar-header">
+                <h3 class="text-lg font-semibold text-gray-900">📊 文字起こし情報</h3>
+                <div class="sidebar-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">セグメント</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">96%</div>
+                        <div class="stat-label">認識精度</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto">
+                <!-- 話者一覧 -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-900 mb-3">👥 話者一覧</h4>
+                    <div class="space-y-2">
+                        <div class="speaker-item active">
+                            <div class="speaker-avatar">T</div>
+                            <div>
+                                <div class="font-medium text-sm">田中（CEO）</div>
+                                <div class="text-xs text-gray-500">45% (3,200文字)</div>
+                            </div>
+                        </div>
+                        <div class="speaker-item">
+                            <div class="speaker-avatar" style="background: #f59e0b;">S</div>
+                            <div>
+                                <div class="font-medium text-sm">佐藤（CFO）</div>
+                                <div class="text-xs text-gray-500">25% (1,800文字)</div>
+                            </div>
+                        </div>
+                        <div class="speaker-item">
+                            <div class="speaker-avatar" style="background: #10b981;">I</div>
+                            <div>
+                                <div class="font-medium text-sm">野村アセットマネジメント</div>
+                                <div class="text-xs text-gray-500">30% (2,100文字)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- クイックアクション -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-900 mb-3">⚡ クイックアクション</h4>
+                    <div class="space-y-2">
+                        <button class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-left hover:bg-gray-50 transition-colors">
+                            ⭐ 重要箇所へジャンプ
+                        </button>
+                        <button class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-left hover:bg-gray-50 transition-colors">
+                            🖍️ ハイライト箇所へ
+                        </button>
+                        <button class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-left hover:bg-gray-50 transition-colors">
+                            ▶️ 再生/停止
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI支援 -->
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-3">🤖 AI支援</h4>
+                    <div class="space-y-2">
+                        <button class="w-full px-3 py-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-sm hover:bg-purple-100 transition-colors">
+                            🎯 認識精度向上
+                        </button>
+                        <button class="w-full px-3 py-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-sm hover:bg-purple-100 transition-colors">
+                            ✨ 自動校正
+                        </button>
+                        <button class="w-full px-3 py-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-sm hover:bg-purple-100 transition-colors">
+                            🔍 重要ポイント検出
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 文字起こし画面のJavaScript
+let isPlaying = false;
+let currentTime = 0;
+let totalDuration = 5445; // 1:30:45 in seconds
+
+function togglePlayback() {
+    isPlaying = !isPlaying;
+    const playIcon = document.getElementById('play-icon');
+    if (playIcon) {
+        playIcon.textContent = isPlaying ? '⏸️' : '▶️';
+    }
+    console.log(isPlaying ? '再生開始' : '再生停止');
+}
+
+function seekAudio(event) {
+    const progressBar = event.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const percentage = clickX / rect.width;
+    
+    currentTime = totalDuration * percentage;
+    updateProgressBar();
+}
+
+function updateProgressBar() {
+    const progressFill = document.getElementById('progress-fill');
+    if (progressFill) {
+        const percentage = (currentTime / totalDuration) * 100;
+        progressFill.style.width = percentage + '%';
+    }
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('文字起こし画面初期化完了');
+});
+</script>
+{% endblock %}

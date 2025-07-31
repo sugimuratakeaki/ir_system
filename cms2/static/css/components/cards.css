@@ -125,6 +125,14 @@
     border-top-color: rgba(255, 255, 255, 0.2);
 }
 
+/* ===== 統計グリッド ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
 /* ===== 統計カード ===== */
 .stat-card {
     padding: var(--space-lg);

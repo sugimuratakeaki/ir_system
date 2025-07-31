@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block title %}IR情報統合センター{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ base_url }}/static/css/pages/ir-content-center.css">
+{% endblock %}
+
+{% block content %}
+<div class="page-header bg-gradient-to-r from-purple-900 to-purple-700 text-white p-8 rounded-lg mb-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold mb-2">IR情報統合センター</h1>
+            <p class="text-purple-100 text-lg">すべてのIR情報を一元管理・活用</p>
+        </div>
+        <div class="flex items-center gap-8">
+            <div class="text-center">
+                <p class="text-purple-200 text-sm mb-1">総コンテンツ数</p>
+                <p class="text-3xl font-bold">1,284</p>
+            </div>
+            <div class="text-center">
+                <p class="text-purple-200 text-sm mb-1">今月の更新</p>
+                <p class="text-3xl font-bold">89</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ir-content-center">
+    <!-- コンテンツストリーム（左サイドバー） -->
+    <div class="content-stream">
+        <div class="stream-header">
+            <h3 class="text-lg font-semibold mb-3">コンテンツストリーム</h3>
+            <div class="stream-filters">
+                <button class="filter-chip active" onclick="filterContent('all')">すべて</button>
+                <button class="filter-chip" onclick="filterContent('faq')">FAQ</button>
+                <button class="filter-chip" onclick="filterContent('document')">資料</button>
+                <button class="filter-chip" onclick="filterContent('news')">ニュース</button>
+                <button class="filter-chip" onclick="filterContent('report')">レポート</button>
+            </div>
+        </div>
+        
+        <div class="stream-content">
+            <!-- FAQ -->
+            <div class="content-card faq" onclick="selectContent('content-001')">
+                <div class="content-type-badge faq">FAQ</div>
+                <h4 class="content-title">配当政策について教えてください</h4>
+                <p class="content-excerpt">当社は安定した配当政策を維持しており...</p>
+                <div class="content-meta">
+                    <span class="meta-item">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        156回
+                    </span>
+                    <span class="meta-item">2日前</span>
+                </div>
+            </div>
+            
+            <!-- ドキュメント -->
+            <div class="content-card document selected" onclick="selectContent('content-002')">
+                <div class="content-type-badge document">資料</div>
+                <h4 class="content-title">2024年第3四半期決算説明資料</h4>
+                <p class="content-excerpt">2024年第3四半期の業績概要と今後の見通し...</p>
+                <div class="content-meta">
+                    <span class="meta-item">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        45回
+                    </span>
+                    <span class="meta-item">今日</span>
+                </div>
+            </div>
+            
+            <!-- ニュース -->
+            <div class="content-card news" onclick="selectContent('content-003')">
+                <div class="content-type-badge news">ニュース</div>
+                <h4 class="content-title">新製品発表に関するお知らせ</h4>
+                <p class="content-excerpt">革新的な新製品を2024年2月に発売予定...</p>
+                <div class="content-meta">
+                    <span class="meta-item">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                        </svg>
+                        公開予定
+                    </span>
+                    <span class="meta-item">1週間後</span>
+                </div>
+            </div>
+            
+            <!-- レポート -->
+            <div class="content-card report" onclick="selectContent('content-004')">
+                <div class="content-type-badge report">レポート</div>
+                <h4 class="content-title">ESG活動報告書2023</h4>
+                <p class="content-excerpt">環境・社会・ガバナンスへの取り組み実績...</p>
+                <div class="content-meta">
+                    <span class="meta-item">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        高評価
+                    </span>
+                    <span class="meta-item">先月</span>
+                </div>
+            </div>
+            
+            <!-- その他のコンテンツ -->
+            <div class="load-more">
+                <button class="btn btn-secondary w-full" onclick="loadMoreContent()">
+                    さらに読み込む
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- メインワークスペース -->
+    <div class="workspace-main">
+        <!-- ヘッダー -->
+        <div class="workspace-header bg-white rounded-lg shadow-sm p-6 mb-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="content-icon document">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </span>
+                        <h2 class="text-2xl font-bold text-gray-900">2024年第3四半期決算説明資料</h2>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <span>最終更新: 2024年12月26日 10:30</span>
+                        <span>|</span>
+                        <span>作成者: IR部門</span>
+                        <span>|</span>
+                        <span>45ダウンロード</span>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-secondary btn-sm" onclick="editContent()">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        編集
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="publishContent()">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2"/>
+                        </svg>
+                        公開
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- コンテンツ詳細 -->
+        <div class="content-detail bg-white rounded-lg shadow-sm">
+            <div class="content-tabs">
+                <button class="content-tab active" onclick="switchTab('preview')">プレビュー</button>
+                <button class="content-tab" onclick="switchTab('metadata')">メタデータ</button>
+                <button class="content-tab" onclick="switchTab('analytics')">分析</button>
+                <button class="content-tab" onclick="switchTab('versions')">バージョン</button>
+            </div>
+            
+            <div class="tab-content" id="preview-tab">
+                <div class="document-preview">
+                    <div class="preview-toolbar">
+                        <div class="flex items-center gap-2">
+                            <button class="btn-icon" onclick="zoomIn()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon" onclick="zoomOut()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
+                                </svg>
+                            </button>
+                            <span class="text-sm text-gray-600">100%</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="btn btn-secondary btn-sm" onclick="downloadPDF()">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                PDF
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="shareContent()">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-5.432 0m5.432 0A3 3 0 0115 18a3 3 0 01-3-3m3 3a3 3 0 01-3-3m0-6a3 3 0 013-3 3 3 0 013 3m0 0a3 3 0 01-3 3m0-3a3 3 0 00-3-3"/>
+                                </svg>
+                                共有
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-content">
+                        <!-- PDFプレビューまたはコンテンツ表示 -->
+                        <div class="pdf-placeholder">
+                            <img src="{{ base_url }}/static/images/sample-pdf-preview.png" alt="決算説明資料プレビュー" class="w-full rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="metadata-tab">
+                <div class="metadata-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">タイトル</label>
+                            <input type="text" class="form-input" value="2024年第3四半期決算説明資料">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">カテゴリー</label>
+                            <select class="form-select">
+                                <option selected>決算資料</option>
+                                <option>IR資料</option>
+                                <option>ESG資料</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">言語</label>
+                            <select class="form-select">
+                                <option selected>日本語</option>
+                                <option>英語</option>
+                                <option>日英併記</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">公開日</label>
+                            <input type="date" class="form-input" value="2024-12-26">
+                        </div>
+                        <div class="form-group col-span-2">
+                            <label class="form-label">概要</label>
+                            <textarea class="form-textarea" rows="3">2024年第3四半期の業績概要、セグメント別実績、通期業績予想の修正について説明しています。</textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary">メタデータを保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- インサイトパネル（右サイドバー） -->
+    <div class="insight-panel">
+        <div class="panel-header">
+            <h3 class="text-lg font-semibold">AIインサイト</h3>
+            <button class="btn-icon" onclick="toggleInsightPanel()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="insight-content">
+            <!-- 関連性スコア -->
+            <div class="insight-section">
+                <h4 class="insight-title">投資家関心度</h4>
+                <div class="relevance-score">
+                    <div class="score-value">92%</div>
+                    <div class="score-label">非常に高い</div>
+                </div>
+                <p class="insight-description">
+                    決算資料は投資家の最も関心の高いコンテンツです。特に業績予想の修正部分に注目が集まっています。
+                </p>
+            </div>
+            
+            <!-- 関連コンテンツ -->
+            <div class="insight-section">
+                <h4 class="insight-title">関連コンテンツ</h4>
+                <div class="related-items">
+                    <div class="related-item" onclick="navigateToContent('related-001')">
+                        <span class="related-icon faq">FAQ</span>
+                        <div class="related-info">
+                            <p class="related-title">業績予想の修正について</p>
+                            <p class="related-meta">85%の関連性</p>
+                        </div>
+                    </div>
+                    <div class="related-item" onclick="navigateToContent('related-002')">
+                        <span class="related-icon news">NEWS</span>
+                        <div class="related-info">
+                            <p class="related-title">決算発表のお知らせ</p>
+                            <p class="related-meta">78%の関連性</p>
+                        </div>
+                    </div>
+                    <div class="related-item" onclick="navigateToContent('related-003')">
+                        <span class="related-icon report">REPORT</span>
+                        <div class="related-info">
+                            <p class="related-title">四半期報告書</p>
+                            <p class="related-meta">95%の関連性</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- アクション提案 -->
+            <div class="insight-section">
+                <h4 class="insight-title">推奨アクション</h4>
+                <div class="action-suggestions">
+                    <div class="suggestion-card">
+                        <div class="suggestion-icon">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="suggestion-content">
+                            <h5 class="suggestion-title">FAQ自動生成</h5>
+                            <p class="suggestion-text">この資料から8つの重要な質問を抽出できます</p>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="generateFAQ()">
+                                FAQを生成
+                            </button>
+                        </div>
+                    </div>
+                    <div class="suggestion-card">
+                        <div class="suggestion-icon">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="suggestion-content">
+                            <h5 class="suggestion-title">メール配信</h5>
+                            <p class="suggestion-text">関心のある投資家256名に配信可能</p>
+                            <button class="btn btn-success btn-sm mt-2" onclick="prepareEmail()">
+                                配信準備
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 利用統計 -->
+            <div class="insight-section">
+                <h4 class="insight-title">利用統計</h4>
+                <div class="usage-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">総閲覧数</span>
+                        <span class="stat-value">1,256</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">平均滞在時間</span>
+                        <span class="stat-value">4分32秒</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">ダウンロード率</span>
+                        <span class="stat-value">68%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ base_url }}/static/js/pages/ir-content-center.js"></script>
+{% endblock %}
