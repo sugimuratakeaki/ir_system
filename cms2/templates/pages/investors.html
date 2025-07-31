@@ -122,6 +122,16 @@
                 エクスポート
             </button>
             
+            <button class="btn btn-secondary" id="segmentBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 2H6V6H2V2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 2H14V6H10V2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 10H6V14H2V10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 10H14V14H10V10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                セグメント管理
+            </button>
+            
             <button class="btn btn-primary" id="addInvestorBtn">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M8 3.33333V12.6667M3.33333 8H12.6667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -209,7 +219,7 @@
                         </svg>
                         メール
                     </button>
-                    <button class="btn btn-sm btn-primary">詳細</button>
+                    <button class="btn btn-sm btn-primary" onclick="showInvestorProfile(1)">詳細</button>
                 </div>
             </div>
             
@@ -262,7 +272,7 @@
                         </svg>
                         メール
                     </button>
-                    <button class="btn btn-sm btn-primary">詳細</button>
+                    <button class="btn btn-sm btn-primary" onclick="showInvestorProfile(2)">詳細</button>
                 </div>
             </div>
             
@@ -358,6 +368,424 @@
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="resetFilters()">リセット</button>
             <button class="btn btn-primary" onclick="applyFilters()">適用</button>
+        </div>
+    </div>
+</div>
+
+<!-- 投資家詳細プロファイルモーダル -->
+<div class="modal" id="investorProfileModal" style="display: none;">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2>投資家詳細プロファイル</h2>
+            <button class="modal-close" onclick="closeInvestorProfile()">×</button>
+        </div>
+        <div class="modal-body">
+            <!-- タブナビゲーション -->
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="basic">基本情報</button>
+                <button class="profile-tab" data-tab="style">投資スタイル</button>
+                <button class="profile-tab" data-tab="interests">関心分野</button>
+                <button class="profile-tab" data-tab="history">対話履歴</button>
+                <button class="profile-tab" data-tab="segments">セグメント・タグ</button>
+            </div>
+            
+            <!-- タブコンテンツ -->
+            <div class="profile-content">
+                <!-- 基本情報タブ -->
+                <div id="basicTab" class="tab-pane active">
+                    <div class="profile-header">
+                        <div class="profile-avatar">野村</div>
+                        <div class="profile-info">
+                            <h3>野村アセットマネジメント株式会社</h3>
+                            <p class="profile-subtitle">チーフファンドマネージャー - 山田 太郎</p>
+                            <div class="profile-badges">
+                                <span class="badge badge-success">アクティブ</span>
+                                <span class="badge badge-info">機関投資家</span>
+                                <span class="badge badge-warning">重要顧客</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-grid">
+                        <div class="profile-section">
+                            <h4>連絡先情報</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>電話番号</label>
+                                    <span>03-1234-5678</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>メール</label>
+                                    <span>yamada@nomura-am.co.jp</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>所在地</label>
+                                    <span>東京都中央区日本橋</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>言語</label>
+                                    <span>日本語、英語</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h4>保有情報</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>保有株数</label>
+                                    <span>1,234,567株</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>保有比率</label>
+                                    <span>3.45%</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>初回投資日</label>
+                                    <span>2018年4月15日</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>平均取得単価</label>
+                                    <span>¥2,345</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 投資スタイルタブ -->
+                <div id="styleTab" class="tab-pane" style="display: none;">
+                    <div class="style-overview">
+                        <h4>投資スタイル分析</h4>
+                        <div class="style-chart">
+                            <canvas id="investmentStyleChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="style-details">
+                        <div class="style-section">
+                            <h5>投資アプローチ</h5>
+                            <div class="style-tags">
+                                <span class="style-tag active">バリュー投資</span>
+                                <span class="style-tag">長期保有</span>
+                                <span class="style-tag active">ファンダメンタル重視</span>
+                                <span class="style-tag">ESG統合</span>
+                            </div>
+                        </div>
+                        
+                        <div class="style-section">
+                            <h5>リスク選好度</h5>
+                            <div class="risk-meter">
+                                <div class="risk-scale">
+                                    <div class="risk-indicator" style="left: 65%;"></div>
+                                </div>
+                                <div class="risk-labels">
+                                    <span>低リスク</span>
+                                    <span>中リスク</span>
+                                    <span>高リスク</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="style-section">
+                            <h5>投資期間</h5>
+                            <div class="timeline">
+                                <div class="timeline-bar">
+                                    <div class="timeline-fill" style="width: 80%;"></div>
+                                </div>
+                                <p class="timeline-text">平均保有期間: 4.5年</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 関心分野タブ -->
+                <div id="interestsTab" class="tab-pane" style="display: none;">
+                    <div class="interests-grid">
+                        <div class="interest-category">
+                            <h5>重点関心分野</h5>
+                            <div class="interest-items">
+                                <div class="interest-item high">
+                                    <span class="interest-icon">📊</span>
+                                    <span class="interest-name">財務パフォーマンス</span>
+                                    <span class="interest-score">95%</span>
+                                </div>
+                                <div class="interest-item high">
+                                    <span class="interest-icon">🌱</span>
+                                    <span class="interest-name">ESG/サステナビリティ</span>
+                                    <span class="interest-score">88%</span>
+                                </div>
+                                <div class="interest-item medium">
+                                    <span class="interest-icon">🚀</span>
+                                    <span class="interest-name">成長戦略</span>
+                                    <span class="interest-score">75%</span>
+                                </div>
+                                <div class="interest-item medium">
+                                    <span class="interest-icon">💰</span>
+                                    <span class="interest-name">株主還元</span>
+                                    <span class="interest-score">70%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="interest-category">
+                            <h5>最近の関心トピック</h5>
+                            <div class="recent-topics">
+                                <div class="topic-item">
+                                    <span class="topic-date">2024/03/15</span>
+                                    <span class="topic-text">中期経営計画の進捗について質問</span>
+                                </div>
+                                <div class="topic-item">
+                                    <span class="topic-date">2024/03/01</span>
+                                    <span class="topic-text">カーボンニュートラル目標について照会</span>
+                                </div>
+                                <div class="topic-item">
+                                    <span class="topic-date">2024/02/20</span>
+                                    <span class="topic-text">R&D投資の方向性について議論</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 対話履歴タブ -->
+                <div id="historyTab" class="tab-pane" style="display: none;">
+                    <div class="history-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h5>決算説明会後の個別面談</h5>
+                                    <span class="timeline-date">2024/03/15 14:00-15:00</span>
+                                </div>
+                                <p class="timeline-description">Q3決算についての詳細説明と今後の見通しについて議論。特に海外事業の展開について高い関心を示した。</p>
+                                <div class="timeline-tags">
+                                    <span class="tag">決算</span>
+                                    <span class="tag">海外展開</span>
+                                    <span class="tag">成長戦略</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h5>ESGスモールミーティング</h5>
+                                    <span class="timeline-date">2024/02/28 10:00-11:30</span>
+                                </div>
+                                <p class="timeline-description">ESG戦略についての小規模説明会に参加。TCFD開示の充実について建設的な提案をいただいた。</p>
+                                <div class="timeline-tags">
+                                    <span class="tag">ESG</span>
+                                    <span class="tag">TCFD</span>
+                                    <span class="tag">開示</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h5>定期コンタクト（電話会議）</h5>
+                                    <span class="timeline-date">2024/02/01 16:00-16:30</span>
+                                </div>
+                                <p class="timeline-description">月次の定期連絡。市場環境の変化と当社への影響について意見交換。</p>
+                                <div class="timeline-tags">
+                                    <span class="tag">定期連絡</span>
+                                    <span class="tag">市場環境</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- セグメント・タグタブ -->
+                <div id="segmentsTab" class="tab-pane" style="display: none;">
+                    <div class="segment-management">
+                        <div class="segment-section">
+                            <h5>所属セグメント</h5>
+                            <div class="segment-list">
+                                <div class="segment-item">
+                                    <span class="segment-color" style="background: #10B981;"></span>
+                                    <span class="segment-name">長期安定株主</span>
+                                    <button class="segment-remove">×</button>
+                                </div>
+                                <div class="segment-item">
+                                    <span class="segment-color" style="background: #3B82F6;"></span>
+                                    <span class="segment-name">ESG重視投資家</span>
+                                    <button class="segment-remove">×</button>
+                                </div>
+                                <div class="segment-item">
+                                    <span class="segment-color" style="background: #8B5CF6;"></span>
+                                    <span class="segment-name">大口機関投資家</span>
+                                    <button class="segment-remove">×</button>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-secondary add-segment-btn">+ セグメント追加</button>
+                        </div>
+                        
+                        <div class="segment-section">
+                            <h5>カスタムタグ</h5>
+                            <div class="tag-cloud">
+                                <span class="custom-tag">議決権行使重視 <button>×</button></span>
+                                <span class="custom-tag">四半期フォロー必須 <button>×</button></span>
+                                <span class="custom-tag">CEO面談希望 <button>×</button></span>
+                                <span class="custom-tag">技術説明会参加 <button>×</button></span>
+                                <span class="custom-tag">配当重視 <button>×</button></span>
+                            </div>
+                            <div class="tag-input-group">
+                                <input type="text" class="tag-input" placeholder="新しいタグを入力...">
+                                <button class="btn btn-sm btn-primary">追加</button>
+                            </div>
+                        </div>
+                        
+                        <div class="segment-section">
+                            <h5>自動分類スコア</h5>
+                            <div class="auto-scores">
+                                <div class="score-item">
+                                    <span class="score-label">エンゲージメントスコア</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width: 85%;"></div>
+                                    </div>
+                                    <span class="score-value">85/100</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="score-label">影響力スコア</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width: 92%;"></div>
+                                    </div>
+                                    <span class="score-value">92/100</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="score-label">関係性スコア</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width: 78%;"></div>
+                                    </div>
+                                    <span class="score-value">78/100</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeInvestorProfile()">閉じる</button>
+            <button class="btn btn-primary" onclick="saveInvestorProfile()">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- セグメント管理モーダル -->
+<div class="modal" id="segmentManagementModal" style="display: none;">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h2>投資家セグメント管理</h2>
+            <button class="modal-close" onclick="closeSegmentManagement()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="segment-overview">
+                <div class="segment-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">アクティブセグメント</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1,248</div>
+                        <div class="stat-label">分類済み投資家</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">カスタムタグ</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="segment-grid">
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <div class="segment-icon" style="background: #10B981;">長期</div>
+                        <button class="segment-menu">⋮</button>
+                    </div>
+                    <h4>長期安定株主</h4>
+                    <p class="segment-description">3年以上継続保有、安定的な議決権行使</p>
+                    <div class="segment-info">
+                        <span>投資家数: 234</span>
+                        <span>保有比率: 45.2%</span>
+                    </div>
+                    <div class="segment-actions">
+                        <button class="btn btn-sm">編集</button>
+                        <button class="btn btn-sm">投資家一覧</button>
+                    </div>
+                </div>
+                
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <div class="segment-icon" style="background: #3B82F6;">ESG</div>
+                        <button class="segment-menu">⋮</button>
+                    </div>
+                    <h4>ESG重視投資家</h4>
+                    <p class="segment-description">ESG評価を投資判断の主要基準とする</p>
+                    <div class="segment-info">
+                        <span>投資家数: 156</span>
+                        <span>保有比率: 28.3%</span>
+                    </div>
+                    <div class="segment-actions">
+                        <button class="btn btn-sm">編集</button>
+                        <button class="btn btn-sm">投資家一覧</button>
+                    </div>
+                </div>
+                
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <div class="segment-icon" style="background: #8B5CF6;">大口</div>
+                        <button class="segment-menu">⋮</button>
+                    </div>
+                    <h4>大口機関投資家</h4>
+                    <p class="segment-description">保有比率1%以上の機関投資家</p>
+                    <div class="segment-info">
+                        <span>投資家数: 45</span>
+                        <span>保有比率: 65.7%</span>
+                    </div>
+                    <div class="segment-actions">
+                        <button class="btn btn-sm">編集</button>
+                        <button class="btn btn-sm">投資家一覧</button>
+                    </div>
+                </div>
+                
+                <div class="segment-card add-new">
+                    <button class="add-segment-card">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <path d="M24 10V38M10 24H38" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <span>新規セグメント作成</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="segment-rules">
+                <h3>自動分類ルール</h3>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <div class="rule-condition">保有期間 ≥ 3年 AND 売却履歴なし</div>
+                        <div class="rule-arrow">→</div>
+                        <div class="rule-segment">長期安定株主</div>
+                        <button class="rule-edit">編集</button>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-condition">ESG関連質問回数 ≥ 5回/年</div>
+                        <div class="rule-arrow">→</div>
+                        <div class="rule-segment">ESG重視投資家</div>
+                        <button class="rule-edit">編集</button>
+                    </div>
+                </div>
+                <button class="btn btn-secondary">+ ルール追加</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeSegmentManagement()">閉じる</button>
+            <button class="btn btn-primary">変更を保存</button>
         </div>
     </div>
 </div>
@@ -778,6 +1206,703 @@
     cursor: pointer;
 }
 
+/* 投資家プロファイルモーダル */
+.modal-lg {
+    max-width: 900px;
+    width: 90%;
+}
+
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: var(--space-lg);
+    gap: var(--space-md);
+}
+
+.profile-tab {
+    padding: var(--space-sm) var(--space-md);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.profile-tab:hover {
+    color: var(--gray-900);
+}
+
+.profile-tab.active {
+    color: var(--accent-teal);
+    border-bottom-color: var(--accent-teal);
+}
+
+.tab-pane {
+    animation: fadeIn var(--transition-normal);
+}
+
+.profile-header {
+    display: flex;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: var(--gray-300);
+    color: var(--gray-700);
+    border-radius: var(--border-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+}
+
+.profile-info h3 {
+    margin-bottom: var(--space-xs);
+}
+
+.profile-subtitle {
+    color: var(--gray-600);
+    margin-bottom: var(--space-sm);
+}
+
+.profile-badges {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.badge {
+    padding: 4px 12px;
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+.badge-warning {
+    background: rgba(251, 146, 60, 0.1);
+    color: #FB923C;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+}
+
+.profile-section {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+}
+
+.profile-section h4 {
+    margin-bottom: var(--space-md);
+    color: var(--gray-700);
+}
+
+.info-grid {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-item label {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+}
+
+.info-item span {
+    font-weight: var(--font-medium);
+    color: var(--gray-900);
+}
+
+/* 投資スタイルタブ */
+.style-overview {
+    margin-bottom: var(--space-xl);
+}
+
+.style-chart {
+    height: 300px;
+    background: var(--gray-50);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-lg);
+}
+
+.style-details {
+    display: grid;
+    gap: var(--space-lg);
+}
+
+.style-section {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+}
+
+.style-section h5 {
+    margin-bottom: var(--space-md);
+    color: var(--gray-700);
+}
+
+.style-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.style-tag {
+    padding: var(--space-xs) var(--space-md);
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+}
+
+.style-tag.active {
+    background: var(--accent-teal);
+    color: white;
+}
+
+.risk-meter {
+    margin-top: var(--space-md);
+}
+
+.risk-scale {
+    position: relative;
+    height: 8px;
+    background: linear-gradient(to right, #10B981, #F59E0B, #EF4444);
+    border-radius: var(--border-radius-full);
+    margin-bottom: var(--space-sm);
+}
+
+.risk-indicator {
+    position: absolute;
+    top: -6px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 3px solid var(--gray-700);
+    border-radius: var(--border-radius-full);
+    transform: translateX(-50%);
+}
+
+.risk-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+}
+
+.timeline-bar {
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+.timeline-fill {
+    height: 100%;
+    background: var(--accent-teal);
+    transition: width var(--transition-normal);
+}
+
+.timeline-text {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* 関心分野タブ */
+.interests-grid {
+    display: grid;
+    gap: var(--space-xl);
+}
+
+.interest-category {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+}
+
+.interest-items {
+    display: grid;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.interest-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm);
+    background: white;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.interest-icon {
+    font-size: var(--text-xl);
+}
+
+.interest-name {
+    flex: 1;
+    font-weight: var(--font-medium);
+}
+
+.interest-score {
+    font-weight: var(--font-bold);
+    font-size: var(--text-sm);
+}
+
+.interest-item.high .interest-score {
+    color: var(--success);
+}
+
+.interest-item.medium .interest-score {
+    color: #F59E0B;
+}
+
+.recent-topics {
+    display: grid;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+}
+
+.topic-item {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-sm);
+    background: white;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.topic-date {
+    color: var(--gray-500);
+    font-size: var(--text-sm);
+    min-width: 90px;
+}
+
+.topic-text {
+    color: var(--gray-700);
+    font-size: var(--text-sm);
+}
+
+/* 対話履歴タブ */
+.history-timeline {
+    position: relative;
+    padding-left: var(--space-xl);
+}
+
+.history-timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gray-200);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: var(--space-xl);
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -28px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    background: var(--accent-teal);
+    border: 3px solid white;
+    border-radius: var(--border-radius-full);
+    box-shadow: 0 0 0 1px var(--gray-200);
+}
+
+.timeline-content {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.timeline-header h5 {
+    margin: 0;
+    color: var(--gray-900);
+}
+
+.timeline-date {
+    color: var(--gray-500);
+    font-size: var(--text-sm);
+}
+
+.timeline-description {
+    color: var(--gray-700);
+    margin-bottom: var(--space-md);
+}
+
+.timeline-tags {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+/* セグメント・タグタブ */
+.segment-management {
+    display: grid;
+    gap: var(--space-xl);
+}
+
+.segment-section {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+}
+
+.segment-list {
+    display: grid;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.segment-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-sm);
+}
+
+.segment-color {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--border-radius-full);
+}
+
+.segment-name {
+    flex: 1;
+    font-weight: var(--font-medium);
+}
+
+.segment-remove {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.segment-remove:hover {
+    color: var(--error);
+}
+
+.add-segment-btn {
+    width: 100%;
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.custom-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border-radius: var(--border-radius-full);
+    font-size: var(--text-sm);
+}
+
+.custom-tag button {
+    background: none;
+    border: none;
+    color: var(--gray-500);
+    cursor: pointer;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-tag button:hover {
+    color: var(--error);
+}
+
+.tag-input-group {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.tag-input {
+    flex: 1;
+    padding: var(--space-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+}
+
+.auto-scores {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.score-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.score-label {
+    min-width: 150px;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+.score-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    background: var(--accent-teal);
+    transition: width var(--transition-normal);
+}
+
+.score-value {
+    min-width: 60px;
+    text-align: right;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--gray-700);
+}
+
+/* セグメント管理モーダル */
+.segment-overview {
+    margin-bottom: var(--space-xl);
+}
+
+.segment-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+}
+
+.stat-card {
+    text-align: center;
+    padding: var(--space-lg);
+    background: var(--gray-50);
+    border-radius: var(--border-radius-md);
+}
+
+.stat-number {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--accent-teal);
+    margin-bottom: var(--space-xs);
+}
+
+.stat-label {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+}
+
+.segment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.segment-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    transition: all var(--transition-normal);
+}
+
+.segment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-md);
+}
+
+.segment-icon {
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    color: white;
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+}
+
+.segment-menu {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+}
+
+.segment-card h4 {
+    margin-bottom: var(--space-sm);
+    color: var(--gray-900);
+}
+
+.segment-description {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+.segment-info {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--text-sm);
+    color: var(--gray-500);
+    margin-bottom: var(--space-md);
+}
+
+.segment-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.segment-card.add-new {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-50);
+    border: 2px dashed var(--gray-300);
+}
+
+.add-segment-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: none;
+    border: none;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.add-segment-card:hover {
+    color: var(--accent-teal);
+}
+
+.segment-rules {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-md);
+}
+
+.segment-rules h3 {
+    margin-bottom: var(--space-lg);
+}
+
+.rule-list {
+    display: grid;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.rule-item {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-sm);
+}
+
+.rule-condition {
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    font-family: var(--font-mono);
+}
+
+.rule-arrow {
+    color: var(--gray-400);
+}
+
+.rule-segment {
+    font-weight: var(--font-medium);
+    color: var(--accent-teal);
+}
+
+.rule-edit {
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--gray-100);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    cursor: pointer;
+}
+
+.rule-edit:hover {
+    background: var(--gray-200);
+    color: var(--gray-900);
+}
+
 /* レスポンシブ */
 @media (max-width: 1024px) {
     .content-header {
@@ -862,6 +1987,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('addInvestorBtn').addEventListener('click', () => {
         // モーダル表示または新規登録ページへ遷移
         showNotification('新規投資家登録画面を開きます', 'info');
+    });
+    
+    // セグメント管理
+    document.getElementById('segmentBtn').addEventListener('click', () => {
+        document.getElementById('segmentManagementModal').style.display = 'flex';
     });
     
     // エクスポート
@@ -1000,6 +2130,119 @@ function applyFilters() {
     // フィルター適用ロジック
     showNotification('フィルターを適用しました', 'success');
     closeAdvancedFilter();
+}
+
+// 投資家プロファイル関連関数
+function showInvestorProfile(investorId) {
+    // モックデータを読み込み
+    loadInvestorData(investorId);
+    document.getElementById('investorProfileModal').style.display = 'flex';
+    
+    // タブイベントの設定
+    const tabs = document.querySelectorAll('.profile-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            switchProfileTab(this.dataset.tab);
+        });
+    });
+    
+    // チャートの初期化
+    setTimeout(() => {
+        initializeInvestmentStyleChart();
+    }, 100);
+}
+
+function closeInvestorProfile() {
+    document.getElementById('investorProfileModal').style.display = 'none';
+}
+
+function saveInvestorProfile() {
+    showNotification('投資家プロファイルを保存しました', 'success');
+    closeInvestorProfile();
+}
+
+function switchProfileTab(tabName) {
+    // タブの切り替え
+    const tabs = document.querySelectorAll('.profile-tab');
+    const panes = document.querySelectorAll('.tab-pane');
+    
+    tabs.forEach(tab => {
+        if (tab.dataset.tab === tabName) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+    
+    panes.forEach(pane => {
+        if (pane.id === tabName + 'Tab') {
+            pane.style.display = 'block';
+        } else {
+            pane.style.display = 'none';
+        }
+    });
+}
+
+function loadInvestorData(investorId) {
+    // 実際の実装ではAPIからデータを取得
+    console.log('Loading investor data for ID:', investorId);
+}
+
+function initializeInvestmentStyleChart() {
+    const canvas = document.getElementById('investmentStyleChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    // 簡易的なレーダーチャートの描画
+    // 実際の実装ではChart.jsなどを使用
+    ctx.fillStyle = '#e5e7eb';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#1e293b';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('投資スタイル分析チャート', canvas.width / 2, canvas.height / 2);
+}
+
+// セグメント管理関連関数
+function closeSegmentManagement() {
+    document.getElementById('segmentManagementModal').style.display = 'none';
+}
+
+// セグメント・タグ管理
+const segmentRemoveButtons = document.querySelectorAll('.segment-remove');
+segmentRemoveButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (confirm('このセグメントから除外しますか？')) {
+            this.parentElement.remove();
+            showNotification('セグメントから除外しました', 'success');
+        }
+    });
+});
+
+const customTagButtons = document.querySelectorAll('.custom-tag button');
+customTagButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        this.parentElement.remove();
+        showNotification('タグを削除しました', 'success');
+    });
+});
+
+// タグ追加機能
+const tagInput = document.querySelector('.tag-input');
+if (tagInput) {
+    const addTagBtn = tagInput.nextElementSibling;
+    addTagBtn.addEventListener('click', () => {
+        const tagValue = tagInput.value.trim();
+        if (tagValue) {
+            const tagCloud = document.querySelector('.tag-cloud');
+            const newTag = document.createElement('span');
+            newTag.className = 'custom-tag';
+            newTag.innerHTML = `${tagValue} <button onclick="this.parentElement.remove();">×</button>`;
+            tagCloud.appendChild(newTag);
+            tagInput.value = '';
+            showNotification('タグを追加しました', 'success');
+        }
+    });
 }
 </script>
 {% endblock %}
