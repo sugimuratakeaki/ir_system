@@ -56,6 +56,14 @@ class SidebarManager {
             item.addEventListener('click', (e) => this.handleMenuClick(e));
         });
 
+        // サブメニューを持つアイテムの直接的なイベントハンドリング
+        this.sidebar.querySelectorAll('.nav-item.has-submenu').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleSubmenu(e);
+            });
+        });
+
         // サブメニューのトグル
         this.sidebar.querySelectorAll('.nav-submenu-toggle').forEach(toggle => {
             toggle.addEventListener('click', (e) => this.toggleSubmenu(e));
@@ -173,6 +181,11 @@ class SidebarManager {
         const navItem = e.currentTarget;
         const link = navItem.querySelector('a');
         
+        // サブメニューがある場合は処理をスキップ（別のイベントハンドラーで処理）
+        if (navItem.classList.contains('has-submenu')) {
+            return;
+        }
+        
         // サブメニューがある場合は展開/折りたたみ
         if (navItem.querySelector('.nav-submenu')) {
             e.preventDefault();
@@ -193,16 +206,17 @@ class SidebarManager {
         e.preventDefault();
         e.stopPropagation();
         
-        const navItem = e.currentTarget.closest('.nav-item');
-        const submenu = navItem.querySelector('.nav-submenu');
+        const navItem = e.currentTarget.closest('.nav-item') || e.currentTarget;
+        const submenu = navItem.querySelector('.nav-submenu') || navItem.nextElementSibling;
         
         if (!submenu) return;
         
-        const isOpen = navItem.classList.contains('open');
+        const isExpanded = navItem.classList.contains('expanded');
+        const isShow = submenu.classList.contains('show');
         
         // 他のサブメニューを閉じる（アコーディオン動作）
         if (!this.isCollapsed) {
-            this.sidebar.querySelectorAll('.nav-item.open').forEach(item => {
+            this.sidebar.querySelectorAll('.nav-item.expanded').forEach(item => {
                 if (item !== navItem) {
                     this.closeSubmenu(item);
                 }
@@ -210,7 +224,7 @@ class SidebarManager {
         }
         
         // 現在のサブメニューをトグル
-        if (isOpen) {
+        if (isExpanded || isShow) {
             this.closeSubmenu(navItem);
         } else {
             this.openSubmenu(navItem);
@@ -218,38 +232,19 @@ class SidebarManager {
     }
 
     openSubmenu(navItem) {
-        const submenu = navItem.querySelector('.nav-submenu');
+        const submenu = navItem.querySelector('.nav-submenu') || navItem.nextElementSibling;
         if (!submenu) return;
         
-        navItem.classList.add('open');
-        
-        // 高さを計算してアニメーション
-        const height = submenu.scrollHeight;
-        submenu.style.height = '0';
-        requestAnimationFrame(() => {
-            submenu.style.height = `${height}px`;
-        });
-        
-        // アニメーション完了後に高さをautoに
-        setTimeout(() => {
-            submenu.style.height = 'auto';
-        }, 300);
+        navItem.classList.add('expanded');
+        submenu.classList.add('show');
     }
 
     closeSubmenu(navItem) {
-        const submenu = navItem.querySelector('.nav-submenu');
+        const submenu = navItem.querySelector('.nav-submenu') || navItem.nextElementSibling;
         if (!submenu) return;
         
-        // 現在の高さを取得
-        const height = submenu.scrollHeight;
-        submenu.style.height = `${height}px`;
-        
-        // 高さを0にアニメーション
-        requestAnimationFrame(() => {
-            submenu.style.height = '0';
-        });
-        
-        navItem.classList.remove('open');
+        navItem.classList.remove('expanded');
+        submenu.classList.remove('show');
     }
 
     initSubmenus() {
@@ -470,6 +465,13 @@ class SidebarManager {
 function toggleSidebar() {
     if (window.sidebarManager) {
         window.sidebarManager.toggle();
+    }
+}
+
+// グローバル関数としてサブメニューのトグル機能を提供
+function toggleSubmenu(event, element) {
+    if (window.sidebarManager) {
+        window.sidebarManager.toggleSubmenu(event);
     }
 }
 
