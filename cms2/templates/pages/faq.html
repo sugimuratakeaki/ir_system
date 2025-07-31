@@ -410,7 +410,7 @@ if (!window.KAGAMI) {
 </div>
 
 <!-- FAQ編集モーダル -->
-<div class="modal-wrapper" id="faqEditModal" style="opacity: 0; visibility: hidden;">
+<div class="modal-wrapper" id="faqEditModal" style="display: none;">
     <div class="modal-backdrop" onclick="KAGAMI.faq.closeEditModal()"></div>
     <div class="modal modal-large">
         <button class="modal-close" onclick="KAGAMI.faq.closeEditModal()">×</button>
@@ -506,7 +506,7 @@ if (!window.KAGAMI) {
 </div>
 
 <!-- AI改善モーダル -->
-<div class="modal-wrapper" id="aiImproveModal" style="opacity: 0; visibility: hidden;">
+<div class="modal-wrapper" id="aiImproveModal" style="display: none;">
     <div class="modal-backdrop" onclick="KAGAMI.faq.closeAIImproveModal()"></div>
     <div class="modal modal-large">
         <button class="modal-close" onclick="KAGAMI.faq.closeAIImproveModal()">×</button>
@@ -570,7 +570,7 @@ if (!window.KAGAMI) {
 </div>
 
 <!-- 多言語設定モーダル -->
-<div class="modal-wrapper" id="languageSettingsModal" style="opacity: 0; visibility: hidden;">
+<div class="modal-wrapper" id="languageSettingsModal" style="display: none;">
     <div class="modal-backdrop" onclick="KAGAMI.faq.closeLanguageSettings()"></div>
     <div class="modal modal-large">
         <button class="modal-close" onclick="KAGAMI.faq.closeLanguageSettings()">×</button>
@@ -722,135 +722,15 @@ if (!window.KAGAMI) {
     </div>
 </div>
 
-<!-- FAQ編集モーダル -->
-<div class="modal" id="faqEditModal" style="display: none;">
-    <div class="modal-content modal-lg">
-        <div class="modal-header">
-            <h2>FAQ編集</h2>
-            <button class="modal-close" onclick="KAGAMI.faq.closeEditModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <form id="faqEditForm">
-                <input type="hidden" id="faqId" value="">
-                
-                <div class="form-group">
-                    <label class="form-label required">質問</label>
-                    <textarea class="form-input" id="faqQuestion" rows="3" placeholder="投資家からの質問を入力してください" required></textarea>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label required">カテゴリ</label>
-                        <select class="form-select" id="faqCategory" required>
-                            <option value="">カテゴリを選択</option>
-                            <option value="financial">財務・業績</option>
-                            <option value="strategy">経営戦略</option>
-                            <option value="esg">ESG・サステナビリティ</option>
-                            <option value="governance">ガバナンス</option>
-                            <option value="other">その他</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label required">ステータス</label>
-                        <select class="form-select" id="faqStatus" required>
-                            <option value="draft">下書き</option>
-                            <option value="review">レビュー中</option>
-                            <option value="published">公開中</option>
-                            <option value="archived">アーカイブ</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label required">回答</label>
-                    <div class="editor-toolbar">
-                        <button type="button" class="editor-btn" onclick="KAGAMI.faq.formatText('bold')" title="太字">
-                            <strong>B</strong>
-                        </button>
-                        <button type="button" class="editor-btn" onclick="KAGAMI.faq.formatText('italic')" title="斜体">
-                            <em>I</em>
-                        </button>
-                        <button type="button" class="editor-btn" onclick="KAGAMI.faq.formatText('underline')" title="下線">
-                            <u>U</u>
-                        </button>
-                        <span class="editor-separator"></span>
-                        <button type="button" class="editor-btn" onclick="KAGAMI.faq.formatText('bulletList')" title="箇条書き">
-                            • ―
-                        </button>
-                        <button type="button" class="editor-btn" onclick="KAGAMI.faq.formatText('numberList')" title="番号付きリスト">
-                            1. ―
-                        </button>
-                        <span class="editor-separator"></span>
-                        <button type="button" class="editor-btn" onclick="KAGAMI.faq.insertLink()" title="リンク">
-                            🔗
-                        </button>
-                        <button type="button" class="editor-btn" onclick="KAGAMI.faq.aiImprove()" title="AI改善">
-                            ✨ AI改善
-                        </button>
-                    </div>
-                    <textarea class="form-input editor-content" id="faqAnswer" rows="10" placeholder="回答を入力してください" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">参照元・ソース</label>
-                    <div class="source-list" id="sourceList">
-                        <div class="source-item">
-                            <input type="text" class="form-input" placeholder="例：2024年3月期決算説明会資料 P.12">
-                            <button type="button" class="btn btn-sm btn-outline" onclick="KAGAMI.faq.removeSource(this)">削除</button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="KAGAMI.faq.addSource()">+ ソース追加</button>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">タグ</label>
-                    <input type="text" class="form-input" id="faqTags" placeholder="タグをカンマ区切りで入力（例：決算, Q3, 業績予想）">
-                </div>
-                
-                <!-- AI情報 -->
-                <div class="ai-edit-info">
-                    <h4>AI分析情報</h4>
-                    <div class="ai-metrics">
-                        <div class="ai-metric">
-                            <span class="metric-label">類似FAQ検出</span>
-                            <span class="metric-value">3件の類似FAQが見つかりました</span>
-                            <button type="button" class="btn btn-xs btn-outline" onclick="KAGAMI.faq.showSimilar()">確認</button>
-                        </div>
-                        <div class="ai-metric">
-                            <span class="metric-label">回答品質スコア</span>
-                            <div class="quality-score">
-                                <div class="score-bar">
-                                    <div class="score-fill" style="width: 85%;"></div>
-                                </div>
-                                <span class="score-text">85/100</span>
-                            </div>
-                        </div>
-                        <div class="ai-metric">
-                            <span class="metric-label">推奨改善点</span>
-                            <ul class="improvement-list">
-                                <li>数値の根拠となる資料を追加することを推奨</li>
-                                <li>専門用語に説明を追加</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="KAGAMI.faq.closeEditModal()">キャンセル</button>
-            <button type="button" class="btn btn-primary" onclick="KAGAMI.faq.saveFAQ()">保存</button>
-            <button type="button" class="btn btn-primary" onclick="KAGAMI.faq.saveFAQAndPublish()">保存して公開</button>
-        </div>
-    </div>
-</div>
+
 
 <!-- 類似FAQ確認モーダル -->
-<div class="modal" id="similarFAQModal" style="display: none;">
-    <div class="modal-content">
+<div class="modal-wrapper" id="similarFAQModal" style="display: none;">
+    <div class="modal-backdrop" onclick="KAGAMI.faq.closeSimilarModal()"></div>
+    <div class="modal modal-medium">
+        <button class="modal-close" onclick="KAGAMI.faq.closeSimilarModal()">×</button>
         <div class="modal-header">
-            <h2>類似FAQ</h2>
-            <button class="modal-close" onclick="KAGAMI.faq.closeSimilarModal()">×</button>
+            <h2 class="modal-title">類似FAQ</h2>
         </div>
         <div class="modal-body">
             <p class="modal-description">以下の類似FAQが見つかりました。重複を避けるため、既存のFAQの更新も検討してください。</p>
@@ -2287,10 +2167,13 @@ textarea.form-input {
                 document.getElementById('faqTags').value = '';
                 
                 // モーダルを表示
-                modal.style.opacity = '1';
-                modal.style.visibility = 'visible';
-                modal.classList.add('modal-show');
-                modal.classList.remove('modal-hide');
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.style.visibility = 'visible';
+                    modal.classList.add('modal-show');
+                    modal.classList.remove('modal-hide');
+                }, 10);
             }
         },
         
@@ -2319,10 +2202,13 @@ textarea.form-input {
                 }
                 
                 // モーダルを表示
-                modal.style.opacity = '1';
-                modal.style.visibility = 'visible';
-                modal.classList.add('modal-show');
-                modal.classList.remove('modal-hide');
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.style.visibility = 'visible';
+                    modal.classList.add('modal-show');
+                    modal.classList.remove('modal-hide');
+                }, 10);
                 
                 if (window.KAGAMI && window.KAGAMI.notification) {
                     window.KAGAMI.notification.show('FAQ編集画面を開きました', 'info');
@@ -2373,9 +2259,10 @@ textarea.form-input {
             if (modal) {
                 modal.classList.add('modal-hide');
                 modal.classList.remove('modal-show');
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
                 setTimeout(() => {
-                    modal.style.opacity = '0';
-                    modal.style.visibility = 'hidden';
+                    modal.style.display = 'none';
                 }, 300);
             }
         },
@@ -2400,10 +2287,13 @@ textarea.form-input {
                 }
                 
                 // モーダルを表示
-                modal.style.opacity = '1';
-                modal.style.visibility = 'visible';
-                modal.classList.add('modal-show');
-                modal.classList.remove('modal-hide');
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.style.visibility = 'visible';
+                    modal.classList.add('modal-show');
+                    modal.classList.remove('modal-hide');
+                }, 10);
             }
         },
         
@@ -2507,9 +2397,10 @@ textarea.form-input {
             if (modal) {
                 modal.classList.add('modal-hide');
                 modal.classList.remove('modal-show');
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
                 setTimeout(() => {
-                    modal.style.opacity = '0';
-                    modal.style.visibility = 'hidden';
+                    modal.style.display = 'none';
                 }, 300);
             }
         },
@@ -2554,10 +2445,13 @@ textarea.form-input {
         showLanguageSettings: function() {
             const modal = document.getElementById('languageSettingsModal');
             if (modal) {
-                modal.style.opacity = '1';
-                modal.style.visibility = 'visible';
-                modal.classList.add('modal-show');
-                modal.classList.remove('modal-hide');
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.style.visibility = 'visible';
+                    modal.classList.add('modal-show');
+                    modal.classList.remove('modal-hide');
+                }, 10);
             }
         },
         
@@ -2567,9 +2461,10 @@ textarea.form-input {
             if (modal) {
                 modal.classList.add('modal-hide');
                 modal.classList.remove('modal-show');
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
                 setTimeout(() => {
-                    modal.style.opacity = '0';
-                    modal.style.visibility = 'hidden';
+                    modal.style.display = 'none';
                 }, 300);
             }
         },
@@ -2673,6 +2568,12 @@ textarea.form-input {
             const modal = document.getElementById('similarFAQModal');
             if (modal) {
                 modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.style.visibility = 'visible';
+                    modal.classList.add('modal-show');
+                    modal.classList.remove('modal-hide');
+                }, 10);
             }
         },
         
@@ -2680,7 +2581,13 @@ textarea.form-input {
         closeSimilarModal: function() {
             const modal = document.getElementById('similarFAQModal');
             if (modal) {
-                modal.style.display = 'none';
+                modal.classList.add('modal-hide');
+                modal.classList.remove('modal-show');
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
             }
         },
         
