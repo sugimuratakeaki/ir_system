@@ -251,7 +251,7 @@ if (!window.KAGAMI) {
                     <span class="translation-badge pending">🇰🇷 未翻訳</span>
                 </div>
                 <span class="faq-status published">公開中</span>
-                <button class="action-btn" onclick="KAGAMI.faq.toggleExpand(this)">
+                <button class="action-btn" onclick="event.stopPropagation()">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -341,11 +341,84 @@ if (!window.KAGAMI) {
                 </div>
             </div>
             <div class="faq-item-actions">
+                <div class="translation-status">
+                    <span class="translation-badge pending">🇺🇸 未翻訳</span>
+                    <span class="translation-badge pending">🇨🇳 未翻訳</span>
+                    <span class="translation-badge pending">🇰🇷 未翻訳</span>
+                </div>
                 <span class="faq-status review">レビュー中</span>
-                <button class="action-btn" onclick="KAGAMI.faq.toggleExpand(this)">
+                <button class="action-btn" onclick="event.stopPropagation()">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="faq-item-content" style="display: none;">
+            <div class="faq-answer">
+                <p>当社は持続可能な企業成長とESG投資への対応を重視し、以下の取り組みを推進しています：</p>
+                <ul>
+                    <li>環境：2030年までにCO2排出量を50%削減（2020年比）</li>
+                    <li>社会：ダイバーシティ推進により女性管理職比率30%達成</li>
+                    <li>ガバナンス：独立社外取締役比率を50%以上に維持</li>
+                </ul>
+            </div>
+            
+            <div class="faq-ai-info">
+                <div class="ai-confidence">
+                    <span class="confidence-label">AI信頼度:</span>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 88%"></div>
+                    </div>
+                    <span class="confidence-value">88%</span>
+                </div>
+                <div class="ai-sources">
+                    <span class="sources-label">参照元:</span>
+                    <a href="#" class="source-link">統合報告書2023 P.45-48</a>
+                    <a href="#" class="source-link">サステナビリティレポート P.12</a>
+                </div>
+            </div>
+            
+            <!-- 多言語管理 -->
+            <div class="language-management">
+                <div class="language-versions">
+                    <div class="language-version">
+                        <span class="lang-label">🇺🇸 English</span>
+                        <span class="lang-status pending">未翻訳</span>
+                        <button class="btn btn-xs btn-primary" onclick="KAGAMI.faq.autoTranslate(2, 'en')">自動翻訳</button>
+                    </div>
+                    <div class="language-version">
+                        <span class="lang-label">🇨🇳 中文</span>
+                        <span class="lang-status pending">未翻訳</span>
+                        <button class="btn btn-xs btn-primary" onclick="KAGAMI.faq.autoTranslate(2, 'zh')">自動翻訳</button>
+                    </div>
+                    <div class="language-version">
+                        <span class="lang-label">🇰🇷 한국어</span>
+                        <span class="lang-status pending">未翻訳</span>
+                        <button class="btn btn-xs btn-primary" onclick="KAGAMI.faq.autoTranslate(2, 'ko')">自動翻訳</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-actions">
+                <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.edit(2)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.3333 2C11.5084 1.82491 11.7163 1.68601 11.9451 1.59125C12.1739 1.49649 12.4191 1.44772 12.6667 1.44772C12.9142 1.44772 13.1594 1.49649 13.3882 1.59125C13.617 1.68601 13.8249 1.82491 14 2C14.1751 2.1751 14.314 2.38297 14.4088 2.61178C14.5035 2.84059 14.5523 3.08582 14.5523 3.33333C14.5523 3.58085 14.5035 3.82608 14.4088 4.05489C14.314 4.2837 14.1751 4.49157 14 4.66667L5 13.6667L2 14.6667L3 11.6667L11.3333 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    編集
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.improve(2)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 2L9.73205 6.47109L14.596 6.87336L11.0359 10.0289L12.1353 14.7933L8 12.3L3.86474 14.7933L4.96415 10.0289L1.40402 6.87336L6.26795 6.47109L8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    AI改善
+                </button>
+                <button class="btn btn-sm btn-outline danger" onclick="KAGAMI.faq.archive(2)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 5.33333H14M2 5.33333V13.3333C2 13.6869 2.14048 14.0261 2.39052 14.2761C2.64057 14.5262 2.97971 14.6667 3.33333 14.6667H12.6667C13.0203 14.6667 13.3594 14.5262 13.6095 14.2761C13.8595 14.0261 14 13.6869 14 13.3333V5.33333M4.66667 5.33333V3.33333C4.66667 2.97971 4.80714 2.64057 5.05719 2.39052C5.30724 2.14048 5.64638 2 6 2H10C10.3536 2 10.6928 2.14048 10.9428 2.39052C11.1929 2.64057 11.3333 2.97971 11.3333 3.33333V5.33333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    アーカイブ
                 </button>
             </div>
         </div>
@@ -363,11 +436,86 @@ if (!window.KAGAMI) {
                 </div>
             </div>
             <div class="faq-item-actions">
+                <div class="translation-status">
+                    <span class="translation-badge complete">🇺🇸 翻訳済</span>
+                    <span class="translation-badge complete">🇨🇳 翻訳済</span>
+                    <span class="translation-badge complete">🇰🇷 翻訳済</span>
+                </div>
                 <span class="faq-status published">公開中</span>
-                <button class="action-btn" onclick="KAGAMI.faq.toggleExpand(this)">
+                <button class="action-btn" onclick="event.stopPropagation()">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="faq-item-content" style="display: none;">
+            <div class="faq-answer">
+                <p>当社は安定的かつ継続的な株主還元を基本方針としており、以下の配当政策を実施しています：</p>
+                <ul>
+                    <li>配当性向：連結純利益の35%以上を目標</li>
+                    <li>年間配当：1株当たり120円（中間60円、期末60円）を予定</li>
+                    <li>自己株式取得：機動的に実施し、総還元性向50%を目指す</li>
+                </ul>
+                <p>また、業績が計画を上回った場合には、特別配当の実施も検討いたします。</p>
+            </div>
+            
+            <div class="faq-ai-info">
+                <div class="ai-confidence">
+                    <span class="confidence-label">AI信頼度:</span>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 95%"></div>
+                    </div>
+                    <span class="confidence-value">95%</span>
+                </div>
+                <div class="ai-sources">
+                    <span class="sources-label">参照元:</span>
+                    <a href="#" class="source-link">決算短信 P.8</a>
+                    <a href="#" class="source-link">有価証券報告書 P.34</a>
+                    <a href="#" class="source-link">株主還元方針</a>
+                </div>
+            </div>
+            
+            <!-- 多言語管理 -->
+            <div class="language-management">
+                <div class="language-versions">
+                    <div class="language-version">
+                        <span class="lang-label">🇺🇸 English</span>
+                        <span class="lang-status complete">翻訳済</span>
+                        <button class="btn btn-xs btn-outline" onclick="KAGAMI.faq.editTranslation(3, 'en')">編集</button>
+                    </div>
+                    <div class="language-version">
+                        <span class="lang-label">🇨🇳 中文</span>
+                        <span class="lang-status complete">翻訳済</span>
+                        <button class="btn btn-xs btn-outline" onclick="KAGAMI.faq.editTranslation(3, 'zh')">編集</button>
+                    </div>
+                    <div class="language-version">
+                        <span class="lang-label">🇰🇷 한국어</span>
+                        <span class="lang-status complete">翻訳済</span>
+                        <button class="btn btn-xs btn-outline" onclick="KAGAMI.faq.editTranslation(3, 'ko')">編集</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-actions">
+                <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.edit(3)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.3333 2C11.5084 1.82491 11.7163 1.68601 11.9451 1.59125C12.1739 1.49649 12.4191 1.44772 12.6667 1.44772C12.9142 1.44772 13.1594 1.49649 13.3882 1.59125C13.617 1.68601 13.8249 1.82491 14 2C14.1751 2.1751 14.314 2.38297 14.4088 2.61178C14.5035 2.84059 14.5523 3.08582 14.5523 3.33333C14.5523 3.58085 14.5035 3.82608 14.4088 4.05489C14.314 4.2837 14.1751 4.49157 14 4.66667L5 13.6667L2 14.6667L3 11.6667L11.3333 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    編集
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="KAGAMI.faq.improve(3)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 2L9.73205 6.47109L14.596 6.87336L11.0359 10.0289L12.1353 14.7933L8 12.3L3.86474 14.7933L4.96415 10.0289L1.40402 6.87336L6.26795 6.47109L8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    AI改善
+                </button>
+                <button class="btn btn-sm btn-outline danger" onclick="KAGAMI.faq.archive(3)">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 5.33333H14M2 5.33333V13.3333C2 13.6869 2.14048 14.0261 2.39052 14.2761C2.64057 14.5262 2.97971 14.6667 3.33333 14.6667H12.6667C13.0203 14.6667 13.3594 14.5262 13.6095 14.2761C13.8595 14.0261 14 13.6869 14 13.3333V5.33333M4.66667 5.33333V3.33333C4.66667 2.97971 4.80714 2.64057 5.05719 2.39052C5.30724 2.14048 5.64638 2 6 2H10C10.3536 2 10.6928 2.14048 10.9428 2.39052C11.1929 2.64057 11.3333 2.97971 11.3333 3.33333V5.33333" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    アーカイブ
                 </button>
             </div>
         </div>
@@ -986,6 +1134,7 @@ if (!window.KAGAMI) {
 }
 
 .faq-item-header {
+    cursor: pointer;
     padding: var(--space-lg);
     display: flex;
     justify-content: space-between;
@@ -2120,11 +2269,12 @@ textarea.form-input {
         currentEditId: null,
         
         // FAQの展開/折りたたみ
-        toggleExpand: function(button) {
+        toggleExpand: function(element) {
             console.log('toggleExpand called');
-            const item = button.closest('.faq-item');
+            // elementがheaderの場合は親のitemを取得、buttonの場合はそのまま親のitemを取得
+            const item = element.closest('.faq-item');
             const content = item.querySelector('.faq-item-content');
-            const arrow = button.querySelector('svg');
+            const arrow = item.querySelector('.action-btn svg');
             
             if (!content) {
                 console.error('Content not found');
@@ -2631,10 +2781,10 @@ textarea.form-input {
         
         // イベントリスナーの設定
         function setupEventListeners() {
-            // アコーディオンボタンのイベントリスナー
-            const toggleButtons = document.querySelectorAll('.faq-toggle-btn');
-            toggleButtons.forEach(button => {
-                button.addEventListener('click', function() {
+            // FAQ-item-header全体をクリック可能にする
+            const faqHeaders = document.querySelectorAll('.faq-item-header');
+            faqHeaders.forEach(header => {
+                header.addEventListener('click', function() {
                     if (window.KAGAMI && window.KAGAMI.faq) {
                         window.KAGAMI.faq.toggleExpand(this);
                     } else {

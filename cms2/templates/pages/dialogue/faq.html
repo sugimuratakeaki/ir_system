@@ -99,8 +99,8 @@
                 </div>
             </div>
             <div class="divide-y max-h-[600px] overflow-y-auto">
-                <!-- FAQ項目 -->
-                <div class="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 border-blue-500 bg-blue-50">
+                <!-- FAQ項目 1 -->
+                <div class="faq-item px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 border-blue-500 bg-blue-50" data-faq-id="faq-1">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 mr-4">
                             <div class="flex items-center space-x-2 mb-2">
@@ -109,13 +109,20 @@
                                 <span class="text-gray-400" title="発言根拠あり">📎</span>
                             </div>
                             <h3 class="font-medium text-gray-900 mb-1">Q: 中期経営計画の進捗について教えてください</h3>
-                            <p class="text-sm text-gray-600 line-clamp-2">A: 2024-2026年の中期経営計画は順調に進捗しています。初年度の目標である売上高15%成長については...</p>
-                            <div class="mt-2 flex items-center">
-                                <span class="text-xs text-gray-500 mr-2">信頼度:</span>
-                                <div class="flex-1 bg-gray-200 rounded-full h-2 max-w-xs">
-                                    <div class="bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 h-2 rounded-full" style="width: 85%"></div>
+                            <p class="text-sm text-gray-600 line-clamp-2 faq-summary">A: 2024-2026年の中期経営計画は順調に進捗しています。初年度の目標である売上高15%成長については...</p>
+                            
+                            <!-- 詳細情報（最初のFAQは初期表示） -->
+                            <div class="faq-details mt-3">
+                                <div class="mt-2 flex items-center">
+                                    <span class="text-xs text-gray-500 mr-2">信頼度:</span>
+                                    <div class="flex-1 bg-gray-200 rounded-full h-2 max-w-xs">
+                                        <div class="bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-600">85%</span>
                                 </div>
-                                <span class="ml-2 text-xs text-gray-600">85%</span>
+                                <div class="mt-2 text-xs text-gray-500">
+                                    <p><strong>根拠:</strong> CFO発言 (14:23) - "中期経営計画については、初年度である今期は計画を上回るペースで進捗しています。"</p>
+                                </div>
                             </div>
                         </div>
                         <div class="flex flex-col space-y-1">
@@ -133,8 +140,8 @@
                     </div>
                 </div>
 
-                <!-- 他のFAQ項目 -->
-                <div class="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors">
+                <!-- FAQ項目 2 -->
+                <div class="faq-item px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 border-transparent" data-faq-id="faq-2">
                     <div class="flex items-start justify-between">
                         <div class="flex-1 mr-4">
                             <div class="flex items-center space-x-2 mb-2">
@@ -142,7 +149,61 @@
                                 <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded">🤖 AI生成</span>
                             </div>
                             <h3 class="font-medium text-gray-900 mb-1">Q: ESGへの取り組みについて教えてください</h3>
-                            <p class="text-sm text-gray-600 line-clamp-2">A: 当社はESG経営を重要な経営課題と位置づけ、環境負荷低減、社会貢献、ガバナンス強化に...</p>
+                            <p class="text-sm text-gray-600 line-clamp-2 faq-summary">A: 当社はESG経営を重要な経営課題と位置づけ、環境負荷低減、社会貢献、ガバナンス強化に...</p>
+                            
+                            <!-- 詳細情報（デフォルトは非表示） -->
+                            <div class="faq-details mt-3 hidden">
+                                <div class="mt-2 flex items-center">
+                                    <span class="text-xs text-gray-500 mr-2">信頼度:</span>
+                                    <div class="flex-1 bg-gray-200 rounded-full h-2 max-w-xs">
+                                        <div class="bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 h-2 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-600">92%</span>
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500">
+                                    <p><strong>根拠:</strong> CEO発言 (15:10) - "ESGは経営の中核として位置づけており、具体的なアクションプランを実行中です。"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col space-y-1">
+                            <button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                            <button class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0716.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ項目 3 -->
+                <div class="faq-item px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 border-transparent" data-faq-id="faq-3">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 mr-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded">レビュー中</span>
+                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 rounded">✍️ 手動作成</span>
+                            </div>
+                            <h3 class="font-medium text-gray-900 mb-1">Q: 株主還元方針について教えてください</h3>
+                            <p class="text-sm text-gray-600 line-clamp-2 faq-summary">A: 株主還元については、安定的な配当の継続を基本方針とし、配当性向30%を目標として...</p>
+                            
+                            <!-- 詳細情報（デフォルトは非表示） -->
+                            <div class="faq-details mt-3 hidden">
+                                <div class="mt-2 flex items-center">
+                                    <span class="text-xs text-gray-500 mr-2">信頼度:</span>
+                                    <div class="flex-1 bg-gray-200 rounded-full h-2 max-w-xs">
+                                        <div class="bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 h-2 rounded-full" style="width: 88%"></div>
+                                    </div>
+                                    <span class="ml-2 text-xs text-gray-600">88%</span>
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500">
+                                    <p><strong>根拠:</strong> CFO発言 (14:45) - "配当性向30%を基本とし、余剰資金は自己株式取得での還元も視野に入れています。"</p>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex flex-col space-y-1">
                             <button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors">
@@ -297,8 +358,170 @@
 <script>
 // FAQ編集機能のJavaScript実装
 document.addEventListener('DOMContentLoaded', function() {
-    // FAQ選択、編集、削除などの機能実装
+    console.log('FAQ初期化開始...');
+    
+    const faqItems = document.querySelectorAll('.faq-item');
+    const editButtons = document.querySelectorAll('.faq-item button');
+    
+    console.log('FAQ項目数:', faqItems.length);
+    console.log('ボタン数:', editButtons.length);
+    
+    // 各FAQ項目の詳細情報確認
+    faqItems.forEach((item, index) => {
+        const faqId = item.getAttribute('data-faq-id');
+        const faqDetails = item.querySelector('.faq-details');
+        console.log(`FAQ${index + 1}:`, {
+            id: faqId,
+            hasDetails: !!faqDetails,
+            detailsHidden: faqDetails ? faqDetails.classList.contains('hidden') : 'N/A'
+        });
+    });
+    
+    // FAQ展開機能の実装（元の概念に基づく）
+    faqItems.forEach((item, index) => {
+        console.log(`FAQ${index + 1}にイベントリスナー追加中...`);
+        
+        item.addEventListener('click', function(e) {
+            console.log('=== FAQ クリックイベント発火 ===');
+            console.log('クリックされたFAQ:', this.getAttribute('data-faq-id'));
+            console.log('クリックされた要素:', e.target);
+            console.log('event.target.tagName:', e.target.tagName);
+            
+            // ボタンまたはその子要素（SVG、path等）がクリックされた場合は処理しない
+            const clickedButton = e.target.closest('button');
+            if (clickedButton) {
+                console.log('ボタンクリックのため処理を中断');
+                return;
+            }
+            
+            const faqDetails = this.querySelector('.faq-details');
+            console.log('faq-details要素:', faqDetails);
+            
+            if (!faqDetails) {
+                console.error('faq-details要素が見つかりません!');
+                return;
+            }
+            
+            const isCurrentlyExpanded = !faqDetails.classList.contains('hidden');
+            console.log('現在の展開状態:', isCurrentlyExpanded ? '展開中' : '折りたたみ中');
+            console.log('faq-detailsのクラス:', faqDetails.className);
+            
+            // 他のFAQの展開を解除（一度に一つだけ展開）
+            console.log('他のFAQを折りたたみ中...');
+            faqItems.forEach(otherItem => {
+                if (otherItem !== this) {
+                    const otherDetails = otherItem.querySelector('.faq-details');
+                    if (otherDetails) {
+                        otherDetails.classList.add('hidden');
+                        otherItem.classList.remove('border-blue-500', 'bg-blue-50');
+                        otherItem.classList.add('border-transparent');
+                    }
+                }
+            });
+            
+            // 現在のFAQの展開状態切り替え
+            if (isCurrentlyExpanded) {
+                // 既に展開されている場合は折りたたむ
+                console.log('FAQ折りたたみ実行中...');
+                faqDetails.classList.add('hidden');
+                this.classList.remove('border-blue-500', 'bg-blue-50');
+                this.classList.add('border-transparent');
+                console.log('FAQ折りたたみ完了:', this.getAttribute('data-faq-id'));
+            } else {
+                // 展開する（expanded状態にする）
+                console.log('FAQ展開実行中...');
+                faqDetails.classList.remove('hidden');
+                this.classList.remove('border-transparent');
+                this.classList.add('border-blue-500', 'bg-blue-50');
+                console.log('FAQ展開完了:', this.getAttribute('data-faq-id'));
+                console.log('展開後のfaq-detailsクラス:', faqDetails.className);
+            }
+            
+            console.log('=== FAQ クリックイベント処理完了 ===');
+        });
+        
+        console.log(`FAQ${index + 1}のイベントリスナー追加完了`);
+    });
+    
+    // 編集・削除ボタンの個別処理
+    editButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // FAQ展開処理を阻止
+            e.stopPropagation();
+            
+            const faqItem = this.closest('.faq-item');
+            const faqId = faqItem.getAttribute('data-faq-id');
+            const svgPath = this.querySelector('svg path');
+            
+            if (!svgPath) {
+                console.warn('SVG path not found in button');
+                return;
+            }
+            
+            const pathData = svgPath.getAttribute('d');
+            
+            // パスデータに基づいて編集か削除かを判定
+            if (pathData && pathData.includes('M11 5H6a2 2')) {
+                // 編集ボタン（ペンアイコン）
+                handleEditFAQ(faqItem, faqId);
+            } else if (pathData && pathData.includes('M19 7l-.867')) {
+                // 削除ボタン（ゴミ箱アイコン）
+                handleDeleteFAQ(faqItem, faqId);
+            } else {
+                console.warn('Unknown button type:', pathData);
+            }
+        });
+    });
+    
+    // 編集処理
+    function handleEditFAQ(faqItem, faqId) {
+        console.log('FAQ編集開始:', faqId);
+        
+        const questionText = faqItem.querySelector('h3').textContent.replace('Q: ', '');
+        const answerText = faqItem.querySelector('.faq-summary').textContent.replace('A: ', '');
+        
+        // 編集フォームに値を設定（実装例）
+        const questionTextarea = document.querySelector('textarea[placeholder*="質問"]');
+        const answerTextarea = document.querySelector('textarea[placeholder*="回答"]');
+        
+        if (questionTextarea) questionTextarea.value = questionText;
+        if (answerTextarea) answerTextarea.value = answerText;
+        
+        console.log('編集データ読み込み完了');
+    }
+    
+    // 削除処理
+    function handleDeleteFAQ(faqItem, faqId) {
+        const questionText = faqItem.querySelector('h3').textContent;
+        
+        if (confirm(`${questionText}\n\nこのFAQを削除しますか？`)) {
+            console.log('FAQ削除実行:', faqId);
+            
+            // アニメーションで削除
+            faqItem.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            faqItem.style.opacity = '0';
+            faqItem.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                // TODO: 実際のサーバーサイド削除処理
+                // faqItem.remove();
+                console.log('FAQ削除完了:', faqId);
+            }, 300);
+        }
+    }
+    
     console.log('FAQ編集画面初期化完了');
+    console.log('- FAQ項目数:', faqItems.length);
+    console.log('- ボタン数:', editButtons.length);
+    console.log('- 最初のFAQは初期展開状態');
+    console.log('- 全項目で展開/折りたたみ機能が有効になりました');
+    
+    // 初期状態の確認
+    faqItems.forEach((item, index) => {
+        const faqDetails = item.querySelector('.faq-details');
+        const isExpanded = faqDetails && !faqDetails.classList.contains('hidden');
+        console.log(`FAQ${index + 1} 初期状態:`, isExpanded ? '展開' : '折りたたみ');
+    });
 });
 </script>
 {% endblock %}
