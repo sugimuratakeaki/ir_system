@@ -5,7 +5,7 @@
 
 class NotificationManager {
     constructor() {
-        this.container = document.getElementById('notificationContainer') || this.createContainer();
+        this.container = document.getElementById('notification-container') || this.createContainer();
         this.notifications = new Map();
         this.history = [];
         this.maxNotifications = 5;
@@ -23,7 +23,7 @@ class NotificationManager {
 
     createContainer() {
         const container = document.createElement('div');
-        container.id = 'notificationContainer';
+        container.id = 'notification-container';
         container.className = 'notification-container';
         document.body.appendChild(container);
         return container;
@@ -224,26 +224,55 @@ class NotificationManager {
     }
 }
 
-// シングルトンインスタンスを作成
-const notificationManager = new NotificationManager();
-
-// グローバル関数として公開
-window.showNotification = (type, title, message, options) => {
-    return notificationManager.show(type, title, message, options);
-};
-
-window.showSuccess = (title, message, options) => {
-    return notificationManager.success(title, message, options);
-};
-
-window.showError = (title, message, options) => {
-    return notificationManager.error(title, message, options);
-};
-
-window.showWarning = (title, message, options) => {
-    return notificationManager.warning(title, message, options);
-};
-
-window.showInfo = (title, message, options) => {
-    return notificationManager.info(title, message, options);
-};
+// KAGAMIオブジェクトに統合
+document.addEventListener('DOMContentLoaded', () => {
+    // 通知マネージャーのインスタンスを作成
+    const notificationManager = new NotificationManager();
+    
+    // KAGAMIオブジェクトに追加
+    if (window.KAGAMI) {
+        KAGAMI.notification = {
+            show: (message, type = 'info', options = {}) => {
+                return notificationManager.show(type, '', message, options);
+            },
+            success: (message, options = {}) => {
+                return notificationManager.success('成功', message, options);
+            },
+            info: (message, options = {}) => {
+                return notificationManager.info('情報', message, options);
+            },
+            warning: (message, options = {}) => {
+                return notificationManager.warning('警告', message, options);
+            },
+            error: (message, options = {}) => {
+                return notificationManager.error('エラー', message, options);
+            },
+            remove: (id) => notificationManager.remove(id),
+            removeAll: () => notificationManager.removeAll()
+        };
+    }
+    
+    // 下位互換性のためのグローバル関数も維持
+    window.showNotification = (type, title, message, options) => {
+        return notificationManager.show(type, title, message, options);
+    };
+    
+    window.showSuccess = (title, message, options) => {
+        return notificationManager.success(title, message, options);
+    };
+    
+    window.showError = (title, message, options) => {
+        return notificationManager.error(title, message, options);
+    };
+    
+    window.showWarning = (title, message, options) => {
+        return notificationManager.warning(title, message, options);
+    };
+    
+    window.showInfo = (title, message, options) => {
+        return notificationManager.info(title, message, options);
+    };
+    
+    // グローバルアクセス用
+    window.NotificationManager = notificationManager;
+});

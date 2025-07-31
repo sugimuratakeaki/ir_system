@@ -328,7 +328,32 @@ function throttle(func, limit) {
     };
 }
 
+// グローバルKAGAMIオブジェクトの初期化
+window.KAGAMI = {
+    // 基本情報
+    version: '2.0.0',
+    debug: false,
+    
+    // 各機能モジュール
+    notification: {},
+    faq: {},
+    modal: {},
+    table: {},
+    form: {},
+    
+    // ユーティリティ関数
+    utils: {
+        debounce: debounce,
+        throttle: throttle
+    }
+};
+
 // アプリケーションの初期化
 document.addEventListener('DOMContentLoaded', () => {
     window.KagamiApp = new KagamiApp();
+    
+    // KAGAMIオブジェクトにアプリインスタンスを追加
+    KAGAMI.app = window.KagamiApp;
+    
+    console.log('KAGAMI object initialized:', KAGAMI);
 });
