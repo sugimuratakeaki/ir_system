@@ -40,7 +40,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-semibold);
   line-height: var(--leading-tight);
-  color: var(--gray-900);
+  color: inherit;
 }
 
 h1 { font-size: var(--text-4xl); margin-bottom: var(--space-lg); }
@@ -73,10 +73,28 @@ a:focus {
 p {
   margin-bottom: var(--space-md);
   line-height: var(--leading-relaxed);
+  color: inherit;
 }
 
 p:last-child {
   margin-bottom: 0;
+}
+
+/* ===== コンテキスト別カラースキーム ===== */
+/* 通常のコンテンツエリア（白背景）での文字色 */
+.content-area,
+.card,
+.panel,
+.modal-content,
+main {
+  color: var(--gray-900);
+}
+
+/* 暗い背景エリアでの文字色は親から自然に継承 */
+.dark-background,
+.plan-header,
+.smart-suggestion {
+  color: white;
 }
 
 /* ===== リスト ===== */

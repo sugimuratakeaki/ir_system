@@ -17,21 +17,22 @@
     }
     
     .plan-header {
-        background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+        background: linear-gradient(135deg, var(--kagami-blue) 0%, var(--info) 100%);
         color: white;
-        padding: 24px;
+        padding: var(--space-xl);
+        border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
     }
     
     .plan-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 8px;
+        font-size: var(--text-2xl);
+        font-weight: var(--font-bold);
+        margin-bottom: var(--space-sm);
     }
     
     .plan-period {
-        font-size: 1rem;
+        font-size: var(--text-lg);
         opacity: 0.9;
-        margin-bottom: 16px;
+        margin-bottom: var(--space-md);
     }
     
     .plan-source {
@@ -1068,8 +1069,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
             <div class="flex-1">
-                <h3 class="font-semibold mb-1">AI分析による重要な発見</h3>
-                <p class="text-sm opacity-90" id="suggestionText">DX投資に関する質問が先週比で40%増加しています。投資家向けに詳細な説明資料の準備を推奨します。</p>
+                <h3 class="font-semibold mb-1 text-white">AI分析による重要な発見</h3>
+                <p class="text-sm opacity-90 text-white" id="suggestionText">DX投資に関する質問が先週比で40%増加しています。投資家向けに詳細な説明資料の準備を推奨します。</p>
             </div>
             <button onclick="dismissSuggestion()" class="text-white/80 hover:text-white">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1133,8 +1134,8 @@
     <!-- 中期経営計画表示エリア -->
     <div class="midterm-plan-container">
     <div class="plan-header">
-        <h1 class="plan-title">中期経営計画 2024-2026</h1>
-        <p class="plan-period">「DXとESGを軸とした持続的成長への挑戦」</p>
+        <h1 class="plan-title text-white">中期経営計画 2024-2026</h1>
+        <p class="plan-period text-white">「DXとESGを軸とした持続的成長への挑戦」</p>
         <div class="plan-source">
             <span class="source-badge">📄 2024年5月決算短信より</span>
             <span class="source-badge">📢 2024年5月15日適時開示より</span>
