@@ -719,6 +719,32 @@ async def strategy(request: Request):
         "base_url": "/cms2"
     })
 
+@app.get("/strategy-planning", response_class=HTMLResponse)
+async def strategy_planning(request: Request):
+    """戦略計画管理ページ"""
+    return templates.TemplateResponse("pages/strategy-planning.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/strategy-planning/kpis", response_class=HTMLResponse)
+async def strategy_planning_kpis(request: Request):
+    """戦略KPI詳細ページ"""
+    # TODO: 実装予定
+    return templates.TemplateResponse("pages/strategy-planning.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
+@app.get("/strategy-planning/feedbacks", response_class=HTMLResponse)
+async def strategy_planning_feedbacks(request: Request):
+    """投資家フィードバック一覧ページ"""
+    # TODO: 実装予定
+    return templates.TemplateResponse("pages/strategy-planning.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
 @app.get("/upload", response_class=HTMLResponse)
 async def upload(request: Request):
     """音声アップロードページ"""
