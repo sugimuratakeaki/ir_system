@@ -1027,6 +1027,167 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- AI戦略分析アラート -->
+    <div id="ai-analysis-alert" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 rounded-lg" style="display: none;">
+        <div class="flex items-start gap-3">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-sm font-semibold text-blue-900">新しい開示資料を検出しました</h3>
+                <p class="text-sm text-blue-700 mt-1">2024年1月22日付の決算短信から戦略アップデートを抽出できます。</p>
+                <button onclick="startAIAnalysis()" class="mt-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
+                    AI分析を開始
+                </button>
+            </div>
+            <button onclick="dismissAlert()" class="text-blue-400 hover:text-blue-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- データソース選択パネル -->
+    <div id="data-source-panel" class="mb-6 p-6 bg-white rounded-lg shadow-sm border border-gray-200" style="display: none;">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">戦略分析のデータソース選択</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 決算短信 -->
+            <div class="data-source-card">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-800">決算短信</h4>
+                    <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">3件</span>
+                </div>
+                <div class="space-y-2">
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" class="mr-3" checked>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium">2024年3月期 第3四半期決算短信</div>
+                            <div class="text-xs text-gray-500">2024/01/22 アップロード</div>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" class="mr-3">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium">2024年3月期 第2四半期決算短信</div>
+                            <div class="text-xs text-gray-500">2023/10/25 アップロード</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- 適時開示 -->
+            <div class="data-source-card">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-medium text-gray-800">適時開示</h4>
+                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">5件</span>
+                </div>
+                <div class="space-y-2">
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" class="mr-3" checked>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium">中期経営計画の進捗について</div>
+                            <div class="text-xs text-gray-500">2024/01/15 開示</div>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" class="mr-3">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium">海外事業展開に関するお知らせ</div>
+                            <div class="text-xs text-gray-500">2024/01/10 開示</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-end gap-3">
+            <button onclick="closeDataSourcePanel()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                キャンセル
+            </button>
+            <button onclick="proceedWithAnalysis()" class="px-4 py-2 bg-kagami-blue text-white rounded-md hover:bg-kagami-blue-dark flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                選択したデータでAI分析を実行
+            </button>
+        </div>
+    </div>
+
+    <!-- AI分析プロセス表示 -->
+    <div id="ai-analysis-process" class="mb-6" style="display: none;">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">AI戦略分析実行中</h3>
+            <div class="space-y-4">
+                <div class="analysis-step" id="step-1">
+                    <div class="flex items-center gap-3">
+                        <div class="step-indicator processing">
+                            <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium">データ読み込み・前処理</div>
+                            <div class="text-sm text-gray-500">決算短信と適時開示からテキストを抽出中...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-step" id="step-2">
+                    <div class="flex items-center gap-3">
+                        <div class="step-indicator pending">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium">定量目標の抽出</div>
+                            <div class="text-sm text-gray-500">数値目標とKPIを識別中...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-step" id="step-3">
+                    <div class="flex items-center gap-3">
+                        <div class="step-indicator pending">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium">重点施策の特定</div>
+                            <div class="text-sm text-gray-500">戦略的取り組みを分類中...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-step" id="step-4">
+                    <div class="flex items-center gap-3">
+                        <div class="step-indicator pending">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium">前回との差分分析</div>
+                            <div class="text-sm text-gray-500">変更点と理由を推測中...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                <div class="flex items-center gap-2 text-sm text-blue-700">
+                    <svg class="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    <span>処理時間の目安：1-2分</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- AIアシストボタン -->
     <div class="ai-assist-button" onclick="toggleAIAssist()">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1060,6 +1221,166 @@
             </svg>
             <span class="text-sm font-medium">計画最適化</span>
         </div>
+    </div>
+    
+    <!-- AI分析結果パネル -->
+    <div id="ai-analysis-results" class="mb-6" style="display: none;">
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+            <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-kagami-blue to-accent-teal text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold">AI戦略分析完了</h3>
+                        <p class="text-sm opacity-90 mt-1">2024年1月22日 14:35 実行</p>
+                    </div>
+                    <button onclick="saveAnalysisResults()" class="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-md transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        結果を保存
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <!-- サマリー -->
+                <div class="mb-6">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 00-2 2v6a2 2 0 002 2h2a1 1 0 100-2H6V7h5a1 1 0 011 1v5h2V8a3 3 0 00-3-3H4z" clip-rule="evenodd" />
+                        </svg>
+                        エグゼクティブサマリー
+                    </h4>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-sm text-blue-900 leading-relaxed">
+                            最新の決算短信から<strong>3つの重要な戦略アップデート</strong>を検出しました。
+                            海外売上比率目標が35%から<strong class="text-red-600">38%に上方修正</strong>され、
+                            特にアジア市場での成長加速が明確化されています。
+                            DX投資も当初計画から<strong>20億円増額</strong>となり、AIとデータ分析基盤の強化が追加されました。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 定量目標の変更 -->
+                <div class="mb-6">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        定量目標の更新
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-600">海外売上比率</span>
+                                <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">上方修正</span>
+                            </div>
+                            <div class="flex items-end gap-2">
+                                <span class="text-2xl font-bold text-gray-900">38%</span>
+                                <span class="text-sm text-gray-500 line-through">35%</span>
+                                <span class="text-sm text-green-600">+3pt</span>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-2">理由：アジア市場の想定以上の成長</p>
+                        </div>
+                        
+                        <div class="bg-white border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-600">DX投資額</span>
+                                <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">増額</span>
+                            </div>
+                            <div class="flex items-end gap-2">
+                                <span class="text-2xl font-bold text-gray-900">320億円</span>
+                                <span class="text-sm text-gray-500 line-through">300億円</span>
+                                <span class="text-sm text-green-600">+20億円</span>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-2">理由：AI・データ分析基盤の追加投資</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 新規施策 -->
+                <div class="mb-6">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                        </svg>
+                        新規追加施策
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <h5 class="font-medium text-purple-900 mb-1">AIを活用した需要予測システム導入</h5>
+                            <p class="text-sm text-purple-700">2024年Q2より段階的に導入。在庫最適化により営業利益率0.5pt改善を見込む</p>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <h5 class="font-medium text-purple-900 mb-1">東南アジア統括会社設立</h5>
+                            <p class="text-sm text-purple-700">シンガポールに地域統括機能を集約。2024年7月設立予定</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 推奨アクション -->
+                <div class="bg-gradient-to-r from-teal-50 to-blue-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        AIからの推奨アクション
+                    </h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start gap-2">
+                            <span class="text-teal-600">•</span>
+                            <span>海外売上比率の上方修正に関するFAQを早急に作成し、為替前提や地域別内訳を明確化</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-teal-600">•</span>
+                            <span>DX投資のROI測定指標を具体化し、四半期ごとの進捗報告体制を構築</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-teal-600">•</span>
+                            <span>東南アジア統括会社に関する投資家向け説明資料を準備（ガバナンス体制、投資規模等）</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- アクションボタン -->
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button onclick="applyAnalysisResults()" class="px-4 py-2 bg-kagami-blue text-white rounded-md hover:bg-kagami-blue-dark flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        分析結果を適用
+                    </button>
+                    <button onclick="generateFAQFromAnalysis()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        FAQ生成
+                    </button>
+                    <button onclick="createInvestorPresentation()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        説明資料作成
+                    </button>
+                    <button onclick="scheduleInvestorCalls()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        投資家説明会設定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 戦略マップビューへのリンク -->
+    <div class="strategy-map-link" style="position: fixed; top: 80px; right: 20px; z-index: 100;">
+        <a href="/strategy-map" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+            戦略マップビュー
+        </a>
     </div>
     
     <!-- スマート提案 -->
@@ -1671,6 +1992,393 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+    // AI戦略分析関連の関数
+    
+    // ページ読み込み時の初期処理
+    document.addEventListener('DOMContentLoaded', function() {
+        // content-centerからのデータ更新を確認
+        checkForNewData();
+    });
+    
+    // 新しいデータの確認
+    function checkForNewData() {
+        // ここではcontent-centerとの連携をシミュレート
+        const hasNewData = localStorage.getItem('has_new_disclosure_data');
+        if (hasNewData === 'true' || true) { // デモ用に常にtrue
+            document.getElementById('ai-analysis-alert').style.display = 'block';
+        }
+    }
+    
+    // アラートを閉じる
+    function dismissAlert() {
+        document.getElementById('ai-analysis-alert').style.display = 'none';
+        localStorage.removeItem('has_new_disclosure_data');
+    }
+    
+    // AI分析を開始
+    function startAIAnalysis() {
+        // アラートを閉じる
+        document.getElementById('ai-analysis-alert').style.display = 'none';
+        
+        // データソース選択パネルを表示
+        document.getElementById('data-source-panel').style.display = 'block';
+        
+        // スクロール
+        document.getElementById('data-source-panel').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // データソースパネルを閉じる
+    function closeDataSourcePanel() {
+        document.getElementById('data-source-panel').style.display = 'none';
+    }
+    
+    // AI分析を実行
+    function proceedWithAnalysis() {
+        // データソースパネルを閉じる
+        document.getElementById('data-source-panel').style.display = 'none';
+        
+        // 分析プロセスを表示
+        document.getElementById('ai-analysis-process').style.display = 'block';
+        
+        // スクロール
+        document.getElementById('ai-analysis-process').scrollIntoView({ behavior: 'smooth' });
+        
+        // 分析プロセスをシミュレート
+        simulateAnalysisProcess();
+    }
+    
+    // 分析プロセスのシミュレーション
+    function simulateAnalysisProcess() {
+        const steps = [
+            { id: 'step-1', duration: 1500 },
+            { id: 'step-2', duration: 2000 },
+            { id: 'step-3', duration: 1800 },
+            { id: 'step-4', duration: 2200 }
+        ];
+        
+        let currentStep = 0;
+        
+        function processStep() {
+            if (currentStep > 0) {
+                // 前のステップを完了に
+                const prevStep = document.querySelector(`#${steps[currentStep - 1].id} .step-indicator`);
+                prevStep.classList.remove('processing');
+                prevStep.classList.add('completed');
+                prevStep.innerHTML = `
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                `;
+            }
+            
+            if (currentStep < steps.length) {
+                // 次のステップを処理中に
+                const currentStepEl = document.querySelector(`#${steps[currentStep].id} .step-indicator`);
+                currentStepEl.classList.remove('pending');
+                currentStepEl.classList.add('processing');
+                currentStepEl.innerHTML = `
+                    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                `;
+                
+                setTimeout(() => {
+                    currentStep++;
+                    processStep();
+                }, steps[currentStep].duration);
+            } else {
+                // すべてのステップが完了
+                showAnalysisResults();
+            }
+        }
+        
+        processStep();
+    }
+    
+    // 分析結果を表示
+    function showAnalysisResults() {
+        // 分析プロセスを閉じる
+        document.getElementById('ai-analysis-process').style.display = 'none';
+        
+        // 分析結果を表示
+        document.getElementById('ai-analysis-results').style.display = 'block';
+        
+        // スクロール
+        document.getElementById('ai-analysis-results').scrollIntoView({ behavior: 'smooth' });
+        
+        // 通知を表示
+        showNotification('AI分析が完了しました！3つの重要な戦略アップデートを検出しました。', 'success');
+    }
+    
+    // 分析結果を保存
+    function saveAnalysisResults() {
+        showModal({
+            title: '分析結果の保存',
+            content: `
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600">
+                        AI分析結果を保存し、中期経営計画に反映させますか？
+                    </p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-2">保存される内容</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 海外売上比率35%→ 38%の修正</li>
+                            <li>• DX投資額300億円→ 320億円の増額</li>
+                            <li>• 新規施策：AI需要予測システム</li>
+                            <li>• 新規施策：東南アジア統括会社</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="mr-2">
+                            <span class="text-sm">関連する投資家への通知を送信</span>
+                        </label>
+                    </div>
+                </div>
+            `,
+            confirmText: '保存する',
+            onConfirm: () => {
+                showNotification('分析結果を保存しました', 'success');
+                
+                // 中期経営計画の表示を更新
+                updateMidtermPlanDisplay();
+            }
+        });
+    }
+    
+    // 分析結果を適用
+    function applyAnalysisResults() {
+        showModal({
+            title: '分析結果の適用確認',
+            content: `
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600">
+                        AI分析結果を中期経営計画に適用します。
+                    </p>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="text-sm text-yellow-800">
+                                <p class="font-medium mb-1">重要な変更が含まれています</p>
+                                <p>この操作により、既存の目標値が更新されます。</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">適用オプション</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="apply_option" value="draft" checked class="mr-2">
+                                <span class="text-sm">下書きとして保存（承認待ち）</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="apply_option" value="immediate" class="mr-2">
+                                <span class="text-sm">すぐに適用（管理者権限必要）</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: '適用する',
+            onConfirm: () => {
+                showNotification('分析結果を適用しました', 'success');
+                updateMidtermPlanDisplay();
+                
+                // AI分析結果パネルを閉じる
+                document.getElementById('ai-analysis-results').style.display = 'none';
+            }
+        });
+    }
+    
+    // FAQを生成
+    function generateFAQFromAnalysis() {
+        showModal({
+            title: 'AI分析結果からFAQを生成',
+            content: `
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600">
+                        AI分析結果に基づいて、投資家から予想される質問と回答を自動生成します。
+                    </p>
+                    
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-900 mb-2">生成されるFAQ（予定）</h4>
+                        <ul class="text-sm text-blue-700 space-y-2">
+                            <li class="flex items-start gap-2">
+                                <span class="font-medium">Q1:</span>
+                                <span>海外売上比率38%の前提条件と地域別内訳は？</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="font-medium">Q2:</span>
+                                <span>DX投資の増額分のROIと期待効果は？</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="font-medium">Q3:</span>
+                                <span>東南アジア統括会社のガバナンス体制は？</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="font-medium">Q4:</span>
+                                <span>AI需要予測システムの具体的な導入スケジュールは？</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            生成オプション
+                        </label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">公開済み情報のみを使用</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">関連資料へのリンクを含む</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: 'FAQを生成',
+            onConfirm: () => {
+                showNotification('FAQを生成中...', 'info');
+                setTimeout(() => {
+                    showNotification('4件のFAQを生成しました', 'success');
+                    // FAQエディターへ遷移
+                    document.getElementById('faq-editor').style.display = 'block';
+                    document.getElementById('faq-editor').scrollIntoView({ behavior: 'smooth' });
+                }, 2000);
+            }
+        });
+    }
+    
+    // 投資家向けプレゼンテーション作成
+    function createInvestorPresentation() {
+        showModal({
+            title: '投資家向け説明資料の作成',
+            content: `
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600">
+                        AI分析結果に基づいた投資家向け説明資料を作成します。
+                    </p>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">資料タイプ</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>決算説明会用プレゼンテーション</option>
+                            <option>個別面談用サマリー資料</option>
+                            <option>Web公開用PDF</option>
+                            <option>エグゼクティブサマリー（1ページ）</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">含める内容</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">戦略アップデートのサマリー</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">定量目標の変更点</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">新規施策の詳細</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">リスク要因と対応策</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: '資料を作成',
+            onConfirm: () => {
+                showNotification('説明資料を作成中...', 'info');
+                setTimeout(() => {
+                    showNotification('説明資料を作成しました。ダウンロード可能です。', 'success');
+                }, 3000);
+            }
+        });
+    }
+    
+    // 中期経営計画の表示を更新
+    function updateMidtermPlanDisplay() {
+        // 海外売上比率を更新
+        const overseasCard = document.querySelector('[onclick="showTargetDetail(\'overseas-ratio\')"');
+        if (overseasCard) {
+            overseasCard.querySelector('.target-value').textContent = '38%';
+            overseasCard.querySelector('.target-baseline').textContent = '2023年度実績: 22%（+16pt）';
+            
+            // アニメーションを追加
+            overseasCard.classList.add('updated');
+            setTimeout(() => {
+                overseasCard.classList.remove('updated');
+            }, 2000);
+        }
+        
+        // DX投資を更新
+        const dxCard = document.querySelector('[onclick="showTargetDetail(\'dx-investment\')"');
+        if (dxCard) {
+            dxCard.querySelector('.target-value').textContent = '3年間で320億円';
+            
+            // アニメーションを追加
+            dxCard.classList.add('updated');
+            setTimeout(() => {
+                dxCard.classList.remove('updated');
+            }, 2000);
+        }
+    }
+    
+    // CSSアニメーション用のスタイルを追加
+    const style = document.createElement('style');
+    style.textContent = `
+        .step-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .step-indicator.pending {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+        
+        .step-indicator.processing {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .step-indicator.completed {
+            background: #d1fae5;
+        }
+        
+        .target-card.updated {
+            animation: highlight 2s ease-out;
+        }
+        
+        @keyframes highlight {
+            0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(20, 184, 166, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); }
+        }
+    `;
+    document.head.appendChild(style);
+
 <script>
     // 目標詳細画面表示
     function showTargetDetail(targetId) {

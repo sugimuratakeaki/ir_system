@@ -1,0 +1,1131 @@
+{% extends "base.html" %}
+
+{% block title %}戦略管理ダッシュボード{% endblock %}
+{% block page_icon %}🎯{% endblock %}
+{% block page_title %}戦略管理ダッシュボード{% endblock %}
+{% block breadcrumb_current %}戦略管理{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* メインコンテナ */
+    .strategy-dashboard {
+        background: var(--gray-50);
+        min-height: calc(100vh - var(--header-height));
+        padding: var(--space-lg);
+    }
+    
+    /* ヘッダーセクション */
+    .dashboard-header {
+        background: white;
+        border-radius: var(--border-radius-xl);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-lg);
+    }
+    
+    .header-info h1 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-bold);
+        color: var(--gray-900);
+        margin: 0 0 var(--space-sm) 0;
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+    
+    .header-info p {
+        color: var(--gray-600);
+        font-size: var(--text-base);
+        margin: 0;
+    }
+    
+    .header-actions {
+        display: flex;
+        gap: var(--space-sm);
+    }
+    
+    /* アクションボタン */
+    .action-button {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: var(--space-sm) var(--space-md);
+        background: white;
+        color: var(--gray-700);
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius-lg);
+        font-size: var(--text-sm);
+        font-weight: var(--font-medium);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+    
+    .action-button:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+        transform: translateY(-1px);
+    }
+    
+    .action-button.primary {
+        background: var(--kagami-blue);
+        color: white;
+        border-color: var(--kagami-blue);
+    }
+    
+    .action-button.primary:hover {
+        background: var(--kagami-blue-dark);
+        border-color: var(--kagami-blue-dark);
+    }
+    
+    /* サマリーカード */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+    }
+    
+    .summary-card {
+        background: white;
+        border-radius: var(--border-radius-xl);
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-sm);
+        transition: all var(--transition-normal);
+    }
+    
+    .summary-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .summary-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-md);
+    }
+    
+    .summary-title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: var(--text-base);
+        font-weight: var(--font-semibold);
+        color: var(--gray-700);
+    }
+    
+    .summary-badge {
+        padding: 2px 8px;
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border-radius: var(--border-radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-medium);
+    }
+    
+    .summary-badge.updated {
+        background: var(--warning-light);
+        color: white;
+    }
+    
+    .summary-badge.new {
+        background: var(--info-light);
+        color: white;
+    }
+    
+    .summary-value {
+        font-size: var(--text-3xl);
+        font-weight: var(--font-bold);
+        color: var(--gray-900);
+        margin-bottom: var(--space-xs);
+    }
+    
+    .summary-baseline {
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+        margin-bottom: var(--space-md);
+    }
+    
+    .summary-progress {
+        margin-bottom: var(--space-sm);
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background: var(--gray-200);
+        border-radius: var(--border-radius-full);
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: var(--accent-teal);
+        border-radius: var(--border-radius-full);
+        transition: width var(--transition-slow) var(--easing-default);
+    }
+    
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--text-xs);
+        color: var(--gray-600);
+        margin-top: var(--space-xs);
+    }
+    
+    /* 戦略カテゴリーセクション */
+    .strategy-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+        gap: var(--space-xl);
+        margin-bottom: var(--space-xl);
+    }
+    
+    .strategy-section {
+        background: white;
+        border-radius: var(--border-radius-xl);
+        padding: var(--space-xl);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-lg);
+        padding-bottom: var(--space-md);
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: var(--text-lg);
+        font-weight: var(--font-bold);
+        color: var(--gray-900);
+    }
+    
+    .section-icon {
+        font-size: var(--text-xl);
+    }
+    
+    .view-details {
+        font-size: var(--text-sm);
+        color: var(--kagami-blue);
+        text-decoration: none;
+        font-weight: var(--font-medium);
+        transition: color var(--transition-fast);
+    }
+    
+    .view-details:hover {
+        color: var(--kagami-blue-dark);
+        text-decoration: underline;
+    }
+    
+    /* 目標リスト */
+    .targets-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .target-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-md);
+        background: var(--gray-50);
+        border-radius: var(--border-radius-lg);
+        border: 1px solid var(--gray-200);
+        transition: all var(--transition-fast);
+    }
+    
+    .target-item:hover {
+        background: white;
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-xs);
+    }
+    
+    .target-info {
+        flex: 1;
+    }
+    
+    .target-name {
+        font-weight: var(--font-semibold);
+        color: var(--gray-900);
+        margin-bottom: var(--space-xs);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+    
+    .target-metrics {
+        display: flex;
+        gap: var(--space-lg);
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+    }
+    
+    .metric-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+    
+    .metric-label {
+        color: var(--gray-500);
+    }
+    
+    .metric-value {
+        font-weight: var(--font-semibold);
+        color: var(--gray-700);
+    }
+    
+    .target-actions {
+        display: flex;
+        gap: var(--space-xs);
+    }
+    
+    .target-action {
+        padding: var(--space-xs) var(--space-sm);
+        background: white;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius-md);
+        font-size: var(--text-xs);
+        color: var(--gray-600);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+    
+    .target-action:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+        color: var(--gray-700);
+    }
+    
+    /* インサイトセクション */
+    .insights-section {
+        background: white;
+        border-radius: var(--border-radius-xl);
+        padding: var(--space-xl);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-lg);
+    }
+    
+    .insight-card {
+        padding: var(--space-lg);
+        background: var(--gray-50);
+        border-radius: var(--border-radius-lg);
+        border: 1px solid var(--gray-200);
+        transition: all var(--transition-fast);
+    }
+    
+    .insight-card:hover {
+        background: white;
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-xs);
+    }
+    
+    .insight-type {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: 4px 12px;
+        background: var(--info-light);
+        color: white;
+        border-radius: var(--border-radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-medium);
+        margin-bottom: var(--space-sm);
+    }
+    
+    .insight-type.warning {
+        background: var(--warning);
+    }
+    
+    .insight-type.success {
+        background: var(--success);
+    }
+    
+    .insight-title {
+        font-weight: var(--font-semibold);
+        color: var(--gray-900);
+        margin-bottom: var(--space-xs);
+    }
+    
+    .insight-description {
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+        line-height: var(--leading-relaxed);
+    }
+    
+    /* 投資家質問セクション */
+    .questions-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: var(--error-light);
+        color: white;
+        border-radius: var(--border-radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-medium);
+    }
+    
+    /* レスポンシブ対応 */
+    @media (max-width: 1200px) {
+        .strategy-sections {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .strategy-dashboard {
+            padding: var(--space-md);
+        }
+        
+        .dashboard-header {
+            padding: var(--space-lg);
+        }
+        
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .insights-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .target-metrics {
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="strategy-dashboard">
+    <!-- ヘッダーセクション -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-info">
+                <h1>
+                    <span>🎯</span>
+                    中期経営計画 戦略管理ダッシュボード
+                </h1>
+                <p>2024-2026年度 中期経営計画の進捗と投資家対話状況を一元管理</p>
+            </div>
+            <div class="header-actions">
+                <button class="action-button" onclick="exportDashboard()">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    エクスポート
+                </button>
+                <button class="action-button primary" onclick="updateStrategies()">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    最新データで更新
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- サマリーカード -->
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-header">
+                <h3 class="summary-title">
+                    <span>📈</span>
+                    全体進捗率
+                </h3>
+            </div>
+            <div class="summary-value">42.5%</div>
+            <div class="summary-baseline">計画1年目として順調に推移</div>
+            <div class="summary-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 42.5%;"></div>
+                </div>
+                <div class="progress-text">
+                    <span>0%</span>
+                    <span>42.5%</span>
+                    <span>100%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-header">
+                <h3 class="summary-title">
+                    <span>💬</span>
+                    投資家からの質問
+                </h3>
+                <span class="summary-badge updated">要対応</span>
+            </div>
+            <div class="summary-value">45件</div>
+            <div class="summary-baseline">今週: +12件（前週比）</div>
+            <div class="summary-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 73%; background: var(--warning);"></div>
+                </div>
+                <div class="progress-text">
+                    <span>回答済: 33件</span>
+                    <span>未回答: 12件</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-header">
+                <h3 class="summary-title">
+                    <span>🔄</span>
+                    戦略変更
+                </h3>
+                <span class="summary-badge new">新規</span>
+            </div>
+            <div class="summary-value">3項目</div>
+            <div class="summary-baseline">今四半期の見直し事項</div>
+            <div class="summary-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%; background: var(--info);"></div>
+                </div>
+                <div class="progress-text">
+                    <span>承認済: 2件</span>
+                    <span>検討中: 1件</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-header">
+                <h3 class="summary-title">
+                    <span>⏰</span>
+                    次回IR説明会
+                </h3>
+            </div>
+            <div class="summary-value">15日後</div>
+            <div class="summary-baseline">2024年Q1決算説明会</div>
+            <div class="summary-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 65%; background: var(--success);"></div>
+                </div>
+                <div class="progress-text">
+                    <span>準備進捗: 65%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 戦略カテゴリーセクション -->
+    <div class="strategy-sections">
+        <!-- 財務目標 -->
+        <div class="strategy-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon">💰</span>
+                    財務目標
+                </h2>
+                <a href="#" class="view-details">詳細を見る →</a>
+            </div>
+            <div class="targets-list">
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">
+                            売上高
+                            <span class="summary-badge updated">更新</span>
+                        </div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">1,500億円</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">630億円</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">42%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">
+                            質問 <span class="questions-indicator">8</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">営業利益率</div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">15.0%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">13.8%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">65%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">質問</button>
+                    </div>
+                </div>
+                
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">ROE</div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">12.0%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">9.2%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">35%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">
+                            質問 <span class="questions-indicator">3</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 成長戦略 -->
+        <div class="strategy-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon">🚀</span>
+                    成長戦略
+                </h2>
+                <a href="#" class="view-details">詳細を見る →</a>
+            </div>
+            <div class="targets-list">
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">
+                            海外売上比率
+                            <span class="summary-badge updated">更新</span>
+                        </div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">38%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">28%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">58%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">
+                            質問 <span class="questions-indicator">5</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">アジア市場展開</div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">5カ国</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">2カ国</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">40%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">
+                            質問 <span class="questions-indicator">18</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">新規事業売上</div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">200億円</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">45億円</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">23%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">質問</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ESG目標 -->
+        <div class="strategy-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon">🌱</span>
+                    ESG目標
+                </h2>
+                <a href="#" class="view-details">詳細を見る →</a>
+            </div>
+            <div class="targets-list">
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">CO2削減率</div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">-50%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">-28%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">56%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">
+                            質問 <span class="questions-indicator">7</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">女性管理職比率</div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">30%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">18%</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">45%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">
+                            質問 <span class="questions-indicator">2</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- デジタル戦略 -->
+        <div class="strategy-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="section-icon">💻</span>
+                    デジタル戦略
+                </h2>
+                <a href="#" class="view-details">詳細を見る →</a>
+            </div>
+            <div class="targets-list">
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">
+                            DX投資額
+                            <span class="summary-badge updated">更新</span>
+                        </div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">目標:</span>
+                                <span class="metric-value">320億円</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">現在:</span>
+                                <span class="metric-value">112億円</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">35%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">
+                            質問 <span class="questions-indicator">12</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="target-item">
+                    <div class="target-info">
+                        <div class="target-name">
+                            AI需要予測システム
+                            <span class="summary-badge new">新規</span>
+                        </div>
+                        <div class="target-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">開始:</span>
+                                <span class="metric-value">2024 Q2</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">効果:</span>
+                                <span class="metric-value">利益率+0.5pt</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">進捗:</span>
+                                <span class="metric-value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="target-action">詳細</button>
+                        <button class="target-action">質問</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AIインサイトセクション -->
+    <div class="insights-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span class="section-icon">🤖</span>
+                AIによる戦略インサイト
+            </h2>
+        </div>
+        <div class="insights-grid">
+            <div class="insight-card">
+                <span class="insight-type">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    相関分析
+                </span>
+                <h3 class="insight-title">海外展開と売上成長の相関</h3>
+                <p class="insight-description">
+                    海外売上比率の上昇が全体売上目標達成の主要因となっています。特にアジア市場の成長が予想を上回っており、リソースの追加配分を検討すべきです。
+                </p>
+            </div>
+            
+            <div class="insight-card">
+                <span class="insight-type warning">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    注意事項
+                </span>
+                <h3 class="insight-title">DX投資のROI測定</h3>
+                <p class="insight-description">
+                    増額された20億円の投資対効果が不明確です。具体的なKPIと測定方法の設定が必要です。投資家からの質問も増加傾向にあります。
+                </p>
+            </div>
+            
+            <div class="insight-card">
+                <span class="insight-type success">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    機会
+                </span>
+                <h3 class="insight-title">ESG投資家の関心増加</h3>
+                <p class="insight-description">
+                    CO2削減への取り組みに対する投資家の関心が高まっています。詳細な進捗レポートの開示により、ESG投資家へのアピールが可能です。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ダッシュボードの初期化
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDashboard();
+        loadLatestData();
+        setupEventListeners();
+    });
+    
+    // ダッシュボードの初期化
+    function initializeDashboard() {
+        // プログレスバーのアニメーション
+        animateProgressBars();
+        
+        // 更新バッジのアニメーション
+        animateUpdateBadges();
+    }
+    
+    // 最新データの読み込み
+    function loadLatestData() {
+        // 実際の実装では、APIから最新データを取得
+        console.log('最新データを読み込み中...');
+    }
+    
+    // イベントリスナーの設定
+    function setupEventListeners() {
+        // 目標アイテムのクリックイベント
+        document.querySelectorAll('.target-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('target-action')) {
+                    showTargetDetail(this);
+                }
+            });
+        });
+    }
+    
+    // プログレスバーのアニメーション
+    function animateProgressBars() {
+        const progressBars = document.querySelectorAll('.progress-fill');
+        progressBars.forEach((bar, index) => {
+            setTimeout(() => {
+                bar.style.width = bar.style.width || '0%';
+            }, index * 100);
+        });
+    }
+    
+    // 更新バッジのアニメーション
+    function animateUpdateBadges() {
+        const badges = document.querySelectorAll('.summary-badge.updated, .summary-badge.new');
+        badges.forEach(badge => {
+            badge.style.animation = 'pulse 2s infinite';
+        });
+    }
+    
+    // 戦略の更新
+    function updateStrategies() {
+        showNotification('最新の決算データから戦略指標を更新しています...', 'info');
+        
+        // ローディング表示
+        const button = event.currentTarget;
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            更新中...
+        `;
+        
+        // 実際の処理をシミュレート
+        setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                最新データで更新
+            `;
+            showNotification('戦略指標を最新データで更新しました', 'success');
+            
+            // 更新されたアイテムをハイライト
+            const updatedItems = document.querySelectorAll('.summary-badge.updated');
+            updatedItems.forEach(item => {
+                item.style.animation = 'none';
+                setTimeout(() => {
+                    item.style.animation = 'pulse 2s infinite';
+                }, 100);
+            });
+        }, 3000);
+    }
+    
+    // ダッシュボードのエクスポート
+    function exportDashboard() {
+        showModal({
+            title: 'ダッシュボードのエクスポート',
+            content: `
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-600">
+                        戦略管理ダッシュボードをエクスポートします。
+                    </p>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">エクスポート形式</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            <option>PDF（役員会報告用）</option>
+                            <option>Excel（詳細分析用）</option>
+                            <option>PowerPoint（プレゼン用）</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">含める内容</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">サマリー情報</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">各戦略の詳細</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="mr-2">
+                                <span class="text-sm">投資家質問分析</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2">
+                                <span class="text-sm">AIインサイト</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: 'エクスポート',
+            onConfirm: () => {
+                showNotification('ダッシュボードをエクスポート中...', 'info');
+                setTimeout(() => {
+                    showNotification('ダッシュボードのエクスポートが完了しました', 'success');
+                }, 2000);
+            }
+        });
+    }
+    
+    // 目標の詳細表示
+    function showTargetDetail(targetElement) {
+        const targetName = targetElement.querySelector('.target-name').textContent.trim();
+        
+        showModal({
+            title: `${targetName}の詳細`,
+            content: `
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-2">進捗状況</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Q1実績</span>
+                                <span class="text-sm font-medium">計画比 105%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">前年同期比</span>
+                                <span class="text-sm font-medium">+12.3%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">主な変更点</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 海外展開の加速による上方修正</li>
+                            <li>• 為替影響（円安）によるプラス効果</li>
+                            <li>• 新製品の好調な立ち上がり</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">投資家からの主な質問</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 持続可能性についての詳細説明</li>
+                            <li>• 競合他社との差別化要因</li>
+                            <li>• リスク要因とその対策</li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            confirmText: '閉じる'
+        });
+    }
+    
+    // 通知表示
+    function showNotification(message, type = 'info') {
+        if (window.parent && window.parent.showNotification) {
+            window.parent.showNotification(message, type);
+        } else {
+            console.log(`${type}: ${message}`);
+        }
+    }
+    
+    // モーダル表示
+    function showModal(options) {
+        if (window.parent && window.parent.showModal) {
+            window.parent.showModal(options);
+        } else {
+            if (confirm(options.content)) {
+                options.onConfirm && options.onConfirm();
+            }
+        }
+    }
+    
+    // パルスアニメーション用のスタイル
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

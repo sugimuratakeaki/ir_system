@@ -745,6 +745,14 @@ async def strategy_planning_feedbacks(request: Request):
         "base_url": "/cms2"
     })
 
+@app.get("/strategy-map", response_class=HTMLResponse)
+async def strategy_map(request: Request):
+    """戦略マップビューページ"""
+    return templates.TemplateResponse("pages/strategy-map.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
 @app.get("/upload", response_class=HTMLResponse)
 async def upload(request: Request):
     """音声アップロードページ"""
