@@ -1,482 +1,1388 @@
 {% extends 'base/base.html' %}
 
-{% block title %}戦略アシスタント - IR担当者{% endblock %}
+{% block title %}中期計画・投資家対応管理 - 戦略アシスタント{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/strategy-assistant.css">
+<style>
+    /* 中期計画表示エリア */
+    .midterm-plan-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+    
+    .plan-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .plan-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .plan-period {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+    }
+    
+    .plan-source {
+        display: flex;
+        gap: 16px;
+        font-size: 0.875rem;
+        flex-wrap: wrap;
+    }
+    
+    .source-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* 計画詳細 */
+    .plan-content {
+        padding: 24px;
+    }
+    
+    .plan-section {
+        margin-bottom: 32px;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .section-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    /* 目標カード */
+    .target-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .target-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        position: relative;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .target-card:hover {
+        border-color: #14b8a6;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+    
+    .target-indicator {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+    }
+    
+    .target-indicator.has-questions {
+        background: #f59e0b;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.2); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    
+    .target-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .target-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a365d;
+        margin-bottom: 4px;
+    }
+    
+    .target-baseline {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+    
+    .target-questions {
+        font-size: 0.75rem;
+        color: #f59e0b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .target-questions.all-answered {
+        color: #10b981;
+    }
+    
+    /* 質問管理エリア */
+    .question-management {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .question-tabs {
+        display: flex;
+        gap: 4px;
+        background: #f3f4f6;
+        padding: 4px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .question-tab {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        background: transparent;
+        border: none;
+    }
+    
+    .question-tab.active {
+        background: white;
+        color: #111827;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .question-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #ef4444;
+        color: white;
+        font-size: 0.625rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    /* 質問リスト */
+    .question-list {
+        space-y: 12px;
+    }
+    
+    .question-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        transition: all 0.2s;
+        cursor: pointer;
+        margin-bottom: 12px;
+    }
+    
+    .question-item:hover {
+        border-color: #14b8a6;
+        background: #f0fdfa;
+    }
+    
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+    
+    .question-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+    
+    .question-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .status-badge {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.625rem;
+        font-weight: 600;
+    }
+    
+    .status-new {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .status-answered {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-faq {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .question-text {
+        font-weight: 500;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .question-context {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 12px;
+    }
+    
+    .question-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .action-button {
+        padding: 6px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .action-button:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+    
+    .action-button.primary {
+        background: #14b8a6;
+        border-color: #14b8a6;
+        color: white;
+    }
+    
+    .action-button.primary:hover {
+        background: #0d9488;
+        border-color: #0d9488;
+    }
+    
+    /* FAQ作成エリア */
+    .faq-editor {
+        background: linear-gradient(135deg, #f0fdfa, #e0f2fe);
+        border: 1px solid #14b8a6;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .faq-editor::before {
+        content: '🤖';
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        font-size: 32px;
+        opacity: 0.2;
+    }
+    
+    .faq-editor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .faq-editor-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #0f766e;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .ai-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 12px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        font-size: 0.75rem;
+        color: #0f766e;
+    }
+    
+    .ai-indicator.active {
+        animation: ai-pulse 1.5s infinite;
+    }
+    
+    @keyframes ai-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+    
+    /* FAQ編集フォーム */
+    .faq-form {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-section {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+    }
+    
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #14b8a6;
+        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+    }
+    
+    .form-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    /* AI提案 */
+    .ai-suggestions {
+        background: #f0fdfa;
+        border: 1px solid #14b8a6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 12px;
+    }
+    
+    .ai-suggestion-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        background: white;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .ai-suggestion-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .suggestion-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #d1fae5;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .suggestion-content {
+        flex: 1;
+    }
+    
+    .suggestion-title {
+        font-weight: 500;
+        color: #111827;
+        margin-bottom: 4px;
+        font-size: 0.875rem;
+    }
+    
+    .suggestion-text {
+        font-size: 0.75rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+    
+    .suggestion-action {
+        color: #14b8a6;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    /* AI分析結果パネル */
+    .ai-analysis-results {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+    
+    .ai-analysis-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #14b8a6 100%);
+        color: white;
+        padding: 24px;
+    }
+    
+    .ai-analysis-content {
+        padding: 24px;
+    }
+    
+    /* インサイトパネル */
+    .insights-panel {
+        background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .insight-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .insight-item:hover {
+        transform: translateX(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .insight-icon {
+        width: 40px;
+        height: 40px;
+        background: #dbeafe;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2563eb;
+    }
+    
+    .insight-icon.warning {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .insight-icon.success {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    /* タブコンテンツ */
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    /* プログレスバー */
+    .progress-bar {
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 2px;
+        overflow: hidden;
+        margin: 8px 0;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: #10b981;
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-bar-fill.warning {
+        background: #f59e0b;
+    }
+    
+    .progress-bar-fill.danger {
+        background: #ef4444;
+    }
+    
+    /* フローティングアクション */
+    .floating-actions {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 50;
+    }
+    
+    .ai-assist-button {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.5);
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+    
+    .ai-assist-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 15px 35px -5px rgba(20, 184, 166, 0.7);
+    }
+    
+    /* モーダル */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+    }
+    
+    .modal-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        transform: scale(0.9);
+        transition: transform 0.3s;
+    }
+    
+    .modal-backdrop.active .modal-content {
+        transform: scale(1);
+    }
+    
+    .modal-header {
+        padding: 24px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .modal-body {
+        padding: 24px;
+    }
+    
+    .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    
+    /* ロード中表示 */
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .target-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .question-tabs {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .question-actions {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
-    <!-- ページヘッダー -->
-    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg p-6">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold">戦略アシスタント</h1>
-                <p class="mt-1 opacity-90">中期経営計画の進捗管理とIR戦略立案支援</p>
+    <!-- AI分析アラート -->
+    <div id="ai-analysis-alert" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 rounded-lg" style="display: none;">
+        <div class="flex items-start gap-3">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
             </div>
-            <div class="flex space-x-3">
-                <button class="btn bg-white/20 text-white border-white/30 hover:bg-white/30">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    レポート生成
+            <div class="flex-1">
+                <h3 class="text-sm font-semibold text-blue-900">新しい開示資料を検出しました</h3>
+                <p class="text-sm text-blue-700 mt-1">2024年1月22日付の決算短信から戦略アップデートを抽出できます。</p>
+                <button onclick="startAIAnalysis()" class="mt-2 inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
+                    AI分析を開始
                 </button>
-                <button class="btn bg-white text-indigo-600 hover:bg-gray-100">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    設定
-                </button>
+            </div>
+            <button onclick="dismissAlert()" class="text-blue-400 hover:text-blue-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 中期経営計画表示エリア -->
+    <div class="midterm-plan-container">
+        <div class="plan-header">
+            <h1 class="plan-title" id="plan-title">読み込み中...</h1>
+            <p class="plan-period" id="plan-subtitle">...</p>
+            <div class="plan-source" id="plan-sources">
+                <!-- 動的に生成 -->
+            </div>
+        </div>
+        
+        <div class="plan-content">
+            <!-- 定量目標セクション -->
+            <div class="plan-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span>📊</span>
+                        定量目標（2026年度）
+                    </h2>
+                    <div class="section-actions">
+                        <button onclick="showAllQuestions('quantitative')" class="action-button">
+                            関連質問を見る (<span id="quantitative-question-count">0</span>件)
+                        </button>
+                        <button onclick="editTargets('quantitative')" class="action-button">
+                            編集
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="target-grid" id="quantitative-targets">
+                    <!-- 動的に生成 -->
+                </div>
+            </div>
+            
+            <!-- 重点施策セクション -->
+            <div class="plan-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span>🎯</span>
+                        重点施策
+                    </h2>
+                    <div class="section-actions">
+                        <button onclick="showAllQuestions('strategies')" class="action-button">
+                            関連質問を見る (<span id="strategies-question-count">0</span>件)
+                        </button>
+                        <button onclick="editTargets('strategies')" class="action-button">
+                            編集
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="target-grid" id="key-strategies">
+                    <!-- 動的に生成 -->
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 中期経営計画サマリー -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div class="card bg-gradient-to-br from-blue-50 to-white">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-gray-600">計画期間</h3>
-                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-            </div>
-            <p class="text-2xl font-bold text-gray-900">2023-2025</p>
-            <p class="text-sm text-gray-600 mt-1">残り13ヶ月</p>
-            <div class="mt-3">
-                <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
-                    <span>進捗</span>
-                    <span>67%</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-blue-500 h-2 rounded-full" style="width: 67%"></div>
-                </div>
+    <!-- 質問管理エリア -->
+    <div class="question-management">
+        <div class="section-header">
+            <h2 class="section-title">
+                <span>💬</span>
+                投資家からの質問管理
+            </h2>
+            <div class="section-actions">
+                <button onclick="importQuestions()" class="action-button">
+                    質問をインポート
+                </button>
+                <button onclick="showAIAssistant()" class="action-button primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    AI回答支援
+                </button>
             </div>
         </div>
-
-        <div class="card bg-gradient-to-br from-green-50 to-white">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-gray-600">売上高目標</h3>
-                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-            </div>
-            <p class="text-2xl font-bold text-gray-900">¥1.5兆</p>
-            <p class="text-sm text-green-600 mt-1">達成率 78%</p>
-            <p class="text-xs text-gray-500 mt-2">前年比 +12.3%</p>
+        
+        <div class="question-tabs">
+            <button class="question-tab active" onclick="switchQuestionTab('unanswered')">
+                未回答
+                <span class="question-badge" id="unanswered-count">0</span>
+            </button>
+            <button class="question-tab" onclick="switchQuestionTab('draft')">
+                下書き
+                <span class="question-badge" id="draft-count">0</span>
+            </button>
+            <button class="question-tab" onclick="switchQuestionTab('answered')">
+                回答済み
+            </button>
+            <button class="question-tab" onclick="switchQuestionTab('faq')">
+                FAQ化済み
+            </button>
         </div>
-
-        <div class="card bg-gradient-to-br from-purple-50 to-white">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-gray-600">営業利益率</h3>
-                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
-                </svg>
-            </div>
-            <p class="text-2xl font-bold text-gray-900">13.2%</p>
-            <p class="text-sm text-purple-600 mt-1">目標 15.0%</p>
-            <p class="text-xs text-gray-500 mt-2">改善余地 1.8pt</p>
-        </div>
-
-        <div class="card bg-gradient-to-br from-orange-50 to-white">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-medium text-gray-600">ROE</h3>
-                <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <p class="text-2xl font-bold text-gray-900">10.8%</p>
-            <p class="text-sm text-orange-600 mt-1">目標 12.0%</p>
-            <p class="text-xs text-gray-500 mt-2">前年比 +0.9pt</p>
+        
+        <div id="question-list" class="question-list">
+            <!-- 動的に生成 -->
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- 戦略マップ -->
-        <div class="lg:col-span-2">
-            <div class="card">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-semibold text-gray-900">戦略マップ</h2>
-                    <div class="flex items-center space-x-2">
-                        <button class="text-sm text-gray-600 hover:text-gray-900">四半期</button>
-                        <span class="text-gray-400">|</span>
-                        <button class="text-sm text-kagami-blue font-medium">年度</button>
-                        <span class="text-gray-400">|</span>
-                        <button class="text-sm text-gray-600 hover:text-gray-900">全期間</button>
-                    </div>
-                </div>
-                
-                <!-- 戦略ツリー -->
-                <div class="strategy-map">
-                    <!-- ビジョン -->
-                    <div class="strategy-level">
-                        <div class="strategy-node vision">
-                            <h4 class="font-medium text-white mb-1">ビジョン</h4>
-                            <p class="text-sm text-blue-100">持続可能な成長と企業価値向上</p>
-                        </div>
-                    </div>
-                    
-                    <!-- 重点戦略 -->
-                    <div class="strategy-level">
-                        <div class="strategy-connection"></div>
-                        <div class="flex justify-around gap-4">
-                            <div class="strategy-node priority">
-                                <h4 class="font-medium text-gray-900 mb-1">DX推進</h4>
-                                <p class="text-xs text-gray-600">デジタル変革</p>
-                                <div class="mt-2">
-                                    <div class="progress-mini">
-                                        <div class="progress-bar bg-yellow-500" style="width: 65%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-500 mt-1">65%</span>
-                                </div>
-                            </div>
-                            <div class="strategy-node priority">
-                                <h4 class="font-medium text-gray-900 mb-1">ESG経営</h4>
-                                <p class="text-xs text-gray-600">サステナビリティ</p>
-                                <div class="mt-2">
-                                    <div class="progress-mini">
-                                        <div class="progress-bar bg-green-500" style="width: 82%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-500 mt-1">82%</span>
-                                </div>
-                            </div>
-                            <div class="strategy-node priority">
-                                <h4 class="font-medium text-gray-900 mb-1">海外展開</h4>
-                                <p class="text-xs text-gray-600">グローバル成長</p>
-                                <div class="mt-2">
-                                    <div class="progress-mini">
-                                        <div class="progress-bar bg-red-500" style="width: 45%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-500 mt-1">45%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 施策 -->
-                    <div class="strategy-level">
-                        <div class="strategy-connection"></div>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="strategy-initiative">
-                                <p class="text-xs font-medium">基幹システム刷新</p>
-                                <span class="badge badge-yellow text-xs mt-1">実行中</span>
-                            </div>
-                            <div class="strategy-initiative">
-                                <p class="text-xs font-medium">AI活用推進</p>
-                                <span class="badge badge-blue text-xs mt-1">計画中</span>
-                            </div>
-                            <div class="strategy-initiative">
-                                <p class="text-xs font-medium">脱炭素化</p>
-                                <span class="badge badge-green text-xs mt-1">順調</span>
-                            </div>
-                            <div class="strategy-initiative">
-                                <p class="text-xs font-medium">ダイバーシティ推進</p>
-                                <span class="badge badge-green text-xs mt-1">順調</span>
-                            </div>
-                            <div class="strategy-initiative">
-                                <p class="text-xs font-medium">アジア市場開拓</p>
-                                <span class="badge badge-red text-xs mt-1">遅延</span>
-                            </div>
-                            <div class="strategy-initiative">
-                                <p class="text-xs font-medium">M&A推進</p>
-                                <span class="badge badge-yellow text-xs mt-1">検討中</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KPIダッシュボード -->
-                <div class="mt-8">
-                    <h3 class="text-md font-semibold text-gray-900 mb-4">重要KPI推移</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="text-sm font-medium text-gray-700">売上高成長率</h4>
-                                <span class="text-xs text-green-600">+2.3pt</span>
-                            </div>
-                            <canvas id="salesGrowthChart" height="100"></canvas>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <h4 class="text-sm font-medium text-gray-700">営業利益率</h4>
-                                <span class="text-xs text-yellow-600">+0.8pt</span>
-                            </div>
-                            <canvas id="profitMarginChart" height="100"></canvas>
-                        </div>
-                    </div>
-                </div>
+    <!-- FAQ作成エリア -->
+    <div id="faq-editor" class="faq-editor" style="display: none;">
+        <div class="faq-editor-header">
+            <h3 class="faq-editor-title">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI支援FAQ作成
+            </h3>
+            <div class="ai-indicator active">
+                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                AIが分析中...
             </div>
         </div>
-
-        <!-- 右側パネル -->
-        <div class="space-y-6">
-            <!-- AI分析インサイト -->
-            <div class="card bg-gradient-to-br from-purple-50 to-white">
-                <div class="flex items-start mb-3">
-                    <svg class="w-6 h-6 text-purple-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                    </svg>
-                    <h3 class="text-lg font-semibold text-gray-900">AI分析インサイト</h3>
+        
+        <div class="faq-form">
+            <div class="form-section">
+                <label class="form-label">元の質問</label>
+                <div class="p-3 bg-gray-50 rounded-lg text-sm" id="original-question">
+                    <!-- 動的に挿入 -->
                 </div>
+            </div>
+            
+            <div class="form-section">
+                <label class="form-label">カテゴリー</label>
+                <select class="form-input" id="faq-category">
+                    <option>財務・業績</option>
+                    <option>経営戦略</option>
+                    <option>ESG・サステナビリティ</option>
+                    <option>ガバナンス</option>
+                    <option>事業展開</option>
+                    <option>技術・研究開発</option>
+                </select>
+            </div>
+            
+            <div class="form-section">
+                <label class="form-label">FAQ用の質問文</label>
+                <input type="text" class="form-input" id="faq-question" 
+                    placeholder="投資家にとってわかりやすい質問文に編集">
                 
-                <div class="space-y-3">
-                    <div class="bg-purple-100 rounded-lg p-3">
-                        <p class="text-sm font-medium text-purple-900 mb-1">🎯 重点対応推奨</p>
-                        <p class="text-xs text-purple-700">海外事業の進捗遅延が全体目標達成のボトルネックになっています。リソース再配分を検討してください。</p>
-                    </div>
-                    
-                    <div class="bg-blue-100 rounded-lg p-3">
-                        <p class="text-sm font-medium text-blue-900 mb-1">📈 ポジティブトレンド</p>
-                        <p class="text-xs text-blue-700">ESG関連施策の進捗が良好で、投資家評価も向上しています。この勢いを維持することを推奨します。</p>
-                    </div>
-                    
-                    <div class="bg-yellow-100 rounded-lg p-3">
-                        <p class="text-sm font-medium text-yellow-900 mb-1">⚠️ 注意事項</p>
-                        <p class="text-xs text-yellow-700">DX投資のROIが計画を下回っています。効果測定方法の見直しが必要かもしれません。</p>
+                <div class="ai-suggestions">
+                    <div class="text-xs font-semibold text-teal-700 mb-2">AI提案</div>
+                    <div class="ai-suggestion-item" onclick="applyAISuggestion('question', 1)">
+                        <div class="suggestion-icon">💡</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-title">より汎用的な表現</div>
+                            <div class="suggestion-text">
+                                「海外展開における地域別の売上目標と投資計画について教えてください」
+                            </div>
+                        </div>
+                        <span class="suggestion-action">適用</span>
                     </div>
                 </div>
             </div>
-
-            <!-- アクションプラン -->
-            <div class="card">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">今後のアクション</h3>
-                <div class="space-y-3">
-                    <div class="action-item">
-                        <div class="flex items-start">
-                            <input type="checkbox" class="mt-1 mr-3">
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">海外事業戦略の見直し</p>
-                                <p class="text-xs text-gray-600 mt-1">地政学リスクを考慮した代替シナリオ策定</p>
-                                <div class="flex items-center mt-2">
-                                    <span class="text-xs text-gray-500">期限: 12/25</span>
-                                    <span class="mx-2 text-gray-300">•</span>
-                                    <span class="badge badge-red text-xs">高優先度</span>
-                                </div>
+            
+            <div class="form-section">
+                <label class="form-label">回答</label>
+                <textarea class="form-textarea" id="faq-answer" 
+                    placeholder="明確で包括的な回答を記載"></textarea>
+                
+                <div class="ai-suggestions">
+                    <div class="text-xs font-semibold text-teal-700 mb-2">AI提案（開示済み情報から生成）</div>
+                    <div class="ai-suggestion-item" onclick="applyAISuggestion('answer', 1)">
+                        <div class="suggestion-icon">📊</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-title">数値を含む具体的回答</div>
+                            <div class="suggestion-text">
+                                「2026年度の海外売上比率35%達成に向けて、アジア地域で200億円（全体の60%）、
+                                北米で100億円（30%）、欧州で30億円（10%）の売上を計画しています。」
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="action-item">
-                        <div class="flex items-start">
-                            <input type="checkbox" class="mt-1 mr-3">
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">DX効果測定レポート作成</p>
-                                <p class="text-xs text-gray-600 mt-1">投資家向け説明資料の準備</p>
-                                <div class="flex items-center mt-2">
-                                    <span class="text-xs text-gray-500">期限: 12/20</span>
-                                    <span class="mx-2 text-gray-300">•</span>
-                                    <span class="badge badge-yellow text-xs">中優先度</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="action-item">
-                        <div class="flex items-start">
-                            <input type="checkbox" class="mt-1 mr-3" checked>
-                            <div class="flex-1 opacity-50">
-                                <p class="text-sm font-medium text-gray-900 line-through">ESGレポート更新</p>
-                                <p class="text-xs text-gray-600 mt-1">第3四半期実績反映</p>
-                                <div class="flex items-center mt-2">
-                                    <span class="text-xs text-gray-500">完了: 12/15</span>
-                                </div>
-                            </div>
-                        </div>
+                        <span class="suggestion-action">適用</span>
                     </div>
                 </div>
             </div>
-
-            <!-- 関連資料 -->
-            <div class="card">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">関連資料</h3>
-                <div class="space-y-2">
-                    <a href="#" class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                        <svg class="w-8 h-8 text-red-500 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                        </svg>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-900">中期経営計画書</p>
-                            <p class="text-xs text-gray-500">2023-2025_MTP.pdf</p>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                        <svg class="w-8 h-8 text-green-500 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M8,15.5V17H16V15.5L12,12L8,15.5M8,11V12.5L12,9L16,12.5V11L12,7.5L8,11Z"/>
-                        </svg>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-900">進捗管理シート</p>
-                            <p class="text-xs text-gray-500">Progress_Q3_2024.xlsx</p>
-                        </div>
-                    </a>
-                </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="saveFAQ()" class="btn btn-primary">保存してFAQ公開</button>
+                <button onclick="saveDraft()" class="btn btn-secondary">下書き保存</button>
+                <button onclick="closeFAQEditor()" class="btn btn-secondary">キャンセル</button>
             </div>
         </div>
+    </div>
+
+    <!-- インサイトパネル -->
+    <div class="insights-panel" id="insightsPanel">
+        <h3 class="text-lg font-semibold mb-4">AIによる分析と推奨事項</h3>
+        <div class="space-y-3" id="insights-list">
+            <!-- 動的に生成 -->
+        </div>
+    </div>
+
+    <!-- フローティングアクション -->
+    <div class="floating-actions">
+        <button class="ai-assist-button" onclick="toggleAIAssist()">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+        </button>
     </div>
 </div>
 
-<style>
-/* 戦略マップ */
-.strategy-map {
-    padding: 2rem;
-}
-
-.strategy-level {
-    margin-bottom: 3rem;
-    position: relative;
-}
-
-.strategy-node {
-    padding: 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    position: relative;
-}
-
-.strategy-node.vision {
-    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-    color: white;
-    max-width: 20rem;
-    margin: 0 auto;
-}
-
-.strategy-node.priority {
-    background: white;
-    border: 2px solid #e5e7eb;
-    flex: 1;
-}
-
-.strategy-connection {
-    position: absolute;
-    top: -2rem;
-    left: 50%;
-    width: 2px;
-    height: 2rem;
-    background-color: #d1d5db;
-    transform: translateX(-50%);
-}
-
-.strategy-initiative {
-    background: #f9fafb;
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    border: 1px solid #e5e7eb;
-}
-
-.progress-mini {
-    width: 100%;
-    height: 0.25rem;
-    background-color: #e5e7eb;
-    border-radius: 9999px;
-    overflow: hidden;
-}
-
-/* アクションアイテム */
-.action-item {
-    padding: 0.75rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    transition: all 0.15s;
-}
-
-.action-item:hover {
-    background-color: #f9fafb;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-</style>
-
+<!-- モーダル -->
+<div id="modal-backdrop" class="modal-backdrop">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title" class="text-xl font-semibold"></h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <!-- 動的コンテンツ -->
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeModal()" class="btn btn-secondary">閉じる</button>
+            <button id="modal-confirm" class="btn btn-primary">確認</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<!-- ページ固有のJavaScript -->
+<script src="/static/js/pages/strategy-assistant.js"></script>
 <script>
-// KPIチャート初期化
-document.addEventListener('DOMContentLoaded', function() {
-    // 売上高成長率チャート
-    const salesCtx = document.getElementById('salesGrowthChart').getContext('2d');
-    new Chart(salesCtx, {
-        type: 'line',
-        data: {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-            datasets: [{
-                label: '成長率',
-                data: [8.5, 10.2, 12.3, 14.1],
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#10b981'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
+// グローバル変数
+let strategyData = null;
+let currentQuestionTab = 'unanswered';
+let currentEditingQuestion = null;
 
-    // 営業利益率チャート
-    const profitCtx = document.getElementById('profitMarginChart').getContext('2d');
-    new Chart(profitCtx, {
-        type: 'line',
-        data: {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-            datasets: [{
-                label: '利益率',
-                data: [12.1, 12.5, 13.2, 13.8],
-                borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#f59e0b'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    min: 10,
-                    max: 16,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
+// ページ読み込み時の初期化
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // データの読み込み
+        const response = await fetch('/static/data/strategy-planning.json');
+        strategyData = await response.json();
+        
+        // 画面の初期化
+        initializePlan();
+        loadQuestions();
+        loadInsights();
+        
+        // 新しいデータのチェック
+        checkForNewData();
+    } catch (error) {
+        console.error('Error loading strategy data:', error);
+        showNotification('データの読み込みに失敗しました', 'error');
+    }
 });
 
-// アクションアイテムのチェック処理
-document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        const actionItem = this.closest('.action-item');
-        if (this.checked) {
-            actionItem.querySelector('.flex-1').classList.add('opacity-50');
-            actionItem.querySelector('.text-gray-900').classList.add('line-through');
-        } else {
-            actionItem.querySelector('.flex-1').classList.remove('opacity-50');
-            actionItem.querySelector('.text-gray-900').classList.remove('line-through');
+// 中期経営計画の初期化
+function initializePlan() {
+    if (!strategyData || !strategyData.midtermPlan) return;
+    
+    const plan = strategyData.midtermPlan;
+    
+    // ヘッダー情報
+    document.getElementById('plan-title').textContent = plan.title;
+    document.getElementById('plan-subtitle').textContent = plan.subtitle;
+    
+    // データソース
+    const sourcesContainer = document.getElementById('plan-sources');
+    sourcesContainer.innerHTML = plan.dataSources.map(source => 
+        `<span class="source-badge">${source.icon} ${source.type} - ${source.date}</span>`
+    ).join('');
+    
+    // 定量目標
+    renderTargets('quantitative-targets', plan.quantitativeTargets);
+    const quantitativeQuestionCount = plan.quantitativeTargets.reduce((sum, target) => sum + (target.questionCount || 0), 0);
+    document.getElementById('quantitative-question-count').textContent = quantitativeQuestionCount;
+    
+    // 重点施策
+    renderTargets('key-strategies', plan.keyStrategies);
+    const strategiesQuestionCount = plan.keyStrategies.reduce((sum, target) => sum + (target.questionCount || 0), 0);
+    document.getElementById('strategies-question-count').textContent = strategiesQuestionCount;
+}
+
+// 目標カードの描画
+function renderTargets(containerId, targets) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = targets.map(target => `
+        <div class="target-card" onclick="showTargetDetail('${target.id}')">
+            <div class="target-indicator ${target.hasQuestions ? 'has-questions' : ''}"></div>
+            <div class="target-name">${target.name}</div>
+            <div class="target-value">${target.value}</div>
+            <div class="target-baseline">${target.baseline}</div>
+            <div class="target-questions ${target.questionCount === 0 ? 'all-answered' : ''}" onclick="event.stopPropagation(); showTargetQuestions('${target.id}')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ${target.questionCount > 0 ? 
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />' :
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />'
+                    }
+                </svg>
+                <span>${target.questionCount > 0 ? `${target.questionCount}件の未回答質問` : 'すべて回答済み'}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill ${getProgressClass(target.progress)}" style="width: ${target.progress || 0}%"></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 進捗率に応じたクラス
+function getProgressClass(progress) {
+    if (progress >= 70) return '';
+    if (progress >= 40) return 'warning';
+    return 'danger';
+}
+
+// 質問の読み込み
+function loadQuestions() {
+    if (!strategyData || !strategyData.questions) return;
+    
+    const questions = strategyData.questions;
+    
+    // カウンター更新
+    document.getElementById('unanswered-count').textContent = questions.summary.unanswered;
+    document.getElementById('draft-count').textContent = questions.summary.draft;
+    
+    // 質問リスト表示
+    renderQuestions(questions.recentQuestions);
+}
+
+// 質問の描画
+function renderQuestions(questions) {
+    const container = document.getElementById('question-list');
+    container.innerHTML = questions.map(q => `
+        <div class="question-item" onclick="openQuestionDetail('${q.id}')">
+            <div class="question-header">
+                <div class="question-meta">
+                    <span>🏢 ${q.investor}</span>
+                    <span>•</span>
+                    <span>${q.date} ${q.type}</span>
+                    <span>•</span>
+                    <span>${q.category}</span>
+                </div>
+                <div class="question-status">
+                    <span class="status-badge status-${q.status}">${getStatusLabel(q.status)}</span>
+                </div>
+            </div>
+            <p class="question-text">${q.question}</p>
+            <p class="question-context">
+                関連：${q.relatedTo.join(', ')}
+            </p>
+            <div class="question-actions">
+                <button class="action-button primary" onclick="event.stopPropagation(); answerQuestion('${q.id}')">回答作成</button>
+                <button class="action-button" onclick="event.stopPropagation(); createFAQ('${q.id}')">FAQ化</button>
+                <button class="action-button" onclick="event.stopPropagation(); assignQuestion('${q.id}')">担当者割当</button>
+                <button class="action-button" onclick="event.stopPropagation(); relateQuestion('${q.id}')">類似質問を見る</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ステータスラベルの取得
+function getStatusLabel(status) {
+    const labels = {
+        'new': '新規',
+        'draft': '下書き',
+        'answered': '回答済み',
+        'faq': 'FAQ化済み'
+    };
+    return labels[status] || status;
+}
+
+// インサイトの読み込み
+function loadInsights() {
+    if (!strategyData || !strategyData.insights) return;
+    
+    const container = document.getElementById('insights-list');
+    container.innerHTML = strategyData.insights.current.map(insight => `
+        <div class="insight-item" onclick="applyInsight('${insight.type}')">
+            <div class="insight-icon ${insight.type}">
+                ${insight.icon}
+            </div>
+            <div class="flex-1">
+                <h4 class="font-medium text-sm">${insight.title}</h4>
+                <p class="text-xs text-gray-600 mt-1">${insight.description}</p>
+            </div>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+    `).join('');
+}
+
+// 新しいデータのチェック
+function checkForNewData() {
+    // デモ用：新しいデータがあることを通知
+    setTimeout(() => {
+        document.getElementById('ai-analysis-alert').style.display = 'block';
+    }, 2000);
+}
+
+// アラートを閉じる
+function dismissAlert() {
+    document.getElementById('ai-analysis-alert').style.display = 'none';
+}
+
+// AI分析開始
+function startAIAnalysis() {
+    dismissAlert();
+    showModal({
+        title: 'AI戦略分析',
+        content: `
+            <div class="space-y-4">
+                <p>最新の開示資料からAI分析を実行します。</p>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-medium mb-2">分析対象</h4>
+                    <ul class="text-sm space-y-1">
+                        <li>• 2024年1月22日 決算短信</li>
+                        <li>• 2024年1月15日 中期経営計画進捗</li>
+                    </ul>
+                </div>
+                <p class="text-sm text-gray-600">処理時間の目安：1-2分</p>
+            </div>
+        `,
+        onConfirm: () => {
+            showNotification('AI分析を開始しました', 'info');
+            // ここで実際の分析処理を実行
+            simulateAIAnalysis();
         }
     });
+}
+
+// 目標詳細表示
+function showTargetDetail(targetId) {
+    const allTargets = [...strategyData.midtermPlan.quantitativeTargets, ...strategyData.midtermPlan.keyStrategies];
+    const target = allTargets.find(t => t.id === targetId);
+    
+    if (!target) return;
+    
+    showModal({
+        title: target.name,
+        content: `
+            <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-2xl font-bold mb-2">${target.value}</p>
+                    <p class="text-sm text-gray-600">${target.baseline}</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-medium mb-2">進捗状況</h4>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill ${getProgressClass(target.progress)}" style="width: ${target.progress}%"></div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">${target.progress}% 達成</p>
+                </div>
+                
+                ${target.details ? `
+                    <div>
+                        <h4 class="font-medium mb-2">詳細</h4>
+                        <p class="text-sm text-gray-600">${target.details.description}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="flex gap-2">
+                    <button onclick="editTarget('${targetId}')" class="btn btn-primary btn-sm">編集</button>
+                    <button onclick="showTargetQuestions('${targetId}')" class="btn btn-secondary btn-sm">関連質問を見る</button>
+                </div>
+            </div>
+        `,
+        showConfirm: false
+    });
+}
+
+// 質問タブ切り替え
+function switchQuestionTab(tab) {
+    currentQuestionTab = tab;
+    
+    // タブのアクティブ状態を更新
+    document.querySelectorAll('.question-tab').forEach(t => {
+        t.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // 質問リストを更新
+    // ここで実際のタブに応じた質問を表示
+    loadQuestions();
+}
+
+// FAQ作成
+function createFAQ(questionId) {
+    const question = strategyData.questions.recentQuestions.find(q => q.id === questionId);
+    if (!question) return;
+    
+    currentEditingQuestion = question;
+    
+    document.getElementById('original-question').textContent = question.question;
+    document.getElementById('faq-question').value = '';
+    document.getElementById('faq-answer').value = '';
+    document.getElementById('faq-editor').style.display = 'block';
+    document.getElementById('faq-editor').scrollIntoView({ behavior: 'smooth' });
+}
+
+// FAQエディタを閉じる
+function closeFAQEditor() {
+    document.getElementById('faq-editor').style.display = 'none';
+    currentEditingQuestion = null;
+}
+
+// FAQ保存
+function saveFAQ() {
+    const faqData = {
+        question: document.getElementById('faq-question').value,
+        answer: document.getElementById('faq-answer').value,
+        category: document.getElementById('faq-category').value,
+        originalQuestionId: currentEditingQuestion?.id
+    };
+    
+    // ここで実際の保存処理
+    showNotification('FAQを保存しました', 'success');
+    closeFAQEditor();
+}
+
+// AI提案の適用
+function applyAISuggestion(type, index) {
+    if (type === 'question') {
+        document.getElementById('faq-question').value = "海外展開における地域別の売上目標と投資計画について教えてください";
+    } else if (type === 'answer') {
+        document.getElementById('faq-answer').value = "2026年度の海外売上比率35%達成に向けて、アジア地域で200億円（全体の60%）、北米で100億円（30%）、欧州で30億円（10%）の売上を計画しています。投資額は3年間で総額150億円を予定し、現地法人設立、物流拠点構築、マーケティング強化に充当します。";
+    }
+}
+
+// モーダル表示
+function showModal(options) {
+    const backdrop = document.getElementById('modal-backdrop');
+    const title = document.getElementById('modal-title');
+    const body = document.getElementById('modal-body');
+    const confirmBtn = document.getElementById('modal-confirm');
+    
+    title.textContent = options.title;
+    body.innerHTML = options.content;
+    
+    if (options.showConfirm !== false) {
+        confirmBtn.style.display = 'block';
+        confirmBtn.onclick = () => {
+            closeModal();
+            if (options.onConfirm) options.onConfirm();
+        };
+    } else {
+        confirmBtn.style.display = 'none';
+    }
+    
+    backdrop.classList.add('active');
+}
+
+// モーダルを閉じる
+function closeModal() {
+    document.getElementById('modal-backdrop').classList.remove('active');
+}
+
+// 通知表示
+function showNotification(message, type = 'info') {
+    // Tailwindのtoastコンポーネントを使用
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-50 ${
+        type === 'success' ? 'bg-green-600' : 
+        type === 'error' ? 'bg-red-600' : 
+        'bg-blue-600'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// AI分析のシミュレーション
+function simulateAIAnalysis() {
+    setTimeout(() => {
+        showNotification('AI分析が完了しました', 'success');
+        
+        // 分析結果の表示
+        showModal({
+            title: 'AI分析結果',
+            content: `
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-medium mb-2">重要な発見</h4>
+                        <ul class="text-sm space-y-1">
+                            <li>• 海外売上比率目標を35%→38%に上方修正を推奨</li>
+                            <li>• DX投資額を300億円→320億円に増額の必要性</li>
+                            <li>• 新規施策：AI需要予測システムの追加</li>
+                        </ul>
+                    </div>
+                    <p class="text-sm text-gray-600">これらの変更を中期経営計画に反映しますか？</p>
+                </div>
+            `,
+            onConfirm: () => {
+                showNotification('中期経営計画を更新しました', 'success');
+                // 画面の更新
+                updatePlanWithAIResults();
+            }
+        });
+    }, 2000);
+}
+
+// AI分析結果の反映
+function updatePlanWithAIResults() {
+    // 海外売上比率を更新
+    const overseasTarget = strategyData.midtermPlan.quantitativeTargets.find(t => t.id === 'overseas-ratio');
+    if (overseasTarget) {
+        overseasTarget.value = '38%';
+        overseasTarget.baseline = '2023年度実績: 22%（+16pt）';
+    }
+    
+    // DX投資を更新
+    const dxStrategy = strategyData.midtermPlan.keyStrategies.find(s => s.id === 'dx-investment');
+    if (dxStrategy) {
+        dxStrategy.value = '3年間で320億円';
+    }
+    
+    // 画面を再描画
+    initializePlan();
+}
+
+// その他の機能
+function toggleAIAssist() {
+    showNotification('AI アシスタントが起動しました', 'info');
+}
+
+function answerQuestion(questionId) {
+    showNotification(`質問 ${questionId} の回答作成画面を開きます`, 'info');
+}
+
+function assignQuestion(questionId) {
+    showNotification(`質問 ${questionId} の担当者割当画面を開きます`, 'info');
+}
+
+function relateQuestion(questionId) {
+    showNotification(`質問 ${questionId} の類似質問を検索します`, 'info');
+}
+
+function showTargetQuestions(targetId) {
+    showNotification(`${targetId} に関連する質問を表示します`, 'info');
+}
+
+function showAllQuestions(type) {
+    showNotification(`${type} に関連するすべての質問を表示します`, 'info');
+}
+
+function editTargets(type) {
+    showNotification(`${type} の編集画面を開きます`, 'info');
+}
+
+function importQuestions() {
+    showNotification('質問のインポート画面を開きます', 'info');
+}
+
+function showAIAssistant() {
+    showNotification('AI回答支援を起動します', 'info');
+}
+
+function applyInsight(type) {
+    showNotification(`インサイト ${type} を適用します`, 'info');
+}
+
+function openQuestionDetail(questionId) {
+    showNotification(`質問 ${questionId} の詳細を表示します`, 'info');
+}
+
+function editTarget(targetId) {
+    showNotification(`目標 ${targetId} の編集画面を開きます`, 'info');
+}
+
+// モーダル背景のクリックで閉じる
+document.getElementById('modal-backdrop').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
 });
 </script>
 {% endblock %}

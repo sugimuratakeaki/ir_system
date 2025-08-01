@@ -2,6 +2,10 @@
 
 {% block title %}議事録ファクトリー - IR担当者{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/dialogue-factory.css">
+{% endblock %}
+
 {% block content %}
 <div class="space-y-6">
     <!-- ページヘッダー -->
@@ -168,11 +172,239 @@
                 </div>
             </div>
 
-            <!-- ステップ2-5のコンテンツはここに追加 -->
+            <!-- ステップ2: 文字起こし -->
             <div id="step2-content" class="step-content-panel hidden">
                 <div class="card">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">文字起こし編集</h3>
-                    <p class="text-gray-600">AI文字起こし処理中...</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">文字起こし編集</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-600">処理状況:</span>
+                            <div class="progress w-32">
+                                <div id="transcription-progress" class="progress-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 音声プレイヤー -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <div class="flex items-center gap-4">
+                            <button class="play-button" onclick="togglePlayback()">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                            <div class="flex-1">
+                                <div class="audio-progress">
+                                    <div class="audio-progress-bar"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>00:00</span>
+                                    <span>45:32</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">速度:</span>
+                                <select class="form-select-sm">
+                                    <option>0.75x</option>
+                                    <option selected>1.0x</option>
+                                    <option>1.25x</option>
+                                    <option>1.5x</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 文字起こしセグメント -->
+                    <div id="transcript-segments" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- セグメントはJavaScriptで動的に追加 -->
+                    </div>
+                    
+                    <div class="mt-6 flex justify-between">
+                        <button class="btn btn-secondary" onclick="prevStep()">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            前へ戻る
+                        </button>
+                        <button class="btn btn-primary" onclick="nextStep()">
+                            次へ: AI分析
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステップ3: AI分析 -->
+            <div id="step3-content" class="step-content-panel hidden">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">AI分析結果</h3>
+                    
+                    <!-- 分析サマリー -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="bg-green-50 rounded-lg p-4 text-center">
+                            <div id="sentiment-chart" class="mb-2">
+                                <!-- センチメント分析チャート -->
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-blue-900 mb-2">重要ポイント</h4>
+                            <ul id="key-points-list" class="text-sm">
+                                <!-- 重要ポイントリスト -->
+                            </ul>
+                        </div>
+                        <div class="bg-yellow-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-yellow-900 mb-2">懸念事項</h4>
+                            <ul id="concerns-list" class="text-sm">
+                                <!-- 懸念事項リスト -->
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- キーワードクラウド -->
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">キーワード分析</h4>
+                        <div id="keyword-cloud" class="text-center space-x-2 space-y-2">
+                            <!-- キーワードクラウド -->
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-between">
+                        <button class="btn btn-secondary" onclick="prevStep()">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            前へ戻る
+                        </button>
+                        <button class="btn btn-primary" onclick="nextStep()">
+                            次へ: コンテンツ生成
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステップ4: コンテンツ生成 -->
+            <div id="step4-content" class="step-content-panel hidden">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">コンテンツ生成</h3>
+                    
+                    <!-- FAQ生成 -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-gray-900">FAQ（よくある質問）</h4>
+                            <button class="btn btn-sm btn-secondary" onclick="addFAQ()">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                追加
+                            </button>
+                        </div>
+                        <div id="faq-list" class="space-y-4">
+                            <!-- FAQ項目 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 要約生成 -->
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">エグゼクティブサマリー</h4>
+                        <div id="executive-summary" class="bg-gray-50 rounded-lg p-4">
+                            <!-- 要約内容 -->
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-between">
+                        <button class="btn btn-secondary" onclick="prevStep()">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            前へ戻る
+                        </button>
+                        <button class="btn btn-primary" onclick="nextStep()">
+                            次へ: 公開設定
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステップ5: 公開設定 -->
+            <div id="step5-content" class="step-content-panel hidden">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">公開設定</h3>
+                    
+                    <!-- 公開範囲 -->
+                    <div class="mb-6">
+                        <label class="form-label">公開範囲</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="publish-scope" value="all" class="form-radio" checked>
+                                <span class="ml-2">全ての投資家に公開</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="publish-scope" value="registered" class="form-radio">
+                                <span class="ml-2">登録投資家のみ</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="publish-scope" value="specific" class="form-radio">
+                                <span class="ml-2">特定の投資家グループ</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 公開日時 -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="form-field">
+                            <label class="form-label">公開日</label>
+                            <input type="date" id="publish-date" class="form-input">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">公開時刻</label>
+                            <input type="time" id="publish-time" class="form-input" value="09:00">
+                        </div>
+                    </div>
+                    
+                    <!-- 通知設定 -->
+                    <div class="mb-6">
+                        <label class="form-label">通知設定</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox" checked>
+                                <span class="ml-2">メールで通知する</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="form-checkbox">
+                                <span class="ml-2">IRサイトのお知らせに掲載</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- プレビュー -->
+                    <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                        <h4 class="font-semibold text-blue-900 mb-2">公開内容のプレビュー</h4>
+                        <p class="text-sm text-blue-700">議事録、FAQ、エグゼクティブサマリーが投資家向けページに公開されます。</p>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-between">
+                        <button class="btn btn-secondary" onclick="prevStep()">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            前へ戻る
+                        </button>
+                        <button class="btn btn-primary" onclick="publishDialogue()">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            公開する
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -319,93 +551,188 @@
     display: block;
     animation: fadeIn 0.3s;
 }
+
+/* プレイボタン */
+.play-button {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.play-button:hover {
+    background-color: #2563eb;
+    transform: scale(1.05);
+}
+
+/* 音声プログレスバー */
+.audio-progress {
+    height: 0.5rem;
+    background-color: #e5e7eb;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.audio-progress-bar {
+    height: 100%;
+    background-color: #3b82f6;
+    width: 0;
+    transition: width 0.1s;
+}
+
+/* 文字起こしセグメント */
+.transcript-segment {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.transcript-segment.highlighted {
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.transcript-segment.important {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.speaker-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+}
+
+.segment-text {
+    width: 100%;
+    min-height: 4rem;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* FAQ項目 */
+.faq-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: white;
+}
+
+.faq-question,
+.faq-answer {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.faq-number {
+    font-weight: 600;
+    color: #3b82f6;
+    min-width: 2rem;
+}
+
+.faq-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* キーワードクラウド */
+.keyword {
+    display: inline-block;
+    margin: 0.25rem;
+    color: #3b82f6;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.keyword:hover {
+    transform: scale(1.1);
+    color: #2563eb;
+}
+
+/* ボタンアイコン */
+.btn-icon {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background-color: #f3f4f6;
+}
+
+/* 通知 */
+.notification {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 500;
+    transform: translateX(400px);
+    transition: transform 0.3s;
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    background-color: #10b981;
+}
+
+.notification-error {
+    background-color: #ef4444;
+}
+
+.notification-info {
+    background-color: #3b82f6;
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 </style>
 
-<script>
-// ワークフロー制御
-let currentStep = 1;
-
-function nextStep() {
-    if (currentStep < 5) {
-        // 現在のステップを非表示
-        document.getElementById(`step${currentStep}-content`).classList.remove('active');
-        
-        // ステップを進める
-        currentStep++;
-        
-        // 新しいステップを表示
-        document.getElementById(`step${currentStep}-content`)?.classList.add('active');
-        
-        // 進捗表示を更新
-        updateProgress();
-    }
-}
-
-function updateProgress() {
-    // ステップアイテムの更新
-    document.querySelectorAll('.step-item').forEach((item, index) => {
-        if (index < currentStep - 1) {
-            item.classList.add('completed');
-            item.classList.remove('active');
-        } else if (index === currentStep - 1) {
-            item.classList.add('active');
-            item.classList.remove('completed');
-        } else {
-            item.classList.remove('active', 'completed');
-        }
-    });
-    
-    // コネクターの更新
-    document.querySelectorAll('.step-connector').forEach((conn, index) => {
-        if (index < currentStep - 1) {
-            conn.classList.add('active');
-        } else {
-            conn.classList.remove('active');
-        }
-    });
-}
-
-// ドラッグ＆ドロップ処理
-const dropzone = document.getElementById('dropzone');
-
-dropzone?.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('drag-over');
-});
-
-dropzone?.addEventListener('dragleave', () => {
-    dropzone.classList.remove('drag-over');
-});
-
-dropzone?.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('drag-over');
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleFileSelect(files[0]);
-    }
-});
-
-// ファイル選択処理
-document.getElementById('file-input')?.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        handleFileSelect(e.target.files[0]);
-    }
-});
-
-function handleFileSelect(file) {
-    // ファイル情報を表示
-    document.getElementById('file-info').classList.remove('hidden');
-    document.getElementById('file-name').textContent = file.name;
-    document.getElementById('file-size').textContent = formatFileSize(file.size);
-}
-
-function formatFileSize(bytes) {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    if (bytes === 0) return '0 Bytes';
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-}
-</script>
+<script src="/static/js/pages/dialogue-factory.js"></script>
 {% endblock %}

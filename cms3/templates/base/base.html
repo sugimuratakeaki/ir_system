@@ -10,7 +10,10 @@
     
     <!-- カスタムCSS -->
     <link rel="stylesheet" href="/static/css/base.css">
-    {% block styles %}{% endblock %}
+    <link rel="stylesheet" href="/static/css/components/common.css">
+    
+    <!-- ページ固有のCSS -->
+    {% block extra_css %}{% endblock %}
     
     <!-- Tailwind Config -->
     <script>
@@ -67,6 +70,8 @@
     <script src="/static/js/core/utils.js"></script>
     <script src="/static/js/core/api.js"></script>
     <script src="/static/js/core/notification.js"></script>
+    
+    <!-- ページ固有のJavaScript -->
     {% block scripts %}{% endblock %}
 </body>
 </html>
