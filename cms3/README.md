@@ -33,23 +33,24 @@ KAGAMIは、企業のIR（Investor Relations）活動を統合的に管理し、
 
 ### バックエンド
 - Python 3.8+
-- Django 4.2.8
-- Django REST Framework
-- Celery（非同期タスク）
+- FastAPI 0.104.1
+- Uvicorn（ASGIサーバー）
+- Jinja2（テンプレートエンジン）
+- Python-multipart（フォーム処理）
+- Aiofiles（非同期ファイル操作）
 
 ### フロントエンド
 - HTML5 / CSS3
 - JavaScript (Vanilla)
-- Tailwind CSS
+- CSS Grid / Flexbox
 - Chart.js（データ可視化）
 
 ### データベース
-- SQLite（開発環境）
-- MySQL/PostgreSQL（本番環境推奨）
+- ファイルベース（JSON）
+- 将来的にはPostgreSQL/MySQL対応予定
 
 ### その他
-- Redis（キャッシュ・セッション）
-- Gunicorn（本番環境）
+- Uvicorn（本番環境対応）
 - Nginx（リバースプロキシ）
 
 ## クイックスタート
@@ -76,36 +77,35 @@ chmod +x start.sh
 ```
 
 ### 5. アクセス
-- フロントサイト: http://localhost:8000/
-- 管理画面: http://localhost:8000/admin/
+- フロントサイト: http://localhost:8003/
+- ヘルスチェック: http://localhost:8003/health
+- API: http://localhost:8003/api/test-data/sample
 
 ## プロジェクト構造
 ```
 cms3/
-├── start.sh              # 起動スクリプト
-├── manage.py            # Django管理コマンド
+├── start.sh              # 起動スクリプト（FastAPI用）
+├── app.py               # FastAPIメインアプリケーション
 ├── requirements.txt     # Python依存関係
-├── .env                # 環境変数（要作成）
-├── cms3/               # プロジェクト設定
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── apps/               # アプリケーション
-│   ├── investors/      # 投資家管理
-│   ├── documents/      # ドキュメント管理
-│   ├── analytics/      # 分析機能
-│   └── ...
-├── templates/          # HTMLテンプレート
+├── config/             # 設定ファイル
+│   ├── __init__.py
+│   ├── roles.py
+│   └── settings.py
+├── utils/              # ユーティリティ
+├── templates/          # HTMLテンプレート（Jinja2）
 │   ├── base/          # ベーステンプレート
+│   ├── components/    # 再利用可能なコンポーネント
 │   ├── front/         # フロントサイト
-│   ├── investor/      # 投資家向け
 │   ├── ir/            # IR担当者向け
 │   ├── executive/     # 経営陣向け
-│   └── director/      # 社外取締役向け
+│   ├── director/      # 社外取締役向け
+│   └── errors/        # エラーページ
 ├── static/            # 静的ファイル
-│   ├── css/
-│   ├── js/
-│   └── images/
+│   ├── css/           # スタイルシート
+│   ├── js/            # JavaScript
+│   ├── images/        # 画像ファイル
+│   └── data/          # テストデータ（JSON）
+├── venv/              # Python仮想環境
 └── logs/              # ログファイル
 ```
 
@@ -116,9 +116,14 @@ cms3/
 source venv/bin/activate
 ```
 
-### マイグレーションの実行
+### サーバーの停止
 ```bash
-./start.sh migrate
+./start.sh stop
+```
+
+### サーバーの状態確認
+```bash
+./start.sh status
 ```
 
 ### テストの実行
@@ -126,28 +131,27 @@ source venv/bin/activate
 ./start.sh test
 ```
 
-### 新しいアプリの作成
+### 開発用シェルの起動
 ```bash
-python manage.py startapp app_name
+./start.sh shell
 ```
 
 ## デプロイ
 
 ### 本番環境の設定
-1. `.env`ファイルの編集
-   - `DEBUG=False`
-   - `SECRET_KEY`を安全な値に変更
-   - `ALLOWED_HOSTS`に本番ドメインを追加
-
-2. 静的ファイルの収集
-```bash
-python manage.py collectstatic
-```
-
-3. 本番環境での起動
+1. 本番環境での起動
 ```bash
 ./start.sh start --production
 ```
+
+2. 特定のポート/ホストでの起動
+```bash
+./start.sh start --port 8080 --host 127.0.0.1
+```
+
+3. FastAPI自動ドキュメント
+- Swagger UI: http://localhost:8003/docs
+- ReDoc: http://localhost:8003/redoc
 
 ### Docker対応（オプション）
 ```bash
@@ -156,11 +160,11 @@ docker-compose up -d
 
 ## セキュリティ
 
-- SQLインジェクション対策：Django ORM使用
-- XSS対策：テンプレートの自動エスケープ
-- CSRF対策：Django組み込みミドルウェア
-- 認証・認可：Django認証システム
+- XSS対策：Jinja2テンプレートの自動エスケープ
+- CORS対策：FastAPI組み込み機能
+- 認証・認可：実装予定
 - HTTPS：本番環境では必須
+- 入力検証：Pydanticモデル使用
 
 ## ライセンス
 このプロジェクトは株式会社KAGAMIの専有ソフトウェアです。
@@ -174,4 +178,5 @@ docker-compose up -d
 プルリクエストを歓迎します。大きな変更の場合は、まずissueを作成して変更内容を議論してください。
 
 ## 更新履歴
+- v3.0.0 (2025-01-XX) - FastAPIによる新アーキテクチャ
 - v1.0.0 (2024-12-XX) - 初回リリース

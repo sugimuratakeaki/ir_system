@@ -99,6 +99,15 @@ async def ir_strategy_assistant(request: Request):
         "role": "ir"
     })
 
+@app.get("/ir/strategy-assistant/timeline-analysis", response_class=HTMLResponse)
+async def ir_timeline_analysis(request: Request):
+    """時系列分析 - 戦略アシスタント"""
+    return templates.TemplateResponse("ir/strategy-assistant/timeline-analysis.html", {
+        "request": request,
+        "title": "時系列分析 - 戦略アシスタント",
+        "role": "ir"
+    })
+
 @app.get("/ir/analytics-lab", response_class=HTMLResponse)
 async def ir_analytics_lab(request: Request):
     """分析ラボ"""

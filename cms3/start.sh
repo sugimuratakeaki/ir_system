@@ -19,8 +19,8 @@ LOG_DIR="$PROJECT_DIR/logs"
 PID_FILE="$PROJECT_DIR/.server.pid"
 
 # デフォルト設定
-DEFAULT_PORT=8000
-DEFAULT_HOST="127.0.0.1"
+DEFAULT_PORT=8003
+DEFAULT_HOST="0.0.0.0"
 ENVIRONMENT="development"
 
 # ロゴ表示
@@ -132,18 +132,11 @@ install_dependencies() {
     if [ ! -f "$REQUIREMENTS_FILE" ]; then
         log "WARN" "requirements.txtが見つかりません。作成します..."
         cat > "$REQUIREMENTS_FILE" << EOF
-Django==4.2.8
-python-dotenv==1.0.0
-mysqlclient==2.2.0
-Pillow==10.1.0
-django-crispy-forms==2.1
-crispy-bootstrap5==0.7
-djangorestframework==3.14.0
-django-cors-headers==4.3.0
-celery==5.3.4
-redis==5.0.1
-gunicorn==21.2.0
-whitenoise==6.6.0
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+jinja2==3.1.2
+python-multipart==0.0.6
+aiofiles==23.2.1
 EOF
         log "INFO" "requirements.txtを作成しました"
     fi
@@ -153,25 +146,14 @@ EOF
     log "INFO" "依存関係のインストールが完了しました"
 }
 
-# データベースの初期化
+# データベースの初期化（FastAPIではファイルベースなのでスキップ）
 setup_database() {
-    log "INFO" "データベースをセットアップ中..."
-    
-    # マイグレーションファイルの作成
-    python manage.py makemigrations --noinput > /dev/null 2>&1
-    
-    # マイグレーションの実行
-    python manage.py migrate --noinput || error_exit "データベースマイグレーションに失敗しました"
-    
-    log "INFO" "データベースのセットアップが完了しました"
+    log "INFO" "データベースセットアップをスキップします（FastAPIはファイルベース）"
 }
 
-# 静的ファイルの収集
+# 静的ファイルの収集（FastAPIでは自動処理）
 collect_static() {
-    if [ "$ENVIRONMENT" = "production" ]; then
-        log "INFO" "静的ファイルを収集中..."
-        python manage.py collectstatic --noinput || log "WARN" "静的ファイルの収集に失敗しました"
-    fi
+    log "INFO" "静的ファイルはFastAPIが自動処理します"
 }
 
 # 初期セットアップ
@@ -204,13 +186,7 @@ EOF
     fi
     
     setup_database
-    
-    # スーパーユーザーの作成
-    log "INFO" "管理者アカウントを作成しますか？ (y/N)"
-    read -r CREATE_SUPERUSER
-    if [[ "$CREATE_SUPERUSER" =~ ^[Yy]$ ]]; then
-        python manage.py createsuperuser
-    fi
+
     
     log "INFO" "初期セットアップが完了しました！"
 }
@@ -231,15 +207,19 @@ start_server() {
     
     if [ "$ENVIRONMENT" = "production" ]; then
         collect_static
-        gunicorn cms3.wsgi:application \
-            --bind $host:$port \
+        uvicorn app:app \
+            --host $host \
+            --port $port \
             --workers 4 \
-            --pid "$PID_FILE" \
-            --daemon \
-            --access-logfile "$LOG_DIR/access.log" \
-            --error-logfile "$LOG_DIR/error.log"
+            --access-log \
+            --loop uvloop &
+        echo $! > "$PID_FILE"
     else
-        python manage.py runserver $host:$port &
+        uvicorn app:app \
+            --host $host \
+            --port $port \
+            --reload \
+            --access-log &
         echo $! > "$PID_FILE"
     fi
     
@@ -293,27 +273,24 @@ show_logs() {
     fi
 }
 
-# マイグレーション実行
+# マイグレーション実行（FastAPIではスキップ）
 run_migrations() {
     setup_venv
-    log "INFO" "マイグレーションを実行中..."
-    python manage.py makemigrations
-    python manage.py migrate
-    log "INFO" "マイグレーションが完了しました"
+    log "INFO" "FastAPIではマイグレーションは不要です"
 }
 
 # テスト実行
 run_tests() {
     setup_venv
     log "INFO" "テストを実行中..."
-    python manage.py test
+    python -m pytest tests/ -v
 }
 
-# Djangoシェル起動
+# Pythonシェル起動
 run_shell() {
     setup_venv
-    log "INFO" "Djangoシェルを起動します..."
-    python manage.py shell
+    log "INFO" "Pythonシェルを起動します..."
+    python -i -c "from app import app; print('FastAPI app imported as app')"
 }
 
 # メイン処理

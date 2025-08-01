@@ -1,0 +1,409 @@
+{% extends 'base/base.html' %}
+
+{% block title %}時系列分析 - 戦略アシスタント{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/strategy-assistant.css">
+<style>
+    /* 時系列分析専用スタイル */
+    .timeline-analysis-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+    }
+    
+    .analysis-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .timeline-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .time-range-selector {
+        display: flex;
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 2px;
+    }
+    
+    .time-range-option {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .time-range-option.active {
+        background: white;
+        color: #3b82f6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* 時系列チャート */
+    .timeline-chart-container {
+        height: 400px;
+        position: relative;
+        background: #f9fafb;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    /* イベントマーカー */
+    .event-marker {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #3b82f6;
+        border: 2px solid white;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .event-marker:hover {
+        transform: scale(1.5);
+    }
+    
+    .event-marker.positive {
+        background: #10b981;
+    }
+    
+    .event-marker.negative {
+        background: #ef4444;
+    }
+    
+    .event-marker.neutral {
+        background: #f59e0b;
+    }
+    
+    /* 相関分析 */
+    .correlation-matrix {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .correlation-cell {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .correlation-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .correlation-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .correlation-positive {
+        color: #10b981;
+    }
+    
+    .correlation-negative {
+        color: #ef4444;
+    }
+    
+    /* インサイトパネル */
+    .insights-panel {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .insight-item {
+        display: flex;
+        align-items: start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .insight-icon {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .insight-icon.critical {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .insight-icon.important {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+    
+    .insight-icon.info {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <nav class="flex items-center text-sm text-gray-500 mb-2">
+                    <a href="/ir/strategy-assistant" class="hover:text-gray-700">戦略アシスタント</a>
+                    <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <span class="text-gray-900">時系列分析</span>
+                </nav>
+                <h1 class="text-2xl font-bold text-gray-900">投資家フィードバック時系列分析</h1>
+                <p class="text-gray-600 mt-1">投資家の関心事項と市場動向の相関を分析</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="btn btn-secondary" onclick="exportReport()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    レポート出力
+                </button>
+                <button class="btn btn-primary" onclick="showDetailedSettings()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    詳細設定
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 時系列分析メインコンテンツ -->
+    <div class="timeline-analysis-container">
+        <!-- 分析ヘッダー -->
+        <div class="analysis-header">
+            <h2 class="text-xl font-semibold text-gray-900">投資家センチメント推移</h2>
+            <div class="timeline-controls">
+                <div class="time-range-selector">
+                    <button class="time-range-option">1ヶ月</button>
+                    <button class="time-range-option">3ヶ月</button>
+                    <button class="time-range-option active">6ヶ月</button>
+                    <button class="time-range-option">1年</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600">比較対象：</label>
+                    <select class="form-select text-sm">
+                        <option>株価</option>
+                        <option>出来高</option>
+                        <option>PER</option>
+                        <option>業界平均</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 時系列チャート -->
+        <div class="timeline-chart-container">
+            <div class="text-gray-500">
+                <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <p class="text-center">インタラクティブチャート表示エリア</p>
+                <p class="text-sm text-center mt-2">Chart.jsまたはD3.jsで実装予定</p>
+            </div>
+            
+            <!-- サンプルイベントマーカー -->
+            <div class="event-marker positive" style="left: 20%; bottom: 60%;" title="決算発表 - ポジティブ反応"></div>
+            <div class="event-marker negative" style="left: 35%; bottom: 40%;" title="業績下方修正 - ネガティブ反応"></div>
+            <div class="event-marker neutral" style="left: 60%; bottom: 50%;" title="中計発表 - 中立的反応"></div>
+            <div class="event-marker positive" style="left: 80%; bottom: 70%;" title="配当増配発表 - ポジティブ反応"></div>
+        </div>
+
+        <!-- 相関分析 -->
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">相関分析</h3>
+        <div class="correlation-matrix">
+            <div class="correlation-cell">
+                <div class="correlation-value correlation-positive">+0.82</div>
+                <div class="correlation-label">株価との相関</div>
+            </div>
+            <div class="correlation-cell">
+                <div class="correlation-value correlation-negative">-0.45</div>
+                <div class="correlation-label">ボラティリティ</div>
+            </div>
+            <div class="correlation-cell">
+                <div class="correlation-value correlation-positive">+0.67</div>
+                <div class="correlation-label">業界指数</div>
+            </div>
+            <div class="correlation-cell">
+                <div class="correlation-value">+0.23</div>
+                <div class="correlation-label">出来高</div>
+            </div>
+        </div>
+
+        <!-- AIインサイト -->
+        <div class="insights-panel">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <span class="inline-flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    AI分析によるインサイト
+                </span>
+            </h3>
+            
+            <div class="insight-item">
+                <div class="insight-icon critical">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-900">重要な転換点を検出</h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                        中期経営計画発表後、投資家センチメントが急速に悪化。特にROE改善策への失望が主因。
+                        株価は3日間で-8%下落し、その後も低迷が続いている。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon important">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-900">トレンド予測</h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                        現在のセンチメント低下トレンドが続く場合、次回決算発表時に売り圧力が強まる可能性（確率72%）。
+                        早急な投資家向け説明会の開催を推奨。
+                    </p>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon info">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-900">推奨アクション</h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                        1. ROE改善の具体的ロードマップを1週間以内に公表<br>
+                        2. 主要機関投資家との個別面談を設定（特にアセットマネジメントA社）<br>
+                        3. 四半期進捗レポートの頻度を月次に変更
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 詳細データテーブル -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">イベント別センチメントスコア</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日付</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">イベント</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">投資家反応</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">センチメントスコア</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">株価影響</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">主要コメント</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024/12/15</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">中期経営計画発表</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                ネガティブ
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="text-red-600 font-semibold">-3.2</span>
+                                <svg class="w-4 h-4 ml-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                </svg>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">-8.2%</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">ROE目標が期待を下回る</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024/11/15</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">第3四半期決算</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                ポジティブ
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="text-green-600 font-semibold">+2.8</span>
+                                <svg class="w-4 h-4 ml-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                                </svg>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">+4.5%</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">業績好調、ガイダンス上方修正</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2024/10/20</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">配当政策発表</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                中立
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span class="text-gray-600 font-semibold">+0.5</span>
+                                <svg class="w-4 h-4 ml-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                </svg>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">+0.8%</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">配当維持、自社株買いなし</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/pages/timeline-analysis.js"></script>
+{% endblock %}
