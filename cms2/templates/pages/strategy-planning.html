@@ -1028,7 +1028,7 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- AI戦略分析アラート -->
-    <div id="ai-analysis-alert" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 rounded-lg" style="display: none;">
+    <div id="ai-analysis-alert" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 rounded-lg">
         <div class="flex items-start gap-3">
             <div class="flex-shrink-0">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1038,9 +1038,9 @@
             <div class="flex-1">
                 <h3 class="text-sm font-semibold text-blue-900">新しい開示資料を検出しました</h3>
                 <p class="text-sm text-blue-700 mt-1">2024年1月22日付の決算短信から戦略アップデートを抽出できます。</p>
-                <button onclick="startAIAnalysis()" class="mt-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
+                <a href="/strategy-edit-ai" class="mt-2 inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
                     AI分析を開始
-                </button>
+                </a>
             </div>
             <button onclick="dismissAlert()" class="text-blue-400 hover:text-blue-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

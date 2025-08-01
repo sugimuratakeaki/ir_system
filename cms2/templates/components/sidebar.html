@@ -100,10 +100,20 @@
                 <span class="nav-text">投資家管理</span>
             </a>
             
-            <a href="/strategy" class="nav-item {% if request.path == '/strategy' %}active{% endif %}" data-tooltip="戦略・開示">
-                <span class="nav-icon">🎯</span>
-                <span class="nav-text">戦略・開示</span>
-            </a>
+            <div class="nav-item-wrapper">
+                <a href="javascript:void(0)" class="nav-item has-submenu {% if request.path.startswith('/strategy') %}active expanded{% endif %}" data-tooltip="戦略・開示">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">戦略・開示</span>
+                    <span class="nav-arrow">▼</span>
+                </a>
+                <div class="nav-submenu {% if request.path.startswith('/strategy') %}show{% endif %}">
+                    <a href="/strategy" class="submenu-item {% if request.path == '/strategy' %}active{% endif %}">ダッシュボード</a>
+                    <a href="/strategy-planning" class="submenu-item {% if request.path == '/strategy-planning' %}active{% endif %}">中期計画管理</a>
+                    <a href="/strategy-edit-ai" class="submenu-item {% if request.path == '/strategy-edit-ai' %}active{% endif %}">🤖 AI戦略分析</a>
+                    <a href="/strategy-map" class="submenu-item {% if request.path == '/strategy-map' %}active{% endif %}">戦略マップ</a>
+                    <a href="/strategy-disclosure-assistant" class="submenu-item {% if request.path == '/strategy-disclosure-assistant' %}active{% endif %}">開示支援</a>
+                </div>
+            </div>
             
             <a href="/email-campaigns" class="nav-item {% if request.path == '/email-campaigns' %}active{% endif %}" data-tooltip="メール配信">
                 <span class="nav-icon">✉️</span>

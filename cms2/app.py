@@ -727,6 +727,14 @@ async def strategy_planning(request: Request):
         "base_url": "/cms2"
     })
 
+@app.get("/strategy-edit-ai", response_class=HTMLResponse)
+async def strategy_edit_ai(request: Request):
+    """AI戦略分析・編集ページ"""
+    return templates.TemplateResponse("pages/strategy-edit-ai.html", {
+        "request": request,
+        "base_url": "/cms2"
+    })
+
 @app.get("/strategy-planning/kpis", response_class=HTMLResponse)
 async def strategy_planning_kpis(request: Request):
     """戦略KPI詳細ページ"""
