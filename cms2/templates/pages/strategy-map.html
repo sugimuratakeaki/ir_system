@@ -85,6 +85,285 @@
         border-color: var(--kagami-blue-dark);
     }
     
+    /* 投資家質問分析セクション - 新規追加 */
+    .investor-questions-section {
+        background: white;
+        border-radius: var(--border-radius-xl);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .questions-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .questions-title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: var(--text-lg);
+        font-weight: var(--font-bold);
+        color: var(--gray-900);
+    }
+    
+    .questions-period {
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+    }
+    
+    .questions-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: var(--space-xl);
+    }
+    
+    /* 質問カテゴリー別分析 */
+    .category-analysis {
+        background: var(--gray-50);
+        border-radius: var(--border-radius-lg);
+        padding: var(--space-lg);
+    }
+    
+    .category-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-sm) 0;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .category-item:last-child {
+        border-bottom: none;
+    }
+    
+    .category-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        flex: 1;
+    }
+    
+    .category-icon {
+        font-size: var(--text-lg);
+    }
+    
+    .category-name {
+        font-weight: var(--font-medium);
+        color: var(--gray-900);
+    }
+    
+    .category-stats {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+    }
+    
+    .question-count {
+        font-weight: var(--font-bold);
+        color: var(--gray-900);
+        font-size: var(--text-lg);
+    }
+    
+    .trend-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: var(--text-sm);
+    }
+    
+    .trend-up {
+        color: var(--error);
+    }
+    
+    .trend-down {
+        color: var(--success);
+    }
+    
+    /* 質問詳細分析 */
+    .questions-detail {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-lg);
+    }
+    
+    .hot-topics {
+        background: var(--gray-50);
+        border-radius: var(--border-radius-lg);
+        padding: var(--space-lg);
+    }
+    
+    .hot-topics-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-bottom: var(--space-md);
+    }
+    
+    .hot-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        background: var(--error);
+        color: white;
+        border-radius: var(--border-radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-medium);
+    }
+    
+    .topic-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .topic-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        padding: var(--space-sm);
+        background: white;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .topic-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+        background: var(--kagami-blue);
+        color: white;
+        border-radius: var(--border-radius-full);
+        font-size: var(--text-xs);
+        font-weight: var(--font-bold);
+    }
+    
+    .topic-content {
+        flex: 1;
+    }
+    
+    .topic-question {
+        font-weight: var(--font-medium);
+        color: var(--gray-900);
+        margin-bottom: 4px;
+    }
+    
+    .topic-meta {
+        display: flex;
+        gap: var(--space-md);
+        font-size: var(--text-xs);
+        color: var(--gray-600);
+    }
+    
+    /* 対応状況分析 */
+    .response-status {
+        background: var(--gray-50);
+        border-radius: var(--border-radius-lg);
+        padding: var(--space-lg);
+    }
+    
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .status-card {
+        text-align: center;
+        padding: var(--space-md);
+        background: white;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .status-value {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-bold);
+        color: var(--gray-900);
+        margin-bottom: 4px;
+    }
+    
+    .status-label {
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+    }
+    
+    .status-card.answered {
+        border-color: var(--success);
+    }
+    
+    .status-card.answered .status-value {
+        color: var(--success);
+    }
+    
+    .status-card.pending {
+        border-color: var(--warning);
+    }
+    
+    .status-card.pending .status-value {
+        color: var(--warning);
+    }
+    
+    .status-card.escalated {
+        border-color: var(--error);
+    }
+    
+    .status-card.escalated .status-value {
+        color: var(--error);
+    }
+    
+    .feedback-loop {
+        background: white;
+        border-radius: var(--border-radius-md);
+        padding: var(--space-md);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .feedback-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-bottom: var(--space-sm);
+        font-weight: var(--font-medium);
+        color: var(--gray-900);
+    }
+    
+    .feedback-items {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+    }
+    
+    .feedback-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+    
+    .feedback-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: var(--gray-100);
+        border-radius: var(--border-radius-full);
+        font-size: var(--text-xs);
+    }
+    
+    .feedback-status.active {
+        background: var(--success-light);
+        color: white;
+    }
+    
     /* サマリーカード */
     .summary-grid {
         display: grid;
@@ -390,6 +669,10 @@
         .strategy-sections {
             grid-template-columns: 1fr;
         }
+        
+        .questions-grid {
+            grid-template-columns: 1fr;
+        }
     }
     
     @media (max-width: 768px) {
@@ -417,6 +700,10 @@
         .target-metrics {
             flex-direction: column;
             gap: var(--space-xs);
+        }
+        
+        .status-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -447,6 +734,184 @@
                     </svg>
                     最新データで更新
                 </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 投資家質問分析セクション（新規追加） -->
+    <div class="investor-questions-section">
+        <div class="questions-header">
+            <h2 class="questions-title">
+                <span>💬</span>
+                投資家からの質問分析
+            </h2>
+            <span class="questions-period">過去30日間</span>
+        </div>
+        
+        <div class="questions-grid">
+            <!-- カテゴリー別質問数 -->
+            <div class="category-analysis">
+                <h3 style="font-size: var(--text-base); font-weight: var(--font-semibold); margin-bottom: var(--space-md);">
+                    カテゴリー別質問数
+                </h3>
+                
+                <div class="category-item">
+                    <div class="category-info">
+                        <span class="category-icon">💰</span>
+                        <span class="category-name">財務目標</span>
+                    </div>
+                    <div class="category-stats">
+                        <span class="question-count">11件</span>
+                        <span class="trend-indicator trend-up">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                            +3
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="category-item">
+                    <div class="category-info">
+                        <span class="category-icon">🚀</span>
+                        <span class="category-name">成長戦略</span>
+                    </div>
+                    <div class="category-stats">
+                        <span class="question-count">23件</span>
+                        <span class="trend-indicator trend-up">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                            +8
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="category-item">
+                    <div class="category-info">
+                        <span class="category-icon">🌱</span>
+                        <span class="category-name">ESG目標</span>
+                    </div>
+                    <div class="category-stats">
+                        <span class="question-count">9件</span>
+                        <span class="trend-indicator trend-down">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            </svg>
+                            -2
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="category-item">
+                    <div class="category-info">
+                        <span class="category-icon">💻</span>
+                        <span class="category-name">デジタル戦略</span>
+                    </div>
+                    <div class="category-stats">
+                        <span class="question-count">12件</span>
+                        <span class="trend-indicator trend-up">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                            +5
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 質問詳細分析 -->
+            <div class="questions-detail">
+                <!-- ホットトピック -->
+                <div class="hot-topics">
+                    <div class="hot-topics-header">
+                        <h3 style="font-size: var(--text-base); font-weight: var(--font-semibold);">
+                            注目度の高い質問
+                        </h3>
+                        <span class="hot-badge">
+                            🔥 HOT
+                        </span>
+                    </div>
+                    
+                    <div class="topic-list">
+                        <div class="topic-item">
+                            <span class="topic-number">1</span>
+                            <div class="topic-content">
+                                <div class="topic-question">アジア市場展開の具体的なタイムラインと投資規模は？</div>
+                                <div class="topic-meta">
+                                    <span>成長戦略</span>
+                                    <span>18件の類似質問</span>
+                                    <span>海外投資家中心</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="topic-item">
+                            <span class="topic-number">2</span>
+                            <div class="topic-content">
+                                <div class="topic-question">DX投資320億円の内訳と期待ROIの詳細は？</div>
+                                <div class="topic-meta">
+                                    <span>デジタル戦略</span>
+                                    <span>12件の類似質問</span>
+                                    <span>機関投資家中心</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="topic-item">
+                            <span class="topic-number">3</span>
+                            <div class="topic-content">
+                                <div class="topic-question">海外売上比率38%の達成可能性と為替リスクヘッジは？</div>
+                                <div class="topic-meta">
+                                    <span>財務目標</span>
+                                    <span>8件の類似質問</span>
+                                    <span>全投資家層</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 対応状況と経営フィードバック -->
+                <div class="response-status">
+                    <h3 style="font-size: var(--text-base); font-weight: var(--font-semibold); margin-bottom: var(--space-md);">
+                        質問対応状況
+                    </h3>
+                    
+                    <div class="status-grid">
+                        <div class="status-card answered">
+                            <div class="status-value">33件</div>
+                            <div class="status-label">回答済み</div>
+                        </div>
+                        <div class="status-card pending">
+                            <div class="status-value">8件</div>
+                            <div class="status-label">検討中</div>
+                        </div>
+                        <div class="status-card escalated">
+                            <div class="status-value">4件</div>
+                            <div class="status-label">経営会議へ</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-loop">
+                        <div class="feedback-header">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            経営へのフィードバックループ
+                        </div>
+                        <div class="feedback-items">
+                            <div class="feedback-item">
+                                <span class="feedback-status active">実施済</span>
+                                <span>アジア展開計画を取締役会で再検討</span>
+                            </div>
+                            <div class="feedback-item">
+                                <span class="feedback-status">予定</span>
+                                <span>DX投資のKPI詳細を次回説明会で開示</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -570,8 +1035,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">
+                        <button class="target-action" onclick="showTargetDetail('revenue')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('revenue')">
                             質問 <span class="questions-indicator">8</span>
                         </button>
                     </div>
@@ -596,8 +1061,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">質問</button>
+                        <button class="target-action" onclick="showTargetDetail('margin')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('margin')">質問</button>
                     </div>
                 </div>
                 
@@ -620,8 +1085,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">
+                        <button class="target-action" onclick="showTargetDetail('roe')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('roe')">
                             質問 <span class="questions-indicator">3</span>
                         </button>
                     </div>
@@ -661,8 +1126,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">
+                        <button class="target-action" onclick="showTargetDetail('overseas')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('overseas')">
                             質問 <span class="questions-indicator">5</span>
                         </button>
                     </div>
@@ -687,8 +1152,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">
+                        <button class="target-action" onclick="showTargetDetail('asia')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('asia')">
                             質問 <span class="questions-indicator">18</span>
                         </button>
                     </div>
@@ -713,8 +1178,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">質問</button>
+                        <button class="target-action" onclick="showTargetDetail('newbiz')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('newbiz')">質問</button>
                     </div>
                 </div>
             </div>
@@ -749,8 +1214,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">
+                        <button class="target-action" onclick="showTargetDetail('co2')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('co2')">
                             質問 <span class="questions-indicator">7</span>
                         </button>
                     </div>
@@ -775,8 +1240,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">
+                        <button class="target-action" onclick="showTargetDetail('diversity')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('diversity')">
                             質問 <span class="questions-indicator">2</span>
                         </button>
                     </div>
@@ -816,8 +1281,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">
+                        <button class="target-action" onclick="showTargetDetail('dx')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('dx')">
                             質問 <span class="questions-indicator">12</span>
                         </button>
                     </div>
@@ -845,8 +1310,8 @@
                         </div>
                     </div>
                     <div class="target-actions">
-                        <button class="target-action">詳細</button>
-                        <button class="target-action">質問</button>
+                        <button class="target-action" onclick="showTargetDetail('ai')">詳細</button>
+                        <button class="target-action" onclick="showTargetQuestions('ai')">質問</button>
                     </div>
                 </div>
             </div>
@@ -921,6 +1386,9 @@
         
         // 更新バッジのアニメーション
         animateUpdateBadges();
+        
+        // 質問トレンドのアニメーション
+        animateTrendIndicators();
     }
     
     // 最新データの読み込み
@@ -937,6 +1405,20 @@
                 if (!e.target.classList.contains('target-action')) {
                     showTargetDetail(this);
                 }
+            });
+        });
+        
+        // カテゴリーアイテムのクリックイベント
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function() {
+                showCategoryQuestions(this);
+            });
+        });
+        
+        // トピックアイテムのクリックイベント
+        document.querySelectorAll('.topic-item').forEach(item => {
+            item.addEventListener('click', function() {
+                showQuestionDetail(this);
             });
         });
     }
@@ -956,6 +1438,109 @@
         const badges = document.querySelectorAll('.summary-badge.updated, .summary-badge.new');
         badges.forEach(badge => {
             badge.style.animation = 'pulse 2s infinite';
+        });
+    }
+    
+    // トレンドインジケーターのアニメーション
+    function animateTrendIndicators() {
+        const trends = document.querySelectorAll('.trend-indicator');
+        trends.forEach((trend, index) => {
+            setTimeout(() => {
+                trend.style.opacity = '0';
+                trend.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    trend.style.transition = 'all 0.3s ease';
+                    trend.style.opacity = '1';
+                    trend.style.transform = 'translateY(0)';
+                }, 100);
+            }, index * 150);
+        });
+    }
+    
+    // カテゴリー別質問を表示
+    function showCategoryQuestions(categoryElement) {
+        const categoryName = categoryElement.querySelector('.category-name').textContent;
+        
+        showModal({
+            title: `${categoryName}の質問一覧`,
+            content: `
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 mb-2">最頻出の質問</h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• アジア市場での競争優位性は何か？</li>
+                            <li>• 現地パートナーシップの進捗状況は？</li>
+                            <li>• 為替リスクへの対応策は？</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">投資家タイプ別関心</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">海外投資家</span>
+                                <span class="font-medium">65%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">機関投資家</span>
+                                <span class="font-medium">25%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">個人投資家</span>
+                                <span class="font-medium">10%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmText: '閉じる'
+        });
+    }
+    
+    // 質問の詳細を表示
+    function showQuestionDetail(topicElement) {
+        const question = topicElement.querySelector('.topic-question').textContent;
+        
+        showModal({
+            title: '質問詳細と対応状況',
+            content: `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">質問内容</h4>
+                        <p class="text-sm text-gray-600">${question}</p>
+                    </div>
+                    
+                    <div class="bg-yellow-50 rounded-lg p-4">
+                        <h4 class="font-medium text-yellow-900 mb-2">対応状況</h4>
+                        <p class="text-sm text-yellow-700">
+                            経営企画部で検討中。次回取締役会（1/25）で議論予定。
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">過去の類似質問</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 2023/12: 「アジア進出の具体的なロードマップは？」</li>
+                            <li>• 2023/11: 「東南アジアでの投資規模と期待リターンは？」</li>
+                            <li>• 2023/10: 「中国市場リスクへの対応は？」</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">推奨アクション</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>✓ 詳細な地域別展開計画の作成</li>
+                            <li>✓ 投資規模とROI試算の開示</li>
+                            <li>✓ リスク管理体制の説明強化</li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            confirmText: '閉じる',
+            cancelText: '対応を記録',
+            onCancel: () => {
+                showNotification('対応状況を記録しました', 'success');
+            }
         });
     }
     
@@ -1023,11 +1608,11 @@
                             </label>
                             <label class="flex items-center">
                                 <input type="checkbox" checked class="mr-2">
-                                <span class="text-sm">各戦略の詳細</span>
+                                <span class="text-sm">投資家質問分析</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="checkbox" checked class="mr-2">
-                                <span class="text-sm">投資家質問分析</span>
+                                <span class="text-sm">各戦略の詳細</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="checkbox" class="mr-2">
@@ -1048,11 +1633,9 @@
     }
     
     // 目標の詳細表示
-    function showTargetDetail(targetElement) {
-        const targetName = targetElement.querySelector('.target-name').textContent.trim();
-        
+    function showTargetDetail(targetId) {
         showModal({
-            title: `${targetName}の詳細`,
+            title: `目標の詳細`,
             content: `
                 <div class="space-y-4">
                     <div class="bg-gray-50 rounded-lg p-4">
@@ -1092,6 +1675,45 @@
         });
     }
     
+    // 目標に関する質問を表示
+    function showTargetQuestions(targetId) {
+        showModal({
+            title: `投資家からの質問`,
+            content: `
+                <div class="space-y-4">
+                    <div class="bg-red-50 rounded-lg p-4">
+                        <h4 class="font-medium text-red-900 mb-2">未回答の質問（優先対応）</h4>
+                        <ul class="text-sm text-red-700 space-y-2">
+                            <li>• 競合他社対比での成長率の妥当性は？</li>
+                            <li>• 為替前提の変更による影響は？</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-900 mb-2">回答済みの質問</h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>✓ 海外展開による売上増加の内訳</li>
+                            <li>✓ 新製品の市場シェア目標</li>
+                            <li>✓ コスト削減施策の詳細</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-900 mb-2">AIの推奨回答</h4>
+                        <p class="text-sm text-blue-700">
+                            競合他社分析レポートを基に、当社の差別化要因（技術力、顧客基盤）を強調した回答を準備することを推奨します。
+                        </p>
+                    </div>
+                </div>
+            `,
+            confirmText: '回答を作成',
+            cancelText: '閉じる',
+            onConfirm: () => {
+                showNotification('回答作成画面に移動します', 'info');
+            }
+        });
+    }
+    
     // 通知表示
     function showNotification(message, type = 'info') {
         if (window.parent && window.parent.showNotification) {
@@ -1123,6 +1745,19 @@
             50% {
                 opacity: 0.8;
                 transform: scale(1.05);
+            }
+        }
+        
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
             }
         }
     `;
