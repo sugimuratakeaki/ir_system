@@ -1,0 +1,617 @@
+{% extends 'base/base.html' %}
+
+{% block title %}管理パネル - IR担当者{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">管理パネル</h1>
+                <p class="text-gray-600 mt-1">システム設定とユーザー管理</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="btn btn-secondary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    バックアップ
+                </button>
+                <button class="btn btn-primary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    同期
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- タブナビゲーション -->
+    <div class="bg-white shadow-sm rounded-lg">
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+                <button class="tab-item active" onclick="switchTab('users')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    ユーザー管理
+                </button>
+                <button class="tab-item" onclick="switchTab('permissions')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    権限管理
+                </button>
+                <button class="tab-item" onclick="switchTab('settings')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    システム設定
+                </button>
+                <button class="tab-item" onclick="switchTab('logs')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    監査ログ
+                </button>
+            </nav>
+        </div>
+
+        <!-- タブコンテンツ -->
+        <div class="p-6">
+            <!-- ユーザー管理タブ -->
+            <div id="users-tab" class="tab-panel active">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- ユーザーリスト -->
+                    <div class="lg:col-span-2">
+                        <!-- 検索・フィルター -->
+                        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+                            <div class="relative flex-1 max-w-md">
+                                <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-kagami-blue focus:border-kagami-blue" placeholder="ユーザー名・メールで検索">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="showAddUserModal()">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                </svg>
+                                ユーザー追加
+                            </button>
+                        </div>
+
+                        <!-- ユーザーテーブル -->
+                        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                            <table class="min-w-full divide-y divide-gray-300">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ユーザー</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ロール</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">最終ログイン</th>
+                                        <th class="relative px-6 py-3"><span class="sr-only">アクション</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <div class="h-10 w-10 rounded-full bg-kagami-blue flex items-center justify-center text-white font-medium">
+                                                        山田
+                                                    </div>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">山田 太郎</div>
+                                                    <div class="text-sm text-gray-500">yamada@kagami.co.jp</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="badge badge-blue">IR担当者</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                アクティブ
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            2時間前
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="text-kagami-blue hover:text-kagami-dark">編集</button>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <div class="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center text-white font-medium">
+                                                        鈴木
+                                                    </div>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">鈴木 花子</div>
+                                                    <div class="text-sm text-gray-500">suzuki@kagami.co.jp</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="badge badge-purple">経営陣</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                アクティブ
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            昨日
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="text-kagami-blue hover:text-kagami-dark">編集</button>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <div class="h-10 w-10 rounded-full bg-gray-500 flex items-center justify-center text-white font-medium">
+                                                        佐藤
+                                                    </div>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">佐藤 一郎</div>
+                                                    <div class="text-sm text-gray-500">sato@kagami.co.jp</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="badge badge-gray">社外取締役</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                無効
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            30日前
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="text-kagami-blue hover:text-kagami-dark">編集</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ユーザー統計 -->
+                    <div class="space-y-6">
+                        <div class="card">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">ユーザー統計</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm text-gray-700">総ユーザー数</span>
+                                        <span class="text-sm font-medium">48</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700 mb-2">ロール別</p>
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-600">IR担当者</span>
+                                            <span class="text-sm">12</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-600">経営陣</span>
+                                            <span class="text-sm">8</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-600">社外取締役</span>
+                                            <span class="text-sm">6</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-600">閲覧者</span>
+                                            <span class="text-sm">22</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700 mb-2">アクティブ率</p>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">85% (41/48)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-yellow-50 border-yellow-200">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="text-sm font-medium text-yellow-900">パスワード更新推奨</h4>
+                                    <p class="text-xs text-yellow-700 mt-1">
+                                        3名のユーザーが90日以上パスワードを更新していません。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 権限管理タブ -->
+            <div id="permissions-tab" class="tab-panel hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">ロール別権限設定</h3>
+                    
+                    <!-- 権限マトリクス -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        機能
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        IR担当者
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        経営陣
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        社外取締役
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        閲覧者
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        議事録作成・編集
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" checked class="form-checkbox text-green-600">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" class="form-checkbox">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" class="form-checkbox">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" disabled class="form-checkbox">
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        投資家情報管理
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" checked class="form-checkbox text-green-600">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" checked class="form-checkbox text-green-600">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" class="form-checkbox">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" disabled class="form-checkbox">
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        開示承認
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" class="form-checkbox">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" checked class="form-checkbox text-green-600">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" checked class="form-checkbox text-green-600">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" disabled class="form-checkbox">
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        システム管理
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" checked class="form-checkbox text-green-600">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" class="form-checkbox">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" class="form-checkbox">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" disabled class="form-checkbox">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end">
+                        <button class="btn btn-primary">権限設定を保存</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- システム設定タブ -->
+            <div id="settings-tab" class="tab-panel hidden">
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <!-- 基本設定 -->
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">基本設定</h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">会社名</label>
+                                    <input type="text" class="form-input" value="株式会社KAGAMI">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">IRサイトURL</label>
+                                    <input type="url" class="form-input" value="https://ir.kagami.co.jp">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">タイムゾーン</label>
+                                <select class="form-select">
+                                    <option selected>Asia/Tokyo (JST)</option>
+                                    <option>America/New_York (EST)</option>
+                                    <option>Europe/London (GMT)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 通知設定 -->
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">通知設定</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-700">新規面談リクエスト</span>
+                                    <p class="text-xs text-gray-500">投資家から面談リクエストがあった時に通知</p>
+                                </div>
+                                <input type="checkbox" checked class="form-checkbox">
+                            </label>
+                            
+                            <label class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-700">開示承認依頼</span>
+                                    <p class="text-xs text-gray-500">開示資料の承認が必要な時に通知</p>
+                                </div>
+                                <input type="checkbox" checked class="form-checkbox">
+                            </label>
+                            
+                            <label class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-700">システムアップデート</span>
+                                    <p class="text-xs text-gray-500">重要なシステム更新がある時に通知</p>
+                                </div>
+                                <input type="checkbox" checked class="form-checkbox">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- セキュリティ設定 -->
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">セキュリティ設定</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">パスワードポリシー</label>
+                                <select class="form-select">
+                                    <option selected>標準（8文字以上、英数字混在）</option>
+                                    <option>強化（12文字以上、記号含む）</option>
+                                    <option>カスタム</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">セッションタイムアウト</label>
+                                <select class="form-select">
+                                    <option>30分</option>
+                                    <option selected>1時間</option>
+                                    <option>2時間</option>
+                                    <option>無制限</option>
+                                </select>
+                            </div>
+                            
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="form-checkbox">
+                                <span class="ml-2 text-sm text-gray-700">二要素認証を必須にする</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button class="btn btn-primary">設定を保存</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 監査ログタブ -->
+            <div id="logs-tab" class="tab-panel hidden">
+                <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+                    <div class="flex space-x-2">
+                        <select class="form-select">
+                            <option>すべてのアクション</option>
+                            <option>ログイン</option>
+                            <option>データ変更</option>
+                            <option>開示操作</option>
+                            <option>システム設定</option>
+                        </select>
+                        <input type="date" class="form-input">
+                    </div>
+                    <button class="btn btn-secondary">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        ログ出力
+                    </button>
+                </div>
+
+                <!-- ログテーブル -->
+                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-300">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日時</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ユーザー</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">アクション</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">対象</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IPアドレス</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    2024/12/16 14:35:22
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    山田 太郎
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="badge badge-blue">ログイン</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    -
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    192.168.1.100
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    2024/12/16 14:30:15
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    鈴木 花子
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="badge badge-green">承認</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    決算短信（Q3）
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    192.168.1.101
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    2024/12/16 13:45:30
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    山田 太郎
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="badge badge-yellow">更新</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    投資家情報（ID: 1234）
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    192.168.1.100
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tab-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tab-item:hover {
+    color: #374151;
+}
+
+.tab-item.active {
+    color: #1e40af;
+    border-bottom-color: #1e40af;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+</style>
+
+<script>
+// タブ切り替え
+function switchTab(tabName) {
+    // すべてのタブとパネルを非アクティブに
+    document.querySelectorAll('.tab-item').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+        panel.classList.add('hidden');
+    });
+    
+    // 選択されたタブとパネルをアクティブに
+    event.target.closest('.tab-item').classList.add('active');
+    document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+}
+
+// ユーザー追加モーダル
+function showAddUserModal() {
+    console.log('Show add user modal');
+}
+
+// 権限チェックボックスの処理
+document.querySelectorAll('input[type="checkbox"]:not([disabled])').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        // 権限変更の処理
+        console.log('Permission changed');
+    });
+});
+</script>
+{% endblock %}

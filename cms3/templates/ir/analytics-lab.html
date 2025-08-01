@@ -1,0 +1,478 @@
+{% extends 'base/base.html' %}
+
+{% block title %}分析ラボ - IR担当者{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">分析ラボ</h1>
+                <p class="mt-1 opacity-90">IR活動の効果測定と投資家行動分析</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="btn bg-white/20 text-white border-white/30 hover:bg-white/30">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    レポート出力
+                </button>
+                <button class="btn bg-white text-purple-600 hover:bg-gray-100">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    カスタマイズ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- メトリクスサマリー -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="card bg-gradient-to-br from-blue-50 to-white">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">IR活動ROI</h3>
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">3.2x</p>
+            <p class="text-sm text-blue-600 mt-1">前年比 +0.8x</p>
+            <div class="mt-2 text-xs text-gray-500">
+                投資対効果が向上中
+            </div>
+        </div>
+
+        <div class="card bg-gradient-to-br from-green-50 to-white">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">エンゲージメント率</h3>
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">78%</p>
+            <p class="text-sm text-green-600 mt-1">目標達成</p>
+            <div class="mt-2 text-xs text-gray-500">
+                アクティブ投資家の割合
+            </div>
+        </div>
+
+        <div class="card bg-gradient-to-br from-purple-50 to-white">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">情報到達率</h3>
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">92%</p>
+            <p class="text-sm text-purple-600 mt-1">高水準</p>
+            <div class="mt-2 text-xs text-gray-500">
+                開示情報の閲覧率
+            </div>
+        </div>
+
+        <div class="card bg-gradient-to-br from-orange-50 to-white">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">満足度スコア</h3>
+                <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">4.6/5</p>
+            <p class="text-sm text-orange-600 mt-1">優秀</p>
+            <div class="mt-2 text-xs text-gray-500">
+                投資家からの評価
+            </div>
+        </div>
+    </div>
+
+    <!-- 分析ダッシュボード -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- メインチャートエリア -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- IR活動効果分析 -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-semibold text-gray-900">IR活動効果分析</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="text-sm text-gray-600 hover:text-gray-900">日次</button>
+                        <span class="text-gray-400">|</span>
+                        <button class="text-sm text-gray-600 hover:text-gray-900">週次</button>
+                        <span class="text-gray-400">|</span>
+                        <button class="text-sm text-kagami-blue font-medium">月次</button>
+                        <span class="text-gray-400">|</span>
+                        <button class="text-sm text-gray-600 hover:text-gray-900">年次</button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">活動別エンゲージメント</h3>
+                        <canvas id="engagementChart" height="200"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">情報開示の影響度</h3>
+                        <canvas id="impactChart" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- 活動別パフォーマンス -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">活動別パフォーマンス</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left text-xs font-medium text-gray-500 uppercase py-2">活動タイプ</th>
+                                    <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">実施数</th>
+                                    <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">参加率</th>
+                                    <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">満足度</th>
+                                    <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">ROI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-3 text-sm text-gray-900">決算説明会</td>
+                                    <td class="py-3 text-sm text-right">4回</td>
+                                    <td class="py-3 text-sm text-right">
+                                        <span class="text-green-600">85%</span>
+                                    </td>
+                                    <td class="py-3 text-sm text-right">4.8/5</td>
+                                    <td class="py-3 text-sm text-right font-medium">4.2x</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-3 text-sm text-gray-900">個別面談</td>
+                                    <td class="py-3 text-sm text-right">48回</td>
+                                    <td class="py-3 text-sm text-right">
+                                        <span class="text-green-600">92%</span>
+                                    </td>
+                                    <td class="py-3 text-sm text-right">4.6/5</td>
+                                    <td class="py-3 text-sm text-right font-medium">3.8x</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-3 text-sm text-gray-900">カンファレンス</td>
+                                    <td class="py-3 text-sm text-right">6回</td>
+                                    <td class="py-3 text-sm text-right">
+                                        <span class="text-yellow-600">72%</span>
+                                    </td>
+                                    <td class="py-3 text-sm text-right">4.3/5</td>
+                                    <td class="py-3 text-sm text-right font-medium">2.9x</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-3 text-sm text-gray-900">施設見学会</td>
+                                    <td class="py-3 text-sm text-right">2回</td>
+                                    <td class="py-3 text-sm text-right">
+                                        <span class="text-green-600">95%</span>
+                                    </td>
+                                    <td class="py-3 text-sm text-right">4.9/5</td>
+                                    <td class="py-3 text-sm text-right font-medium">5.1x</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 投資家行動分析 -->
+            <div class="card">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">投資家行動分析</h2>
+                
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="text-center">
+                        <div class="relative inline-flex">
+                            <svg class="w-20 h-20">
+                                <circle cx="40" cy="40" r="35" stroke="#e5e7eb" stroke-width="5" fill="none"></circle>
+                                <circle cx="40" cy="40" r="35" stroke="#3b82f6" stroke-width="5" fill="none"
+                                        stroke-dasharray="220" stroke-dashoffset="66" transform="rotate(-90 40 40)"></circle>
+                            </svg>
+                            <span class="absolute inset-0 flex items-center justify-center text-lg font-bold">70%</span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-700">資料ダウンロード率</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="relative inline-flex">
+                            <svg class="w-20 h-20">
+                                <circle cx="40" cy="40" r="35" stroke="#e5e7eb" stroke-width="5" fill="none"></circle>
+                                <circle cx="40" cy="40" r="35" stroke="#10b981" stroke-width="5" fill="none"
+                                        stroke-dasharray="220" stroke-dashoffset="48" transform="rotate(-90 40 40)"></circle>
+                            </svg>
+                            <span class="absolute inset-0 flex items-center justify-center text-lg font-bold">78%</span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-700">ウェブ閲覧率</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="relative inline-flex">
+                            <svg class="w-20 h-20">
+                                <circle cx="40" cy="40" r="35" stroke="#e5e7eb" stroke-width="5" fill="none"></circle>
+                                <circle cx="40" cy="40" r="35" stroke="#8b5cf6" stroke-width="5" fill="none"
+                                        stroke-dasharray="220" stroke-dashoffset="88" transform="rotate(-90 40 40)"></circle>
+                            </svg>
+                            <span class="absolute inset-0 flex items-center justify-center text-lg font-bold">60%</span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-700">問い合わせ率</p>
+                    </div>
+                </div>
+
+                <!-- ヒートマップ -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">コンテンツ関心度ヒートマップ</h3>
+                    <div class="grid grid-cols-7 gap-1 text-xs">
+                        <div class="text-center font-medium text-gray-600">決算資料</div>
+                        <div class="bg-green-100 p-2 text-center rounded">月</div>
+                        <div class="bg-green-200 p-2 text-center rounded">火</div>
+                        <div class="bg-green-300 p-2 text-center rounded">水</div>
+                        <div class="bg-green-200 p-2 text-center rounded">木</div>
+                        <div class="bg-green-400 p-2 text-center rounded">金</div>
+                        <div class="bg-green-100 p-2 text-center rounded">土</div>
+                        
+                        <div class="text-center font-medium text-gray-600">説明会資料</div>
+                        <div class="bg-blue-100 p-2 text-center rounded">月</div>
+                        <div class="bg-blue-200 p-2 text-center rounded">火</div>
+                        <div class="bg-blue-400 p-2 text-center rounded">水</div>
+                        <div class="bg-blue-300 p-2 text-center rounded">木</div>
+                        <div class="bg-blue-200 p-2 text-center rounded">金</div>
+                        <div class="bg-blue-100 p-2 text-center rounded">土</div>
+                        
+                        <div class="text-center font-medium text-gray-600">ESG報告書</div>
+                        <div class="bg-purple-100 p-2 text-center rounded">月</div>
+                        <div class="bg-purple-200 p-2 text-center rounded">火</div>
+                        <div class="bg-purple-200 p-2 text-center rounded">水</div>
+                        <div class="bg-purple-300 p-2 text-center rounded">木</div>
+                        <div class="bg-purple-200 p-2 text-center rounded">金</div>
+                        <div class="bg-purple-100 p-2 text-center rounded">土</div>
+                    </div>
+                    <div class="mt-2 flex items-center justify-center space-x-4 text-xs text-gray-600">
+                        <span class="flex items-center">
+                            <span class="w-3 h-3 bg-gray-200 rounded mr-1"></span>
+                            低
+                        </span>
+                        <span class="flex items-center">
+                            <span class="w-3 h-3 bg-blue-300 rounded mr-1"></span>
+                            中
+                        </span>
+                        <span class="flex items-center">
+                            <span class="w-3 h-3 bg-green-400 rounded mr-1"></span>
+                            高
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側: インサイトとレポート -->
+        <div class="space-y-6">
+            <!-- AIインサイト -->
+            <div class="card bg-gradient-to-br from-purple-50 to-white">
+                <div class="flex items-start mb-3">
+                    <svg class="w-6 h-6 text-purple-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-900">分析インサイト</h3>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="bg-purple-100 rounded-lg p-3">
+                        <p class="text-sm font-medium text-purple-900 mb-1">🎯 効果的な施策</p>
+                        <p class="text-xs text-purple-700">施設見学会のROIが最も高く（5.1x）、参加者の95%が高評価。四半期に1回の定期開催を検討すべきです。</p>
+                    </div>
+                    
+                    <div class="bg-blue-100 rounded-lg p-3">
+                        <p class="text-sm font-medium text-blue-900 mb-1">📊 改善ポイント</p>
+                        <p class="text-xs text-blue-700">カンファレンス参加率が72%と低め。事前の案内方法や開催時期の見直しが必要かもしれません。</p>
+                    </div>
+                    
+                    <div class="bg-green-100 rounded-lg p-3">
+                        <p class="text-sm font-medium text-green-900 mb-1">💡 新たな発見</p>
+                        <p class="text-xs text-green-700">ESG報告書の閲覧が木曜日に集中。定期的な情報更新は木曜日が効果的です。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- カスタムレポート -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">カスタムレポート</h3>
+                <div class="space-y-3">
+                    <button class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-900">月次IR活動レポート</p>
+                                <p class="text-xs text-gray-500">自動生成・毎月1日</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    
+                    <button class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-900">投資家エンゲージメント分析</p>
+                                <p class="text-xs text-gray-500">四半期レビュー用</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    
+                    <button class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-gray-900">コンテンツパフォーマンス</p>
+                                <p class="text-xs text-gray-500">週次更新</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+                <button class="w-full mt-4 btn btn-primary btn-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    新規レポート作成
+                </button>
+            </div>
+
+            <!-- データエクスポート -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">データエクスポート</h3>
+                <div class="space-y-3">
+                    <select class="form-select w-full">
+                        <option>期間を選択</option>
+                        <option>過去7日間</option>
+                        <option>過去30日間</option>
+                        <option>過去3ヶ月</option>
+                        <option>過去1年</option>
+                        <option>カスタム期間</option>
+                    </select>
+                    
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="form-checkbox">
+                            <span class="ml-2 text-sm">IR活動データ</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="form-checkbox">
+                            <span class="ml-2 text-sm">投資家エンゲージメント</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="ml-2 text-sm">コンテンツ分析</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="ml-2 text-sm">フィードバック</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button class="flex-1 btn btn-secondary btn-sm">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            CSV
+                        </button>
+                        <button class="flex-1 btn btn-secondary btn-sm">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// エンゲージメントチャート
+document.addEventListener('DOMContentLoaded', function() {
+    // 活動別エンゲージメント
+    const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+    new Chart(engagementCtx, {
+        type: 'bar',
+        data: {
+            labels: ['決算説明会', '個別面談', 'カンファレンス', '施設見学'],
+            datasets: [{
+                label: '参加率',
+                data: [85, 92, 72, 95],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(245, 158, 11, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 情報開示の影響度
+    const impactCtx = document.getElementById('impactChart').getContext('2d');
+    new Chart(impactCtx, {
+        type: 'radar',
+        data: {
+            labels: ['株価影響', '取引量', '問い合わせ', 'メディア露出', '投資家評価'],
+            datasets: [{
+                label: '決算発表',
+                data: [85, 78, 92, 70, 88],
+                borderColor: 'rgba(59, 130, 246, 0.8)',
+                backgroundColor: 'rgba(59, 130, 246, 0.2)'
+            }, {
+                label: 'ESG報告',
+                data: [65, 60, 75, 85, 92],
+                borderColor: 'rgba(16, 185, 129, 0.8)',
+                backgroundColor: 'rgba(16, 185, 129, 0.2)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

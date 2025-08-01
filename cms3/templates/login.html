@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - KAGAMI IR管理センター</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- カスタムCSS -->
+    <link rel="stylesheet" href="/static/css/base.css">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kagami-blue': '#1e40af',
+                        'kagami-light-blue': '#3b82f6',
+                        'kagami-dark': '#1e293b',
+                        'kagami-gray': '#64748b'
+                    },
+                    fontFamily: {
+                        'sans': ['Noto Sans JP', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-kagami-blue to-kagami-light-blue min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        <!-- ロゴ -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-kagami-blue mb-2">KAGAMI</h1>
+            <p class="text-gray-600 text-sm">IR管理センター CMS 3.0</p>
+        </div>
+        
+        <!-- ログインフォーム -->
+        <form id="loginForm" class="space-y-6">
+            <!-- メールアドレス -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">メールアドレス</label>
+                <input type="email" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-kagami-blue focus:border-transparent transition"
+                       placeholder="example@kagami.co.jp"
+                       required>
+            </div>
+            
+            <!-- パスワード -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">パスワード</label>
+                <input type="password" 
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-kagami-blue focus:border-transparent transition"
+                       placeholder="••••••••"
+                       required>
+            </div>
+            
+            <!-- ロール選択 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ロールを選択</label>
+                <select id="roleSelect" 
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-kagami-blue focus:border-transparent transition">
+                    <option value="ir">IR担当者</option>
+                    <option value="executive">経営陣</option>
+                    <option value="director">社外取締役</option>
+                    <option value="investor">投資家</option>
+                </select>
+            </div>
+            
+            <!-- パスワードを記憶 -->
+            <div class="flex items-center justify-between">
+                <label class="flex items-center">
+                    <input type="checkbox" class="rounded text-kagami-blue focus:ring-kagami-blue">
+                    <span class="ml-2 text-sm text-gray-600">ログイン状態を保持する</span>
+                </label>
+                <a href="#" class="text-sm text-kagami-blue hover:underline">パスワードを忘れた？</a>
+            </div>
+            
+            <!-- ログインボタン -->
+            <button type="submit" 
+                    class="w-full bg-kagami-blue text-white py-3 rounded-lg font-medium hover:bg-kagami-dark transition transform hover:scale-[1.02]">
+                ログイン
+            </button>
+        </form>
+        
+        <!-- デモ情報 -->
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <p class="text-xs text-gray-600 text-center">
+                <strong>デモ環境</strong><br>
+                メール: demo@kagami.co.jp<br>
+                パスワード: demo123
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // ログインフォームの処理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const role = document.getElementById('roleSelect').value;
+            
+            // ロールに応じてリダイレクト
+            switch(role) {
+                case 'ir':
+                    window.location.href = '/ir/workspace';
+                    break;
+                case 'executive':
+                    window.location.href = '/executive/dashboard';
+                    break;
+                case 'director':
+                    window.location.href = '/director/oversight';
+                    break;
+                case 'investor':
+                    window.location.href = '/front/investor-portal';
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

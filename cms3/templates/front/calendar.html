@@ -1,0 +1,356 @@
+{% extends 'base/base_front.html' %}
+
+{% block title %}IRカレンダー{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="bg-gradient-to-r from-kagami-blue to-blue-700 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold mb-4">IRカレンダー</h1>
+        <p class="text-xl opacity-90">決算発表・説明会などのスケジュール</p>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- カレンダー -->
+        <div class="lg:col-span-3">
+            <div class="bg-white rounded-lg shadow-sm">
+                <!-- カレンダーヘッダー -->
+                <div class="border-b border-gray-200 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="previousMonth()">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <h2 class="text-xl font-semibold text-gray-900" id="currentMonth">2024年12月</h2>
+                            <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="nextMonth()">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="scrollToToday()">今日</button>
+                    </div>
+                </div>
+                
+                <!-- カレンダー本体 -->
+                <div class="p-6">
+                    <div class="grid grid-cols-7 gap-px mb-px">
+                        <div class="bg-gray-50 py-2 text-center text-xs font-medium text-gray-500 uppercase">日</div>
+                        <div class="bg-gray-50 py-2 text-center text-xs font-medium text-gray-500 uppercase">月</div>
+                        <div class="bg-gray-50 py-2 text-center text-xs font-medium text-gray-500 uppercase">火</div>
+                        <div class="bg-gray-50 py-2 text-center text-xs font-medium text-gray-500 uppercase">水</div>
+                        <div class="bg-gray-50 py-2 text-center text-xs font-medium text-gray-500 uppercase">木</div>
+                        <div class="bg-gray-50 py-2 text-center text-xs font-medium text-gray-500 uppercase">金</div>
+                        <div class="bg-gray-50 py-2 text-center text-xs font-medium text-gray-500 uppercase">土</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-7 gap-px bg-gray-200">
+                        <!-- 前月の日付 -->
+                        <div class="bg-white p-2 h-24 text-gray-400">
+                            <div class="text-sm">27</div>
+                        </div>
+                        <div class="bg-white p-2 h-24 text-gray-400">
+                            <div class="text-sm">28</div>
+                        </div>
+                        <div class="bg-white p-2 h-24 text-gray-400">
+                            <div class="text-sm">29</div>
+                        </div>
+                        <div class="bg-white p-2 h-24 text-gray-400">
+                            <div class="text-sm">30</div>
+                        </div>
+                        <div class="bg-white p-2 h-24 text-gray-400">
+                            <div class="text-sm">31</div>
+                        </div>
+                        
+                        <!-- 今月の日付 -->
+                        <div class="bg-white p-2 h-24">
+                            <div class="text-sm font-medium">1</div>
+                        </div>
+                        <div class="bg-white p-2 h-24">
+                            <div class="text-sm font-medium">2</div>
+                        </div>
+                        
+                        <!-- 以下、カレンダーの日付を続ける -->
+                        <!-- 重要な日付の例 -->
+                        <div class="bg-white p-2 h-24">
+                            <div class="text-sm font-medium">16</div>
+                            <div class="mt-1">
+                                <div class="text-xs bg-red-100 text-red-800 rounded px-1 py-0.5 truncate">
+                                    決算発表
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-2 h-24">
+                            <div class="text-sm font-medium">21</div>
+                            <div class="mt-1">
+                                <div class="text-xs bg-blue-100 text-blue-800 rounded px-1 py-0.5 truncate">
+                                    決算説明会
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 今日 -->
+                        <div class="bg-kagami-blue/10 p-2 h-24 border-2 border-kagami-blue">
+                            <div class="text-sm font-bold text-kagami-blue">16</div>
+                            <div class="mt-1">
+                                <div class="text-xs bg-red-100 text-red-800 rounded px-1 py-0.5 truncate">
+                                    決算発表
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- イベント詳細リスト -->
+            <div class="mt-8 bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">今後のIRイベント</h2>
+                
+                <div class="space-y-6">
+                    <!-- イベント1 -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 text-center">
+                            <div class="bg-red-100 rounded-lg p-2">
+                                <p class="text-xs text-red-600 font-medium">12月</p>
+                                <p class="text-2xl font-bold text-red-600">16</p>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="font-medium text-gray-900">2024年12月期 第3四半期決算発表</h3>
+                            <p class="text-sm text-gray-600 mt-1">15:00 東証への適時開示</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <span class="badge badge-red text-xs">決算</span>
+                                <span class="badge badge-gray text-xs">本日</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- イベント2 -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 text-center">
+                            <div class="bg-blue-100 rounded-lg p-2">
+                                <p class="text-xs text-blue-600 font-medium">12月</p>
+                                <p class="text-2xl font-bold text-blue-600">21</p>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="font-medium text-gray-900">第3四半期決算説明会</h3>
+                            <p class="text-sm text-gray-600 mt-1">15:00-16:30 オンライン開催</p>
+                            <div class="mt-2 flex items-center space-x-4">
+                                <span class="badge badge-blue text-xs">説明会</span>
+                                <a href="#" class="text-sm text-kagami-blue hover:underline">参加登録</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- イベント3 -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 text-center">
+                            <div class="bg-green-100 rounded-lg p-2">
+                                <p class="text-xs text-green-600 font-medium">1月</p>
+                                <p class="text-2xl font-bold text-green-600">15</p>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="font-medium text-gray-900">個人投資家向け説明会</h3>
+                            <p class="text-sm text-gray-600 mt-1">18:00-19:00 東京会場＋オンライン</p>
+                            <div class="mt-2 flex items-center space-x-4">
+                                <span class="badge badge-green text-xs">IR説明会</span>
+                                <a href="#" class="text-sm text-kagami-blue hover:underline">詳細・申込</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- イベント4 -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 text-center">
+                            <div class="bg-purple-100 rounded-lg p-2">
+                                <p class="text-xs text-purple-600 font-medium">2月</p>
+                                <p class="text-2xl font-bold text-purple-600">14</p>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="font-medium text-gray-900">2024年12月期 通期決算発表（予定）</h3>
+                            <p class="text-sm text-gray-600 mt-1">15:00 東証への適時開示</p>
+                            <div class="mt-2">
+                                <span class="badge badge-purple text-xs">決算</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- イベント5 -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-16 text-center">
+                            <div class="bg-yellow-100 rounded-lg p-2">
+                                <p class="text-xs text-yellow-600 font-medium">3月</p>
+                                <p class="text-2xl font-bold text-yellow-600">26</p>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="font-medium text-gray-900">第XX期定時株主総会（予定）</h3>
+                            <p class="text-sm text-gray-600 mt-1">10:00-12:00 本社会議室</p>
+                            <div class="mt-2">
+                                <span class="badge badge-yellow text-xs">株主総会</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側: サイドバー -->
+        <div class="space-y-8">
+            <!-- イベントカテゴリー -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">イベントカテゴリー</h3>
+                <div class="space-y-3">
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="form-checkbox text-red-600">
+                        <span class="ml-2 text-sm">決算発表</span>
+                        <span class="ml-auto w-3 h-3 bg-red-500 rounded-full"></span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="form-checkbox text-blue-600">
+                        <span class="ml-2 text-sm">決算説明会</span>
+                        <span class="ml-auto w-3 h-3 bg-blue-500 rounded-full"></span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="form-checkbox text-green-600">
+                        <span class="ml-2 text-sm">IR説明会</span>
+                        <span class="ml-auto w-3 h-3 bg-green-500 rounded-full"></span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="form-checkbox text-yellow-600">
+                        <span class="ml-2 text-sm">株主総会</span>
+                        <span class="ml-auto w-3 h-3 bg-yellow-500 rounded-full"></span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" checked class="form-checkbox text-purple-600">
+                        <span class="ml-2 text-sm">その他</span>
+                        <span class="ml-auto w-3 h-3 bg-purple-500 rounded-full"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- カレンダー配信 -->
+            <div class="bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">カレンダー連携</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    IRイベントをお使いのカレンダーアプリと同期できます。
+                </p>
+                <div class="space-y-3">
+                    <button class="w-full btn btn-secondary text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        iCal形式でダウンロード
+                    </button>
+                    <button class="w-full btn btn-primary text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        カレンダーURLをコピー
+                    </button>
+                </div>
+            </div>
+
+            <!-- 沈黙期間のお知らせ -->
+            <div class="bg-yellow-50 rounded-lg shadow-sm p-6">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-sm font-medium text-yellow-900">沈黙期間について</h4>
+                        <p class="text-xs text-yellow-700 mt-1">
+                            決算発表前の2週間は、決算に関するお問い合わせへの回答を控えさせていただきます。
+                        </p>
+                        <p class="text-xs text-yellow-700 mt-2">
+                            次回沈黙期間：1月31日〜2月13日
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* バッジ */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+.badge-red {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-blue {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.badge-green {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.badge-yellow {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.badge-purple {
+    background-color: #ede9fe;
+    color: #7c3aed;
+}
+
+.badge-gray {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ボタンサイズ */
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+</style>
+
+<script>
+// カレンダーナビゲーション
+function previousMonth() {
+    console.log('Previous month');
+    // 前月のカレンダーを表示
+}
+
+function nextMonth() {
+    console.log('Next month');
+    // 翌月のカレンダーを表示
+}
+
+function scrollToToday() {
+    console.log('Scroll to today');
+    // 今日の日付にスクロール
+}
+
+// カテゴリーフィルター
+document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        console.log('Category filter changed');
+        // カテゴリーの表示/非表示を切り替え
+    });
+});
+</script>
+{% endblock %}

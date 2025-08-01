@@ -1,0 +1,411 @@
+{% extends 'base/base.html' %}
+
+{% block title %}議事録ファクトリー - IR担当者{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">議事録ファクトリー</h1>
+                <p class="text-gray-600 mt-1">音声・動画から議事録を作成し、投資家向けコンテンツを生成します</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="btn btn-secondary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2"></path>
+                    </svg>
+                    下書き保存
+                </button>
+                <button class="btn btn-primary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    新規作成
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ワークフロー進捗 -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4 flex-1">
+                <!-- ステップ1: アップロード -->
+                <div class="step-item active">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4 class="step-title">アップロード</h4>
+                        <p class="step-description">音声・動画ファイル</p>
+                    </div>
+                </div>
+                
+                <div class="step-connector active"></div>
+                
+                <!-- ステップ2: 文字起こし -->
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4 class="step-title">文字起こし</h4>
+                        <p class="step-description">AIによる自動変換</p>
+                    </div>
+                </div>
+                
+                <div class="step-connector"></div>
+                
+                <!-- ステップ3: AI分析 -->
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4 class="step-title">AI分析</h4>
+                        <p class="step-description">要約・ポイント抽出</p>
+                    </div>
+                </div>
+                
+                <div class="step-connector"></div>
+                
+                <!-- ステップ4: コンテンツ生成 -->
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4 class="step-title">コンテンツ生成</h4>
+                        <p class="step-description">FAQ・要約作成</p>
+                    </div>
+                </div>
+                
+                <div class="step-connector"></div>
+                
+                <!-- ステップ5: 公開設定 -->
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4 class="step-title">公開設定</h4>
+                        <p class="step-description">配信・アクセス管理</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツエリア -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 左側: ワークフローコンテンツ -->
+        <div class="lg:col-span-2">
+            <!-- ステップ1: ファイルアップロード -->
+            <div id="step1-content" class="step-content-panel active">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">ファイルアップロード</h3>
+                    
+                    <!-- ドロップゾーン -->
+                    <div class="upload-dropzone" id="dropzone">
+                        <input type="file" id="file-input" class="hidden" accept="audio/*,video/*">
+                        <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-gray-600 mb-2">ファイルをドラッグ＆ドロップ</p>
+                        <p class="text-sm text-gray-500 mb-4">または</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                            ファイルを選択
+                        </button>
+                        <p class="text-xs text-gray-500 mt-4">対応形式: MP3, WAV, MP4, MOV (最大500MB)</p>
+                    </div>
+
+                    <!-- ファイル情報 -->
+                    <div id="file-info" class="hidden mt-6">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg class="w-8 h-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                                    </svg>
+                                    <div>
+                                        <p class="font-medium text-gray-900" id="file-name">ファイル名.mp3</p>
+                                        <p class="text-sm text-gray-500" id="file-size">25.4 MB</p>
+                                    </div>
+                                </div>
+                                <button class="text-red-600 hover:text-red-800">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- メタデータ入力 -->
+                    <div class="mt-6 space-y-4">
+                        <div class="form-field">
+                            <label class="form-label required">会議タイトル</label>
+                            <input type="text" class="form-input" placeholder="例: 2024年Q3決算説明会">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-field">
+                                <label class="form-label required">開催日</label>
+                                <input type="date" class="form-input">
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label">参加者数</label>
+                                <input type="number" class="form-input" placeholder="50">
+                            </div>
+                        </div>
+                        
+                        <div class="form-field">
+                            <label class="form-label">メモ</label>
+                            <textarea class="form-textarea" rows="3" placeholder="補足情報を入力"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button class="btn btn-primary" onclick="nextStep()">
+                            次へ: 文字起こし
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステップ2-5のコンテンツはここに追加 -->
+            <div id="step2-content" class="step-content-panel hidden">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">文字起こし編集</h3>
+                    <p class="text-gray-600">AI文字起こし処理中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側: サイドパネル -->
+        <div class="space-y-6">
+            <!-- 処理中の議事録 -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">処理中の議事録</h3>
+                <div class="space-y-3">
+                    <div class="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-sm">決算説明会</p>
+                                <p class="text-xs text-gray-500">ステップ3: AI分析中</p>
+                            </div>
+                            <span class="badge badge-blue">処理中</span>
+                        </div>
+                        <div class="mt-2">
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium text-sm">投資家面談</p>
+                                <p class="text-xs text-gray-500">ステップ2: 文字起こし中</p>
+                            </div>
+                            <span class="badge badge-yellow">待機中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AIアシスタント -->
+            <div class="card bg-blue-50 border-blue-200">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h4 class="text-sm font-medium text-blue-900">AIアシスタントのヒント</h4>
+                        <p class="text-sm text-blue-700 mt-1">
+                            音声ファイルは背景ノイズが少ないほど、文字起こしの精度が向上します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ワークフローステップスタイル */
+.step-item {
+    display: flex;
+    align-items: center;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.step-item.active,
+.step-item.completed {
+    opacity: 1;
+}
+
+.step-number {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 0.75rem;
+    transition: all 0.3s;
+}
+
+.step-item.active .step-number {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.step-item.completed .step-number {
+    background-color: #10b981;
+    color: white;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.step-description {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.step-connector {
+    flex: 0 0 2rem;
+    height: 2px;
+    background-color: #e5e7eb;
+    margin: 0 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.step-connector.active {
+    background-color: #3b82f6;
+}
+
+/* アップロードゾーン */
+.upload-dropzone {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.5rem;
+    padding: 3rem;
+    text-align: center;
+    background-color: #f9fafb;
+    transition: all 0.3s;
+}
+
+.upload-dropzone.drag-over {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+/* ステップコンテンツパネル */
+.step-content-panel {
+    display: none;
+}
+
+.step-content-panel.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+</style>
+
+<script>
+// ワークフロー制御
+let currentStep = 1;
+
+function nextStep() {
+    if (currentStep < 5) {
+        // 現在のステップを非表示
+        document.getElementById(`step${currentStep}-content`).classList.remove('active');
+        
+        // ステップを進める
+        currentStep++;
+        
+        // 新しいステップを表示
+        document.getElementById(`step${currentStep}-content`)?.classList.add('active');
+        
+        // 進捗表示を更新
+        updateProgress();
+    }
+}
+
+function updateProgress() {
+    // ステップアイテムの更新
+    document.querySelectorAll('.step-item').forEach((item, index) => {
+        if (index < currentStep - 1) {
+            item.classList.add('completed');
+            item.classList.remove('active');
+        } else if (index === currentStep - 1) {
+            item.classList.add('active');
+            item.classList.remove('completed');
+        } else {
+            item.classList.remove('active', 'completed');
+        }
+    });
+    
+    // コネクターの更新
+    document.querySelectorAll('.step-connector').forEach((conn, index) => {
+        if (index < currentStep - 1) {
+            conn.classList.add('active');
+        } else {
+            conn.classList.remove('active');
+        }
+    });
+}
+
+// ドラッグ＆ドロップ処理
+const dropzone = document.getElementById('dropzone');
+
+dropzone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('drag-over');
+});
+
+dropzone?.addEventListener('dragleave', () => {
+    dropzone.classList.remove('drag-over');
+});
+
+dropzone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-over');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFileSelect(files[0]);
+    }
+});
+
+// ファイル選択処理
+document.getElementById('file-input')?.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+    }
+});
+
+function handleFileSelect(file) {
+    // ファイル情報を表示
+    document.getElementById('file-info').classList.remove('hidden');
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-size').textContent = formatFileSize(file.size);
+}
+
+function formatFileSize(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+}
+</script>
+{% endblock %}

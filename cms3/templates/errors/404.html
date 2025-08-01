@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - ページが見つかりません | KAGAMI IR System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .kagami-blue { color: #1e40af; }
+        .bg-kagami-blue { background-color: #1e40af; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-lg w-full text-center">
+            <!-- エラーイラスト -->
+            <div class="mb-8">
+                <svg class="w-48 h-48 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            
+            <!-- エラーコード -->
+            <h1 class="text-9xl font-bold text-gray-200 mb-4">404</h1>
+            
+            <!-- エラーメッセージ -->
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">ページが見つかりません</h2>
+            <p class="text-gray-600 mb-8">
+                お探しのページは移動または削除された可能性があります。<br>
+                URLをご確認の上、もう一度お試しください。
+            </p>
+            
+            <!-- アクションボタン -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="/" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-kagami-blue hover:bg-blue-700 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    トップページへ
+                </a>
+                <button onclick="history.back()" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    前のページに戻る
+                </button>
+            </div>
+            
+            <!-- 検索ボックス -->
+            <div class="mt-12 max-w-md mx-auto">
+                <p class="text-sm text-gray-600 mb-4">サイト内検索でお探しください</p>
+                <form class="flex">
+                    <input type="text" placeholder="キーワードを入力" class="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <button type="submit" class="px-4 py-2 bg-kagami-blue text-white rounded-r-md hover:bg-blue-700 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- よくあるリンク -->
+            <div class="mt-12">
+                <p class="text-sm text-gray-600 mb-4">よくアクセスされるページ</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="/news" class="text-sm text-kagami-blue hover:underline">ニュース・お知らせ</a>
+                    <a href="/documents" class="text-sm text-kagami-blue hover:underline">IR資料室</a>
+                    <a href="/calendar" class="text-sm text-kagami-blue hover:underline">IRカレンダー</a>
+                    <a href="/contact" class="text-sm text-kagami-blue hover:underline">お問い合わせ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // エラーログの送信（本番環境では実装）
+        console.error('404 Error:', window.location.pathname);
+    </script>
+</body>
+</html>

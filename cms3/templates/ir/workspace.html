@@ -1,0 +1,279 @@
+{% extends 'base/base.html' %}
+
+{% block title %}ワークスペース - IR担当者{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">ワークスペース</h1>
+            <p class="text-gray-600 mt-1">こんにちは、山田さん。今日のIR活動をサポートします。</p>
+        </div>
+        <div class="flex space-x-3">
+            <button class="btn btn-secondary">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                エクスポート
+            </button>
+            <button class="btn btn-primary">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                新規作成
+            </button>
+        </div>
+    </div>
+
+    <!-- 統計カード -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- 投資家数 -->
+        <div class="card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm">登録投資家数</p>
+                    <p class="text-3xl font-bold mt-2">1,234</p>
+                    <p class="text-blue-100 text-sm mt-1">前月比 +5.2%</p>
+                </div>
+                <div class="bg-white/20 p-3 rounded-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今月の面談数 -->
+        <div class="card bg-gradient-to-br from-green-500 to-green-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm">今月の面談数</p>
+                    <p class="text-3xl font-bold mt-2">48</p>
+                    <p class="text-green-100 text-sm mt-1">目標達成率 96%</p>
+                </div>
+                <div class="bg-white/20 p-3 rounded-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 開示予定 -->
+        <div class="card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-purple-100 text-sm">今週の開示予定</p>
+                    <p class="text-3xl font-bold mt-2">3</p>
+                    <p class="text-purple-100 text-sm mt-1">決算短信含む</p>
+                </div>
+                <div class="bg-white/20 p-3 rounded-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- タスク -->
+        <div class="card bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm">未完了タスク</p>
+                    <p class="text-3xl font-bold mt-2">12</p>
+                    <p class="text-orange-100 text-sm mt-1">期限内 8件</p>
+                </div>
+                <div class="bg-white/20 p-3 rounded-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツグリッド -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 今日の予定 -->
+        <div class="lg:col-span-2 card">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">今日の予定</h2>
+            <div class="space-y-3">
+                <!-- 予定項目 -->
+                <div class="flex items-center p-4 bg-blue-50 rounded-lg">
+                    <div class="flex-shrink-0 w-16 text-center">
+                        <p class="text-sm font-medium text-blue-600">10:00</p>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h4 class="font-medium text-gray-900">機関投資家A社 個別面談</h4>
+                        <p class="text-sm text-gray-600">オンライン会議（Zoom）</p>
+                    </div>
+                    <span class="badge badge-blue">面談</span>
+                </div>
+
+                <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                    <div class="flex-shrink-0 w-16 text-center">
+                        <p class="text-sm font-medium text-green-600">14:00</p>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h4 class="font-medium text-gray-900">Q4決算説明会リハーサル</h4>
+                        <p class="text-sm text-gray-600">会議室A + オンライン</p>
+                    </div>
+                    <span class="badge badge-green">社内</span>
+                </div>
+
+                <div class="flex items-center p-4 bg-purple-50 rounded-lg">
+                    <div class="flex-shrink-0 w-16 text-center">
+                        <p class="text-sm font-medium text-purple-600">16:00</p>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h4 class="font-medium text-gray-900">適時開示チェック</h4>
+                        <p class="text-sm text-gray-600">業績予想修正の検討</p>
+                    </div>
+                    <span class="badge badge-yellow">重要</span>
+                </div>
+            </div>
+            <a href="/ir/schedule-center" class="block mt-4 text-center text-sm text-kagami-blue hover:underline">
+                すべての予定を見る →
+            </a>
+        </div>
+
+        <!-- 最新の活動 -->
+        <div class="card">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">最新の活動</h2>
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm text-gray-900">決算短信をアップロード</p>
+                        <p class="text-xs text-gray-500">5分前</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm text-gray-900">投資家B社との面談完了</p>
+                        <p class="text-xs text-gray-500">2時間前</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm text-gray-900">プレスリリース公開</p>
+                        <p class="text-xs text-gray-500">昨日</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- クイックアクション -->
+    <div class="card">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">クイックアクション</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a href="/ir/dialogue-factory" class="quick-action-btn">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                <span>議事録作成</span>
+            </a>
+
+            <a href="/ir/investor-hub" class="quick-action-btn">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <span>投資家管理</span>
+            </a>
+
+            <a href="/ir/schedule-center" class="quick-action-btn">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>面談予約</span>
+            </a>
+
+            <a href="/ir/content-studio" class="quick-action-btn">
+                <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <span>資料アップ</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    color: #374151;
+    transition: all 0.2s;
+}
+
+.quick-action-btn:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+    color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.quick-action-btn svg {
+    color: #6b7280;
+    transition: color 0.2s;
+}
+
+.quick-action-btn:hover svg {
+    color: #3b82f6;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ページ初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // ダッシュボードデータの取得
+    loadDashboardData();
+    
+    // 定期的なデータ更新（5分ごと）
+    setInterval(loadDashboardData, 5 * 60 * 1000);
+});
+
+// ダッシュボードデータの読み込み
+async function loadDashboardData() {
+    try {
+        const data = await DataService.getDashboardData();
+        // データを使って画面を更新
+        console.log('Dashboard data loaded:', data);
+        
+        // 成功通知
+        notification.success('データを更新しました');
+    } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+        notification.error('データの取得に失敗しました');
+    }
+}
+</script>
+{% endblock %}

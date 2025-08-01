@@ -1,0 +1,474 @@
+{% extends 'base/base.html' %}
+
+{% block title %}コンテンツスタジオ - IR担当者{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="bg-white shadow-sm rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">コンテンツスタジオ</h1>
+                <p class="text-gray-600 mt-1">IR資料の作成・管理・配信</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="btn btn-secondary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H6a2 2 0 00-2 2z"></path>
+                    </svg>
+                    フォルダ作成
+                </button>
+                <button class="btn btn-primary" onclick="showUploadModal()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    アップロード
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- カテゴリーフィルター -->
+    <div class="bg-white shadow-sm rounded-lg p-4">
+        <div class="flex flex-wrap gap-2">
+            <button class="category-btn active">すべて</button>
+            <button class="category-btn">決算資料</button>
+            <button class="category-btn">説明会資料</button>
+            <button class="category-btn">プレスリリース</button>
+            <button class="category-btn">統合報告書</button>
+            <button class="category-btn">ESG資料</button>
+            <button class="category-btn">株主総会</button>
+            <button class="category-btn">その他</button>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- 左側: フォルダツリー -->
+        <div class="lg:col-span-1">
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">フォルダ</h3>
+                <div class="folder-tree">
+                    <div class="folder-item">
+                        <div class="folder-header active">
+                            <svg class="w-4 h-4 folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                            </svg>
+                            <span class="font-medium">2024年度</span>
+                        </div>
+                        <div class="folder-children">
+                            <div class="folder-item">
+                                <div class="folder-header">
+                                    <svg class="w-4 h-4 folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                                    </svg>
+                                    <span>Q3</span>
+                                </div>
+                            </div>
+                            <div class="folder-item">
+                                <div class="folder-header">
+                                    <svg class="w-4 h-4 folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                                    </svg>
+                                    <span>Q2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="folder-item">
+                        <div class="folder-header">
+                            <svg class="w-4 h-4 folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                            </svg>
+                            <span class="font-medium">2023年度</span>
+                        </div>
+                    </div>
+                    <div class="folder-item">
+                        <div class="folder-header">
+                            <svg class="w-4 h-4 folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                            </svg>
+                            <span class="font-medium">ESG資料</span>
+                        </div>
+                    </div>
+                    <div class="folder-item">
+                        <div class="folder-header">
+                            <svg class="w-4 h-4 folder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                            </svg>
+                            <span class="font-medium">テンプレート</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中央: ファイルリスト -->
+        <div class="lg:col-span-2">
+            <div class="card">
+                <!-- 検索・ソート -->
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+                    <div class="relative flex-1 max-w-md">
+                        <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-kagami-blue focus:border-kagami-blue" placeholder="ファイル名で検索">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <select class="form-select">
+                        <option>更新日時順</option>
+                        <option>ファイル名順</option>
+                        <option>サイズ順</option>
+                        <option>作成者順</option>
+                    </select>
+                </div>
+
+                <!-- ファイルグリッド -->
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- ファイルアイテム -->
+                    <div class="file-item hover:bg-gray-50 rounded-lg p-4 cursor-pointer border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-gray-900 truncate">2024年第3四半期決算短信.pdf</h4>
+                                <div class="flex items-center mt-1 text-xs text-gray-500">
+                                    <span>2.5 MB</span>
+                                    <span class="mx-2">•</span>
+                                    <span>2024/12/10 15:30</span>
+                                    <span class="mx-2">•</span>
+                                    <span>山田太郎</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge badge-blue text-xs">決算資料</span>
+                                    <span class="badge badge-green text-xs">公開中</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 ml-4">
+                                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-item hover:bg-gray-50 rounded-lg p-4 cursor-pointer border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L8,14H10L12,19H10M14,19L12,14H14L16,19H14Z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-gray-900 truncate">Q3決算説明会プレゼンテーション.pptx</h4>
+                                <div class="flex items-center mt-1 text-xs text-gray-500">
+                                    <span>15.8 MB</span>
+                                    <span class="mx-2">•</span>
+                                    <span>2024/12/11 10:00</span>
+                                    <span class="mx-2">•</span>
+                                    <span>鈴木花子</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge badge-blue text-xs">説明会資料</span>
+                                    <span class="badge badge-yellow text-xs">準備中</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 ml-4">
+                                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-item hover:bg-gray-50 rounded-lg p-4 cursor-pointer border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 mr-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M8,15.5V17H16V15.5L12,12L8,15.5M8,11V12.5L12,9L16,12.5V11L12,7.5L8,11Z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-gray-900 truncate">財務データ_Q3_2024.xlsx</h4>
+                                <div class="flex items-center mt-1 text-xs text-gray-500">
+                                    <span>3.2 MB</span>
+                                    <span class="mx-2">•</span>
+                                    <span>2024/12/09 14:20</span>
+                                    <span class="mx-2">•</span>
+                                    <span>財務部</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge badge-gray text-xs">内部資料</span>
+                                    <span class="badge badge-red text-xs">社外秘</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 ml-4">
+                                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側: 詳細・アクション -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- ファイル詳細 -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">ファイル詳細</h3>
+                <div class="text-center py-8 text-gray-500">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-sm">ファイルを選択してください</p>
+                </div>
+            </div>
+
+            <!-- クイックアップロード -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">クイックアップロード</h3>
+                <div class="upload-area border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-kagami-blue transition-colors">
+                    <svg class="w-8 h-8 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="text-sm text-gray-600 mb-2">ドラッグ＆ドロップ</p>
+                    <p class="text-xs text-gray-500">または</p>
+                    <button class="mt-2 text-xs text-kagami-blue hover:underline">ファイルを選択</button>
+                </div>
+            </div>
+
+            <!-- 最近のアクティビティ -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">最近のアクティビティ</h3>
+                <div class="space-y-3">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm text-gray-900">決算短信をアップロード</p>
+                            <p class="text-xs text-gray-500">山田太郎 - 5分前</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm text-gray-900">説明会資料を承認</p>
+                            <p class="text-xs text-gray-500">鈴木花子 - 2時間前</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm text-gray-900">財務データを更新</p>
+                            <p class="text-xs text-gray-500">財務部 - 昨日</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* カテゴリーボタン */
+.category-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.category-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.category-btn.active {
+    background-color: #1e40af;
+    color: white;
+    border-color: #1e40af;
+}
+
+/* フォルダツリー */
+.folder-tree {
+    font-size: 0.875rem;
+}
+
+.folder-item {
+    margin-bottom: 0.25rem;
+}
+
+.folder-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.folder-header:hover {
+    background-color: #f3f4f6;
+}
+
+.folder-header.active {
+    background-color: #eff6ff;
+    color: #1e40af;
+}
+
+.folder-icon {
+    transition: transform 0.15s;
+}
+
+.folder-header.active .folder-icon {
+    transform: rotate(90deg);
+}
+
+.folder-children {
+    margin-left: 1.5rem;
+    margin-top: 0.25rem;
+}
+
+/* ファイルアイテム */
+.file-item {
+    transition: all 0.15s;
+}
+
+.file-item:hover {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* アップロードエリア */
+.upload-area {
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    background-color: #f9fafb;
+}
+</style>
+
+<script>
+// フォルダ展開/折りたたみ
+document.querySelectorAll('.folder-header').forEach(header => {
+    header.addEventListener('click', function() {
+        this.classList.toggle('active');
+        const children = this.nextElementSibling;
+        if (children && children.classList.contains('folder-children')) {
+            children.style.display = children.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+});
+
+// カテゴリーフィルター
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        // フィルター処理
+        console.log('Category filter:', this.textContent);
+    });
+});
+
+// ファイルアップロード
+function showUploadModal() {
+    console.log('Show upload modal');
+}
+
+// ドラッグ＆ドロップ
+const uploadArea = document.querySelector('.upload-area');
+if (uploadArea) {
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('border-kagami-blue');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('border-kagami-blue');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('border-kagami-blue');
+        const files = e.dataTransfer.files;
+        console.log('Files dropped:', files);
+    });
+}
+
+// ファイル選択
+document.querySelectorAll('.file-item').forEach(item => {
+    item.addEventListener('click', function() {
+        // ファイル詳細を表示
+        console.log('File selected');
+    });
+});
+</script>
+{% endblock %}

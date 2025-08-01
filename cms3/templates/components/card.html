@@ -1,0 +1,207 @@
+<!-- カードコンポーネント -->
+<div class="card {{ card_class|default('') }}">
+    {% if card_header %}
+    <!-- カードヘッダー -->
+    <div class="card-header">
+        <h3 class="text-lg font-semibold text-gray-900">{{ card_title }}</h3>
+        {% if card_actions %}
+        <div class="card-actions">
+            {% block card_actions %}{% endblock %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- カードボディ -->
+    <div class="card-body">
+        {% block card_body %}
+        {{ card_content|default('カードコンテンツ') }}
+        {% endblock %}
+    </div>
+    
+    {% if card_footer %}
+    <!-- カードフッター -->
+    <div class="card-footer">
+        {% block card_footer %}{% endblock %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- 統計カード -->
+{% if card_type == 'stat' %}
+<div class="stat-card {{ stat_color|default('bg-white') }}">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-sm {{ stat_label_color|default('text-gray-600') }}">{{ stat_label }}</p>
+            <p class="text-2xl font-bold mt-1 {{ stat_value_color|default('text-gray-900') }}">{{ stat_value }}</p>
+            {% if stat_change %}
+            <p class="text-sm mt-1 flex items-center {{ stat_change_color|default('text-gray-500') }}">
+                {% if stat_change_icon %}
+                {{ stat_change_icon|safe }}
+                {% endif %}
+                {{ stat_change }}
+            </p>
+            {% endif %}
+        </div>
+        {% if stat_icon %}
+        <div class="{{ stat_icon_bg|default('bg-gray-100') }} p-3 rounded-lg">
+            {{ stat_icon|safe }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- 情報カード -->
+{% if card_type == 'info' %}
+<div class="info-card {{ info_variant|default('') }}">
+    {% if info_icon %}
+    <div class="flex">
+        <div class="flex-shrink-0">
+            {{ info_icon|safe }}
+        </div>
+        <div class="ml-3 flex-1">
+    {% else %}
+    <div>
+    {% endif %}
+        {% if info_title %}
+        <h3 class="text-sm font-medium {{ info_title_color|default('text-gray-800') }}">{{ info_title }}</h3>
+        {% endif %}
+        <div class="mt-2 text-sm {{ info_text_color|default('text-gray-600') }}">
+            {% block info_content %}
+            {{ info_content|default('情報コンテンツ') }}
+            {% endblock %}
+        </div>
+        {% if info_actions %}
+        <div class="mt-4">
+            {% block info_actions %}{% endblock %}
+        </div>
+        {% endif %}
+    {% if info_icon %}
+        </div>
+    {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- アクションカード -->
+{% if card_type == 'action' %}
+<a href="{{ action_url|default('#') }}" class="action-card group">
+    {% if action_icon %}
+    <div class="action-card-icon">
+        {{ action_icon|safe }}
+    </div>
+    {% endif %}
+    <div class="action-card-content">
+        <h3 class="text-lg font-medium text-gray-900 group-hover:text-kagami-blue">{{ action_title }}</h3>
+        {% if action_description %}
+        <p class="mt-1 text-sm text-gray-500">{{ action_description }}</p>
+        {% endif %}
+    </div>
+    <div class="action-card-arrow">
+        <svg class="w-5 h-5 text-gray-400 group-hover:text-kagami-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+    </div>
+</a>
+{% endif %}
+
+<style>
+/* 基本カードスタイル */
+.card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-footer {
+    padding: 1rem 1.5rem;
+    background-color: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* 統計カード */
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* 情報カード */
+.info-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.info-card.info-variant-success {
+    background-color: #f0fdf4;
+    border-color: #86efac;
+}
+
+.info-card.info-variant-warning {
+    background-color: #fffbeb;
+    border-color: #fde047;
+}
+
+.info-card.info-variant-error {
+    background-color: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.info-card.info-variant-info {
+    background-color: #eff6ff;
+    border-color: #93c5fd;
+}
+
+/* アクションカード */
+.action-card {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.action-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.action-card-icon {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #eff6ff;
+    border-radius: 0.5rem;
+}
+
+.action-card-content {
+    flex: 1;
+    margin-left: 1rem;
+}
+
+.action-card-arrow {
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+</style>

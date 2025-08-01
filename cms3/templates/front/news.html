@@ -1,0 +1,421 @@
+{% extends 'base/base_front.html' %}
+
+{% block title %}ニュース・お知らせ{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="bg-gradient-to-r from-kagami-blue to-blue-700 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold mb-4">ニュース・お知らせ</h1>
+        <p class="text-xl opacity-90">最新のIR情報をお届けします</p>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- 左側: ニュースリスト -->
+        <div class="lg:col-span-3">
+            <!-- 検索・フィルター -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+                    <div class="flex flex-wrap gap-2">
+                        <button class="category-btn active">すべて</button>
+                        <button class="category-btn">決算情報</button>
+                        <button class="category-btn">適時開示</button>
+                        <button class="category-btn">プレスリリース</button>
+                        <button class="category-btn">イベント</button>
+                    </div>
+                    <div class="relative">
+                        <input type="text" placeholder="キーワード検索" class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-kagami-blue focus:border-kagami-blue">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ニュースアイテム -->
+            <div class="space-y-6">
+                <!-- アイテム1 -->
+                <article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="news-badge badge-red">決算情報</span>
+                                <time class="text-sm text-gray-500">2024年12月16日</time>
+                            </div>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-kagami-blue transition-colors">
+                            <a href="#">2024年12月期第3四半期決算短信を発表しました</a>
+                        </h2>
+                        <p class="text-gray-700 mb-4">
+                            2024年12月期第3四半期（2024年1月1日～2024年9月30日）の連結業績は、売上高385.2億円（前年同期比12.3%増）、営業利益50.8億円（同18.5%増）となり、過去最高の四半期業績を達成しました。
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap gap-2">
+                                <a href="#" class="text-sm text-kagami-blue hover:underline flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    決算短信（PDF）
+                                </a>
+                                <a href="#" class="text-sm text-kagami-blue hover:underline flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                    決算説明資料
+                                </a>
+                            </div>
+                            <a href="#" class="text-sm text-gray-600 hover:text-kagami-blue transition-colors">
+                                詳細を見る →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- アイテム2 -->
+                <article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="news-badge badge-blue">イベント</span>
+                                <time class="text-sm text-gray-500">2024年12月14日</time>
+                            </div>
+                            <span class="new-badge">NEW</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-kagami-blue transition-colors">
+                            <a href="#">第3四半期決算説明会の開催について</a>
+                        </h2>
+                        <p class="text-gray-700 mb-4">
+                            2024年12月21日（土）15:00より、機関投資家・アナリスト向け決算説明会をオンラインで開催いたします。当日は代表取締役社長より、第3四半期の業績および今後の事業戦略についてご説明いたします。
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    12月21日（土）15:00
+                                </span>
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    オンライン開催
+                                </span>
+                            </div>
+                            <a href="#" class="text-sm text-gray-600 hover:text-kagami-blue transition-colors">
+                                詳細を見る →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- アイテム3 -->
+                <article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="news-badge badge-green">プレスリリース</span>
+                                <time class="text-sm text-gray-500">2024年12月10日</time>
+                            </div>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-kagami-blue transition-colors">
+                            <a href="#">新製品「KAGAMI Pro」の提供開始について</a>
+                        </h2>
+                        <p class="text-gray-700 mb-4">
+                            AIを活用した次世代型IR支援システム「KAGAMI Pro」を2025年1月より提供開始いたします。本製品は、投資家とのコミュニケーションを革新的に改善し、企業価値向上に貢献します。
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">#新製品</span>
+                                <span class="tag">#DX</span>
+                                <span class="tag">#AI</span>
+                            </div>
+                            <a href="#" class="text-sm text-gray-600 hover:text-kagami-blue transition-colors">
+                                詳細を見る →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- アイテム4 -->
+                <article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="news-badge badge-yellow">適時開示</span>
+                                <time class="text-sm text-gray-500">2024年12月5日</time>
+                            </div>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-kagami-blue transition-colors">
+                            <a href="#">自己株式の取得状況に関するお知らせ</a>
+                        </h2>
+                        <p class="text-gray-700 mb-4">
+                            2024年11月15日開催の取締役会において決議いたしました自己株式の取得について、2024年12月4日までの取得状況をお知らせいたします。
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <a href="#" class="text-sm text-kagami-blue hover:underline flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                開示資料（PDF）
+                            </a>
+                            <a href="#" class="text-sm text-gray-600 hover:text-kagami-blue transition-colors">
+                                詳細を見る →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- アイテム5 -->
+                <article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="news-badge badge-purple">ESG</span>
+                                <time class="text-sm text-gray-500">2024年11月28日</time>
+                            </div>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-kagami-blue transition-colors">
+                            <a href="#">統合報告書2024を公開しました</a>
+                        </h2>
+                        <p class="text-gray-700 mb-4">
+                            当社の財務・非財務情報を統合的にまとめた「統合報告書2024」を公開いたしました。持続可能な成長に向けた戦略や、ESGへの取り組みについて詳しくご紹介しています。
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <a href="#" class="text-sm text-kagami-blue hover:underline flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                                統合報告書を読む
+                            </a>
+                            <a href="#" class="text-sm text-gray-600 hover:text-kagami-blue transition-colors">
+                                詳細を見る →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- ページネーション -->
+            <div class="mt-12 flex justify-center">
+                <nav class="inline-flex rounded-md shadow-sm -space-x-px">
+                    <button class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        前へ
+                    </button>
+                    <button class="px-3 py-2 border-t border-b border-gray-300 bg-kagami-blue text-white text-sm font-medium">
+                        1
+                    </button>
+                    <button class="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        2
+                    </button>
+                    <button class="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        3
+                    </button>
+                    <span class="px-3 py-2 border border-gray-300 bg-white text-sm text-gray-700">
+                        ...
+                    </span>
+                    <button class="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        10
+                    </button>
+                    <button class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        次へ
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 右側: サイドバー -->
+        <div class="space-y-8">
+            <!-- 年度別アーカイブ -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">年度別アーカイブ</h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" class="flex items-center justify-between text-gray-700 hover:text-kagami-blue transition-colors">
+                            <span>2024年</span>
+                            <span class="text-sm text-gray-500">(85)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-between text-gray-700 hover:text-kagami-blue transition-colors">
+                            <span>2023年</span>
+                            <span class="text-sm text-gray-500">(124)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-between text-gray-700 hover:text-kagami-blue transition-colors">
+                            <span>2022年</span>
+                            <span class="text-sm text-gray-500">(118)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-between text-gray-700 hover:text-kagami-blue transition-colors">
+                            <span>2021年</span>
+                            <span class="text-sm text-gray-500">(105)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- RSS/メール配信 -->
+            <div class="bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">最新情報を受け取る</h3>
+                <div class="space-y-4">
+                    <a href="#" class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-kagami-blue transition-colors">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-orange-500 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                            </svg>
+                            <span class="font-medium">RSS配信</span>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                    
+                    <a href="#" class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-kagami-blue transition-colors">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-kagami-blue mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="font-medium">メール配信登録</span>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- お問い合わせ -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">IR担当部署</h3>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <p class="text-gray-600">経営企画部 IR室</p>
+                        <p class="font-medium">TEL: 03-1234-5678</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">受付時間</p>
+                        <p class="font-medium">平日 9:00-17:00</p>
+                    </div>
+                    <a href="/contact" class="inline-flex items-center text-kagami-blue hover:underline">
+                        お問い合わせフォーム
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ニュースバッジ */
+.news-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+}
+
+.badge-red {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-blue {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.badge-green {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.badge-yellow {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.badge-purple {
+    background-color: #ede9fe;
+    color: #7c3aed;
+}
+
+/* NEWバッジ */
+.new-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #dc2626;
+    background-color: #fee2e2;
+    border-radius: 0.25rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* カテゴリーボタン */
+.category-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.category-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.category-btn.active {
+    background-color: #1e40af;
+    color: white;
+    border-color: #1e40af;
+}
+
+/* タグ */
+.tag {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    border-radius: 0.25rem;
+}
+</style>
+
+<script>
+// カテゴリーフィルター
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        // フィルター処理の実装
+        console.log('Category filter:', this.textContent);
+    });
+});
+</script>
+{% endblock %}

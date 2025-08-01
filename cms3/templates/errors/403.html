@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - アクセスが拒否されました | KAGAMI IR System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .kagami-blue { color: #1e40af; }
+        .bg-kagami-blue { background-color: #1e40af; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-lg w-full text-center">
+            <!-- エラーイラスト -->
+            <div class="mb-8">
+                <svg class="w-48 h-48 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+            
+            <!-- エラーコード -->
+            <h1 class="text-9xl font-bold text-gray-200 mb-4">403</h1>
+            
+            <!-- エラーメッセージ -->
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">アクセスが拒否されました</h2>
+            <p class="text-gray-600 mb-8">
+                このページへのアクセス権限がありません。<br>
+                ログイン状態や権限設定をご確認ください。
+            </p>
+            
+            <!-- アクションボタン -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="/login" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-kagami-blue hover:bg-blue-700 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                    </svg>
+                    ログインする
+                </a>
+                <a href="/" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    トップページへ
+                </a>
+            </div>
+            
+            <!-- 権限に関する説明 -->
+            <div class="mt-12 bg-yellow-50 rounded-lg p-6 text-left max-w-md mx-auto">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-sm font-medium text-yellow-900">このエラーが表示される理由</h4>
+                        <ul class="text-xs text-yellow-700 mt-2 space-y-1">
+                            <li>• ログインが必要なページにアクセスしている</li>
+                            <li>• アクセス権限が不足している</li>
+                            <li>• セッションがタイムアウトした</li>
+                            <li>• URLが正しくない可能性がある</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- お問い合わせ -->
+            <div class="mt-8">
+                <p class="text-sm text-gray-600 mb-2">アクセス権限についてご不明な点は</p>
+                <a href="/contact" class="text-sm text-kagami-blue hover:underline">システム管理者にお問い合わせください</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // エラーログの送信（本番環境では実装）
+        console.error('403 Error:', {
+            url: window.location.href,
+            referrer: document.referrer,
+            timestamp: new Date().toISOString()
+        });
+    </script>
+</body>
+</html>

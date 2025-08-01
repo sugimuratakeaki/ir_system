@@ -1,0 +1,180 @@
+<!-- データテーブルコンポーネント -->
+<div class="data-table-container">
+    <!-- テーブルヘッダー（検索・フィルター） -->
+    <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+        <!-- 検索ボックス -->
+        <div class="relative flex-1 max-w-md">
+            <input type="text" 
+                   id="{{ table_id|default('data-table') }}-search" 
+                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-kagami-blue focus:border-kagami-blue"
+                   placeholder="{{ search_placeholder|default('検索...') }}">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- アクションボタン -->
+        <div class="flex space-x-2">
+            {% block table_actions %}
+            <button class="btn btn-secondary">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                フィルター
+            </button>
+            <button class="btn btn-secondary">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                エクスポート
+            </button>
+            {% endblock %}
+        </div>
+    </div>
+    
+    <!-- テーブル本体 -->
+    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <table id="{{ table_id|default('data-table') }}" class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+                <tr>
+                    {% block table_header %}
+                    <!-- ヘッダー列をここに定義 -->
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        列1
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        列2
+                    </th>
+                    <th scope="col" class="relative px-6 py-3">
+                        <span class="sr-only">アクション</span>
+                    </th>
+                    {% endblock %}
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% block table_body %}
+                <!-- データ行をここに定義 -->
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        サンプルデータ
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        説明
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="#" class="text-kagami-blue hover:text-kagami-dark">編集</a>
+                    </td>
+                </tr>
+                {% endblock %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- ページネーション -->
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div class="flex-1 flex justify-between sm:hidden">
+            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                前へ
+            </button>
+            <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                次へ
+            </button>
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700">
+                    全 <span class="font-medium">{{ total_items|default('100') }}</span> 件中
+                    <span class="font-medium">{{ start_item|default('1') }}</span> -
+                    <span class="font-medium">{{ end_item|default('10') }}</span> 件を表示
+                </p>
+            </div>
+            <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">前へ</span>
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button aria-current="page" class="z-10 bg-kagami-blue border-kagami-blue text-white relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                        1
+                    </button>
+                    <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                        2
+                    </button>
+                    <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                        3
+                    </button>
+                    <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">次へ</span>
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// データテーブル制御用の基本スクリプト
+class DataTableController {
+    constructor(tableId, options = {}) {
+        this.tableId = tableId;
+        this.table = document.getElementById(tableId);
+        this.searchInput = document.getElementById(`${tableId}-search`);
+        this.options = {
+            searchable: true,
+            sortable: true,
+            paginate: true,
+            pageSize: 10,
+            ...options
+        };
+        
+        this.init();
+    }
+    
+    init() {
+        if (this.options.searchable && this.searchInput) {
+            this.setupSearch();
+        }
+        
+        if (this.options.sortable) {
+            this.setupSort();
+        }
+    }
+    
+    setupSearch() {
+        let timeout;
+        this.searchInput.addEventListener('input', (e) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                this.search(e.target.value);
+            }, 300);
+        });
+    }
+    
+    setupSort() {
+        const headers = this.table.querySelectorAll('thead th[data-sortable="true"]');
+        headers.forEach(header => {
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                this.sort(header.dataset.field);
+            });
+        });
+    }
+    
+    search(query) {
+        // 検索ロジックをここに実装
+        console.log('Searching for:', query);
+    }
+    
+    sort(field) {
+        // ソートロジックをここに実装
+        console.log('Sorting by:', field);
+    }
+}
+</script>

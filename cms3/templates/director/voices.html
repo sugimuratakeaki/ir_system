@@ -1,0 +1,477 @@
+{% extends 'base/base.html' %}
+
+{% block title %}投資家の声 - 社外取締役{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="bg-gradient-to-r from-indigo-700 to-indigo-800 text-white rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">投資家の声</h1>
+                <p class="mt-1 opacity-90">株主・投資家からのフィードバックと対話記録</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="btn bg-white/20 text-white border-white/30 hover:bg-white/30">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    レポート出力
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- センチメント分析サマリー -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">全体センチメント</h3>
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">+72</p>
+            <p class="text-sm text-green-600 mt-1">ポジティブ</p>
+            <div class="mt-3 flex space-x-2 text-xs">
+                <span class="flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                    65%
+                </span>
+                <span class="flex items-center">
+                    <span class="w-2 h-2 bg-gray-400 rounded-full mr-1"></span>
+                    25%
+                </span>
+                <span class="flex items-center">
+                    <span class="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
+                    10%
+                </span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">フィードバック数</h3>
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">234</p>
+            <p class="text-sm text-gray-600 mt-1">過去30日間</p>
+            <p class="text-xs text-blue-600 mt-2">前月比 +18%</p>
+        </div>
+
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">対話実施数</h3>
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">48</p>
+            <p class="text-sm text-gray-600 mt-1">今月実施</p>
+            <p class="text-xs text-purple-600 mt-2">目標達成率 96%</p>
+        </div>
+
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">重要度</h3>
+                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">12</p>
+            <p class="text-sm text-gray-600 mt-1">要対応事項</p>
+            <p class="text-xs text-red-600 mt-2">緊急度高: 3件</p>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 左側: フィードバックリスト -->
+        <div class="lg:col-span-2">
+            <div class="card">
+                <!-- フィルター -->
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+                    <div class="flex space-x-2">
+                        <button class="filter-btn active">すべて</button>
+                        <button class="filter-btn">ポジティブ</button>
+                        <button class="filter-btn">ネガティブ</button>
+                        <button class="filter-btn">要対応</button>
+                    </div>
+                    <select class="form-select">
+                        <option>新着順</option>
+                        <option>重要度順</option>
+                        <option>投資家タイプ順</option>
+                    </select>
+                </div>
+
+                <!-- フィードバックアイテム -->
+                <div class="space-y-4">
+                    <!-- アイテム1 -->
+                    <div class="feedback-item border-l-4 border-green-500">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h4 class="font-medium text-gray-900">機関投資家A社 - 山田氏</h4>
+                                <p class="text-sm text-gray-500">2024年12月14日 個別面談</p>
+                            </div>
+                            <span class="badge badge-green">ポジティブ</span>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                            <p class="text-sm text-gray-700">
+                                「ESG戦略の進捗は非常に評価できる。特に気候変動対策における具体的な数値目標の設定と、その達成に向けた取り組みは業界をリードしている。今後もこの勢いを維持してほしい。」
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">ESG</span>
+                                <span class="tag">気候変動</span>
+                                <span class="tag">評価</span>
+                            </div>
+                            <button class="text-sm text-kagami-blue hover:underline">詳細 →</button>
+                        </div>
+                    </div>
+
+                    <!-- アイテム2 -->
+                    <div class="feedback-item border-l-4 border-red-500">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h4 class="font-medium text-gray-900">外資系ファンドB - Smith氏</h4>
+                                <p class="text-sm text-gray-500">2024年12月13日 電話会議</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="badge badge-red">要対応</span>
+                                <span class="badge badge-yellow">ネガティブ</span>
+                            </div>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3 mb-3">
+                            <p class="text-sm text-gray-700">
+                                「海外事業の進捗に対する説明が不十分。地政学リスクへの対応策が曖昧で、投資判断に必要な情報が不足している。より詳細な開示を求める。」
+                            </p>
+                        </div>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
+                            <p class="text-sm font-medium text-yellow-900 mb-1">IR部門の対応案</p>
+                            <p class="text-xs text-yellow-800">
+                                次回の決算説明会で海外事業の詳細セッションを設け、リスク対応策を具体的に説明する予定です。
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">海外事業</span>
+                                <span class="tag">リスク管理</span>
+                                <span class="tag">情報開示</span>
+                            </div>
+                            <button class="text-sm text-red-600 hover:underline font-medium">対応状況確認 →</button>
+                        </div>
+                    </div>
+
+                    <!-- アイテム3 -->
+                    <div class="feedback-item border-l-4 border-blue-500">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h4 class="font-medium text-gray-900">年金基金C</h4>
+                                <p class="text-sm text-gray-500">2024年12月12日 決算説明会Q&A</p>
+                            </div>
+                            <span class="badge badge-gray">中立</span>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                            <p class="text-sm text-gray-700">
+                                「DX投資の効果について、もう少し具体的な数値で示してほしい。ROIの計測方法と、中長期的な収益貢献の見通しを教えてください。」
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">DX</span>
+                                <span class="tag">投資効果</span>
+                                <span class="tag">質問</span>
+                            </div>
+                            <button class="text-sm text-kagami-blue hover:underline">回答確認 →</button>
+                        </div>
+                    </div>
+
+                    <!-- アイテム4 -->
+                    <div class="feedback-item border-l-4 border-green-500">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h4 class="font-medium text-gray-900">ESG評価機関D</h4>
+                                <p class="text-sm text-gray-500">2024年12月10日 書面フィードバック</p>
+                            </div>
+                            <span class="badge badge-green">ポジティブ</span>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                            <p class="text-sm text-gray-700">
+                                「ガバナンス体制の改善が顕著。特に社外取締役の多様性確保と、取締役会の実効性評価の仕組みは高く評価できる。」
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">ガバナンス</span>
+                                <span class="tag">取締役会</span>
+                                <span class="tag">多様性</span>
+                            </div>
+                            <button class="text-sm text-kagami-blue hover:underline">詳細 →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ページネーション -->
+                <div class="mt-6 flex justify-center">
+                    <nav class="inline-flex rounded-md shadow-sm -space-x-px">
+                        <button class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            前へ
+                        </button>
+                        <button class="px-3 py-2 border-t border-b border-gray-300 bg-kagami-blue text-white text-sm font-medium">
+                            1
+                        </button>
+                        <button class="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            2
+                        </button>
+                        <button class="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            3
+                        </button>
+                        <button class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            次へ
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側: 分析・インサイト -->
+        <div class="space-y-6">
+            <!-- トピック分析 -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">注目トピック</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-xs font-bold text-red-600">1</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">海外事業戦略</p>
+                                <p class="text-xs text-gray-500">言及数: 45回</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-red-600">↑ 急上昇</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-xs font-bold text-orange-600">2</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">DX投資効果</p>
+                                <p class="text-xs text-gray-500">言及数: 38回</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-orange-600">↑ 上昇</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-xs font-bold text-green-600">3</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">ESG取組み</p>
+                                <p class="text-xs text-gray-500">言及数: 32回</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-400">→ 横ばい</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- センチメント推移 -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">センチメント推移</h3>
+                <canvas id="sentimentChart" height="200"></canvas>
+                <div class="mt-4 grid grid-cols-3 gap-2 text-xs">
+                    <div class="text-center">
+                        <p class="text-gray-500">前月</p>
+                        <p class="font-medium text-gray-900">+65</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-gray-500">今月</p>
+                        <p class="font-medium text-green-600">+72</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-gray-500">変化</p>
+                        <p class="font-medium text-green-600">+7pt</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 投資家タイプ別分析 -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">投資家タイプ別</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-700">機関投資家</span>
+                            <span class="text-sm font-medium">42%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 42%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-700">外国法人</span>
+                            <span class="text-sm font-medium">28%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 28%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-700">年金基金</span>
+                            <span class="text-sm font-medium">18%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 18%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-700">その他</span>
+                            <span class="text-sm font-medium">12%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gray-500 h-2 rounded-full" style="width: 12%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- アクション推奨 -->
+            <div class="card bg-blue-50 border-blue-200">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-sm font-medium text-blue-900">推奨アクション</h4>
+                        <p class="text-xs text-blue-700 mt-1">
+                            海外事業に関する懸念が増加しています。次回取締役会で戦略の見直しと、より詳細な情報開示方針の検討を推奨します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* フィルターボタン */
+.filter-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.filter-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.filter-btn.active {
+    background-color: #1e40af;
+    color: white;
+    border-color: #1e40af;
+}
+
+/* フィードバックアイテム */
+.feedback-item {
+    padding: 1rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.15s;
+}
+
+.feedback-item:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* タグ */
+.tag {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4b5563;
+    background-color: #f3f4f6;
+    border-radius: 9999px;
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// センチメント推移チャート
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['8月', '9月', '10月', '11月', '12月'],
+            datasets: [{
+                label: 'センチメントスコア',
+                data: [58, 62, 65, 65, 72],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                pointRadius: 5,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return '+' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+
+// フィルター処理
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        // フィルター処理の実装
+        console.log('Filter:', this.textContent);
+    });
+});
+</script>
+{% endblock %}

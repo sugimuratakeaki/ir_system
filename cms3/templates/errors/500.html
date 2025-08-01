@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - サーバーエラー | KAGAMI IR System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .kagami-blue { color: #1e40af; }
+        .bg-kagami-blue { background-color: #1e40af; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-lg w-full text-center">
+            <!-- エラーイラスト -->
+            <div class="mb-8">
+                <svg class="w-48 h-48 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            
+            <!-- エラーコード -->
+            <h1 class="text-9xl font-bold text-gray-200 mb-4">500</h1>
+            
+            <!-- エラーメッセージ -->
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">サーバーエラーが発生しました</h2>
+            <p class="text-gray-600 mb-8">
+                申し訳ございません。一時的な問題が発生しています。<br>
+                しばらく時間をおいてから、もう一度お試しください。
+            </p>
+            
+            <!-- アクションボタン -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="location.reload()" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-kagami-blue hover:bg-blue-700 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    ページを再読み込み
+                </button>
+                <a href="/" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    トップページへ
+                </a>
+            </div>
+            
+            <!-- エラー詳細（開発環境のみ表示） -->
+            <details class="mt-12 text-left max-w-md mx-auto">
+                <summary class="cursor-pointer text-sm text-gray-600 hover:text-gray-900">技術的な詳細</summary>
+                <div class="mt-4 p-4 bg-gray-100 rounded-md">
+                    <p class="text-xs text-gray-700 font-mono">
+                        Error Code: 500<br>
+                        Timestamp: <span id="timestamp"></span><br>
+                        Request ID: <span id="requestId"></span>
+                    </p>
+                </div>
+            </details>
+            
+            <!-- お問い合わせ -->
+            <div class="mt-12">
+                <p class="text-sm text-gray-600 mb-2">問題が解決しない場合は</p>
+                <a href="/contact" class="text-sm text-kagami-blue hover:underline">お問い合わせください</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // タイムスタンプとリクエストIDの生成
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+        document.getElementById('requestId').textContent = Math.random().toString(36).substr(2, 9).toUpperCase();
+        
+        // エラーログの送信（本番環境では実装）
+        console.error('500 Error:', {
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            url: window.location.href
+        });
+    </script>
+</body>
+</html>

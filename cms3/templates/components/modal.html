@@ -1,0 +1,90 @@
+<!-- 汎用モーダルコンポーネント -->
+<div id="{{ modal_id|default('modal') }}" class="modal hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- 背景のオーバーレイ -->
+        <div class="modal-overlay fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+        <!-- モーダルの位置調整用 -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <!-- モーダル本体 -->
+        <div class="modal-content inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <!-- ヘッダー -->
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <!-- アイコン（オプション） -->
+                    {% if modal_icon %}
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full {{ modal_icon_class|default('bg-blue-100') }} sm:mx-0 sm:h-10 sm:w-10">
+                        {{ modal_icon|safe }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- コンテンツ -->
+                    <div class="mt-3 text-center sm:mt-0 {% if modal_icon %}sm:ml-4{% endif %} sm:text-left flex-1">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            {{ modal_title|default('モーダルタイトル') }}
+                        </h3>
+                        <div class="mt-2">
+                            {% block modal_body %}
+                            <p class="text-sm text-gray-500">
+                                {{ modal_message|default('モーダルの内容がここに表示されます。') }}
+                            </p>
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- フッター -->
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                {% block modal_footer %}
+                <button type="button" class="modal-confirm w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-kagami-blue text-base font-medium text-white hover:bg-kagami-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-kagami-blue sm:ml-3 sm:w-auto sm:text-sm">
+                    {{ confirm_text|default('確認') }}
+                </button>
+                <button type="button" class="modal-cancel mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-kagami-blue sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    {{ cancel_text|default('キャンセル') }}
+                </button>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// モーダル制御用の基本スクリプト
+class ModalController {
+    constructor(modalId) {
+        this.modal = document.getElementById(modalId);
+        this.overlay = this.modal.querySelector('.modal-overlay');
+        this.confirmBtn = this.modal.querySelector('.modal-confirm');
+        this.cancelBtn = this.modal.querySelector('.modal-cancel');
+        
+        this.setupEventListeners();
+    }
+    
+    setupEventListeners() {
+        // オーバーレイクリックで閉じる
+        this.overlay?.addEventListener('click', () => this.close());
+        
+        // キャンセルボタン
+        this.cancelBtn?.addEventListener('click', () => this.close());
+        
+        // ESCキーで閉じる
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !this.modal.classList.contains('hidden')) {
+                this.close();
+            }
+        });
+    }
+    
+    open() {
+        this.modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    close() {
+        this.modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+</script>

@@ -1,0 +1,380 @@
+{% extends 'base/base_front.html' %}
+
+{% block title %}投資家情報{% endblock %}
+
+{% block content %}
+<!-- ヒーローセクション -->
+<section class="relative bg-gradient-to-br from-kagami-blue via-blue-700 to-indigo-800 text-white">
+    <div class="absolute inset-0 bg-black opacity-10"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold mb-6">投資家の皆様へ</h1>
+            <p class="text-xl mb-8 opacity-90">
+                KAGAMIは、革新的なテクノロジーで<br class="hidden sm:inline">
+                持続可能な価値創造を実現します
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="/documents" class="btn bg-white text-kagami-blue hover:bg-gray-100 px-6 py-3">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    最新決算資料
+                </a>
+                <a href="/news" class="btn bg-transparent border-2 border-white text-white hover:bg-white hover:text-kagami-blue px-6 py-3">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                    </svg>
+                    ニュース一覧
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 波形の装飾 -->
+    <div class="absolute bottom-0 left-0 right-0">
+        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z" fill="white"/>
+        </svg>
+    </div>
+</section>
+
+<!-- 最新情報 -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">最新情報</h2>
+            <p class="text-lg text-gray-600">投資判断に必要な最新のIR情報をお届けします</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- 最新ニュース -->
+            <div class="bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                    </svg>
+                    <h3 class="text-xl font-bold text-gray-900">最新ニュース</h3>
+                </div>
+                <div class="space-y-3">
+                    <a href="#" class="block hover:bg-blue-50 -mx-2 px-2 py-2 rounded transition-colors">
+                        <p class="text-sm text-gray-600">2024.12.16</p>
+                        <p class="font-medium text-gray-900 hover:text-kagami-blue">2024年12月期第3四半期決算短信を発表</p>
+                    </a>
+                    <a href="#" class="block hover:bg-blue-50 -mx-2 px-2 py-2 rounded transition-colors">
+                        <p class="text-sm text-gray-600">2024.12.10</p>
+                        <p class="font-medium text-gray-900 hover:text-kagami-blue">新製品「KAGAMI Pro」を発表</p>
+                    </a>
+                </div>
+                <a href="/news" class="inline-flex items-center text-kagami-blue hover:underline mt-4">
+                    すべてのニュースを見る
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- IRカレンダー -->
+            <div class="bg-gradient-to-br from-green-50 to-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <svg class="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <h3 class="text-xl font-bold text-gray-900">IRカレンダー</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-12 text-center">
+                            <p class="text-xs text-gray-500">12月</p>
+                            <p class="text-lg font-bold text-gray-900">21</p>
+                        </div>
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">決算説明会</p>
+                            <p class="text-sm text-gray-600">15:00 オンライン</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-12 text-center">
+                            <p class="text-xs text-gray-500">1月</p>
+                            <p class="text-lg font-bold text-gray-900">15</p>
+                        </div>
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">個人投資家向け説明会</p>
+                            <p class="text-sm text-gray-600">18:00 東京</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="/calendar" class="inline-flex items-center text-kagami-blue hover:underline mt-4">
+                    IRカレンダーを見る
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- 株価情報 -->
+            <div class="bg-gradient-to-br from-purple-50 to-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <svg class="w-8 h-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    <h3 class="text-xl font-bold text-gray-900">株価情報</h3>
+                </div>
+                <div class="mb-4">
+                    <p class="text-3xl font-bold text-gray-900">¥3,580</p>
+                    <p class="text-sm text-green-600">+82 (+2.34%)</p>
+                    <p class="text-xs text-gray-500 mt-1">2024年12月16日 15:00時点</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-600">始値</p>
+                        <p class="font-medium">¥3,520</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">高値</p>
+                        <p class="font-medium">¥3,595</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">安値</p>
+                        <p class="font-medium">¥3,515</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">出来高</p>
+                        <p class="font-medium">2.3M株</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 業績ハイライト -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">業績ハイライト</h2>
+            <p class="text-lg text-gray-600">2024年12月期 第3四半期累計</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">売上高</h3>
+                <p class="text-3xl font-bold text-gray-900">385.2億円</p>
+                <p class="text-sm text-green-600 mt-2">前年同期比 +12.3%</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">営業利益</h3>
+                <p class="text-3xl font-bold text-gray-900">50.8億円</p>
+                <p class="text-sm text-green-600 mt-2">前年同期比 +18.5%</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">純利益</h3>
+                <p class="text-3xl font-bold text-gray-900">35.6億円</p>
+                <p class="text-sm text-green-600 mt-2">前年同期比 +22.1%</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">配当予想</h3>
+                <p class="text-3xl font-bold text-gray-900">100円</p>
+                <p class="text-sm text-gray-600 mt-2">年間配当（予想）</p>
+            </div>
+        </div>
+        
+        <div class="text-center mt-8">
+            <a href="/documents" class="btn btn-primary">
+                詳細な財務データを見る
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 経営方針 -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">持続可能な成長への挑戦</h2>
+                <p class="text-lg text-gray-700 mb-6">
+                    KAGAMIは、「テクノロジーで世界をより良い場所に」というミッションのもと、
+                    革新的な製品・サービスの提供を通じて、持続可能な社会の実現に貢献しています。
+                </p>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-kagami-blue mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">DX推進による事業変革</h4>
+                            <p class="text-gray-600">AIとデータ分析を活用した新たな価値創造</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-kagami-blue mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">ESG経営の強化</h4>
+                            <p class="text-gray-600">環境・社会・ガバナンスを重視した経営</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-kagami-blue mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">グローバル展開の加速</h4>
+                            <p class="text-gray-600">アジア・北米市場でのプレゼンス拡大</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <a href="#" class="btn btn-primary">
+                        中期経営計画を見る
+                    </a>
+                </div>
+            </div>
+            <div class="relative">
+                <img src="/api/placeholder/600/400" alt="経営方針" class="rounded-lg shadow-xl">
+                <div class="absolute -bottom-6 -right-6 bg-kagami-blue text-white p-6 rounded-lg shadow-lg">
+                    <p class="text-3xl font-bold">2025</p>
+                    <p class="text-sm">売上高目標</p>
+                    <p class="text-2xl font-bold">600億円</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 統合報告書 -->
+<section class="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold mb-4">統合報告書 2024</h2>
+            <p class="text-xl mb-8 opacity-90">
+                財務・非財務情報を統合し、KAGAMIの価値創造ストーリーをお伝えします
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#" class="btn bg-white text-indigo-600 hover:bg-gray-100">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    統合報告書を読む
+                </a>
+                <a href="#" class="btn bg-transparent border-2 border-white text-white hover:bg-white hover:text-indigo-600">
+                    ESGデータブック
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- お問い合わせ -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">投資家の皆様のお問い合わせ</h2>
+        <p class="text-lg text-gray-600 mb-8">
+            IR情報に関するご質問・ご意見をお寄せください
+        </p>
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">IR担当部署</h3>
+                    <p class="text-gray-600">経営企画部 IR室</p>
+                    <p class="text-gray-600 mt-2">TEL: 03-1234-5678</p>
+                    <p class="text-sm text-gray-500">受付時間：平日 9:00-17:00</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">オンラインお問い合わせ</h3>
+                    <p class="text-gray-600 mb-4">24時間受付</p>
+                    <a href="/contact" class="btn btn-primary">
+                        お問い合わせフォーム
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* アニメーション */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* ホバーエフェクト */
+.hover-lift {
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+}
+</style>
+
+<script>
+// スムーススクロール
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// 数値のアニメーション
+function animateValue(element, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        element.textContent = Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+// ページ読み込み時のアニメーション
+window.addEventListener('load', () => {
+    // 必要に応じて数値アニメーションを実装
+});
+</script>
+{% endblock %}

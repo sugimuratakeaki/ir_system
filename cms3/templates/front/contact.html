@@ -1,0 +1,313 @@
+{% extends 'base/base_front.html' %}
+
+{% block title %}お問い合わせ{% endblock %}
+
+{% block content %}
+<!-- ページヘッダー -->
+<div class="bg-gradient-to-r from-kagami-blue to-blue-700 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-bold mb-4">お問い合わせ</h1>
+        <p class="text-xl opacity-90">IR・投資に関するご質問・ご意見をお寄せください</p>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- お問い合わせフォーム -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-sm p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">お問い合わせフォーム</h2>
+                
+                <form class="space-y-6">
+                    <!-- お問い合わせ種別 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            お問い合わせ種別 <span class="text-red-500">*</span>
+                        </label>
+                        <select class="form-select w-full" required>
+                            <option value="">選択してください</option>
+                            <option value="ir">IR情報について</option>
+                            <option value="financial">決算・財務について</option>
+                            <option value="stock">株式について</option>
+                            <option value="meeting">説明会・面談希望</option>
+                            <option value="document">資料請求</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+
+                    <!-- お名前 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                お名前（姓） <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" class="form-input w-full" placeholder="山田" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                お名前（名） <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" class="form-input w-full" placeholder="太郎" required>
+                        </div>
+                    </div>
+
+                    <!-- フリガナ -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                フリガナ（セイ）
+                            </label>
+                            <input type="text" class="form-input w-full" placeholder="ヤマダ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                フリガナ（メイ）
+                            </label>
+                            <input type="text" class="form-input w-full" placeholder="タロウ">
+                        </div>
+                    </div>
+
+                    <!-- 会社名・所属 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            会社名・所属
+                        </label>
+                        <input type="text" class="form-input w-full" placeholder="株式会社○○">
+                    </div>
+
+                    <!-- メールアドレス -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            メールアドレス <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" class="form-input w-full" placeholder="example@email.com" required>
+                    </div>
+
+                    <!-- 電話番号 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            電話番号
+                        </label>
+                        <input type="tel" class="form-input w-full" placeholder="03-1234-5678">
+                    </div>
+
+                    <!-- 投資家属性 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            投資家属性
+                        </label>
+                        <select class="form-select w-full">
+                            <option value="">選択してください</option>
+                            <option value="individual">個人投資家</option>
+                            <option value="institutional">機関投資家</option>
+                            <option value="analyst">アナリスト</option>
+                            <option value="media">報道関係者</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+
+                    <!-- お問い合わせ内容 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            お問い合わせ内容 <span class="text-red-500">*</span>
+                        </label>
+                        <textarea class="form-textarea w-full" rows="6" placeholder="お問い合わせ内容をご記入ください" required></textarea>
+                    </div>
+
+                    <!-- 個人情報の取り扱い -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="flex items-start">
+                            <input type="checkbox" class="form-checkbox mt-1" required>
+                            <span class="ml-2 text-sm text-gray-700">
+                                <a href="#" class="text-kagami-blue hover:underline">個人情報の取り扱い</a>について同意します。
+                                <span class="text-red-500">*</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- 送信ボタン -->
+                    <div class="flex justify-center">
+                        <button type="submit" class="btn btn-primary px-8 py-3">
+                            確認画面へ進む
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 右側: 連絡先情報 -->
+        <div class="space-y-8">
+            <!-- IR担当部署 -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">IR担当部署</h3>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">部署名</p>
+                        <p class="text-gray-900">経営企画部 IR室</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">電話番号</p>
+                        <p class="text-gray-900">03-1234-5678</p>
+                        <p class="text-sm text-gray-600 mt-1">受付時間：平日 9:00-17:00</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">FAX番号</p>
+                        <p class="text-gray-900">03-1234-5679</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">住所</p>
+                        <p class="text-gray-900">
+                            〒100-0001<br>
+                            東京都千代田区千代田1-1-1<br>
+                            KAGAMIビル 10F
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- よくあるご質問 -->
+            <div class="bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">よくあるご質問</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    お問い合わせの前に、よくあるご質問をご確認ください。
+                </p>
+                <a href="#" class="inline-flex items-center text-kagami-blue hover:underline">
+                    FAQを見る
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- 面談・取材について -->
+            <div class="bg-yellow-50 rounded-lg shadow-sm p-6">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-sm font-medium text-yellow-900">面談・取材をご希望の方へ</h4>
+                        <p class="text-xs text-yellow-700 mt-1">
+                            機関投資家・アナリストの方の面談、報道関係者の方の取材については、お問い合わせフォームの「お問い合わせ種別」で「説明会・面談希望」を選択の上、詳細をご記入ください。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 株式に関するお問い合わせ -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">株式に関するお問い合わせ</h3>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">株主名簿管理人</p>
+                        <p class="text-gray-900">○○信託銀行株式会社</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">同連絡先</p>
+                        <p class="text-gray-900">
+                            ○○信託銀行株式会社 証券代行部<br>
+                            TEL: 0120-123-456（フリーダイヤル）
+                        </p>
+                    </div>
+                    <a href="#" class="inline-flex items-center text-sm text-kagami-blue hover:underline">
+                        詳細はこちら
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* フォーム要素のスタイル */
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #374151;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #1e40af;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.form-checkbox {
+    width: 1rem;
+    height: 1rem;
+    color: #1e40af;
+    border-color: #d1d5db;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.form-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+/* エラー表示用（JavaScriptで追加） */
+.form-error {
+    border-color: #dc2626 !important;
+}
+
+.error-message {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+</style>
+
+<script>
+// フォームバリデーション
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // バリデーション処理
+    let isValid = true;
+    const requiredFields = this.querySelectorAll('[required]');
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('form-error');
+            isValid = false;
+        } else {
+            field.classList.remove('form-error');
+        }
+    });
+    
+    if (isValid) {
+        // 確認画面へ遷移
+        console.log('Form is valid, proceeding to confirmation');
+        alert('確認画面へ進みます（デモ）');
+    } else {
+        alert('必須項目を入力してください。');
+    }
+});
+
+// リアルタイムバリデーション
+document.querySelectorAll('[required]').forEach(field => {
+    field.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+            this.classList.add('form-error');
+        } else {
+            this.classList.remove('form-error');
+        }
+    });
+});
+</script>
+{% endblock %}

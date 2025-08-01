@@ -1,0 +1,431 @@
+{% extends 'base/base.html' %}
+
+{% block title %}経営インサイト - 経営陣{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- ページヘッダー -->
+    <div class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">経営インサイト</h1>
+                <p class="mt-1 opacity-90">市場動向と投資家動向の分析レポート</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="btn bg-white/20 text-white border-white/30 hover:bg-white/30">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    レポート出力
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 市場環境サマリー -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">日経平均</h3>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">39,156</p>
+            <p class="text-sm text-green-600 mt-1">+1.2% (前日比)</p>
+        </div>
+
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">当社株価</h3>
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">¥3,580</p>
+            <p class="text-sm text-green-600 mt-1">+2.3% (前日比)</p>
+        </div>
+
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">対TOPIX</h3>
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">+15.3%</p>
+            <p class="text-sm text-green-600 mt-1">アウトパフォーム</p>
+        </div>
+
+        <div class="card">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-gray-600">出来高</h3>
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">2.3M</p>
+            <p class="text-sm text-yellow-600 mt-1">平均水準</p>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 左側: 市場分析 -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- 株価パフォーマンス -->
+            <div class="card">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">株価パフォーマンス</h2>
+                    <div class="flex items-center space-x-2">
+                        <button class="text-sm text-gray-600 hover:text-gray-900">1M</button>
+                        <span class="text-gray-400">|</span>
+                        <button class="text-sm text-kagami-blue font-medium">3M</button>
+                        <span class="text-gray-400">|</span>
+                        <button class="text-sm text-gray-600 hover:text-gray-900">6M</button>
+                        <span class="text-gray-400">|</span>
+                        <button class="text-sm text-gray-600 hover:text-gray-900">1Y</button>
+                    </div>
+                </div>
+                
+                <canvas id="stockChart" height="300"></canvas>
+                
+                <div class="grid grid-cols-4 gap-4 mt-6 pt-6 border-t">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">52週高値</p>
+                        <p class="font-medium">¥3,890</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">52週安値</p>
+                        <p class="font-medium">¥2,450</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">PER</p>
+                        <p class="font-medium">18.5x</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">PBR</p>
+                        <p class="font-medium">2.3x</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 投資家動向 -->
+            <div class="card">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">投資家動向分析</h2>
+                
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">保有比率推移</h3>
+                    <canvas id="ownershipChart" height="200"></canvas>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">売買動向（過去30日）</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">外国法人</span>
+                                <span class="text-sm font-medium text-green-600">買い越し +2.3%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">機関投資家</span>
+                                <span class="text-sm font-medium text-green-600">買い越し +1.1%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">個人</span>
+                                <span class="text-sm font-medium text-red-600">売り越し -3.2%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">注目投資家</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">グローバルファンドA</span>
+                                <span class="text-sm font-medium">5.2% 保有</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">年金基金B</span>
+                                <span class="text-sm font-medium">3.8% 保有</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">アクティブファンドC</span>
+                                <span class="text-sm font-medium text-green-600">新規 1.5%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 競合比較 -->
+            <div class="card">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">業界比較分析</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left text-xs font-medium text-gray-500 uppercase py-2">企業</th>
+                                <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">株価</th>
+                                <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">前日比</th>
+                                <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">時価総額</th>
+                                <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">PER</th>
+                                <th class="text-right text-xs font-medium text-gray-500 uppercase py-2">配当利回り</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100 bg-blue-50">
+                                <td class="py-3 text-sm font-medium text-gray-900">当社</td>
+                                <td class="py-3 text-sm text-right">¥3,580</td>
+                                <td class="py-3 text-sm text-right text-green-600">+2.3%</td>
+                                <td class="py-3 text-sm text-right">¥850億</td>
+                                <td class="py-3 text-sm text-right">18.5x</td>
+                                <td class="py-3 text-sm text-right">2.8%</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 text-sm text-gray-900">競合A社</td>
+                                <td class="py-3 text-sm text-right">¥4,210</td>
+                                <td class="py-3 text-sm text-right text-red-600">-0.5%</td>
+                                <td class="py-3 text-sm text-right">¥1,200億</td>
+                                <td class="py-3 text-sm text-right">22.3x</td>
+                                <td class="py-3 text-sm text-right">2.2%</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 text-sm text-gray-900">競合B社</td>
+                                <td class="py-3 text-sm text-right">¥2,890</td>
+                                <td class="py-3 text-sm text-right text-green-600">+1.1%</td>
+                                <td class="py-3 text-sm text-right">¥680億</td>
+                                <td class="py-3 text-sm text-right">15.2x</td>
+                                <td class="py-3 text-sm text-right">3.5%</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="py-3 text-sm text-gray-900">業界平均</td>
+                                <td class="py-3 text-sm text-right">-</td>
+                                <td class="py-3 text-sm text-right text-green-600">+0.8%</td>
+                                <td class="py-3 text-sm text-right">-</td>
+                                <td class="py-3 text-sm text-right">19.8x</td>
+                                <td class="py-3 text-sm text-right">2.7%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側: インサイトとアラート -->
+        <div class="space-y-6">
+            <!-- マーケットインサイト -->
+            <div class="card bg-gradient-to-br from-indigo-50 to-white">
+                <div class="flex items-start mb-3">
+                    <svg class="w-6 h-6 text-indigo-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-900">マーケットインサイト</h3>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="bg-indigo-100 rounded-lg p-3">
+                        <p class="text-sm font-medium text-indigo-900 mb-1">📈 株価動向</p>
+                        <p class="text-xs text-indigo-700">当社株は市場平均を上回るパフォーマンス。ESG評価向上が寄与している可能性が高い。</p>
+                    </div>
+                    
+                    <div class="bg-blue-100 rounded-lg p-3">
+                        <p class="text-sm font-medium text-blue-900 mb-1">🌏 マクロ環境</p>
+                        <p class="text-xs text-blue-700">円安進行により輸出関連銘柄への資金流入続く。当社も恩恵を受ける展開。</p>
+                    </div>
+                    
+                    <div class="bg-purple-100 rounded-lg p-3">
+                        <p class="text-sm font-medium text-purple-900 mb-1">👥 投資家動向</p>
+                        <p class="text-xs text-purple-700">外国人投資家の買い越し継続。中期経営計画への評価が高まっている。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- アラート -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">重要アラート</h3>
+                <div class="space-y-3">
+                    <div class="flex items-start p-3 bg-red-50 rounded-lg">
+                        <svg class="w-5 h-5 text-red-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-red-900">空売り比率上昇</p>
+                            <p class="text-xs text-red-700 mt-1">空売り比率が20%を超過。注視が必要。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
+                        <svg class="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-yellow-900">格付け見直し</p>
+                            <p class="text-xs text-yellow-700 mt-1">S&Pが来週格付けレビュー予定。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- アナリストレポート -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">最新アナリストレポート</h3>
+                <div class="space-y-3">
+                    <div class="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="font-medium text-sm">証券会社A</p>
+                                <p class="text-xs text-gray-600 mt-1">目標株価: ¥4,200</p>
+                            </div>
+                            <span class="badge badge-green text-xs">買い</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">2日前</p>
+                    </div>
+                    
+                    <div class="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="font-medium text-sm">証券会社B</p>
+                                <p class="text-xs text-gray-600 mt-1">目標株価: ¥3,800</p>
+                            </div>
+                            <span class="badge badge-yellow text-xs">中立</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">1週間前</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 今後のイベント -->
+            <div class="card bg-gray-50">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">今後の重要日程</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-12 text-center">
+                            <p class="text-xs text-gray-500">12/20</p>
+                            <p class="text-sm font-bold">金</p>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm font-medium">Q3決算発表</p>
+                            <p class="text-xs text-gray-500">15:00予定</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 w-12 text-center">
+                            <p class="text-xs text-gray-500">12/21</p>
+                            <p class="text-sm font-bold">土</p>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <p class="text-sm font-medium">決算説明会</p>
+                            <p class="text-xs text-gray-500">オンライン開催</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// 株価チャート
+document.addEventListener('DOMContentLoaded', function() {
+    // 株価パフォーマンスチャート
+    const stockCtx = document.getElementById('stockChart').getContext('2d');
+    new Chart(stockCtx, {
+        type: 'line',
+        data: {
+            labels: ['9月', '10月', '11月', '12月'],
+            datasets: [{
+                label: '当社',
+                data: [3200, 3350, 3450, 3580],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'TOPIX',
+                data: [2800, 2850, 2900, 2950],
+                borderColor: '#6b7280',
+                backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                borderDash: [5, 5],
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '¥' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 保有比率推移チャート
+    const ownershipCtx = document.getElementById('ownershipChart').getContext('2d');
+    new Chart(ownershipCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024'],
+            datasets: [{
+                label: '外国法人',
+                data: [35, 37, 39, 42],
+                backgroundColor: '#3b82f6'
+            }, {
+                label: '機関投資家',
+                data: [28, 27, 26, 28],
+                backgroundColor: '#10b981'
+            }, {
+                label: '個人',
+                data: [25, 24, 23, 20],
+                backgroundColor: '#f59e0b'
+            }, {
+                label: 'その他',
+                data: [12, 12, 12, 10],
+                backgroundColor: '#6b7280'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    stacked: true
+                },
+                y: {
+                    stacked: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
