@@ -2,9 +2,11 @@
 
 {% block title %}スケジュールセンター - IR担当者{% endblock %}
 
-{% block styles %}
+{% block extra_css %}
 <!-- FullCalendar CSS -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<!-- カレンダー専用CSS -->
+<link rel="stylesheet" href="/static/css/pages/ir-calendar.css">
 {% endblock %}
 
 {% block content %}
@@ -69,7 +71,7 @@
         </div>
 
         <!-- 右サイドバー -->
-        <div class="space-y-6">
+        <div class="schedule-sidebar space-y-6">
             <!-- 今日の予定 -->
             <div class="card">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">今日の予定</h3>
@@ -214,86 +216,7 @@
     <!-- モーダル実装 -->
 </div>
 
-<style>
-/* カレンダースタイル */
-.view-btn {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #6b7280;
-    background: transparent;
-    border: 1px solid #e5e7eb;
-    cursor: pointer;
-    transition: all 0.15s;
-}
 
-.view-btn:first-child {
-    border-radius: 0.375rem 0 0 0.375rem;
-}
-
-.view-btn:last-child {
-    border-radius: 0 0.375rem 0.375rem 0;
-}
-
-.view-btn:not(:first-child) {
-    border-left: none;
-}
-
-.view-btn:hover {
-    background-color: #f3f4f6;
-}
-
-.view-btn.active {
-    background-color: #1e40af;
-    color: white;
-    border-color: #1e40af;
-}
-
-/* FullCalendarカスタマイズ */
-.fc {
-    font-family: inherit;
-}
-
-.fc-toolbar-title {
-    font-size: 1.25rem !important;
-    font-weight: 600;
-}
-
-.fc-button {
-    background-color: white !important;
-    border: 1px solid #e5e7eb !important;
-    color: #374151 !important;
-    font-weight: 500;
-    padding: 0.375rem 0.75rem !important;
-}
-
-.fc-button:hover {
-    background-color: #f3f4f6 !important;
-}
-
-.fc-button-active {
-    background-color: #1e40af !important;
-    color: white !important;
-    border-color: #1e40af !important;
-}
-
-.fc-event {
-    border: none;
-    padding: 2px 4px;
-    font-size: 0.75rem;
-}
-
-.fc-daygrid-event {
-    white-space: normal;
-}
-
-/* イベントカテゴリー色 */
-.event-meeting { background-color: #3b82f6; }
-.event-internal { background-color: #10b981; }
-.event-preparation { background-color: #8b5cf6; }
-.event-earnings { background-color: #f97316; }
-.event-important { background-color: #ef4444; }
-</style>
 
 {% endblock %}
 
