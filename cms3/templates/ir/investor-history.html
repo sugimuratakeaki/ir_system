@@ -1,0 +1,684 @@
+{% extends 'base/base.html' %}
+
+{% block title %}問い合わせ履歴 - {{ investor_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/investor-management.css">
+<style>
+    .history-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    }
+    .filter-panel {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+    }
+    .timeline-container {
+        position: relative;
+        padding-left: 2rem;
+    }
+    .timeline-line {
+        position: absolute;
+        left: 0.75rem;
+        top: 2rem;
+        bottom: 0;
+        width: 2px;
+        background: #e5e7eb;
+    }
+    .timeline-month {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    .timeline-month-header {
+        position: sticky;
+        top: 0;
+        background: #f9fafb;
+        padding: 0.75rem 1rem;
+        margin-left: -2rem;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    .timeline-dot {
+        position: absolute;
+        left: -1.75rem;
+        top: 0.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        background: white;
+        border: 3px solid #3b82f6;
+        border-radius: 50%;
+        z-index: 1;
+    }
+    .timeline-dot.inquiry {
+        border-color: #f59e0b;
+    }
+    .timeline-dot.meeting {
+        border-color: #3b82f6;
+    }
+    .timeline-dot.email {
+        border-color: #10b981;
+    }
+    .timeline-dot.phone {
+        border-color: #8b5cf6;
+    }
+    .timeline-dot.document {
+        border-color: #6b7280;
+    }
+    .history-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1.25rem;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .history-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+    .inquiry-badge {
+        background: #fef3c7;
+        color: #92400e;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .response-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+    }
+    .response-status.responded {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    .response-status.pending {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    .response-status.in-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .stats-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    .stats-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    .inquiry-detail-panel {
+        position: fixed;
+        right: -100%;
+        top: 0;
+        width: 40%;
+        max-width: 600px;
+        height: 100vh;
+        background: white;
+        box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 50;
+        overflow-y: auto;
+    }
+    .inquiry-detail-panel.open {
+        right: 0;
+    }
+    @media (max-width: 768px) {
+        .inquiry-detail-panel {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- 戻るボタン -->
+    <div>
+        <a href="/ir/investor-detail?id={{ investor_id }}" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            投資家詳細に戻る
+        </a>
+    </div>
+
+    <!-- ヘッダー -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="history-header p-6 text-white">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold">アセットマネジメントA社</h1>
+                    <p class="mt-2 text-blue-100">問い合わせ・コンタクト履歴</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="exportHistory()" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        エクスポート
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計サマリー -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="stats-card">
+            <div class="stats-number">156</div>
+            <div class="stats-label">総コンタクト数</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-number">28</div>
+            <div class="stats-label">問い合わせ件数</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-number">45</div>
+            <div class="stats-label">面談実施回数</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-number">1.2<span class="text-lg font-normal">日</span></div>
+            <div class="stats-label">平均応答時間</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-number">98<span class="text-lg font-normal">%</span></div>
+            <div class="stats-label">応答率</div>
+        </div>
+    </div>
+
+    <!-- フィルターパネル -->
+    <div class="filter-panel p-4">
+        <div class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">期間</label>
+                <div class="flex gap-2">
+                    <input type="date" id="date-from" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <span class="self-center text-gray-500">〜</span>
+                    <input type="date" id="date-to" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                </div>
+            </div>
+            <div class="min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">タイプ</label>
+                <select id="contact-type-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <option value="">すべて</option>
+                    <option value="inquiry">問い合わせ</option>
+                    <option value="meeting">面談</option>
+                    <option value="phone">電話</option>
+                    <option value="email">メール</option>
+                    <option value="document">資料送付</option>
+                </select>
+            </div>
+            <div class="min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">カテゴリ</label>
+                <select id="category-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <option value="">すべて</option>
+                    <option value="financial">財務・業績</option>
+                    <option value="strategy">経営戦略</option>
+                    <option value="esg">ESG・サステナビリティ</option>
+                    <option value="governance">ガバナンス</option>
+                    <option value="dividend">配当・株主還元</option>
+                    <option value="other">その他</option>
+                </select>
+            </div>
+            <div class="min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">検索</label>
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="キーワードで検索" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="flex items-end">
+                <button onclick="applyFilters()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                    フィルター適用
+                </button>
+                <button onclick="resetFilters()" class="ml-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                    リセット
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- タイムライン -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
+            
+            <!-- 2024年12月 -->
+            <div class="timeline-month">
+                <div class="timeline-month-header">2024年12月</div>
+                
+                <!-- 問い合わせ項目 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot inquiry"></div>
+                    <div class="history-card" onclick="showInquiryDetail('inq-001')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <span class="inquiry-badge">問い合わせ</span>
+                                <h3 class="font-semibold text-gray-900">第3四半期決算に関する質問</h3>
+                            </div>
+                            <span class="response-status responded">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                回答済
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">2024年12月15日 14:30 受信</p>
+                        <p class="text-sm text-gray-700 mb-3">
+                            営業利益の増加要因について詳細な説明を求めています。特に海外事業の貢献度と、一時的要因vs構造的要因の内訳について...
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <span>カテゴリ: 財務・業績</span>
+                                <span>担当: 山田太郎</span>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                応答時間: 4時間
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 面談項目 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot meeting"></div>
+                    <div class="history-card" onclick="showMeetingDetail('mtg-045')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <h3 class="font-semibold text-gray-900">個別面談</h3>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">対面</span>
+                            </div>
+                            <span class="text-sm text-gray-500">90分</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">2024年12月10日 14:00-15:30</p>
+                        <p class="text-sm text-gray-700 mb-3">
+                            Q3決算説明および中期経営計画の進捗について議論。ESG取り組みへの高い関心を示す。
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <span>参加者: 山田太郎（先方）、鈴木IR部長（当社）</span>
+                            </div>
+                            <button class="text-sm text-blue-600 hover:text-blue-700">議事録を見る</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- メール項目 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot email"></div>
+                    <div class="history-card">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-900">決算説明会フォローアップ</h3>
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">メール</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">2024年12月5日 10:15 送信</p>
+                        <p class="text-sm text-gray-700 mb-3">
+                            決算説明会でいただいた質問への追加回答および補足資料を送付しました。
+                        </p>
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                            <span>添付: 補足資料3件</span>
+                            <span>送信者: 鈴木IR部長</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2024年11月 -->
+            <div class="timeline-month">
+                <div class="timeline-month-header">2024年11月</div>
+                
+                <!-- 問い合わせ項目 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot inquiry"></div>
+                    <div class="history-card" onclick="showInquiryDetail('inq-002')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <span class="inquiry-badge">問い合わせ</span>
+                                <h3 class="font-semibold text-gray-900">ESG評価機関への対応について</h3>
+                            </div>
+                            <span class="response-status responded">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                回答済
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">2024年11月28日 16:45 受信</p>
+                        <p class="text-sm text-gray-700 mb-3">
+                            MSCI、FTSE等の主要ESG評価機関への対応状況と、今後の評価向上に向けた施策について質問をいただきました...
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <span>カテゴリ: ESG・サステナビリティ</span>
+                                <span>担当: 山田太郎</span>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                応答時間: 1日
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 電話項目 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot phone"></div>
+                    <div class="history-card">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-900">配当政策に関する電話会議</h3>
+                            <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">電話</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">2024年11月20日 11:00-11:30</p>
+                        <p class="text-sm text-gray-700 mb-3">
+                            今後の配当政策および自社株買いの方針について電話で議論。中長期的な株主還元方針を説明。
+                        </p>
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                            <span>参加者: 山田太郎（先方）、田中CFO（当社）</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 資料送付 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot document"></div>
+                    <div class="history-card">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-900">第3四半期決算資料送付</h3>
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">資料送付</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">2024年11月15日 10:00 送信</p>
+                        <p class="text-sm text-gray-700 mb-3">
+                            第3四半期決算短信、補足資料、プレゼンテーション資料を送付。
+                        </p>
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                            <span>資料: 3件</span>
+                            <span>送信者: IR部</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2024年10月 -->
+            <div class="timeline-month">
+                <div class="timeline-month-header">2024年10月</div>
+                
+                <!-- 問い合わせ項目 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot inquiry"></div>
+                    <div class="history-card" onclick="showInquiryDetail('inq-003')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <span class="inquiry-badge">問い合わせ</span>
+                                <h3 class="font-semibold text-gray-900">中期経営計画の進捗について</h3>
+                            </div>
+                            <span class="response-status in-progress">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                </svg>
+                                対応中
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">2024年10月25日 9:30 受信</p>
+                        <p class="text-sm text-gray-700 mb-3">
+                            中期経営計画の初年度の進捗状況と、環境変化を踏まえた計画の見直しの必要性について...
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4 text-sm text-gray-500">
+                                <span>カテゴリ: 経営戦略</span>
+                                <span>担当: 山田太郎</span>
+                            </div>
+                            <div class="text-sm text-orange-600">
+                                期限: 2024年10月30日
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- もっと読み込む -->
+        <div class="text-center mt-8">
+            <button onclick="loadMoreHistory()" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                もっと読み込む
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 問い合わせ詳細パネル -->
+<div id="inquiry-detail-panel" class="inquiry-detail-panel">
+    <div class="p-6">
+        <div class="flex justify-between items-start mb-6">
+            <h2 class="text-xl font-bold text-gray-900">問い合わせ詳細</h2>
+            <button onclick="closeInquiryDetail()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div id="inquiry-detail-content">
+            <!-- 動的にコンテンツが挿入される -->
+        </div>
+    </div>
+</div>
+
+<!-- オーバーレイ -->
+<div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40" onclick="closeInquiryDetail()"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // フィルター適用
+    function applyFilters() {
+        const dateFrom = document.getElementById('date-from').value;
+        const dateTo = document.getElementById('date-to').value;
+        const contactType = document.getElementById('contact-type-filter').value;
+        const category = document.getElementById('category-filter').value;
+        const searchKeyword = document.getElementById('search-input').value;
+        
+        // ここでフィルタリング処理を実装
+        console.log('Applying filters:', {
+            dateFrom,
+            dateTo,
+            contactType,
+            category,
+            searchKeyword
+        });
+        
+        showNotification('フィルターを適用しました', 'success');
+    }
+
+    // フィルターリセット
+    function resetFilters() {
+        document.getElementById('date-from').value = '';
+        document.getElementById('date-to').value = '';
+        document.getElementById('contact-type-filter').value = '';
+        document.getElementById('category-filter').value = '';
+        document.getElementById('search-input').value = '';
+        
+        applyFilters();
+    }
+
+    // 履歴エクスポート
+    function exportHistory() {
+        // エクスポート処理を実装
+        showNotification('履歴データをエクスポートしています...', 'info');
+        
+        setTimeout(() => {
+            showNotification('履歴データのエクスポートが完了しました', 'success');
+        }, 2000);
+    }
+
+    // もっと読み込む
+    function loadMoreHistory() {
+        // 追加の履歴データを読み込む処理
+        showNotification('履歴データを読み込んでいます...', 'info');
+        
+        setTimeout(() => {
+            showNotification('追加の履歴データを読み込みました', 'success');
+        }, 1000);
+    }
+
+    // 問い合わせ詳細表示
+    function showInquiryDetail(inquiryId) {
+        const panel = document.getElementById('inquiry-detail-panel');
+        const overlay = document.getElementById('overlay');
+        const content = document.getElementById('inquiry-detail-content');
+        
+        // 詳細コンテンツを動的に生成（実際はAPIから取得）
+        content.innerHTML = `
+            <div class="space-y-6">
+                <div class="bg-yellow-50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="inquiry-badge">問い合わせ</span>
+                        <span class="response-status responded">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            回答済
+                        </span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-1">第3四半期決算に関する質問</h3>
+                    <p class="text-sm text-gray-600">2024年12月15日 14:30 受信</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">問い合わせ内容</h4>
+                    <div class="bg-gray-50 rounded-lg p-4 text-sm text-gray-700">
+                        <p class="mb-3">お世話になっております。アセットマネジメントA社の山田です。</p>
+                        <p class="mb-3">第3四半期の決算について、以下の点をご教示いただけますでしょうか。</p>
+                        <ol class="list-decimal list-inside space-y-2 mb-3">
+                            <li>営業利益の前年同期比15%増の要因について、海外事業と国内事業の寄与度をそれぞれ教えてください。</li>
+                            <li>一時的要因（為替影響等）と構造的要因（市場シェア拡大等）の内訳を可能な範囲で開示いただけますか。</li>
+                            <li>第4四半期の見通しについて、現時点での手応えはいかがでしょうか。</li>
+                        </ol>
+                        <p>お忙しいところ恐れ入りますが、よろしくお願いいたします。</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">回答内容</h4>
+                    <div class="bg-blue-50 rounded-lg p-4 text-sm text-gray-700">
+                        <p class="mb-3">山田様</p>
+                        <p class="mb-3">お問い合わせいただきありがとうございます。ご質問の件について、以下の通り回答させていただきます。</p>
+                        <ol class="list-decimal list-inside space-y-2 mb-3">
+                            <li>営業利益増加の内訳：海外事業 +9%、国内事業 +6%の寄与となっております。</li>
+                            <li>要因分析：為替影響 +3%、数量効果 +8%、価格効果 +4%となっており、構造的な成長が主要因です。</li>
+                            <li>第4四半期については、現時点で計画線上で推移しており、通期予想の達成に向けて順調に進捗しております。</li>
+                        </ol>
+                        <p class="mb-3">詳細な分析資料を別途お送りいたしますので、ご確認ください。</p>
+                        <p>追加のご質問がございましたら、お気軽にお問い合わせください。</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">対応履歴</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-3 text-sm">
+                            <span class="text-gray-500">12/15 14:30</span>
+                            <div>
+                                <p class="font-medium">問い合わせ受信</p>
+                                <p class="text-gray-600">山田太郎様より問い合わせを受信</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 text-sm">
+                            <span class="text-gray-500">12/15 15:00</span>
+                            <div>
+                                <p class="font-medium">社内確認開始</p>
+                                <p class="text-gray-600">財務部と連携して回答内容を確認</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 text-sm">
+                            <span class="text-gray-500">12/15 18:30</span>
+                            <div>
+                                <p class="font-medium">回答送信</p>
+                                <p class="text-gray-600">詳細資料と共に回答を送信完了</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        フォローアップ
+                    </button>
+                    <button class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        関連資料を見る
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        panel.classList.add('open');
+        overlay.classList.remove('hidden');
+    }
+
+    // 面談詳細表示
+    function showMeetingDetail(meetingId) {
+        // 面談の詳細表示処理（議事録ページへ遷移など）
+        window.location.href = `/ir/dialogue-factory?meeting_id=${meetingId}`;
+    }
+
+    // 問い合わせ詳細を閉じる
+    function closeInquiryDetail() {
+        const panel = document.getElementById('inquiry-detail-panel');
+        const overlay = document.getElementById('overlay');
+        
+        panel.classList.remove('open');
+        overlay.classList.add('hidden');
+    }
+
+    // 通知表示関数
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+        
+        notification.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-500`;
+        notification.textContent = message;
+        
+        const container = document.getElementById('toast-container');
+        container.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // URLパラメータから投資家IDを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const investorId = urlParams.get('id');
+    
+    // ページ読み込み時の処理
+    document.addEventListener('DOMContentLoaded', function() {
+        // 投資家IDに基づいてデータを読み込む
+        console.log('Loading history for investor:', investorId);
+    });
+</script>
+{% endblock %}

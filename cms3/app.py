@@ -81,6 +81,46 @@ async def ir_investor_management(request: Request):
         "role": "ir"
     })
 
+@app.get("/ir/investor-detail", response_class=HTMLResponse)
+async def ir_investor_detail(request: Request):
+    """投資家詳細"""
+    investor_id = request.query_params.get("id", "1")
+    # 実際のアプリケーションではDBから投資家情報を取得
+    investor_name = "アセットマネジメントA社"  # モックデータ
+    return templates.TemplateResponse("ir/investor-detail.html", {
+        "request": request,
+        "title": f"投資家詳細 - {investor_name}",
+        "role": "ir",
+        "investor_id": investor_id,
+        "investor_name": investor_name
+    })
+
+@app.get("/ir/investor-edit", response_class=HTMLResponse)
+async def ir_investor_edit(request: Request):
+    """投資家編集・追加"""
+    investor_id = request.query_params.get("id")
+    title = "投資家情報を編集" if investor_id else "新規投資家を追加"
+    return templates.TemplateResponse("ir/investor-edit.html", {
+        "request": request,
+        "title": title,
+        "role": "ir",
+        "investor_id": investor_id
+    })
+
+@app.get("/ir/investor-history", response_class=HTMLResponse)
+async def ir_investor_history(request: Request):
+    """投資家履歴"""
+    investor_id = request.query_params.get("id", "1")
+    # 実際のアプリケーションではDBから投資家情報を取得
+    investor_name = "アセットマネジメントA社"  # モックデータ
+    return templates.TemplateResponse("ir/investor-history.html", {
+        "request": request,
+        "title": f"問い合わせ履歴 - {investor_name}",
+        "role": "ir",
+        "investor_id": investor_id,
+        "investor_name": investor_name
+    })
+
 @app.get("/ir/schedule-center", response_class=HTMLResponse)
 async def ir_schedule_center(request: Request):
     """スケジュール統合管理"""

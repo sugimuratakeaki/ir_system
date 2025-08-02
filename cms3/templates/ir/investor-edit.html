@@ -1,0 +1,536 @@
+{% extends 'base/base.html' %}
+
+{% block title %}投資家情報編集{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/investor-management.css">
+<style>
+    .form-section {
+        background: #f9fafb;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .form-section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    .form-section-title svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-right: 0.5rem;
+        color: #3b82f6;
+    }
+    .required-mark {
+        color: #ef4444;
+        font-weight: normal;
+        margin-left: 0.25rem;
+    }
+    .input-help {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    .tag-input {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        min-height: 2.5rem;
+        background: white;
+    }
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        background: #dbeafe;
+        color: #1e40af;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+    }
+    .tag-remove {
+        cursor: pointer;
+        color: #1e40af;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- ヘッダー -->
+    <div class="mb-6">
+        <a href="/ir/investor-management" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            投資家リストに戻る
+        </a>
+        <h1 class="text-2xl font-bold text-gray-900">
+            {% if investor_id %}投資家情報を編集{% else %}新規投資家を追加{% endif %}
+        </h1>
+        <p class="text-gray-600 mt-1">投資家の詳細情報を入力してください</p>
+    </div>
+
+    <!-- フォーム -->
+    <form id="investor-form" class="space-y-0">
+        <!-- 基本情報セクション -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                基本情報
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        企業名<span class="required-mark">*</span>
+                    </label>
+                    <input type="text" name="company_name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required value="{% if investor_id %}アセットマネジメントA社{% endif %}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        企業名（英語）
+                    </label>
+                    <input type="text" name="company_name_en" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}Asset Management Company A{% endif %}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        投資家タイプ<span class="required-mark">*</span>
+                    </label>
+                    <select name="investor_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                        <option value="">選択してください</option>
+                        <option value="institutional" {% if investor_id %}selected{% endif %}>機関投資家</option>
+                        <option value="individual">個人投資家</option>
+                        <option value="foreign">外国法人</option>
+                        <option value="pension">年金基金</option>
+                        <option value="sovereign">政府系ファンド</option>
+                        <option value="hedge">ヘッジファンド</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        投資スタイル
+                    </label>
+                    <select name="investment_style" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">選択してください</option>
+                        <option value="growth" {% if investor_id %}selected{% endif %}>長期成長重視</option>
+                        <option value="value">バリュー投資</option>
+                        <option value="index">インデックス運用</option>
+                        <option value="active">アクティブ運用</option>
+                        <option value="passive">パッシブ運用</option>
+                        <option value="quant">クオンツ運用</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        優先度<span class="required-mark">*</span>
+                    </label>
+                    <select name="priority" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                        <option value="high" {% if investor_id %}selected{% endif %}>高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                    <p class="input-help">IR活動における優先順位を設定</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        ステータス<span class="required-mark">*</span>
+                    </label>
+                    <select name="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                        <option value="active" {% if investor_id %}selected{% endif %}>アクティブ</option>
+                        <option value="follow_up">要フォロー</option>
+                        <option value="dormant">休眠</option>
+                        <option value="prospective">見込み</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 保有情報セクション -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                保有情報
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        保有株数
+                    </label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" name="shares_held" class="block w-full pr-12 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}12340000{% endif %}">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">株</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        保有比率
+                    </label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" step="0.01" name="ownership_percentage" class="block w-full pr-8 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}5.2{% endif %}">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">%</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        初回投資日
+                    </label>
+                    <input type="date" name="first_investment_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}2020-04-15{% endif %}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        平均取得単価
+                    </label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" step="0.01" name="average_cost" class="block w-full pr-8 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 担当者情報セクション -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                担当者情報
+            </h2>
+            
+            <div id="contacts-container">
+                <div class="contact-item bg-white p-4 rounded-lg border border-gray-200 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">
+                                担当者名<span class="required-mark">*</span>
+                            </label>
+                            <input type="text" name="contact_name[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required value="{% if investor_id %}山田 太郎{% endif %}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">
+                                担当者名（英語）
+                            </label>
+                            <input type="text" name="contact_name_en[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}Taro Yamada{% endif %}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">
+                                役職
+                            </label>
+                            <input type="text" name="contact_title[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}ファンドマネージャー{% endif %}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">
+                                部署
+                            </label>
+                            <input type="text" name="contact_department[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">
+                                メールアドレス
+                            </label>
+                            <input type="email" name="contact_email[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}yamada@assetmgmt-a.com{% endif %}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">
+                                電話番号
+                            </label>
+                            <input type="tel" name="contact_phone[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="{% if investor_id %}03-1234-5678{% endif %}">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button type="button" onclick="removeContact(this)" class="text-sm text-red-600 hover:text-red-700">
+                            担当者を削除
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" onclick="addContact()" class="mt-2 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                担当者を追加
+            </button>
+        </div>
+
+        <!-- 関心事項・タグセクション -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                関心事項・タグ
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        関心分野
+                    </label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="esg" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" {% if investor_id %}checked{% endif %}>
+                            <span class="ml-2 text-sm">ESG/サステナビリティ</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="growth" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" {% if investor_id %}checked{% endif %}>
+                            <span class="ml-2 text-sm">成長戦略</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="finance" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm">財務パフォーマンス</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="governance" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm">ガバナンス</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="innovation" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm">イノベーション</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="dividend" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm">配当政策</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="risk" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm">リスク管理</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="interests[]" value="market" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm">市場動向</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        カスタムタグ
+                    </label>
+                    <div class="tag-input" id="tag-container">
+                        {% if investor_id %}
+                        <span class="tag">
+                            ESG重視
+                            <span class="tag-remove" onclick="removeTag(this)">×</span>
+                        </span>
+                        <span class="tag">
+                            四半期定例
+                            <span class="tag-remove" onclick="removeTag(this)">×</span>
+                        </span>
+                        {% endif %}
+                    </div>
+                    <input type="text" id="tag-input" placeholder="タグを入力してEnterキーで追加" class="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- メモ・備考セクション -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                メモ・備考
+            </h2>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    社内メモ
+                </label>
+                <textarea name="internal_memo" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="社内共有用のメモを記入">{% if investor_id %}ESG投資に特に関心が高い。サステナビリティレポートの詳細な説明を求める傾向あり。四半期ごとの定期面談を希望。{% endif %}</textarea>
+                <p class="input-help">このメモは社内のIR担当者のみが閲覧可能です</p>
+            </div>
+        </div>
+
+        <!-- アクションボタン -->
+        <div class="flex justify-end space-x-3 pt-6 pb-8">
+            <a href="/ir/investor-management" class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                キャンセル
+            </a>
+            <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                {% if investor_id %}更新する{% else %}追加する{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- 担当者テンプレート（JavaScript用） -->
+<template id="contact-template">
+    <div class="contact-item bg-white p-4 rounded-lg border border-gray-200 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    担当者名<span class="required-mark">*</span>
+                </label>
+                <input type="text" name="contact_name[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    担当者名（英語）
+                </label>
+                <input type="text" name="contact_name_en[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    役職
+                </label>
+                <input type="text" name="contact_title[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    部署
+                </label>
+                <input type="text" name="contact_department[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    メールアドレス
+                </label>
+                <input type="email" name="contact_email[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    電話番号
+                </label>
+                <input type="tel" name="contact_phone[]" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+            <button type="button" onclick="removeContact(this)" class="text-sm text-red-600 hover:text-red-700">
+                担当者を削除
+            </button>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 担当者追加
+    function addContact() {
+        const template = document.getElementById('contact-template');
+        const clone = template.content.cloneNode(true);
+        document.getElementById('contacts-container').appendChild(clone);
+    }
+
+    // 担当者削除
+    function removeContact(button) {
+        const container = document.getElementById('contacts-container');
+        const items = container.querySelectorAll('.contact-item');
+        
+        // 最低1つは残す
+        if (items.length > 1) {
+            button.closest('.contact-item').remove();
+        } else {
+            alert('担当者は最低1名必要です');
+        }
+    }
+
+    // タグ機能
+    const tagInput = document.getElementById('tag-input');
+    const tagContainer = document.getElementById('tag-container');
+
+    tagInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const tagText = this.value.trim();
+            
+            if (tagText) {
+                addTag(tagText);
+                this.value = '';
+            }
+        }
+    });
+
+    function addTag(text) {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.innerHTML = `
+            ${text}
+            <span class="tag-remove" onclick="removeTag(this)">×</span>
+        `;
+        
+        // input要素の前に挿入
+        tagContainer.insertBefore(tag, tagContainer.lastElementChild);
+    }
+
+    function removeTag(element) {
+        element.parentElement.remove();
+    }
+
+    // フォーム送信
+    document.getElementById('investor-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // フォームデータの収集
+        const formData = new FormData(this);
+        
+        // タグの収集
+        const tags = [];
+        tagContainer.querySelectorAll('.tag').forEach(tag => {
+            tags.push(tag.textContent.replace('×', '').trim());
+        });
+        formData.append('tags', JSON.stringify(tags));
+        
+        // ここでAPIに送信
+        console.log('Form data:', Object.fromEntries(formData));
+        
+        // 成功通知を表示（実際はAPIレスポンス後）
+        showNotification('投資家情報を保存しました', 'success');
+        
+        // リダイレクト（実際はAPIレスポンス後）
+        setTimeout(() => {
+            window.location.href = '/ir/investor-management';
+        }, 1500);
+    });
+
+    // 通知表示関数
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+        
+        notification.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-500 translate-y-0 opacity-100`;
+        notification.textContent = message;
+        
+        const container = document.getElementById('toast-container');
+        container.appendChild(notification);
+        
+        // フェードイン
+        setTimeout(() => {
+            notification.classList.add('translate-y-0', 'opacity-100');
+        }, 100);
+        
+        // 3秒後に削除
+        setTimeout(() => {
+            notification.classList.add('translate-y-2', 'opacity-0');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
+    
+    // URLパラメータから投資家IDを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const investorId = urlParams.get('id');
+    
+    // 既存データがある場合の処理
+    {% if investor_id %}
+    // 必要に応じて追加のデータ読み込み処理
+    {% endif %}
+</script>
+{% endblock %}
