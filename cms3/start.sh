@@ -201,6 +201,22 @@ start_server() {
         return
     fi
     
+    # ポートの使用状況をチェック
+    if check_port_usage $port >/dev/null; then
+        log "WARN" "ポート $port は既に使用されています"
+        local pids=$(check_port_usage $port)
+        log "INFO" "使用中のプロセス: $pids"
+        
+        read -p "ポートを使用しているプロセスを強制終了しますか? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            force_kill_port $port
+            sleep 2
+        else
+            error_exit "ポート $port が使用中のため、サーバーを起動できません"
+        fi
+    fi
+    
     setup_venv
     
     log "INFO" "サーバーを起動中... ($host:$port)"
@@ -235,10 +251,70 @@ start_server() {
     fi
 }
 
+# ポートの使用状況をチェック
+check_port_usage() {
+    local port=$1
+    lsof -ti :$port 2>/dev/null
+}
+
+# ポートが解放されるまで待機
+wait_for_port_release() {
+    local port=$1
+    local max_wait=${2:-30}  # 最大30秒待機
+    local count=0
+    
+    log "INFO" "ポート $port の解放を待機中..."
+    
+    while [ $count -lt $max_wait ]; do
+        if ! check_port_usage $port >/dev/null; then
+            log "INFO" "ポート $port が解放されました"
+            return 0
+        fi
+        sleep 1
+        count=$((count + 1))
+        echo -n "."
+    done
+    
+    echo ""
+    log "WARN" "ポート $port の解放を $max_wait 秒待機しましたが、まだ使用中です"
+    return 1
+}
+
+# ポートを使用しているプロセスを強制終了
+force_kill_port() {
+    local port=$1
+    local pids=$(check_port_usage $port)
+    
+    if [ -n "$pids" ]; then
+        log "WARN" "ポート $port を使用しているプロセスを強制終了します: $pids"
+        echo "$pids" | xargs kill -9 2>/dev/null
+        sleep 2
+        
+        # 再度チェック
+        if check_port_usage $port >/dev/null; then
+            log "ERROR" "ポート $port の強制終了に失敗しました"
+            return 1
+        else
+            log "INFO" "ポート $port のプロセスを強制終了しました"
+            return 0
+        fi
+    fi
+    return 0
+}
+
 # サーバー停止
 stop_server() {
+    local port=${PORT:-$DEFAULT_PORT}
+    
     if [ ! -f "$PID_FILE" ]; then
-        log "WARN" "サーバーは起動していません"
+        log "WARN" "PIDファイルが見つかりません"
+        # PIDファイルがなくてもポートをチェック
+        if check_port_usage $port >/dev/null; then
+            log "INFO" "ポート $port を使用しているプロセスが見つかりました"
+            force_kill_port $port
+        else
+            log "INFO" "サーバーは起動していません"
+        fi
         return
     fi
     
@@ -246,20 +322,70 @@ stop_server() {
     if kill -0 $pid 2>/dev/null; then
         log "INFO" "サーバーを停止中... (PID: $pid)"
         kill $pid
+        
+        # プロセスの終了を待機
+        local count=0
+        while [ $count -lt 10 ] && kill -0 $pid 2>/dev/null; do
+            sleep 1
+            count=$((count + 1))
+        done
+        
+        # まだ生きている場合は強制終了
+        if kill -0 $pid 2>/dev/null; then
+            log "WARN" "プロセス $pid を強制終了します"
+            kill -9 $pid 2>/dev/null
+        fi
+        
         rm -f "$PID_FILE"
         log "INFO" "サーバーを停止しました"
     else
         log "WARN" "プロセスが見つかりません"
         rm -f "$PID_FILE"
     fi
+    
+    # ポートの解放を確認
+    if check_port_usage $port >/dev/null; then
+        log "WARN" "ポート $port がまだ使用中です。強制終了を試行します"
+        force_kill_port $port
+    fi
 }
 
 # サーバー状態確認
 check_status() {
+    local port=${PORT:-$DEFAULT_PORT}
+    local host=${HOST:-$DEFAULT_HOST}
+    
+    echo -e "${BLUE}=== サーバー状態確認 ===${NC}"
+    
     if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
-        log "INFO" "サーバーは起動しています (PID: $(cat $PID_FILE))"
+        local pid=$(cat "$PID_FILE")
+        log "INFO" "サーバーは起動しています"
+        echo "  PID: $pid"
+        echo "  URL: http://$host:$port/"
+        
+        # ポートの使用状況も確認
+        if check_port_usage $port >/dev/null; then
+            echo -e "  ポート $port: ${GREEN}使用中${NC}"
+        else
+            echo -e "  ポート $port: ${YELLOW}未使用${NC} (プロセスは起動中だが、ポートが開いていません)"
+        fi
     else
         log "INFO" "サーバーは停止しています"
+        
+        # PIDファイルがない場合でもポートをチェック
+        if check_port_usage $port >/dev/null; then
+            local pids=$(check_port_usage $port)
+            echo -e "  ポート $port: ${YELLOW}他のプロセスが使用中${NC}"
+            echo "  使用中のプロセス: $pids"
+        else
+            echo -e "  ポート $port: ${GREEN}利用可能${NC}"
+        fi
+    fi
+    
+    # ログファイルの情報
+    if [ -d "$LOG_DIR" ]; then
+        local log_count=$(find "$LOG_DIR" -name "*.log" 2>/dev/null | wc -l)
+        echo "  ログファイル: $log_count 個"
     fi
 }
 
@@ -338,8 +464,27 @@ main() {
             stop_server
             ;;
         restart)
+            show_logo
+            local port=${PORT:-$DEFAULT_PORT}
+            
+            log "INFO" "サーバーを再起動しています..."
+            
+            # 1. 既存サーバーを停止
             stop_server
-            sleep 1
+            
+            # 2. ポートの解放を待機
+            if ! wait_for_port_release $port 15; then
+                # 3. 必要に応じて強制終了
+                force_kill_port $port
+                
+                # 4. 再度待機
+                if ! wait_for_port_release $port 10; then
+                    error_exit "ポート $port の解放に失敗しました。手動で確認してください。"
+                fi
+            fi
+            
+            # 5. 少し待ってからサーバー起動
+            sleep 2
             start_server
             ;;
         status)

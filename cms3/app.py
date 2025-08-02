@@ -72,6 +72,15 @@ async def ir_investor_hub(request: Request):
         "role": "ir"
     })
 
+@app.get("/ir/investor-management", response_class=HTMLResponse)
+async def ir_investor_management(request: Request):
+    """投資家管理"""
+    return templates.TemplateResponse("ir/investor-management.html", {
+        "request": request,
+        "title": "投資家管理",
+        "role": "ir"
+    })
+
 @app.get("/ir/schedule-center", response_class=HTMLResponse)
 async def ir_schedule_center(request: Request):
     """スケジュール統合管理"""
@@ -96,6 +105,15 @@ async def ir_strategy_assistant(request: Request):
     return templates.TemplateResponse("ir/strategy-assistant.html", {
         "request": request,
         "title": "戦略アシスタント",
+        "role": "ir"
+    })
+
+@app.get("/ir/strategy-dashboard", response_class=HTMLResponse)
+async def ir_strategy_dashboard(request: Request):
+    """戦略ダッシュボード - 中期計画・投資家対応統合管理"""
+    return templates.TemplateResponse("ir/strategy-dashboard.html", {
+        "request": request,
+        "title": "戦略ダッシュボード",
         "role": "ir"
     })
 
