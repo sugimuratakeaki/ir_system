@@ -157,6 +157,36 @@
     gap: var(--space-xs);
 }
 
+/* Chart.js共通スタイル - チャートがコンテナからはみ出さないように制約 */
+.chart-container,
+.analytics-chart,
+.ai-stat-chart {
+    position: relative;
+    overflow: hidden;
+}
+
+/* canvasタグの親要素に高さ制約を設定 */
+.chart-container canvas,
+.analytics-chart canvas,
+.ai-stat-chart canvas {
+    display: block !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+/* 特定の高さが必要な場合の共通クラス */
+.chart-height-sm {
+    height: 200px;
+}
+
+.chart-height-md {
+    height: 300px;
+}
+
+.chart-height-lg {
+    height: 400px;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
     .data-icons {
@@ -176,5 +206,18 @@
     .tag-small {
         font-size: 10px;
         padding: 1px 6px;
+    }
+    
+    /* モバイルでのチャート高さ調整 */
+    .chart-height-sm {
+        height: 150px;
+    }
+    
+    .chart-height-md {
+        height: 200px;
+    }
+    
+    .chart-height-lg {
+        height: 250px;
     }
 }
